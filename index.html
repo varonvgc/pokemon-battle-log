@@ -56,8 +56,7 @@
     --radius: 12px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { touch-action: pan-x pan-y; }
-  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; min-height: 100vh; padding-bottom: env(safe-area-inset-bottom); touch-action: pan-x pan-y; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; min-height: 100vh; padding-bottom: env(safe-area-inset-bottom); }
 
   /* NAV */
   nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 20px; padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right)); padding-top: env(safe-area-inset-top); display: flex; align-items: center; gap: 8px; min-height: 56px; position: sticky; top: 0; z-index: 100; }
@@ -961,6 +960,21 @@ function deleteRecord(id) {
 
 // ---- INIT ----
 renderParties();
+
+// ---- ピンチズーム無効化（iOS対応）----
+document.addEventListener('touchstart', e => {
+  if (e.touches.length > 1) e.preventDefault();
+}, { passive: false });
+
+let lastTouchEnd = 0;
+document.addEventListener('touchend', e => {
+  const now = Date.now();
+  if (now - lastTouchEnd < 300) e.preventDefault();
+  lastTouchEnd = now;
+}, { passive: false });
+
+document.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
+document.addEventListener('gesturechange', e => e.preventDefault(), { passive: false });
 
 // ---- PWA: Service Worker 登録 ----
 if ('serviceWorker' in navigator) {
