@@ -83,7 +83,7 @@
   .btn-sm { padding: 6px 12px; font-size: 12px; }
 
   /* FORM */
-  input, select, textarea { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 10px 12px; font-size: 14px; width: 100%; outline: none; transition: border .2s; }
+  input, select, textarea { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 10px 12px; font-size: 16px; width: 100%; outline: none; transition: border .2s; }
   input:focus, select:focus { border-color: var(--accent); }
   label { font-size: 13px; color: var(--text-muted); margin-bottom: 6px; display: block; }
 
@@ -960,21 +960,6 @@ function deleteRecord(id) {
 
 // ---- INIT ----
 renderParties();
-
-// ---- ピンチズーム無効化（iOS対応）----
-document.addEventListener('touchstart', e => {
-  if (e.touches.length > 1) e.preventDefault();
-}, { passive: false });
-
-let lastTouchEnd = 0;
-document.addEventListener('touchend', e => {
-  const now = Date.now();
-  if (now - lastTouchEnd < 300) e.preventDefault();
-  lastTouchEnd = now;
-}, { passive: false });
-
-document.addEventListener('gesturestart', e => e.preventDefault(), { passive: false });
-document.addEventListener('gesturechange', e => e.preventDefault(), { passive: false });
 
 // ---- PWA: Service Worker 登録 ----
 if ('serviceWorker' in navigator) {
