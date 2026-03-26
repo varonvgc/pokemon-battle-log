@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -56,7 +56,8 @@
     --radius: 12px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; min-height: 100vh; padding-bottom: env(safe-area-inset-bottom); }
+  html { touch-action: pan-x pan-y; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; min-height: 100vh; padding-bottom: env(safe-area-inset-bottom); touch-action: pan-x pan-y; }
 
   /* NAV */
   nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 20px; padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right)); padding-top: env(safe-area-inset-top); display: flex; align-items: center; gap: 8px; min-height: 56px; position: sticky; top: 0; z-index: 100; }
