@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="対戦記録">
+<meta name="theme-color" content="#6c63ff">
+<link rel="manifest" href="manifest.json">
+<title>ポケモン対戦記録</title>
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc, serverTimestamp, query, orderBy }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA_A_vZgNnCpH6twrLxClD9RPlTF30oguo",
+    authDomain: "pokemon-battle-log-9eaf6.firebaseapp.com",
+    projectId: "pokemon-battle-log-9eaf6",
+    storageBucket: "pokemon-battle-log-9eaf6.firebasestorage.app",
+    messagingSenderId: "780559936180",
+    appId: "1:780559936180:web:1acdd02ff7a5b2075f05e1"
+  };
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // グローバルに公開
+  window._auth = auth;
+  window._db = db;
+  window._GoogleAuthProvider = GoogleAuthProvider;
+  window._signInWithPopup = signInWithPopup;
+  window._signOut = signOut;
+  window._onAuthStateChanged = onAuthStateChanged;
+  window._firestoreOps = { doc, getDoc, setDoc, collection, getDocs, deleteDoc, serverTimestamp, query, orderBy };
+  window._firebaseReady = true;
+  document.dispatchEvent(new Event('firebase-ready'));
+</script>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d2e;
+    --surface2: #252840;
+    --border: #3a3d5c;
+    --accent: #6c63ff;
+    --accent2: #ff6584;
+    --win: #4ade80;
+    --lose: #f87171;
+    --text: #e2e8f0;
+    --text-muted: #94a3b8;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; min-height: 100vh; padding-bottom: env(safe-area-inset-bottom); }
+
+  /* NAV */
+  nav { background: var(--surface); border-bottom: 1px solid var(--border); padding: 0 20px; padding-left: max(20px, env(safe-area-inset-left)); padding-right: max(20px, env(safe-area-inset-right)); padding-top: env(safe-area-inset-top); display: flex; align-items: center; gap: 8px; min-height: 56px; position: sticky; top: 0; z-index: 100; }
+  nav .logo { font-weight: 700; font-size: 18px; color: var(--accent); margin-right: auto; }
+  nav button { background: none; border: none; color: var(--text-muted); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all .2s; }
+  nav button.active, nav button:hover { background: var(--accent); color: #fff; }
+
+  /* PAGES */
+  .page { display: none; padding: 24px 20px; max-width: 900px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  /* CARDS */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; }
+  .card-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: var(--accent); }
+
+  /* BUTTONS */
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 18px; border-radius: 8px; border: none; cursor: pointer; font-size: 14px; font-weight: 600; transition: all .2s; }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: #5851e0; }
+  .btn-danger { background: var(--accent2); color: #fff; }
+  .btn-danger:hover { background: #e05574; }
+  .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--text); }
+  .btn-ghost:hover { background: var(--surface2); }
+  .btn-sm { padding: 6px 12px; font-size: 12px; }
+
+  /* FORM */
+  input, select, textarea { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 10px 12px; font-size: 14px; width: 100%; outline: none; transition: border .2s; }
+  input:focus, select:focus { border-color: var(--accent); }
+  label { font-size: 13px; color: var(--text-muted); margin-bottom: 6px; display: block; }
+
+  /* POKEMON SLOT */
+  .slot-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .slot-grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .pokemon-slot { position: relative; }
+  .slot-input-wrap { position: relative; }
+  .slot-input-wrap input { padding-right: 32px; }
+  .slot-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; padding: 2px 4px; }
+  .slot-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+  .autocomplete-list { position: absolute; top: calc(100% + 2px); left: 0; right: 0; background: var(--surface2); border: 1px solid var(--accent); border-radius: 8px; max-height: 200px; overflow-y: auto; z-index: 200; display: none; }
+  .autocomplete-list.open { display: block; }
+  .autocomplete-item { padding: 8px 12px; cursor: pointer; font-size: 13px; transition: background .15s; }
+  .autocomplete-item:hover, .autocomplete-item.selected { background: var(--accent); color: #fff; }
+  .autocomplete-item .form-tag { font-size: 11px; opacity: .7; }
+
+  /* PARTY LIST */
+  .party-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+  .party-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; cursor: pointer; transition: all .2s; }
+  .party-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .party-card.selected { border-color: var(--accent); background: #2a2a50; }
+  .party-name { font-weight: 600; margin-bottom: 8px; }
+  .party-pokemon { display: flex; flex-wrap: wrap; gap: 4px; }
+  .poke-tag { font-size: 11px; background: var(--bg); padding: 2px 8px; border-radius: 20px; color: var(--text-muted); }
+
+  /* RECORD LIST */
+  .record-item { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; cursor: pointer; transition: border .2s; }
+  .record-item:hover { border-color: var(--accent); }
+  .record-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .badge-win { background: #14532d; color: var(--win); padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+  .badge-lose { background: #450a0a; color: var(--lose); padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
+  .record-date { font-size: 12px; color: var(--text-muted); }
+  .record-detail { font-size: 12px; color: var(--text-muted); }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 300; display: none; align-items: center; justify-content: center; padding: 20px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; }
+  .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 20px; }
+  .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+
+  /* SECTION DIVIDER */
+  .section-label { font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; margin: 20px 0 12px; }
+
+  /* RESULT TOGGLE */
+  .result-toggle { display: flex; gap: 10px; }
+  .result-btn { flex: 1; padding: 12px; border: 2px solid var(--border); border-radius: 8px; background: none; color: var(--text-muted); cursor: pointer; font-size: 16px; font-weight: 700; transition: all .2s; }
+  .result-btn.win.active { border-color: var(--win); background: #14532d; color: var(--win); }
+  .result-btn.lose.active { border-color: var(--lose); background: #450a0a; color: var(--lose); }
+
+  /* DETAIL VIEW */
+  .detail-section { margin-bottom: 16px; }
+  .detail-section h4 { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+  .detail-pokemon { display: flex; flex-wrap: wrap; gap: 6px; }
+  .detail-poke-tag { font-size: 13px; background: var(--surface2); padding: 4px 12px; border-radius: 20px; }
+
+  /* EMPTY STATE */
+  .empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+  .empty-icon { font-size: 48px; margin-bottom: 12px; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .flex { display: flex; }
+  .gap-2 { gap: 8px; }
+  .items-center { align-items: center; }
+  .justify-between { justify-content: space-between; }
+  .mb-3 { margin-bottom: 12px; }
+  .mb-4 { margin-bottom: 16px; }
+  .mt-2 { margin-top: 8px; }
+  .text-muted { color: var(--text-muted); font-size: 13px; }
+  .count-badge { background: var(--surface2); color: var(--text-muted); font-size: 12px; padding: 2px 8px; border-radius: 20px; }
+  .filter-tag { display:inline-flex; align-items:center; gap:5px; background:var(--surface2); border:1px solid var(--border); border-radius:20px; padding:3px 10px; font-size:12px; }
+  .filter-tag button { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; line-height:1; padding:0; }
+  .filter-tag button:hover { color:var(--accent2); }
+  .highlight-tag { background: rgba(108,99,255,0.3) !important; border-color: var(--accent) !important; }
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="logo">⚔️ 対戦記録</span>
+  <button class="active" onclick="showPage('parties')">パーティ管理</button>
+  <button onclick="showPage('record')">記録する</button>
+  <button onclick="showPage('history')">履歴</button>
+  <div id="auth-area" style="margin-left:auto;display:flex;align-items:center;gap:8px">
+    <span id="user-name" style="font-size:12px;color:var(--text-muted)"></span>
+    <button id="auth-btn" class="btn btn-ghost btn-sm" onclick="toggleAuth()">ログイン</button>
+  </div>
+</nav>
+<!-- ログインバナー -->
+<div id="login-banner" style="background:var(--surface);border-bottom:1px solid var(--border);padding:12px 20px;text-align:center;display:none">
+  <span style="color:var(--text-muted);font-size:14px">Googleアカウントでログインするとデータがクラウドに保存され、どの端末からでもアクセスできます。</span>
+  <button class="btn btn-primary btn-sm" onclick="toggleAuth()" style="margin-left:12px">Googleでログイン</button>
+</div>
+
+<!-- PARTIES PAGE -->
+<div id="page-parties" class="page active">
+  <div class="flex justify-between items-center mb-4">
+    <div>
+      <h2 style="font-size:20px;font-weight:700">自分のパーティ</h2>
+      <p class="text-muted mt-2">最大50個まで登録できます</p>
+    </div>
+    <button class="btn btn-primary" onclick="openPartyModal()">＋ 新規登録</button>
+  </div>
+  <div id="party-grid" class="party-grid"></div>
+</div>
+
+<!-- RECORD PAGE -->
+<div id="page-record" class="page">
+  <h2 style="font-size:20px;font-weight:700;margin-bottom:20px">対戦を記録する</h2>
+
+  <div class="card">
+    <div class="card-title">自分のパーティを選択</div>
+    <div id="party-select-grid" class="party-grid"></div>
+  </div>
+
+  <div class="card" id="record-form-card" style="display:none">
+    <div class="section-label">日時</div>
+    <input type="datetime-local" id="rec-date" style="max-width:260px">
+
+    <div class="section-label">相手のパーティ（6体）</div>
+    <div class="slot-grid" id="opp-party-slots"></div>
+
+    <div class="section-label">自分の選出（4体）</div>
+    <div class="slot-grid-4" id="my-selection-slots"></div>
+
+    <div class="section-label">相手の選出（4体）</div>
+    <div class="slot-grid-4" id="opp-selection-slots"></div>
+
+    <div class="section-label">勝敗</div>
+    <div class="result-toggle">
+      <button class="result-btn win" id="btn-win" onclick="setResult('win')">🏆 勝ち</button>
+      <button class="result-btn lose" id="btn-lose" onclick="setResult('lose')">💀 負け</button>
+    </div>
+
+    <div style="margin-top:20px">
+      <label>メモ（任意）</label>
+      <textarea id="rec-memo" rows="3" placeholder="特記事項など..."></textarea>
+    </div>
+
+    <div style="margin-top:20px;text-align:right">
+      <button class="btn btn-primary" onclick="saveRecord()">💾 記録を保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY PAGE -->
+<div id="page-history" class="page">
+  <div class="flex justify-between items-center mb-4">
+    <h2 style="font-size:20px;font-weight:700">対戦履歴</h2>
+  </div>
+
+  <div class="card mb-4">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div>
+        <label>パーティで絞り込み</label>
+        <select id="history-filter" onchange="renderHistory()">
+          <option value="">すべてのパーティ</option>
+        </select>
+      </div>
+      <div>
+        <label>勝敗で絞り込み</label>
+        <select id="history-result-filter" onchange="renderHistory()">
+          <option value="">すべて</option>
+          <option value="win">勝ち</option>
+          <option value="lose">負け</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-bottom:10px">
+      <label>自分の選出ポケモンで絞り込み
+        <span id="my-sel-filter-hint" style="color:var(--text-muted);font-weight:400;font-size:11px">（パーティを先に選択してください）</span>
+      </label>
+      <select id="my-sel-filter-select" onchange="addFilterTagFromSelect(this,'mySelFilter')" disabled>
+        <option value="">-- 選択 --</option>
+      </select>
+      <div id="my-sel-filter-tags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+    </div>
+    <div>
+      <label>相手の選出ポケモンで絞り込み
+        <span style="color:var(--text-muted);font-weight:400;font-size:11px">（記録済みの試合から）</span>
+      </label>
+      <select id="opp-sel-filter-select" onchange="addFilterTagFromSelect(this,'oppSelFilter')">
+        <option value="">-- 選択 --</option>
+      </select>
+      <div id="opp-sel-filter-tags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+    </div>
+  </div>
+
+  <div id="history-stats" class="card mb-4" style="display:none">
+    <div class="flex gap-2" style="flex-wrap:wrap">
+      <div style="flex:1;text-align:center">
+        <div style="font-size:28px;font-weight:700" id="stat-total">0</div>
+        <div class="text-muted">試合</div>
+      </div>
+      <div style="flex:1;text-align:center">
+        <div style="font-size:28px;font-weight:700;color:var(--win)" id="stat-win">0</div>
+        <div class="text-muted">勝ち</div>
+      </div>
+      <div style="flex:1;text-align:center">
+        <div style="font-size:28px;font-weight:700;color:var(--lose)" id="stat-lose">0</div>
+        <div class="text-muted">負け</div>
+      </div>
+      <div style="flex:1;text-align:center">
+        <div style="font-size:28px;font-weight:700;color:var(--accent)" id="stat-rate">-</div>
+        <div class="text-muted">勝率</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="history-list"></div>
+</div>
+
+<!-- PARTY MODAL -->
+<div class="modal-overlay" id="party-modal">
+  <div class="modal">
+    <div class="modal-title" id="party-modal-title">パーティを登録</div>
+    <div class="mb-4">
+      <label>パーティ名</label>
+      <input type="text" id="party-name-input" placeholder="例：雨パ、トリル軸など" maxlength="30">
+    </div>
+    <div class="section-label">パーティのポケモン（最大6体）</div>
+    <div class="slot-grid" id="party-modal-slots"></div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closePartyModal()">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveParty()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- RECORD DETAIL MODAL -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <div class="modal-title">対戦詳細</div>
+    <div id="detail-content"></div>
+    <div class="modal-footer">
+      <button class="btn btn-danger btn-sm" id="detail-delete-btn">削除</button>
+      <button class="btn btn-ghost" onclick="closeDetailModal()">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const POKEMON_LIST = [{"no": "1", "name": "フシギダネ", "form": "通常", "display": "フシギダネ"}, {"no": "2", "name": "フシギソウ", "form": "通常", "display": "フシギソウ"}, {"no": "3", "name": "フシギバナ", "form": "通常", "display": "フシギバナ"}, {"no": "3", "name": "フシギバナ", "form": "メガフシギバナ", "display": "フシギバナ(メガフシギバナ)"}, {"no": "3", "name": "フシギバナ", "form": "キョダイマックス", "display": "フシギバナ(キョダイマックス)"}, {"no": "4", "name": "ヒトカゲ", "form": "通常", "display": "ヒトカゲ"}, {"no": "5", "name": "リザード", "form": "通常", "display": "リザード"}, {"no": "6", "name": "リザードン", "form": "通常", "display": "リザードン"}, {"no": "6", "name": "リザードン", "form": "メガリザードンＸ", "display": "リザードン(メガリザードンＸ)"}, {"no": "6", "name": "リザードン", "form": "メガリザードンＹ", "display": "リザードン(メガリザードンＹ)"}, {"no": "6", "name": "リザードン", "form": "キョダイマックス", "display": "リザードン(キョダイマックス)"}, {"no": "7", "name": "ゼニガメ", "form": "通常", "display": "ゼニガメ"}, {"no": "8", "name": "カメール", "form": "通常", "display": "カメール"}, {"no": "9", "name": "カメックス", "form": "通常", "display": "カメックス"}, {"no": "9", "name": "カメックス", "form": "メガカメックス", "display": "カメックス(メガカメックス)"}, {"no": "9", "name": "カメックス", "form": "キョダイマックス", "display": "カメックス(キョダイマックス)"}, {"no": "10", "name": "キャタピー", "form": "通常", "display": "キャタピー"}, {"no": "11", "name": "トランセル", "form": "通常", "display": "トランセル"}, {"no": "12", "name": "バタフリー", "form": "通常", "display": "バタフリー"}, {"no": "12", "name": "バタフリー", "form": "キョダイマックス", "display": "バタフリー(キョダイマックス)"}, {"no": "13", "name": "ビードル", "form": "通常", "display": "ビードル"}, {"no": "14", "name": "コクーン", "form": "通常", "display": "コクーン"}, {"no": "15", "name": "スピアー", "form": "通常", "display": "スピアー"}, {"no": "15", "name": "スピアー", "form": "メガスピアー", "display": "スピアー(メガスピアー)"}, {"no": "16", "name": "ポッポ", "form": "通常", "display": "ポッポ"}, {"no": "17", "name": "ピジョン", "form": "通常", "display": "ピジョン"}, {"no": "18", "name": "ピジョット", "form": "通常", "display": "ピジョット"}, {"no": "18", "name": "ピジョット", "form": "メガピジョット", "display": "ピジョット(メガピジョット)"}, {"no": "19", "name": "コラッタ", "form": "通常", "display": "コラッタ"}, {"no": "19", "name": "コラッタ", "form": "アローラのすがた", "display": "コラッタ(アローラのすがた)"}, {"no": "20", "name": "ラッタ", "form": "通常", "display": "ラッタ"}, {"no": "20", "name": "ラッタ", "form": "アローラのすがた", "display": "ラッタ(アローラのすがた)"}, {"no": "20", "name": "ラッタ", "form": "ぬし", "display": "ラッタ(ぬし)"}, {"no": "21", "name": "オニスズメ", "form": "通常", "display": "オニスズメ"}, {"no": "22", "name": "オニドリル", "form": "通常", "display": "オニドリル"}, {"no": "23", "name": "アーボ", "form": "通常", "display": "アーボ"}, {"no": "24", "name": "アーボック", "form": "通常", "display": "アーボック"}, {"no": "25", "name": "ピカチュウ", "form": "通常", "display": "ピカチュウ"}, {"no": "25", "name": "ピカチュウ", "form": "ハードロック・ピカチュウ", "display": "ピカチュウ(ハードロック・ピカチュウ)"}, {"no": "25", "name": "ピカチュウ", "form": "マダム・ピカチュウ", "display": "ピカチュウ(マダム・ピカチュウ)"}, {"no": "25", "name": "ピカチュウ", "form": "アイドル・ピカチュウ", "display": "ピカチュウ(アイドル・ピカチュウ)"}, {"no": "25", "name": "ピカチュウ", "form": "ドクター・ピカチュウ", "display": "ピカチュウ(ドクター・ピカチュウ)"}, {"no": "25", "name": "ピカチュウ", "form": "マスクド・ピカチュウ", "display": "ピカチュウ(マスクド・ピカチュウ)"}, {"no": "25", "name": "ピカチュウ", "form": "おきがえピカチュウ", "display": "ピカチュウ(おきがえピカチュウ)"}, {"no": "25", "name": "ピカチュウ", "form": "オリジナルキャップ", "display": "ピカチュウ(オリジナルキャップ)"}, {"no": "25", "name": "ピカチュウ", "form": "ホウエンキャップ", "display": "ピカチュウ(ホウエンキャップ)"}, {"no": "25", "name": "ピカチュウ", "form": "シンオウキャップ", "display": "ピカチュウ(シンオウキャップ)"}, {"no": "25", "name": "ピカチュウ", "form": "イッシュキャップ", "display": "ピカチュウ(イッシュキャップ)"}, {"no": "25", "name": "ピカチュウ", "form": "カロスキャップ", "display": "ピカチュウ(カロスキャップ)"}, {"no": "25", "name": "ピカチュウ", "form": "アローラキャップ", "display": "ピカチュウ(アローラキャップ)"}, {"no": "25", "name": "ピカチュウ", "form": "キミにきめたキャップ", "display": "ピカチュウ(キミにきめたキャップ)"}, {"no": "25", "name": "ピカチュウ", "form": "相棒", "display": "ピカチュウ(相棒)"}, {"no": "25", "name": "ピカチュウ", "form": "ワールドキャップ", "display": "ピカチュウ(ワールドキャップ)"}, {"no": "25", "name": "ピカチュウ", "form": "キョダイマックス", "display": "ピカチュウ(キョダイマックス)"}, {"no": "26", "name": "ライチュウ", "form": "通常", "display": "ライチュウ"}, {"no": "26", "name": "ライチュウ", "form": "アローラのすがた", "display": "ライチュウ(アローラのすがた)"}, {"no": "27", "name": "サンド", "form": "通常", "display": "サンド"}, {"no": "27", "name": "サンド", "form": "アローラのすがた", "display": "サンド(アローラのすがた)"}, {"no": "28", "name": "サンドパン", "form": "通常", "display": "サンドパン"}, {"no": "28", "name": "サンドパン", "form": "アローラのすがた", "display": "サンドパン(アローラのすがた)"}, {"no": "29", "name": "ニドラン♀", "form": "通常", "display": "ニドラン♀"}, {"no": "30", "name": "ニドリーナ", "form": "通常", "display": "ニドリーナ"}, {"no": "31", "name": "ニドクイン", "form": "通常", "display": "ニドクイン"}, {"no": "32", "name": "ニドラン♂", "form": "通常", "display": "ニドラン♂"}, {"no": "33", "name": "ニドリーノ", "form": "通常", "display": "ニドリーノ"}, {"no": "34", "name": "ニドキング", "form": "通常", "display": "ニドキング"}, {"no": "35", "name": "ピッピ", "form": "通常", "display": "ピッピ"}, {"no": "36", "name": "ピクシー", "form": "通常", "display": "ピクシー"}, {"no": "37", "name": "ロコン", "form": "通常", "display": "ロコン"}, {"no": "37", "name": "ロコン", "form": "アローラのすがた", "display": "ロコン(アローラのすがた)"}, {"no": "38", "name": "キュウコン", "form": "通常", "display": "キュウコン"}, {"no": "38", "name": "キュウコン", "form": "アローラのすがた", "display": "キュウコン(アローラのすがた)"}, {"no": "39", "name": "プリン", "form": "通常", "display": "プリン"}, {"no": "40", "name": "プクリン", "form": "通常", "display": "プクリン"}, {"no": "41", "name": "ズバット", "form": "通常", "display": "ズバット"}, {"no": "42", "name": "ゴルバット", "form": "通常", "display": "ゴルバット"}, {"no": "43", "name": "ナゾノクサ", "form": "通常", "display": "ナゾノクサ"}, {"no": "44", "name": "クサイハナ", "form": "通常", "display": "クサイハナ"}, {"no": "45", "name": "ラフレシア", "form": "通常", "display": "ラフレシア"}, {"no": "46", "name": "パラス", "form": "通常", "display": "パラス"}, {"no": "47", "name": "パラセクト", "form": "通常", "display": "パラセクト"}, {"no": "48", "name": "コンパン", "form": "通常", "display": "コンパン"}, {"no": "49", "name": "モルフォン", "form": "通常", "display": "モルフォン"}, {"no": "50", "name": "ディグダ", "form": "通常", "display": "ディグダ"}, {"no": "50", "name": "ディグダ", "form": "アローラのすがた", "display": "ディグダ(アローラのすがた)"}, {"no": "51", "name": "ダグトリオ", "form": "通常", "display": "ダグトリオ"}, {"no": "51", "name": "ダグトリオ", "form": "アローラのすがた", "display": "ダグトリオ(アローラのすがた)"}, {"no": "52", "name": "ニャース", "form": "通常", "display": "ニャース"}, {"no": "52", "name": "ニャース", "form": "アローラのすがた", "display": "ニャース(アローラのすがた)"}, {"no": "52", "name": "ニャース", "form": "ガラルのすがた", "display": "ニャース(ガラルのすがた)"}, {"no": "52", "name": "ニャース", "form": "キョダイマックス", "display": "ニャース(キョダイマックス)"}, {"no": "53", "name": "ペルシアン", "form": "通常", "display": "ペルシアン"}, {"no": "53", "name": "ペルシアン", "form": "アローラのすがた", "display": "ペルシアン(アローラのすがた)"}, {"no": "54", "name": "コダック", "form": "通常", "display": "コダック"}, {"no": "55", "name": "ゴルダック", "form": "通常", "display": "ゴルダック"}, {"no": "56", "name": "マンキー", "form": "通常", "display": "マンキー"}, {"no": "57", "name": "オコリザル", "form": "通常", "display": "オコリザル"}, {"no": "58", "name": "ガーディ", "form": "通常", "display": "ガーディ"}, {"no": "58", "name": "ガーディ", "form": "ヒスイのすがた", "display": "ガーディ(ヒスイのすがた)"}, {"no": "59", "name": "ウインディ", "form": "通常", "display": "ウインディ"}, {"no": "59", "name": "ウインディ", "form": "ヒスイのすがた", "display": "ウインディ(ヒスイのすがた)"}, {"no": "60", "name": "ニョロモ", "form": "通常", "display": "ニョロモ"}, {"no": "61", "name": "ニョロゾ", "form": "通常", "display": "ニョロゾ"}, {"no": "62", "name": "ニョロボン", "form": "通常", "display": "ニョロボン"}, {"no": "63", "name": "ケーシィ", "form": "通常", "display": "ケーシィ"}, {"no": "64", "name": "ユンゲラー", "form": "通常", "display": "ユンゲラー"}, {"no": "65", "name": "フーディン", "form": "通常", "display": "フーディン"}, {"no": "65", "name": "フーディン", "form": "メガフーディン", "display": "フーディン(メガフーディン)"}, {"no": "66", "name": "ワンリキー", "form": "通常", "display": "ワンリキー"}, {"no": "67", "name": "ゴーリキー", "form": "通常", "display": "ゴーリキー"}, {"no": "68", "name": "カイリキー", "form": "通常", "display": "カイリキー"}, {"no": "68", "name": "カイリキー", "form": "キョダイマックス", "display": "カイリキー(キョダイマックス)"}, {"no": "69", "name": "マダツボミ", "form": "通常", "display": "マダツボミ"}, {"no": "70", "name": "ウツドン", "form": "通常", "display": "ウツドン"}, {"no": "71", "name": "ウツボット", "form": "通常", "display": "ウツボット"}, {"no": "72", "name": "メノクラゲ", "form": "通常", "display": "メノクラゲ"}, {"no": "73", "name": "ドククラゲ", "form": "通常", "display": "ドククラゲ"}, {"no": "74", "name": "イシツブテ", "form": "通常", "display": "イシツブテ"}, {"no": "74", "name": "イシツブテ", "form": "アローラのすがた", "display": "イシツブテ(アローラのすがた)"}, {"no": "75", "name": "ゴローン", "form": "通常", "display": "ゴローン"}, {"no": "75", "name": "ゴローン", "form": "アローラのすがた", "display": "ゴローン(アローラのすがた)"}, {"no": "76", "name": "ゴローニャ", "form": "通常", "display": "ゴローニャ"}, {"no": "76", "name": "ゴローニャ", "form": "アローラのすがた", "display": "ゴローニャ(アローラのすがた)"}, {"no": "77", "name": "ポニータ", "form": "通常", "display": "ポニータ"}, {"no": "77", "name": "ポニータ", "form": "ガラルのすがた", "display": "ポニータ(ガラルのすがた)"}, {"no": "78", "name": "ギャロップ", "form": "通常", "display": "ギャロップ"}, {"no": "78", "name": "ギャロップ", "form": "ガラルのすがた", "display": "ギャロップ(ガラルのすがた)"}, {"no": "79", "name": "ヤドン", "form": "通常", "display": "ヤドン"}, {"no": "79", "name": "ヤドン", "form": "ガラルのすがた", "display": "ヤドン(ガラルのすがた)"}, {"no": "80", "name": "ヤドラン", "form": "通常", "display": "ヤドラン"}, {"no": "80", "name": "ヤドラン", "form": "メガヤドラン", "display": "ヤドラン(メガヤドラン)"}, {"no": "80", "name": "ヤドラン", "form": "ガラルのすがた", "display": "ヤドラン(ガラルのすがた)"}, {"no": "81", "name": "コイル", "form": "通常", "display": "コイル"}, {"no": "82", "name": "レアコイル", "form": "通常", "display": "レアコイル"}, {"no": "83", "name": "カモネギ", "form": "通常", "display": "カモネギ"}, {"no": "83", "name": "カモネギ", "form": "ガラルのすがた", "display": "カモネギ(ガラルのすがた)"}, {"no": "84", "name": "ドードー", "form": "通常", "display": "ドードー"}, {"no": "85", "name": "ドードリオ", "form": "通常", "display": "ドードリオ"}, {"no": "86", "name": "パウワウ", "form": "通常", "display": "パウワウ"}, {"no": "87", "name": "ジュゴン", "form": "通常", "display": "ジュゴン"}, {"no": "88", "name": "ベトベター", "form": "通常", "display": "ベトベター"}, {"no": "88", "name": "ベトベター", "form": "アローラのすがた", "display": "ベトベター(アローラのすがた)"}, {"no": "89", "name": "ベトベトン", "form": "通常", "display": "ベトベトン"}, {"no": "89", "name": "ベトベトン", "form": "アローラのすがた", "display": "ベトベトン(アローラのすがた)"}, {"no": "90", "name": "シェルダー", "form": "通常", "display": "シェルダー"}, {"no": "91", "name": "パルシェン", "form": "通常", "display": "パルシェン"}, {"no": "92", "name": "ゴース", "form": "通常", "display": "ゴース"}, {"no": "93", "name": "ゴースト", "form": "通常", "display": "ゴースト"}, {"no": "94", "name": "ゲンガー", "form": "通常", "display": "ゲンガー"}, {"no": "94", "name": "ゲンガー", "form": "メガゲンガー", "display": "ゲンガー(メガゲンガー)"}, {"no": "94", "name": "ゲンガー", "form": "キョダイマックス", "display": "ゲンガー(キョダイマックス)"}, {"no": "95", "name": "イワーク", "form": "通常", "display": "イワーク"}, {"no": "96", "name": "スリープ", "form": "通常", "display": "スリープ"}, {"no": "97", "name": "スリーパー", "form": "通常", "display": "スリーパー"}, {"no": "98", "name": "クラブ", "form": "通常", "display": "クラブ"}, {"no": "99", "name": "キングラー", "form": "通常", "display": "キングラー"}, {"no": "99", "name": "キングラー", "form": "キョダイマックス", "display": "キングラー(キョダイマックス)"}, {"no": "100", "name": "ビリリダマ", "form": "通常", "display": "ビリリダマ"}, {"no": "100", "name": "ビリリダマ", "form": "ヒスイのすがた", "display": "ビリリダマ(ヒスイのすがた)"}, {"no": "101", "name": "マルマイン", "form": "通常", "display": "マルマイン"}, {"no": "101", "name": "マルマイン", "form": "ヒスイのすがた", "display": "マルマイン(ヒスイのすがた)"}, {"no": "102", "name": "タマタマ", "form": "通常", "display": "タマタマ"}, {"no": "103", "name": "ナッシー", "form": "通常", "display": "ナッシー"}, {"no": "103", "name": "ナッシー", "form": "アローラのすがた", "display": "ナッシー(アローラのすがた)"}, {"no": "104", "name": "カラカラ", "form": "通常", "display": "カラカラ"}, {"no": "105", "name": "ガラガラ", "form": "通常", "display": "ガラガラ"}, {"no": "105", "name": "ガラガラ", "form": "アローラのすがた", "display": "ガラガラ(アローラのすがた)"}, {"no": "105", "name": "ガラガラ", "form": "ぬし", "display": "ガラガラ(ぬし)"}, {"no": "106", "name": "サワムラー", "form": "通常", "display": "サワムラー"}, {"no": "107", "name": "エビワラー", "form": "通常", "display": "エビワラー"}, {"no": "108", "name": "ベロリンガ", "form": "通常", "display": "ベロリンガ"}, {"no": "109", "name": "ドガース", "form": "通常", "display": "ドガース"}, {"no": "110", "name": "マタドガス", "form": "通常", "display": "マタドガス"}, {"no": "110", "name": "マタドガス", "form": "ガラルのすがた", "display": "マタドガス(ガラルのすがた)"}, {"no": "111", "name": "サイホーン", "form": "通常", "display": "サイホーン"}, {"no": "112", "name": "サイドン", "form": "通常", "display": "サイドン"}, {"no": "113", "name": "ラッキー", "form": "通常", "display": "ラッキー"}, {"no": "114", "name": "モンジャラ", "form": "通常", "display": "モンジャラ"}, {"no": "115", "name": "ガルーラ", "form": "通常", "display": "ガルーラ"}, {"no": "115", "name": "ガルーラ", "form": "メガガルーラ", "display": "ガルーラ(メガガルーラ)"}, {"no": "116", "name": "タッツー", "form": "通常", "display": "タッツー"}, {"no": "117", "name": "シードラ", "form": "通常", "display": "シードラ"}, {"no": "118", "name": "トサキント", "form": "通常", "display": "トサキント"}, {"no": "119", "name": "アズマオウ", "form": "通常", "display": "アズマオウ"}, {"no": "120", "name": "ヒトデマン", "form": "通常", "display": "ヒトデマン"}, {"no": "121", "name": "スターミー", "form": "通常", "display": "スターミー"}, {"no": "122", "name": "バリヤード", "form": "通常", "display": "バリヤード"}, {"no": "122", "name": "バリヤード", "form": "ガラルのすがた", "display": "バリヤード(ガラルのすがた)"}, {"no": "123", "name": "ストライク", "form": "通常", "display": "ストライク"}, {"no": "124", "name": "ルージュラ", "form": "通常", "display": "ルージュラ"}, {"no": "125", "name": "エレブー", "form": "通常", "display": "エレブー"}, {"no": "126", "name": "ブーバー", "form": "通常", "display": "ブーバー"}, {"no": "127", "name": "カイロス", "form": "通常", "display": "カイロス"}, {"no": "127", "name": "カイロス", "form": "メガカイロス", "display": "カイロス(メガカイロス)"}, {"no": "128", "name": "ケンタロス", "form": "通常", "display": "ケンタロス"}, {"no": "128", "name": "ケンタロス", "form": "パルデアのすがた", "display": "ケンタロス(パルデアのすがた)"}, {"no": "128", "name": "ケンタロス", "form": "パルデアのすがた", "display": "ケンタロス(パルデアのすがた)"}, {"no": "128", "name": "ケンタロス", "form": "パルデアのすがた", "display": "ケンタロス(パルデアのすがた)"}, {"no": "129", "name": "コイキング", "form": "通常", "display": "コイキング"}, {"no": "130", "name": "ギャラドス", "form": "通常", "display": "ギャラドス"}, {"no": "130", "name": "ギャラドス", "form": "メガギャラドス", "display": "ギャラドス(メガギャラドス)"}, {"no": "131", "name": "ラプラス", "form": "通常", "display": "ラプラス"}, {"no": "131", "name": "ラプラス", "form": "キョダイマックス", "display": "ラプラス(キョダイマックス)"}, {"no": "132", "name": "メタモン", "form": "通常", "display": "メタモン"}, {"no": "133", "name": "イーブイ", "form": "通常", "display": "イーブイ"}, {"no": "133", "name": "イーブイ", "form": "相棒", "display": "イーブイ(相棒)"}, {"no": "133", "name": "イーブイ", "form": "キョダイマックス", "display": "イーブイ(キョダイマックス)"}, {"no": "134", "name": "シャワーズ", "form": "通常", "display": "シャワーズ"}, {"no": "135", "name": "サンダース", "form": "通常", "display": "サンダース"}, {"no": "136", "name": "ブースター", "form": "通常", "display": "ブースター"}, {"no": "137", "name": "ポリゴン", "form": "通常", "display": "ポリゴン"}, {"no": "138", "name": "オムナイト", "form": "通常", "display": "オムナイト"}, {"no": "139", "name": "オムスター", "form": "通常", "display": "オムスター"}, {"no": "140", "name": "カブト", "form": "通常", "display": "カブト"}, {"no": "141", "name": "カブトプス", "form": "通常", "display": "カブトプス"}, {"no": "142", "name": "プテラ", "form": "通常", "display": "プテラ"}, {"no": "142", "name": "プテラ", "form": "メガプテラ", "display": "プテラ(メガプテラ)"}, {"no": "143", "name": "カビゴン", "form": "通常", "display": "カビゴン"}, {"no": "143", "name": "カビゴン", "form": "キョダイマックス", "display": "カビゴン(キョダイマックス)"}, {"no": "144", "name": "フリーザー", "form": "通常", "display": "フリーザー"}, {"no": "144", "name": "フリーザー", "form": "ガラルのすがた", "display": "フリーザー(ガラルのすがた)"}, {"no": "145", "name": "サンダー", "form": "通常", "display": "サンダー"}, {"no": "145", "name": "サンダー", "form": "ガラルのすがた", "display": "サンダー(ガラルのすがた)"}, {"no": "146", "name": "ファイヤー", "form": "通常", "display": "ファイヤー"}, {"no": "146", "name": "ファイヤー", "form": "ガラルのすがた", "display": "ファイヤー(ガラルのすがた)"}, {"no": "147", "name": "ミニリュウ", "form": "通常", "display": "ミニリュウ"}, {"no": "148", "name": "ハクリュー", "form": "通常", "display": "ハクリュー"}, {"no": "149", "name": "カイリュー", "form": "通常", "display": "カイリュー"}, {"no": "150", "name": "ミュウツー", "form": "通常", "display": "ミュウツー"}, {"no": "150", "name": "ミュウツー", "form": "メガミュウツーＸ", "display": "ミュウツー(メガミュウツーＸ)"}, {"no": "150", "name": "ミュウツー", "form": "メガミュウツーＹ", "display": "ミュウツー(メガミュウツーＹ)"}, {"no": "151", "name": "ミュウ", "form": "通常", "display": "ミュウ"}, {"no": "152", "name": "チコリータ", "form": "通常", "display": "チコリータ"}, {"no": "153", "name": "ベイリーフ", "form": "通常", "display": "ベイリーフ"}, {"no": "154", "name": "メガニウム", "form": "通常", "display": "メガニウム"}, {"no": "155", "name": "ヒノアラシ", "form": "通常", "display": "ヒノアラシ"}, {"no": "156", "name": "マグマラシ", "form": "通常", "display": "マグマラシ"}, {"no": "157", "name": "バクフーン", "form": "通常", "display": "バクフーン"}, {"no": "157", "name": "バクフーン", "form": "ヒスイのすがた", "display": "バクフーン(ヒスイのすがた)"}, {"no": "158", "name": "ワニノコ", "form": "通常", "display": "ワニノコ"}, {"no": "159", "name": "アリゲイツ", "form": "通常", "display": "アリゲイツ"}, {"no": "160", "name": "オーダイル", "form": "通常", "display": "オーダイル"}, {"no": "161", "name": "オタチ", "form": "通常", "display": "オタチ"}, {"no": "162", "name": "オオタチ", "form": "通常", "display": "オオタチ"}, {"no": "163", "name": "ホーホー", "form": "通常", "display": "ホーホー"}, {"no": "164", "name": "ヨルノズク", "form": "通常", "display": "ヨルノズク"}, {"no": "165", "name": "レディバ", "form": "通常", "display": "レディバ"}, {"no": "166", "name": "レディアン", "form": "通常", "display": "レディアン"}, {"no": "167", "name": "イトマル", "form": "通常", "display": "イトマル"}, {"no": "168", "name": "アリアドス", "form": "通常", "display": "アリアドス"}, {"no": "169", "name": "クロバット", "form": "通常", "display": "クロバット"}, {"no": "170", "name": "チョンチー", "form": "通常", "display": "チョンチー"}, {"no": "171", "name": "ランターン", "form": "通常", "display": "ランターン"}, {"no": "172", "name": "ピチュー", "form": "通常", "display": "ピチュー"}, {"no": "173", "name": "ピィ", "form": "通常", "display": "ピィ"}, {"no": "174", "name": "ププリン", "form": "通常", "display": "ププリン"}, {"no": "175", "name": "トゲピー", "form": "通常", "display": "トゲピー"}, {"no": "176", "name": "トゲチック", "form": "通常", "display": "トゲチック"}, {"no": "177", "name": "ネイティ", "form": "通常", "display": "ネイティ"}, {"no": "178", "name": "ネイティオ", "form": "通常", "display": "ネイティオ"}, {"no": "179", "name": "メリープ", "form": "通常", "display": "メリープ"}, {"no": "180", "name": "モココ", "form": "通常", "display": "モココ"}, {"no": "181", "name": "デンリュウ", "form": "通常", "display": "デンリュウ"}, {"no": "181", "name": "デンリュウ", "form": "メガデンリュウ", "display": "デンリュウ(メガデンリュウ)"}, {"no": "182", "name": "キレイハナ", "form": "通常", "display": "キレイハナ"}, {"no": "183", "name": "マリル", "form": "通常", "display": "マリル"}, {"no": "184", "name": "マリルリ", "form": "通常", "display": "マリルリ"}, {"no": "185", "name": "ウソッキー", "form": "通常", "display": "ウソッキー"}, {"no": "186", "name": "ニョロトノ", "form": "通常", "display": "ニョロトノ"}, {"no": "187", "name": "ハネッコ", "form": "通常", "display": "ハネッコ"}, {"no": "188", "name": "ポポッコ", "form": "通常", "display": "ポポッコ"}, {"no": "189", "name": "ワタッコ", "form": "通常", "display": "ワタッコ"}, {"no": "190", "name": "エイパム", "form": "通常", "display": "エイパム"}, {"no": "191", "name": "ヒマナッツ", "form": "通常", "display": "ヒマナッツ"}, {"no": "192", "name": "キマワリ", "form": "通常", "display": "キマワリ"}, {"no": "193", "name": "ヤンヤンマ", "form": "通常", "display": "ヤンヤンマ"}, {"no": "194", "name": "ウパー", "form": "通常", "display": "ウパー"}, {"no": "194", "name": "ウパー", "form": "パルデアのすがた", "display": "ウパー(パルデアのすがた)"}, {"no": "195", "name": "ヌオー", "form": "通常", "display": "ヌオー"}, {"no": "196", "name": "エーフィ", "form": "通常", "display": "エーフィ"}, {"no": "197", "name": "ブラッキー", "form": "通常", "display": "ブラッキー"}, {"no": "198", "name": "ヤミカラス", "form": "通常", "display": "ヤミカラス"}, {"no": "199", "name": "ヤドキング", "form": "通常", "display": "ヤドキング"}, {"no": "199", "name": "ヤドキング", "form": "ガラルのすがた", "display": "ヤドキング(ガラルのすがた)"}, {"no": "200", "name": "ムウマ", "form": "通常", "display": "ムウマ"}, {"no": "201", "name": "アンノーン", "form": "通常", "display": "アンノーン"}, {"no": "202", "name": "ソーナンス", "form": "通常", "display": "ソーナンス"}, {"no": "203", "name": "キリンリキ", "form": "通常", "display": "キリンリキ"}, {"no": "204", "name": "クヌギダマ", "form": "通常", "display": "クヌギダマ"}, {"no": "205", "name": "フォレトス", "form": "通常", "display": "フォレトス"}, {"no": "206", "name": "ノコッチ", "form": "通常", "display": "ノコッチ"}, {"no": "207", "name": "グライガー", "form": "通常", "display": "グライガー"}, {"no": "208", "name": "ハガネール", "form": "通常", "display": "ハガネール"}, {"no": "208", "name": "ハガネール", "form": "メガハガネール", "display": "ハガネール(メガハガネール)"}, {"no": "209", "name": "ブルー", "form": "通常", "display": "ブルー"}, {"no": "210", "name": "グランブル", "form": "通常", "display": "グランブル"}, {"no": "211", "name": "ハリーセン", "form": "通常", "display": "ハリーセン"}, {"no": "211", "name": "ハリーセン", "form": "ヒスイのすがた", "display": "ハリーセン(ヒスイのすがた)"}, {"no": "212", "name": "ハッサム", "form": "通常", "display": "ハッサム"}, {"no": "212", "name": "ハッサム", "form": "メガハッサム", "display": "ハッサム(メガハッサム)"}, {"no": "213", "name": "ツボツボ", "form": "通常", "display": "ツボツボ"}, {"no": "214", "name": "ヘラクロス", "form": "通常", "display": "ヘラクロス"}, {"no": "214", "name": "ヘラクロス", "form": "メガヘラクロス", "display": "ヘラクロス(メガヘラクロス)"}, {"no": "215", "name": "ニューラ", "form": "通常", "display": "ニューラ"}, {"no": "215", "name": "ニューラ", "form": "ヒスイのすがた", "display": "ニューラ(ヒスイのすがた)"}, {"no": "216", "name": "ヒメグマ", "form": "通常", "display": "ヒメグマ"}, {"no": "217", "name": "リングマ", "form": "通常", "display": "リングマ"}, {"no": "218", "name": "マグマッグ", "form": "通常", "display": "マグマッグ"}, {"no": "219", "name": "マグカルゴ", "form": "通常", "display": "マグカルゴ"}, {"no": "220", "name": "ウリムー", "form": "通常", "display": "ウリムー"}, {"no": "221", "name": "イノムー", "form": "通常", "display": "イノムー"}, {"no": "222", "name": "サニーゴ", "form": "通常", "display": "サニーゴ"}, {"no": "222", "name": "サニーゴ", "form": "ガラルのすがた", "display": "サニーゴ(ガラルのすがた)"}, {"no": "223", "name": "テッポウオ", "form": "通常", "display": "テッポウオ"}, {"no": "224", "name": "オクタン", "form": "通常", "display": "オクタン"}, {"no": "225", "name": "デリバード", "form": "通常", "display": "デリバード"}, {"no": "226", "name": "マンタイン", "form": "通常", "display": "マンタイン"}, {"no": "227", "name": "エアームド", "form": "通常", "display": "エアームド"}, {"no": "228", "name": "デルビル", "form": "通常", "display": "デルビル"}, {"no": "229", "name": "ヘルガー", "form": "通常", "display": "ヘルガー"}, {"no": "229", "name": "ヘルガー", "form": "メガヘルガー", "display": "ヘルガー(メガヘルガー)"}, {"no": "230", "name": "キングドラ", "form": "通常", "display": "キングドラ"}, {"no": "231", "name": "ゴマゾウ", "form": "通常", "display": "ゴマゾウ"}, {"no": "232", "name": "ドンファン", "form": "通常", "display": "ドンファン"}, {"no": "233", "name": "ポリゴン２", "form": "通常", "display": "ポリゴン２"}, {"no": "234", "name": "オドシシ", "form": "通常", "display": "オドシシ"}, {"no": "235", "name": "ドーブル", "form": "通常", "display": "ドーブル"}, {"no": "236", "name": "バルキー", "form": "通常", "display": "バルキー"}, {"no": "237", "name": "カポエラー", "form": "通常", "display": "カポエラー"}, {"no": "238", "name": "ムチュール", "form": "通常", "display": "ムチュール"}, {"no": "239", "name": "エレキッド", "form": "通常", "display": "エレキッド"}, {"no": "240", "name": "ブビィ", "form": "通常", "display": "ブビィ"}, {"no": "241", "name": "ミルタンク", "form": "通常", "display": "ミルタンク"}, {"no": "242", "name": "ハピナス", "form": "通常", "display": "ハピナス"}, {"no": "243", "name": "ライコウ", "form": "通常", "display": "ライコウ"}, {"no": "244", "name": "エンテイ", "form": "通常", "display": "エンテイ"}, {"no": "245", "name": "スイクン", "form": "通常", "display": "スイクン"}, {"no": "246", "name": "ヨーギラス", "form": "通常", "display": "ヨーギラス"}, {"no": "247", "name": "サナギラス", "form": "通常", "display": "サナギラス"}, {"no": "248", "name": "バンギラス", "form": "通常", "display": "バンギラス"}, {"no": "248", "name": "バンギラス", "form": "メガバンギラス", "display": "バンギラス(メガバンギラス)"}, {"no": "249", "name": "ルギア", "form": "通常", "display": "ルギア"}, {"no": "250", "name": "ホウオウ", "form": "通常", "display": "ホウオウ"}, {"no": "251", "name": "セレビィ", "form": "通常", "display": "セレビィ"}, {"no": "252", "name": "キモリ", "form": "通常", "display": "キモリ"}, {"no": "253", "name": "ジュプトル", "form": "通常", "display": "ジュプトル"}, {"no": "254", "name": "ジュカイン", "form": "通常", "display": "ジュカイン"}, {"no": "254", "name": "ジュカイン", "form": "メガジュカイン", "display": "ジュカイン(メガジュカイン)"}, {"no": "255", "name": "アチャモ", "form": "通常", "display": "アチャモ"}, {"no": "256", "name": "ワカシャモ", "form": "通常", "display": "ワカシャモ"}, {"no": "257", "name": "バシャーモ", "form": "通常", "display": "バシャーモ"}, {"no": "257", "name": "バシャーモ", "form": "メガバシャーモ", "display": "バシャーモ(メガバシャーモ)"}, {"no": "258", "name": "ミズゴロウ", "form": "通常", "display": "ミズゴロウ"}, {"no": "259", "name": "ヌマクロー", "form": "通常", "display": "ヌマクロー"}, {"no": "260", "name": "ラグラージ", "form": "通常", "display": "ラグラージ"}, {"no": "260", "name": "ラグラージ", "form": "メガラグラージ", "display": "ラグラージ(メガラグラージ)"}, {"no": "261", "name": "ポチエナ", "form": "通常", "display": "ポチエナ"}, {"no": "262", "name": "グラエナ", "form": "通常", "display": "グラエナ"}, {"no": "263", "name": "ジグザグマ", "form": "通常", "display": "ジグザグマ"}, {"no": "263", "name": "ジグザグマ", "form": "ガラルのすがた", "display": "ジグザグマ(ガラルのすがた)"}, {"no": "264", "name": "マッスグマ", "form": "通常", "display": "マッスグマ"}, {"no": "264", "name": "マッスグマ", "form": "ガラルのすがた", "display": "マッスグマ(ガラルのすがた)"}, {"no": "265", "name": "ケムッソ", "form": "通常", "display": "ケムッソ"}, {"no": "266", "name": "カラサリス", "form": "通常", "display": "カラサリス"}, {"no": "267", "name": "アゲハント", "form": "通常", "display": "アゲハント"}, {"no": "268", "name": "マユルド", "form": "通常", "display": "マユルド"}, {"no": "269", "name": "ドクケイル", "form": "通常", "display": "ドクケイル"}, {"no": "270", "name": "ハスボー", "form": "通常", "display": "ハスボー"}, {"no": "271", "name": "ハスブレロ", "form": "通常", "display": "ハスブレロ"}, {"no": "272", "name": "ルンパッパ", "form": "通常", "display": "ルンパッパ"}, {"no": "273", "name": "タネボー", "form": "通常", "display": "タネボー"}, {"no": "274", "name": "コノハナ", "form": "通常", "display": "コノハナ"}, {"no": "275", "name": "ダーテング", "form": "通常", "display": "ダーテング"}, {"no": "276", "name": "スバメ", "form": "通常", "display": "スバメ"}, {"no": "277", "name": "オオスバメ", "form": "通常", "display": "オオスバメ"}, {"no": "278", "name": "キャモメ", "form": "通常", "display": "キャモメ"}, {"no": "279", "name": "ペリッパー", "form": "通常", "display": "ペリッパー"}, {"no": "280", "name": "ラルトス", "form": "通常", "display": "ラルトス"}, {"no": "281", "name": "キルリア", "form": "通常", "display": "キルリア"}, {"no": "282", "name": "サーナイト", "form": "通常", "display": "サーナイト"}, {"no": "282", "name": "サーナイト", "form": "メガサーナイト", "display": "サーナイト(メガサーナイト)"}, {"no": "283", "name": "アメタマ", "form": "通常", "display": "アメタマ"}, {"no": "284", "name": "アメモース", "form": "通常", "display": "アメモース"}, {"no": "285", "name": "キノココ", "form": "通常", "display": "キノココ"}, {"no": "286", "name": "キノガッサ", "form": "通常", "display": "キノガッサ"}, {"no": "287", "name": "ナマケロ", "form": "通常", "display": "ナマケロ"}, {"no": "288", "name": "ヤルキモノ", "form": "通常", "display": "ヤルキモノ"}, {"no": "289", "name": "ケッキング", "form": "通常", "display": "ケッキング"}, {"no": "290", "name": "ツチニン", "form": "通常", "display": "ツチニン"}, {"no": "291", "name": "テッカニン", "form": "通常", "display": "テッカニン"}, {"no": "292", "name": "ヌケニン", "form": "通常", "display": "ヌケニン"}, {"no": "293", "name": "ゴニョニョ", "form": "通常", "display": "ゴニョニョ"}, {"no": "294", "name": "ドゴーム", "form": "通常", "display": "ドゴーム"}, {"no": "295", "name": "バクオング", "form": "通常", "display": "バクオング"}, {"no": "296", "name": "マクノシタ", "form": "通常", "display": "マクノシタ"}, {"no": "297", "name": "ハリテヤマ", "form": "通常", "display": "ハリテヤマ"}, {"no": "298", "name": "ルリリ", "form": "通常", "display": "ルリリ"}, {"no": "299", "name": "ノズパス", "form": "通常", "display": "ノズパス"}, {"no": "300", "name": "エネコ", "form": "通常", "display": "エネコ"}, {"no": "301", "name": "エネコロロ", "form": "通常", "display": "エネコロロ"}, {"no": "302", "name": "ヤミラミ", "form": "通常", "display": "ヤミラミ"}, {"no": "302", "name": "ヤミラミ", "form": "メガヤミラミ", "display": "ヤミラミ(メガヤミラミ)"}, {"no": "303", "name": "クチート", "form": "通常", "display": "クチート"}, {"no": "303", "name": "クチート", "form": "メガクチート", "display": "クチート(メガクチート)"}, {"no": "304", "name": "ココドラ", "form": "通常", "display": "ココドラ"}, {"no": "305", "name": "コドラ", "form": "通常", "display": "コドラ"}, {"no": "306", "name": "ボスゴドラ", "form": "通常", "display": "ボスゴドラ"}, {"no": "306", "name": "ボスゴドラ", "form": "メガボスゴドラ", "display": "ボスゴドラ(メガボスゴドラ)"}, {"no": "307", "name": "アサナン", "form": "通常", "display": "アサナン"}, {"no": "308", "name": "チャーレム", "form": "通常", "display": "チャーレム"}, {"no": "308", "name": "チャーレム", "form": "メガチャーレム", "display": "チャーレム(メガチャーレム)"}, {"no": "309", "name": "ラクライ", "form": "通常", "display": "ラクライ"}, {"no": "310", "name": "ライボルト", "form": "通常", "display": "ライボルト"}, {"no": "310", "name": "ライボルト", "form": "メガライボルト", "display": "ライボルト(メガライボルト)"}, {"no": "311", "name": "プラスル", "form": "通常", "display": "プラスル"}, {"no": "312", "name": "マイナン", "form": "通常", "display": "マイナン"}, {"no": "313", "name": "バルビート", "form": "通常", "display": "バルビート"}, {"no": "314", "name": "イルミーゼ", "form": "通常", "display": "イルミーゼ"}, {"no": "315", "name": "ロゼリア", "form": "通常", "display": "ロゼリア"}, {"no": "316", "name": "ゴクリン", "form": "通常", "display": "ゴクリン"}, {"no": "317", "name": "マルノーム", "form": "通常", "display": "マルノーム"}, {"no": "318", "name": "キバニア", "form": "通常", "display": "キバニア"}, {"no": "319", "name": "サメハダー", "form": "通常", "display": "サメハダー"}, {"no": "319", "name": "サメハダー", "form": "メガサメハダー", "display": "サメハダー(メガサメハダー)"}, {"no": "320", "name": "ホエルコ", "form": "通常", "display": "ホエルコ"}, {"no": "321", "name": "ホエルオー", "form": "通常", "display": "ホエルオー"}, {"no": "322", "name": "ドンメル", "form": "通常", "display": "ドンメル"}, {"no": "323", "name": "バクーダ", "form": "通常", "display": "バクーダ"}, {"no": "323", "name": "バクーダ", "form": "メガバクーダ", "display": "バクーダ(メガバクーダ)"}, {"no": "324", "name": "コータス", "form": "通常", "display": "コータス"}, {"no": "325", "name": "バネブー", "form": "通常", "display": "バネブー"}, {"no": "326", "name": "ブーピッグ", "form": "通常", "display": "ブーピッグ"}, {"no": "327", "name": "パッチール", "form": "通常", "display": "パッチール"}, {"no": "328", "name": "ナックラー", "form": "通常", "display": "ナックラー"}, {"no": "329", "name": "ビブラーバ", "form": "通常", "display": "ビブラーバ"}, {"no": "330", "name": "フライゴン", "form": "通常", "display": "フライゴン"}, {"no": "331", "name": "サボネア", "form": "通常", "display": "サボネア"}, {"no": "332", "name": "ノクタス", "form": "通常", "display": "ノクタス"}, {"no": "333", "name": "チルット", "form": "通常", "display": "チルット"}, {"no": "334", "name": "チルタリス", "form": "通常", "display": "チルタリス"}, {"no": "334", "name": "チルタリス", "form": "メガチルタリス", "display": "チルタリス(メガチルタリス)"}, {"no": "335", "name": "ザングース", "form": "通常", "display": "ザングース"}, {"no": "336", "name": "ハブネーク", "form": "通常", "display": "ハブネーク"}, {"no": "337", "name": "ルナトーン", "form": "通常", "display": "ルナトーン"}, {"no": "338", "name": "ソルロック", "form": "通常", "display": "ソルロック"}, {"no": "339", "name": "ドジョッチ", "form": "通常", "display": "ドジョッチ"}, {"no": "340", "name": "ナマズン", "form": "通常", "display": "ナマズン"}, {"no": "341", "name": "ヘイガニ", "form": "通常", "display": "ヘイガニ"}, {"no": "342", "name": "シザリガー", "form": "通常", "display": "シザリガー"}, {"no": "343", "name": "ヤジロン", "form": "通常", "display": "ヤジロン"}, {"no": "344", "name": "ネンドール", "form": "通常", "display": "ネンドール"}, {"no": "345", "name": "リリーラ", "form": "通常", "display": "リリーラ"}, {"no": "346", "name": "ユレイドル", "form": "通常", "display": "ユレイドル"}, {"no": "347", "name": "アノプス", "form": "通常", "display": "アノプス"}, {"no": "348", "name": "アーマルド", "form": "通常", "display": "アーマルド"}, {"no": "349", "name": "ヒンバス", "form": "通常", "display": "ヒンバス"}, {"no": "350", "name": "ミロカロス", "form": "通常", "display": "ミロカロス"}, {"no": "351", "name": "ポワルン", "form": "ポワルンのすがた", "display": "ポワルン(ポワルンのすがた)"}, {"no": "351", "name": "ポワルン", "form": "たいようのすがた", "display": "ポワルン(たいようのすがた)"}, {"no": "351", "name": "ポワルン", "form": "あまみずのすがた", "display": "ポワルン(あまみずのすがた)"}, {"no": "351", "name": "ポワルン", "form": "ゆきぐものすがた", "display": "ポワルン(ゆきぐものすがた)"}, {"no": "352", "name": "カクレオン", "form": "通常", "display": "カクレオン"}, {"no": "353", "name": "カゲボウズ", "form": "通常", "display": "カゲボウズ"}, {"no": "354", "name": "ジュペッタ", "form": "通常", "display": "ジュペッタ"}, {"no": "354", "name": "ジュペッタ", "form": "メガジュペッタ", "display": "ジュペッタ(メガジュペッタ)"}, {"no": "355", "name": "ヨマワル", "form": "通常", "display": "ヨマワル"}, {"no": "356", "name": "サマヨール", "form": "通常", "display": "サマヨール"}, {"no": "357", "name": "トロピウス", "form": "通常", "display": "トロピウス"}, {"no": "358", "name": "チリーン", "form": "通常", "display": "チリーン"}, {"no": "359", "name": "アブソル", "form": "通常", "display": "アブソル"}, {"no": "359", "name": "アブソル", "form": "メガアブソル", "display": "アブソル(メガアブソル)"}, {"no": "360", "name": "ソーナノ", "form": "通常", "display": "ソーナノ"}, {"no": "361", "name": "ユキワラシ", "form": "通常", "display": "ユキワラシ"}, {"no": "362", "name": "オニゴーリ", "form": "通常", "display": "オニゴーリ"}, {"no": "362", "name": "オニゴーリ", "form": "メガオニゴーリ", "display": "オニゴーリ(メガオニゴーリ)"}, {"no": "363", "name": "タマザラシ", "form": "通常", "display": "タマザラシ"}, {"no": "364", "name": "トドグラー", "form": "通常", "display": "トドグラー"}, {"no": "365", "name": "トドゼルガ", "form": "通常", "display": "トドゼルガ"}, {"no": "366", "name": "パールル", "form": "通常", "display": "パールル"}, {"no": "367", "name": "ハンテール", "form": "通常", "display": "ハンテール"}, {"no": "368", "name": "サクラビス", "form": "通常", "display": "サクラビス"}, {"no": "369", "name": "ジーランス", "form": "通常", "display": "ジーランス"}, {"no": "370", "name": "ラブカス", "form": "通常", "display": "ラブカス"}, {"no": "371", "name": "タツベイ", "form": "通常", "display": "タツベイ"}, {"no": "372", "name": "コモルー", "form": "通常", "display": "コモルー"}, {"no": "373", "name": "ボーマンダ", "form": "通常", "display": "ボーマンダ"}, {"no": "373", "name": "ボーマンダ", "form": "メガボーマンダ", "display": "ボーマンダ(メガボーマンダ)"}, {"no": "374", "name": "ダンバル", "form": "通常", "display": "ダンバル"}, {"no": "375", "name": "メタング", "form": "通常", "display": "メタング"}, {"no": "376", "name": "メタグロス", "form": "通常", "display": "メタグロス"}, {"no": "376", "name": "メタグロス", "form": "メガメタグロス", "display": "メタグロス(メガメタグロス)"}, {"no": "377", "name": "レジロック", "form": "通常", "display": "レジロック"}, {"no": "378", "name": "レジアイス", "form": "通常", "display": "レジアイス"}, {"no": "379", "name": "レジスチル", "form": "通常", "display": "レジスチル"}, {"no": "380", "name": "ラティアス", "form": "通常", "display": "ラティアス"}, {"no": "380", "name": "ラティアス", "form": "メガラティアス", "display": "ラティアス(メガラティアス)"}, {"no": "381", "name": "ラティオス", "form": "通常", "display": "ラティオス"}, {"no": "381", "name": "ラティオス", "form": "メガラティオス", "display": "ラティオス(メガラティオス)"}, {"no": "382", "name": "カイオーガ", "form": "カイオーガのすがた", "display": "カイオーガ(カイオーガのすがた)"}, {"no": "382", "name": "カイオーガ", "form": "ゲンシカイキのすがた", "display": "カイオーガ(ゲンシカイキのすがた)"}, {"no": "383", "name": "グラードン", "form": "グラードンのすがた", "display": "グラードン(グラードンのすがた)"}, {"no": "383", "name": "グラードン", "form": "ゲンシカイキのすがた", "display": "グラードン(ゲンシカイキのすがた)"}, {"no": "384", "name": "レックウザ", "form": "通常", "display": "レックウザ"}, {"no": "384", "name": "レックウザ", "form": "メガレックウザ", "display": "レックウザ(メガレックウザ)"}, {"no": "385", "name": "ジラーチ", "form": "通常", "display": "ジラーチ"}, {"no": "386", "name": "デオキシス", "form": "ノーマルフォルム", "display": "デオキシス(ノーマルフォルム)"}, {"no": "386", "name": "デオキシス", "form": "アタックフォルム", "display": "デオキシス(アタックフォルム)"}, {"no": "386", "name": "デオキシス", "form": "ディフェンスフォルム", "display": "デオキシス(ディフェンスフォルム)"}, {"no": "386", "name": "デオキシス", "form": "スピードフォルム", "display": "デオキシス(スピードフォルム)"}, {"no": "387", "name": "ナエトル", "form": "通常", "display": "ナエトル"}, {"no": "388", "name": "ハヤシガメ", "form": "通常", "display": "ハヤシガメ"}, {"no": "389", "name": "ドダイトス", "form": "通常", "display": "ドダイトス"}, {"no": "390", "name": "ヒコザル", "form": "通常", "display": "ヒコザル"}, {"no": "391", "name": "モウカザル", "form": "通常", "display": "モウカザル"}, {"no": "392", "name": "ゴウカザル", "form": "通常", "display": "ゴウカザル"}, {"no": "393", "name": "ポッチャマ", "form": "通常", "display": "ポッチャマ"}, {"no": "394", "name": "ポッタイシ", "form": "通常", "display": "ポッタイシ"}, {"no": "395", "name": "エンペルト", "form": "通常", "display": "エンペルト"}, {"no": "396", "name": "ムックル", "form": "通常", "display": "ムックル"}, {"no": "397", "name": "ムクバード", "form": "通常", "display": "ムクバード"}, {"no": "398", "name": "ムクホーク", "form": "通常", "display": "ムクホーク"}, {"no": "399", "name": "ビッパ", "form": "通常", "display": "ビッパ"}, {"no": "400", "name": "ビーダル", "form": "通常", "display": "ビーダル"}, {"no": "401", "name": "コロボーシ", "form": "通常", "display": "コロボーシ"}, {"no": "402", "name": "コロトック", "form": "通常", "display": "コロトック"}, {"no": "403", "name": "コリンク", "form": "通常", "display": "コリンク"}, {"no": "404", "name": "ルクシオ", "form": "通常", "display": "ルクシオ"}, {"no": "405", "name": "レントラー", "form": "通常", "display": "レントラー"}, {"no": "406", "name": "スボミー", "form": "通常", "display": "スボミー"}, {"no": "407", "name": "ロズレイド", "form": "通常", "display": "ロズレイド"}, {"no": "408", "name": "ズガイドス", "form": "通常", "display": "ズガイドス"}, {"no": "409", "name": "ラムパルド", "form": "通常", "display": "ラムパルド"}, {"no": "410", "name": "タテトプス", "form": "通常", "display": "タテトプス"}, {"no": "411", "name": "トリデプス", "form": "通常", "display": "トリデプス"}, {"no": "412", "name": "ミノムッチ", "form": "通常", "display": "ミノムッチ"}, {"no": "413", "name": "ミノマダム", "form": "くさきのミノ", "display": "ミノマダム(くさきのミノ)"}, {"no": "413", "name": "ミノマダム", "form": "すなちのミノ", "display": "ミノマダム(すなちのミノ)"}, {"no": "413", "name": "ミノマダム", "form": "ゴミのミノ", "display": "ミノマダム(ゴミのミノ)"}, {"no": "414", "name": "ガーメイル", "form": "通常", "display": "ガーメイル"}, {"no": "415", "name": "ミツハニー", "form": "通常", "display": "ミツハニー"}, {"no": "416", "name": "ビークイン", "form": "通常", "display": "ビークイン"}, {"no": "417", "name": "パチリス", "form": "通常", "display": "パチリス"}, {"no": "418", "name": "ブイゼル", "form": "通常", "display": "ブイゼル"}, {"no": "419", "name": "フローゼル", "form": "通常", "display": "フローゼル"}, {"no": "420", "name": "チェリンボ", "form": "通常", "display": "チェリンボ"}, {"no": "421", "name": "チェリム", "form": "通常", "display": "チェリム"}, {"no": "422", "name": "カラナクシ", "form": "通常", "display": "カラナクシ"}, {"no": "423", "name": "トリトドン", "form": "通常", "display": "トリトドン"}, {"no": "424", "name": "エテボース", "form": "通常", "display": "エテボース"}, {"no": "425", "name": "フワンテ", "form": "通常", "display": "フワンテ"}, {"no": "426", "name": "フワライド", "form": "通常", "display": "フワライド"}, {"no": "427", "name": "ミミロル", "form": "通常", "display": "ミミロル"}, {"no": "428", "name": "ミミロップ", "form": "通常", "display": "ミミロップ"}, {"no": "428", "name": "ミミロップ", "form": "メガミミロップ", "display": "ミミロップ(メガミミロップ)"}, {"no": "429", "name": "ムウマージ", "form": "通常", "display": "ムウマージ"}, {"no": "430", "name": "ドンカラス", "form": "通常", "display": "ドンカラス"}, {"no": "431", "name": "ニャルマー", "form": "通常", "display": "ニャルマー"}, {"no": "432", "name": "ブニャット", "form": "通常", "display": "ブニャット"}, {"no": "433", "name": "リーシャン", "form": "通常", "display": "リーシャン"}, {"no": "434", "name": "スカンプー", "form": "通常", "display": "スカンプー"}, {"no": "435", "name": "スカタンク", "form": "通常", "display": "スカタンク"}, {"no": "436", "name": "ドーミラー", "form": "通常", "display": "ドーミラー"}, {"no": "437", "name": "ドータクン", "form": "通常", "display": "ドータクン"}, {"no": "438", "name": "ウソハチ", "form": "通常", "display": "ウソハチ"}, {"no": "439", "name": "マネネ", "form": "通常", "display": "マネネ"}, {"no": "440", "name": "ピンプク", "form": "通常", "display": "ピンプク"}, {"no": "441", "name": "ペラップ", "form": "通常", "display": "ペラップ"}, {"no": "442", "name": "ミカルゲ", "form": "通常", "display": "ミカルゲ"}, {"no": "443", "name": "フカマル", "form": "通常", "display": "フカマル"}, {"no": "444", "name": "ガバイト", "form": "通常", "display": "ガバイト"}, {"no": "445", "name": "ガブリアス", "form": "通常", "display": "ガブリアス"}, {"no": "445", "name": "ガブリアス", "form": "メガガブリアス", "display": "ガブリアス(メガガブリアス)"}, {"no": "446", "name": "ゴンベ", "form": "通常", "display": "ゴンベ"}, {"no": "447", "name": "リオル", "form": "通常", "display": "リオル"}, {"no": "448", "name": "ルカリオ", "form": "通常", "display": "ルカリオ"}, {"no": "448", "name": "ルカリオ", "form": "メガルカリオ", "display": "ルカリオ(メガルカリオ)"}, {"no": "449", "name": "ヒポポタス", "form": "通常", "display": "ヒポポタス"}, {"no": "450", "name": "カバルドン", "form": "通常", "display": "カバルドン"}, {"no": "451", "name": "スコルピ", "form": "通常", "display": "スコルピ"}, {"no": "452", "name": "ドラピオン", "form": "通常", "display": "ドラピオン"}, {"no": "453", "name": "グレッグル", "form": "通常", "display": "グレッグル"}, {"no": "454", "name": "ドクロッグ", "form": "通常", "display": "ドクロッグ"}, {"no": "455", "name": "マスキッパ", "form": "通常", "display": "マスキッパ"}, {"no": "456", "name": "ケイコウオ", "form": "通常", "display": "ケイコウオ"}, {"no": "457", "name": "ネオラント", "form": "通常", "display": "ネオラント"}, {"no": "458", "name": "タマンタ", "form": "通常", "display": "タマンタ"}, {"no": "459", "name": "ユキカブリ", "form": "通常", "display": "ユキカブリ"}, {"no": "460", "name": "ユキノオー", "form": "通常", "display": "ユキノオー"}, {"no": "460", "name": "ユキノオー", "form": "メガユキノオー", "display": "ユキノオー(メガユキノオー)"}, {"no": "461", "name": "マニューラ", "form": "通常", "display": "マニューラ"}, {"no": "462", "name": "ジバコイル", "form": "通常", "display": "ジバコイル"}, {"no": "463", "name": "ベロベルト", "form": "通常", "display": "ベロベルト"}, {"no": "464", "name": "ドサイドン", "form": "通常", "display": "ドサイドン"}, {"no": "465", "name": "モジャンボ", "form": "通常", "display": "モジャンボ"}, {"no": "466", "name": "エレキブル", "form": "通常", "display": "エレキブル"}, {"no": "467", "name": "ブーバーン", "form": "通常", "display": "ブーバーン"}, {"no": "468", "name": "トゲキッス", "form": "通常", "display": "トゲキッス"}, {"no": "469", "name": "メガヤンマ", "form": "通常", "display": "メガヤンマ"}, {"no": "470", "name": "リーフィア", "form": "通常", "display": "リーフィア"}, {"no": "471", "name": "グレイシア", "form": "通常", "display": "グレイシア"}, {"no": "472", "name": "グライオン", "form": "通常", "display": "グライオン"}, {"no": "473", "name": "マンムー", "form": "通常", "display": "マンムー"}, {"no": "474", "name": "ポリゴンＺ", "form": "通常", "display": "ポリゴンＺ"}, {"no": "475", "name": "エルレイド", "form": "通常", "display": "エルレイド"}, {"no": "475", "name": "エルレイド", "form": "メガエルレイド", "display": "エルレイド(メガエルレイド)"}, {"no": "476", "name": "ダイノーズ", "form": "通常", "display": "ダイノーズ"}, {"no": "477", "name": "ヨノワール", "form": "通常", "display": "ヨノワール"}, {"no": "478", "name": "ユキメノコ", "form": "通常", "display": "ユキメノコ"}, {"no": "479", "name": "ロトム", "form": "ロトムのすがた", "display": "ロトム(ロトムのすがた)"}, {"no": "479", "name": "ロトム", "form": "ヒートロトム", "display": "ロトム(ヒートロトム)"}, {"no": "479", "name": "ロトム", "form": "ウォッシュロトム", "display": "ロトム(ウォッシュロトム)"}, {"no": "479", "name": "ロトム", "form": "フロストロトム", "display": "ロトム(フロストロトム)"}, {"no": "479", "name": "ロトム", "form": "スピンロトム", "display": "ロトム(スピンロトム)"}, {"no": "479", "name": "ロトム", "form": "カットロトム", "display": "ロトム(カットロトム)"}, {"no": "480", "name": "ユクシー", "form": "通常", "display": "ユクシー"}, {"no": "481", "name": "エムリット", "form": "通常", "display": "エムリット"}, {"no": "482", "name": "アグノム", "form": "通常", "display": "アグノム"}, {"no": "483", "name": "ディアルガ", "form": "通常", "display": "ディアルガ"}, {"no": "483", "name": "ディアルガ", "form": "オリジンフォルム", "display": "ディアルガ(オリジンフォルム)"}, {"no": "484", "name": "パルキア", "form": "通常", "display": "パルキア"}, {"no": "484", "name": "パルキア", "form": "オリジンフォルム", "display": "パルキア(オリジンフォルム)"}, {"no": "485", "name": "ヒードラン", "form": "通常", "display": "ヒードラン"}, {"no": "486", "name": "レジギガス", "form": "通常", "display": "レジギガス"}, {"no": "487", "name": "ギラティナ", "form": "アナザーフォルム", "display": "ギラティナ(アナザーフォルム)"}, {"no": "487", "name": "ギラティナ", "form": "オリジンフォルム", "display": "ギラティナ(オリジンフォルム)"}, {"no": "488", "name": "クレセリア", "form": "通常", "display": "クレセリア"}, {"no": "489", "name": "フィオネ", "form": "通常", "display": "フィオネ"}, {"no": "490", "name": "マナフィ", "form": "通常", "display": "マナフィ"}, {"no": "491", "name": "ダークライ", "form": "通常", "display": "ダークライ"}, {"no": "492", "name": "シェイミ", "form": "ランドフォルム", "display": "シェイミ(ランドフォルム)"}, {"no": "492", "name": "シェイミ", "form": "スカイフォルム", "display": "シェイミ(スカイフォルム)"}, {"no": "493", "name": "アルセウス", "form": "通常", "display": "アルセウス"}, {"no": "494", "name": "ビクティニ", "form": "通常", "display": "ビクティニ"}, {"no": "495", "name": "ツタージャ", "form": "通常", "display": "ツタージャ"}, {"no": "496", "name": "ジャノビー", "form": "通常", "display": "ジャノビー"}, {"no": "497", "name": "ジャローダ", "form": "通常", "display": "ジャローダ"}, {"no": "498", "name": "ポカブ", "form": "通常", "display": "ポカブ"}, {"no": "499", "name": "チャオブー", "form": "通常", "display": "チャオブー"}, {"no": "500", "name": "エンブオー", "form": "通常", "display": "エンブオー"}, {"no": "501", "name": "ミジュマル", "form": "通常", "display": "ミジュマル"}, {"no": "502", "name": "フタチマル", "form": "通常", "display": "フタチマル"}, {"no": "503", "name": "ダイケンキ", "form": "通常", "display": "ダイケンキ"}, {"no": "503", "name": "ダイケンキ", "form": "ヒスイのすがた", "display": "ダイケンキ(ヒスイのすがた)"}, {"no": "504", "name": "ミネズミ", "form": "通常", "display": "ミネズミ"}, {"no": "505", "name": "ミルホッグ", "form": "通常", "display": "ミルホッグ"}, {"no": "506", "name": "ヨーテリー", "form": "通常", "display": "ヨーテリー"}, {"no": "507", "name": "ハーデリア", "form": "通常", "display": "ハーデリア"}, {"no": "508", "name": "ムーランド", "form": "通常", "display": "ムーランド"}, {"no": "509", "name": "チョロネコ", "form": "通常", "display": "チョロネコ"}, {"no": "510", "name": "レパルダス", "form": "通常", "display": "レパルダス"}, {"no": "511", "name": "ヤナップ", "form": "通常", "display": "ヤナップ"}, {"no": "512", "name": "ヤナッキー", "form": "通常", "display": "ヤナッキー"}, {"no": "513", "name": "バオップ", "form": "通常", "display": "バオップ"}, {"no": "514", "name": "バオッキー", "form": "通常", "display": "バオッキー"}, {"no": "515", "name": "ヒヤップ", "form": "通常", "display": "ヒヤップ"}, {"no": "516", "name": "ヒヤッキー", "form": "通常", "display": "ヒヤッキー"}, {"no": "517", "name": "ムンナ", "form": "通常", "display": "ムンナ"}, {"no": "518", "name": "ムシャーナ", "form": "通常", "display": "ムシャーナ"}, {"no": "519", "name": "マメパト", "form": "通常", "display": "マメパト"}, {"no": "520", "name": "ハトーボー", "form": "通常", "display": "ハトーボー"}, {"no": "521", "name": "ケンホロウ", "form": "通常", "display": "ケンホロウ"}, {"no": "522", "name": "シママ", "form": "通常", "display": "シママ"}, {"no": "523", "name": "ゼブライカ", "form": "通常", "display": "ゼブライカ"}, {"no": "524", "name": "ダンゴロ", "form": "通常", "display": "ダンゴロ"}, {"no": "525", "name": "ガントル", "form": "通常", "display": "ガントル"}, {"no": "526", "name": "ギガイアス", "form": "通常", "display": "ギガイアス"}, {"no": "527", "name": "コロモリ", "form": "通常", "display": "コロモリ"}, {"no": "528", "name": "ココロモリ", "form": "通常", "display": "ココロモリ"}, {"no": "529", "name": "モグリュー", "form": "通常", "display": "モグリュー"}, {"no": "530", "name": "ドリュウズ", "form": "通常", "display": "ドリュウズ"}, {"no": "531", "name": "タブンネ", "form": "通常", "display": "タブンネ"}, {"no": "531", "name": "タブンネ", "form": "メガタブンネ", "display": "タブンネ(メガタブンネ)"}, {"no": "532", "name": "ドッコラー", "form": "通常", "display": "ドッコラー"}, {"no": "533", "name": "ドテッコツ", "form": "通常", "display": "ドテッコツ"}, {"no": "534", "name": "ローブシン", "form": "通常", "display": "ローブシン"}, {"no": "535", "name": "オタマロ", "form": "通常", "display": "オタマロ"}, {"no": "536", "name": "ガマガル", "form": "通常", "display": "ガマガル"}, {"no": "537", "name": "ガマゲロゲ", "form": "通常", "display": "ガマゲロゲ"}, {"no": "538", "name": "ナゲキ", "form": "通常", "display": "ナゲキ"}, {"no": "539", "name": "ダゲキ", "form": "通常", "display": "ダゲキ"}, {"no": "540", "name": "クルミル", "form": "通常", "display": "クルミル"}, {"no": "541", "name": "クルマユ", "form": "通常", "display": "クルマユ"}, {"no": "542", "name": "ハハコモリ", "form": "通常", "display": "ハハコモリ"}, {"no": "543", "name": "フシデ", "form": "通常", "display": "フシデ"}, {"no": "544", "name": "ホイーガ", "form": "通常", "display": "ホイーガ"}, {"no": "545", "name": "ペンドラー", "form": "通常", "display": "ペンドラー"}, {"no": "546", "name": "モンメン", "form": "通常", "display": "モンメン"}, {"no": "547", "name": "エルフーン", "form": "通常", "display": "エルフーン"}, {"no": "548", "name": "チュリネ", "form": "通常", "display": "チュリネ"}, {"no": "549", "name": "ドレディア", "form": "通常", "display": "ドレディア"}, {"no": "549", "name": "ドレディア", "form": "ヒスイのすがた", "display": "ドレディア(ヒスイのすがた)"}, {"no": "550", "name": "バスラオ", "form": "あかすじのすがた", "display": "バスラオ(あかすじのすがた)"}, {"no": "550", "name": "バスラオ", "form": "あおすじのすがた", "display": "バスラオ(あおすじのすがた)"}, {"no": "550", "name": "バスラオ", "form": "しろすじのすがた", "display": "バスラオ(しろすじのすがた)"}, {"no": "551", "name": "メグロコ", "form": "通常", "display": "メグロコ"}, {"no": "552", "name": "ワルビル", "form": "通常", "display": "ワルビル"}, {"no": "553", "name": "ワルビアル", "form": "通常", "display": "ワルビアル"}, {"no": "554", "name": "ダルマッカ", "form": "通常", "display": "ダルマッカ"}, {"no": "554", "name": "ダルマッカ", "form": "ガラルのすがた", "display": "ダルマッカ(ガラルのすがた)"}, {"no": "555", "name": "ヒヒダルマ", "form": "ノーマルモード", "display": "ヒヒダルマ(ノーマルモード)"}, {"no": "555", "name": "ヒヒダルマ", "form": "ダルマモード", "display": "ヒヒダルマ(ダルマモード)"}, {"no": "555", "name": "ヒヒダルマ", "form": "ガラルのすがた", "display": "ヒヒダルマ(ガラルのすがた)"}, {"no": "555", "name": "ヒヒダルマ", "form": "ダルマモード", "display": "ヒヒダルマ(ダルマモード)"}, {"no": "556", "name": "マラカッチ", "form": "通常", "display": "マラカッチ"}, {"no": "557", "name": "イシズマイ", "form": "通常", "display": "イシズマイ"}, {"no": "558", "name": "イワパレス", "form": "通常", "display": "イワパレス"}, {"no": "559", "name": "ズルッグ", "form": "通常", "display": "ズルッグ"}, {"no": "560", "name": "ズルズキン", "form": "通常", "display": "ズルズキン"}, {"no": "561", "name": "シンボラー", "form": "通常", "display": "シンボラー"}, {"no": "562", "name": "デスマス", "form": "通常", "display": "デスマス"}, {"no": "562", "name": "デスマス", "form": "ガラルのすがた", "display": "デスマス(ガラルのすがた)"}, {"no": "563", "name": "デスカーン", "form": "通常", "display": "デスカーン"}, {"no": "564", "name": "プロトーガ", "form": "通常", "display": "プロトーガ"}, {"no": "565", "name": "アバゴーラ", "form": "通常", "display": "アバゴーラ"}, {"no": "566", "name": "アーケン", "form": "通常", "display": "アーケン"}, {"no": "567", "name": "アーケオス", "form": "通常", "display": "アーケオス"}, {"no": "568", "name": "ヤブクロン", "form": "通常", "display": "ヤブクロン"}, {"no": "569", "name": "ダストダス", "form": "通常", "display": "ダストダス"}, {"no": "569", "name": "ダストダス", "form": "キョダイマックス", "display": "ダストダス(キョダイマックス)"}, {"no": "570", "name": "ゾロア", "form": "通常", "display": "ゾロア"}, {"no": "570", "name": "ゾロア", "form": "ヒスイのすがた", "display": "ゾロア(ヒスイのすがた)"}, {"no": "571", "name": "ゾロアーク", "form": "通常", "display": "ゾロアーク"}, {"no": "571", "name": "ゾロアーク", "form": "ヒスイのすがた", "display": "ゾロアーク(ヒスイのすがた)"}, {"no": "572", "name": "チラーミィ", "form": "通常", "display": "チラーミィ"}, {"no": "573", "name": "チラチーノ", "form": "通常", "display": "チラチーノ"}, {"no": "574", "name": "ゴチム", "form": "通常", "display": "ゴチム"}, {"no": "575", "name": "ゴチミル", "form": "通常", "display": "ゴチミル"}, {"no": "576", "name": "ゴチルゼル", "form": "通常", "display": "ゴチルゼル"}, {"no": "577", "name": "ユニラン", "form": "通常", "display": "ユニラン"}, {"no": "578", "name": "ダブラン", "form": "通常", "display": "ダブラン"}, {"no": "579", "name": "ランクルス", "form": "通常", "display": "ランクルス"}, {"no": "580", "name": "コアルヒー", "form": "通常", "display": "コアルヒー"}, {"no": "581", "name": "スワンナ", "form": "通常", "display": "スワンナ"}, {"no": "582", "name": "バニプッチ", "form": "通常", "display": "バニプッチ"}, {"no": "583", "name": "バニリッチ", "form": "通常", "display": "バニリッチ"}, {"no": "584", "name": "バイバニラ", "form": "通常", "display": "バイバニラ"}, {"no": "585", "name": "シキジカ", "form": "通常", "display": "シキジカ"}, {"no": "586", "name": "メブキジカ", "form": "通常", "display": "メブキジカ"}, {"no": "587", "name": "エモンガ", "form": "通常", "display": "エモンガ"}, {"no": "588", "name": "カブルモ", "form": "通常", "display": "カブルモ"}, {"no": "589", "name": "シュバルゴ", "form": "通常", "display": "シュバルゴ"}, {"no": "590", "name": "タマゲタケ", "form": "通常", "display": "タマゲタケ"}, {"no": "591", "name": "モロバレル", "form": "通常", "display": "モロバレル"}, {"no": "592", "name": "プルリル", "form": "通常", "display": "プルリル"}, {"no": "593", "name": "ブルンゲル", "form": "通常", "display": "ブルンゲル"}, {"no": "594", "name": "ママンボウ", "form": "通常", "display": "ママンボウ"}, {"no": "595", "name": "バチュル", "form": "通常", "display": "バチュル"}, {"no": "596", "name": "デンチュラ", "form": "通常", "display": "デンチュラ"}, {"no": "597", "name": "テッシード", "form": "通常", "display": "テッシード"}, {"no": "598", "name": "ナットレイ", "form": "通常", "display": "ナットレイ"}, {"no": "599", "name": "ギアル", "form": "通常", "display": "ギアル"}, {"no": "600", "name": "ギギアル", "form": "通常", "display": "ギギアル"}, {"no": "601", "name": "ギギギアル", "form": "通常", "display": "ギギギアル"}, {"no": "602", "name": "シビシラス", "form": "通常", "display": "シビシラス"}, {"no": "603", "name": "シビビール", "form": "通常", "display": "シビビール"}, {"no": "604", "name": "シビルドン", "form": "通常", "display": "シビルドン"}, {"no": "605", "name": "リグレー", "form": "通常", "display": "リグレー"}, {"no": "606", "name": "オーベム", "form": "通常", "display": "オーベム"}, {"no": "607", "name": "ヒトモシ", "form": "通常", "display": "ヒトモシ"}, {"no": "608", "name": "ランプラー", "form": "通常", "display": "ランプラー"}, {"no": "609", "name": "シャンデラ", "form": "通常", "display": "シャンデラ"}, {"no": "610", "name": "キバゴ", "form": "通常", "display": "キバゴ"}, {"no": "611", "name": "オノンド", "form": "通常", "display": "オノンド"}, {"no": "612", "name": "オノノクス", "form": "通常", "display": "オノノクス"}, {"no": "613", "name": "クマシュン", "form": "通常", "display": "クマシュン"}, {"no": "614", "name": "ツンベアー", "form": "通常", "display": "ツンベアー"}, {"no": "615", "name": "フリージオ", "form": "通常", "display": "フリージオ"}, {"no": "616", "name": "チョボマキ", "form": "通常", "display": "チョボマキ"}, {"no": "617", "name": "アギルダー", "form": "通常", "display": "アギルダー"}, {"no": "618", "name": "マッギョ", "form": "通常", "display": "マッギョ"}, {"no": "618", "name": "マッギョ", "form": "ガラルのすがた", "display": "マッギョ(ガラルのすがた)"}, {"no": "619", "name": "コジョフー", "form": "通常", "display": "コジョフー"}, {"no": "620", "name": "コジョンド", "form": "通常", "display": "コジョンド"}, {"no": "621", "name": "クリムガン", "form": "通常", "display": "クリムガン"}, {"no": "622", "name": "ゴビット", "form": "通常", "display": "ゴビット"}, {"no": "623", "name": "ゴルーグ", "form": "通常", "display": "ゴルーグ"}, {"no": "624", "name": "コマタナ", "form": "通常", "display": "コマタナ"}, {"no": "625", "name": "キリキザン", "form": "通常", "display": "キリキザン"}, {"no": "626", "name": "バッフロン", "form": "通常", "display": "バッフロン"}, {"no": "627", "name": "ワシボン", "form": "通常", "display": "ワシボン"}, {"no": "628", "name": "ウォーグル", "form": "通常", "display": "ウォーグル"}, {"no": "628", "name": "ウォーグル", "form": "ヒスイのすがた", "display": "ウォーグル(ヒスイのすがた)"}, {"no": "629", "name": "バルチャイ", "form": "通常", "display": "バルチャイ"}, {"no": "630", "name": "バルジーナ", "form": "通常", "display": "バルジーナ"}, {"no": "631", "name": "クイタラン", "form": "通常", "display": "クイタラン"}, {"no": "632", "name": "アイアント", "form": "通常", "display": "アイアント"}, {"no": "633", "name": "モノズ", "form": "通常", "display": "モノズ"}, {"no": "634", "name": "ジヘッド", "form": "通常", "display": "ジヘッド"}, {"no": "635", "name": "サザンドラ", "form": "通常", "display": "サザンドラ"}, {"no": "636", "name": "メラルバ", "form": "通常", "display": "メラルバ"}, {"no": "637", "name": "ウルガモス", "form": "通常", "display": "ウルガモス"}, {"no": "638", "name": "コバルオン", "form": "通常", "display": "コバルオン"}, {"no": "639", "name": "テラキオン", "form": "通常", "display": "テラキオン"}, {"no": "640", "name": "ビリジオン", "form": "通常", "display": "ビリジオン"}, {"no": "641", "name": "トルネロス", "form": "けしんフォルム", "display": "トルネロス(けしんフォルム)"}, {"no": "641", "name": "トルネロス", "form": "れいじゅうフォルム", "display": "トルネロス(れいじゅうフォルム)"}, {"no": "642", "name": "ボルトロス", "form": "けしんフォルム", "display": "ボルトロス(けしんフォルム)"}, {"no": "642", "name": "ボルトロス", "form": "れいじゅうフォルム", "display": "ボルトロス(れいじゅうフォルム)"}, {"no": "643", "name": "レシラム", "form": "通常", "display": "レシラム"}, {"no": "644", "name": "ゼクロム", "form": "通常", "display": "ゼクロム"}, {"no": "645", "name": "ランドロス", "form": "けしんフォルム", "display": "ランドロス(けしんフォルム)"}, {"no": "645", "name": "ランドロス", "form": "れいじゅうフォルム", "display": "ランドロス(れいじゅうフォルム)"}, {"no": "646", "name": "キュレム", "form": "キュレムのすがた", "display": "キュレム(キュレムのすがた)"}, {"no": "646", "name": "キュレム", "form": "ブラックキュレム", "display": "キュレム(ブラックキュレム)"}, {"no": "646", "name": "キュレム", "form": "ホワイトキュレム", "display": "キュレム(ホワイトキュレム)"}, {"no": "647", "name": "ケルディオ", "form": "いつものすがた", "display": "ケルディオ(いつものすがた)"}, {"no": "647", "name": "ケルディオ", "form": "かくごのすがた", "display": "ケルディオ(かくごのすがた)"}, {"no": "648", "name": "メロエッタ", "form": "ボイスフォルム", "display": "メロエッタ(ボイスフォルム)"}, {"no": "648", "name": "メロエッタ", "form": "ステップフォルム", "display": "メロエッタ(ステップフォルム)"}, {"no": "649", "name": "ゲノセクト", "form": "通常", "display": "ゲノセクト"}, {"no": "650", "name": "ハリマロン", "form": "通常", "display": "ハリマロン"}, {"no": "651", "name": "ハリボーグ", "form": "通常", "display": "ハリボーグ"}, {"no": "652", "name": "ブリガロン", "form": "通常", "display": "ブリガロン"}, {"no": "653", "name": "フォッコ", "form": "通常", "display": "フォッコ"}, {"no": "654", "name": "テールナー", "form": "通常", "display": "テールナー"}, {"no": "655", "name": "マフォクシー", "form": "通常", "display": "マフォクシー"}, {"no": "656", "name": "ケロマツ", "form": "通常", "display": "ケロマツ"}, {"no": "657", "name": "ゲコガシラ", "form": "通常", "display": "ゲコガシラ"}, {"no": "658", "name": "ゲッコウガ", "form": "通常", "display": "ゲッコウガ"}, {"no": "658", "name": "ゲッコウガ", "form": "きずなへんげ", "display": "ゲッコウガ(きずなへんげ)"}, {"no": "658", "name": "ゲッコウガ", "form": "サトシゲッコウガ", "display": "ゲッコウガ(サトシゲッコウガ)"}, {"no": "659", "name": "ホルビー", "form": "通常", "display": "ホルビー"}, {"no": "660", "name": "ホルード", "form": "通常", "display": "ホルード"}, {"no": "661", "name": "ヤヤコマ", "form": "通常", "display": "ヤヤコマ"}, {"no": "662", "name": "ヒノヤコマ", "form": "通常", "display": "ヒノヤコマ"}, {"no": "663", "name": "ファイアロー", "form": "通常", "display": "ファイアロー"}, {"no": "664", "name": "コフキムシ", "form": "通常", "display": "コフキムシ"}, {"no": "665", "name": "コフーライ", "form": "通常", "display": "コフーライ"}, {"no": "666", "name": "ビビヨン", "form": "通常", "display": "ビビヨン"}, {"no": "667", "name": "シシコ", "form": "通常", "display": "シシコ"}, {"no": "668", "name": "カエンジシ", "form": "通常", "display": "カエンジシ"}, {"no": "669", "name": "フラベベ", "form": "通常", "display": "フラベベ"}, {"no": "670", "name": "フラエッテ", "form": "通常", "display": "フラエッテ"}, {"no": "670", "name": "フラエッテ", "form": "えいえんのはな", "display": "フラエッテ(えいえんのはな)"}, {"no": "671", "name": "フラージェス", "form": "通常", "display": "フラージェス"}, {"no": "672", "name": "メェークル", "form": "通常", "display": "メェークル"}, {"no": "673", "name": "ゴーゴート", "form": "通常", "display": "ゴーゴート"}, {"no": "674", "name": "ヤンチャム", "form": "通常", "display": "ヤンチャム"}, {"no": "675", "name": "ゴロンダ", "form": "通常", "display": "ゴロンダ"}, {"no": "676", "name": "トリミアン", "form": "通常", "display": "トリミアン"}, {"no": "677", "name": "ニャスパー", "form": "通常", "display": "ニャスパー"}, {"no": "678", "name": "ニャオニクス", "form": "オスのすがた", "display": "ニャオニクス(オスのすがた)"}, {"no": "678", "name": "ニャオニクス", "form": "メスのすがた", "display": "ニャオニクス(メスのすがた)"}, {"no": "679", "name": "ヒトツキ", "form": "通常", "display": "ヒトツキ"}, {"no": "680", "name": "ニダンギル", "form": "通常", "display": "ニダンギル"}, {"no": "681", "name": "ギルガルド", "form": "シールドフォルム", "display": "ギルガルド(シールドフォルム)"}, {"no": "681", "name": "ギルガルド", "form": "ブレードフォルム", "display": "ギルガルド(ブレードフォルム)"}, {"no": "682", "name": "シュシュプ", "form": "通常", "display": "シュシュプ"}, {"no": "683", "name": "フレフワン", "form": "通常", "display": "フレフワン"}, {"no": "684", "name": "ペロッパフ", "form": "通常", "display": "ペロッパフ"}, {"no": "685", "name": "ペロリーム", "form": "通常", "display": "ペロリーム"}, {"no": "686", "name": "マーイーカ", "form": "通常", "display": "マーイーカ"}, {"no": "687", "name": "カラマネロ", "form": "通常", "display": "カラマネロ"}, {"no": "688", "name": "カメテテ", "form": "通常", "display": "カメテテ"}, {"no": "689", "name": "ガメノデス", "form": "通常", "display": "ガメノデス"}, {"no": "690", "name": "クズモー", "form": "通常", "display": "クズモー"}, {"no": "691", "name": "ドラミドロ", "form": "通常", "display": "ドラミドロ"}, {"no": "692", "name": "ウデッポウ", "form": "通常", "display": "ウデッポウ"}, {"no": "693", "name": "ブロスター", "form": "通常", "display": "ブロスター"}, {"no": "694", "name": "エリキテル", "form": "通常", "display": "エリキテル"}, {"no": "695", "name": "エレザード", "form": "通常", "display": "エレザード"}, {"no": "696", "name": "チゴラス", "form": "通常", "display": "チゴラス"}, {"no": "697", "name": "ガチゴラス", "form": "通常", "display": "ガチゴラス"}, {"no": "698", "name": "アマルス", "form": "通常", "display": "アマルス"}, {"no": "699", "name": "アマルルガ", "form": "通常", "display": "アマルルガ"}, {"no": "700", "name": "ニンフィア", "form": "通常", "display": "ニンフィア"}, {"no": "701", "name": "ルチャブル", "form": "通常", "display": "ルチャブル"}, {"no": "702", "name": "デデンネ", "form": "通常", "display": "デデンネ"}, {"no": "703", "name": "メレシー", "form": "通常", "display": "メレシー"}, {"no": "704", "name": "ヌメラ", "form": "通常", "display": "ヌメラ"}, {"no": "705", "name": "ヌメイル", "form": "通常", "display": "ヌメイル"}, {"no": "705", "name": "ヌメイル", "form": "ヒスイのすがた", "display": "ヌメイル(ヒスイのすがた)"}, {"no": "706", "name": "ヌメルゴン", "form": "通常", "display": "ヌメルゴン"}, {"no": "706", "name": "ヌメルゴン", "form": "ヒスイのすがた", "display": "ヌメルゴン(ヒスイのすがた)"}, {"no": "707", "name": "クレッフィ", "form": "通常", "display": "クレッフィ"}, {"no": "708", "name": "ボクレー", "form": "通常", "display": "ボクレー"}, {"no": "709", "name": "オーロット", "form": "通常", "display": "オーロット"}, {"no": "710", "name": "バケッチャ", "form": "ふつうのサイズ", "display": "バケッチャ(ふつうのサイズ)"}, {"no": "710", "name": "バケッチャ", "form": "ちいさいサイズ", "display": "バケッチャ(ちいさいサイズ)"}, {"no": "710", "name": "バケッチャ", "form": "おおきいサイズ", "display": "バケッチャ(おおきいサイズ)"}, {"no": "710", "name": "バケッチャ", "form": "とくだいサイズ", "display": "バケッチャ(とくだいサイズ)"}, {"no": "711", "name": "パンプジン", "form": "ふつうのサイズ", "display": "パンプジン(ふつうのサイズ)"}, {"no": "711", "name": "パンプジン", "form": "ちいさいサイズ", "display": "パンプジン(ちいさいサイズ)"}, {"no": "711", "name": "パンプジン", "form": "おおきいサイズ", "display": "パンプジン(おおきいサイズ)"}, {"no": "711", "name": "パンプジン", "form": "とくだいサイズ", "display": "パンプジン(とくだいサイズ)"}, {"no": "712", "name": "カチコール", "form": "通常", "display": "カチコール"}, {"no": "713", "name": "クレベース", "form": "通常", "display": "クレベース"}, {"no": "713", "name": "クレベース", "form": "ヒスイのすがた", "display": "クレベース(ヒスイのすがた)"}, {"no": "714", "name": "オンバット", "form": "通常", "display": "オンバット"}, {"no": "715", "name": "オンバーン", "form": "通常", "display": "オンバーン"}, {"no": "716", "name": "ゼルネアス", "form": "通常", "display": "ゼルネアス"}, {"no": "717", "name": "イベルタル", "form": "通常", "display": "イベルタル"}, {"no": "718", "name": "ジガルデ", "form": "５０％フォルム", "display": "ジガルデ(５０％フォルム)"}, {"no": "718", "name": "ジガルデ", "form": "１０％フォルム", "display": "ジガルデ(１０％フォルム)"}, {"no": "718", "name": "ジガルデ", "form": "５０％フォルム", "display": "ジガルデ(５０％フォルム)"}, {"no": "718", "name": "ジガルデ", "form": "パーフェクトフォルム", "display": "ジガルデ(パーフェクトフォルム)"}, {"no": "718", "name": "ジガルデ", "form": "１０％フォルム", "display": "ジガルデ(１０％フォルム)"}, {"no": "719", "name": "ディアンシー", "form": "通常", "display": "ディアンシー"}, {"no": "719", "name": "ディアンシー", "form": "メガディアンシー", "display": "ディアンシー(メガディアンシー)"}, {"no": "720", "name": "フーパ", "form": "いましめられしフーパ", "display": "フーパ(いましめられしフーパ)"}, {"no": "720", "name": "フーパ", "form": "ときはなたれしフーパ", "display": "フーパ(ときはなたれしフーパ)"}, {"no": "721", "name": "ボルケニオン", "form": "通常", "display": "ボルケニオン"}, {"no": "722", "name": "モクロー", "form": "通常", "display": "モクロー"}, {"no": "723", "name": "フクスロー", "form": "通常", "display": "フクスロー"}, {"no": "724", "name": "ジュナイパー", "form": "通常", "display": "ジュナイパー"}, {"no": "724", "name": "ジュナイパー", "form": "ヒスイのすがた", "display": "ジュナイパー(ヒスイのすがた)"}, {"no": "725", "name": "ニャビー", "form": "通常", "display": "ニャビー"}, {"no": "726", "name": "ニャヒート", "form": "通常", "display": "ニャヒート"}, {"no": "727", "name": "ガオガエン", "form": "通常", "display": "ガオガエン"}, {"no": "728", "name": "アシマリ", "form": "通常", "display": "アシマリ"}, {"no": "729", "name": "オシャマリ", "form": "通常", "display": "オシャマリ"}, {"no": "730", "name": "アシレーヌ", "form": "通常", "display": "アシレーヌ"}, {"no": "731", "name": "ツツケラ", "form": "通常", "display": "ツツケラ"}, {"no": "732", "name": "ケララッパ", "form": "通常", "display": "ケララッパ"}, {"no": "733", "name": "ドデカバシ", "form": "通常", "display": "ドデカバシ"}, {"no": "734", "name": "ヤングース", "form": "通常", "display": "ヤングース"}, {"no": "735", "name": "デカグース", "form": "通常", "display": "デカグース"}, {"no": "735", "name": "デカグース", "form": "ぬし", "display": "デカグース(ぬし)"}, {"no": "736", "name": "アゴジムシ", "form": "通常", "display": "アゴジムシ"}, {"no": "737", "name": "デンヂムシ", "form": "通常", "display": "デンヂムシ"}, {"no": "738", "name": "クワガノン", "form": "通常", "display": "クワガノン"}, {"no": "738", "name": "クワガノン", "form": "ぬし", "display": "クワガノン(ぬし)"}, {"no": "739", "name": "マケンカニ", "form": "通常", "display": "マケンカニ"}, {"no": "740", "name": "ケケンカニ", "form": "通常", "display": "ケケンカニ"}, {"no": "741", "name": "オドリドリ", "form": "めらめらスタイル", "display": "オドリドリ(めらめらスタイル)"}, {"no": "741", "name": "オドリドリ", "form": "ぱちぱちスタイル", "display": "オドリドリ(ぱちぱちスタイル)"}, {"no": "741", "name": "オドリドリ", "form": "ふらふらスタイル", "display": "オドリドリ(ふらふらスタイル)"}, {"no": "741", "name": "オドリドリ", "form": "まいまいスタイル", "display": "オドリドリ(まいまいスタイル)"}, {"no": "742", "name": "アブリー", "form": "通常", "display": "アブリー"}, {"no": "743", "name": "アブリボン", "form": "通常", "display": "アブリボン"}, {"no": "743", "name": "アブリボン", "form": "ぬし", "display": "アブリボン(ぬし)"}, {"no": "744", "name": "イワンコ", "form": "通常", "display": "イワンコ"}, {"no": "744", "name": "イワンコ", "form": "マイペース", "display": "イワンコ(マイペース)"}, {"no": "745", "name": "ルガルガン", "form": "まひるのすがた", "display": "ルガルガン(まひるのすがた)"}, {"no": "745", "name": "ルガルガン", "form": "まよなかのすがた", "display": "ルガルガン(まよなかのすがた)"}, {"no": "745", "name": "ルガルガン", "form": "たそがれのすがた", "display": "ルガルガン(たそがれのすがた)"}, {"no": "746", "name": "ヨワシ", "form": "たんどくのすがた", "display": "ヨワシ(たんどくのすがた)"}, {"no": "746", "name": "ヨワシ", "form": "むれたすがた", "display": "ヨワシ(むれたすがた)"}, {"no": "747", "name": "ヒドイデ", "form": "通常", "display": "ヒドイデ"}, {"no": "748", "name": "ドヒドイデ", "form": "通常", "display": "ドヒドイデ"}, {"no": "749", "name": "ドロバンコ", "form": "通常", "display": "ドロバンコ"}, {"no": "750", "name": "バンバドロ", "form": "通常", "display": "バンバドロ"}, {"no": "751", "name": "シズクモ", "form": "通常", "display": "シズクモ"}, {"no": "752", "name": "オニシズクモ", "form": "通常", "display": "オニシズクモ"}, {"no": "752", "name": "オニシズクモ", "form": "ぬし", "display": "オニシズクモ(ぬし)"}, {"no": "753", "name": "カリキリ", "form": "通常", "display": "カリキリ"}, {"no": "754", "name": "ラランテス", "form": "通常", "display": "ラランテス"}, {"no": "754", "name": "ラランテス", "form": "ぬし", "display": "ラランテス(ぬし)"}, {"no": "755", "name": "ネマシュ", "form": "通常", "display": "ネマシュ"}, {"no": "756", "name": "マシェード", "form": "通常", "display": "マシェード"}, {"no": "757", "name": "ヤトウモリ", "form": "通常", "display": "ヤトウモリ"}, {"no": "758", "name": "エンニュート", "form": "通常", "display": "エンニュート"}, {"no": "758", "name": "エンニュート", "form": "ぬし", "display": "エンニュート(ぬし)"}, {"no": "759", "name": "ヌイコグマ", "form": "通常", "display": "ヌイコグマ"}, {"no": "760", "name": "キテルグマ", "form": "通常", "display": "キテルグマ"}, {"no": "761", "name": "アマカジ", "form": "通常", "display": "アマカジ"}, {"no": "762", "name": "アママイコ", "form": "通常", "display": "アママイコ"}, {"no": "763", "name": "アマージョ", "form": "通常", "display": "アマージョ"}, {"no": "764", "name": "キュワワー", "form": "通常", "display": "キュワワー"}, {"no": "765", "name": "ヤレユータン", "form": "通常", "display": "ヤレユータン"}, {"no": "766", "name": "ナゲツケサル", "form": "通常", "display": "ナゲツケサル"}, {"no": "767", "name": "コソクムシ", "form": "通常", "display": "コソクムシ"}, {"no": "768", "name": "グソクムシャ", "form": "通常", "display": "グソクムシャ"}, {"no": "769", "name": "スナバァ", "form": "通常", "display": "スナバァ"}, {"no": "770", "name": "シロデスナ", "form": "通常", "display": "シロデスナ"}, {"no": "771", "name": "ナマコブシ", "form": "通常", "display": "ナマコブシ"}, {"no": "772", "name": "タイプ：ヌル", "form": "通常", "display": "タイプ：ヌル"}, {"no": "773", "name": "シルヴァディ", "form": "通常", "display": "シルヴァディ"}, {"no": "774", "name": "メテノ", "form": "りゅうせいのすがた", "display": "メテノ(りゅうせいのすがた)"}, {"no": "774", "name": "メテノ", "form": "りゅうせいのすがた", "display": "メテノ(りゅうせいのすがた)"}, {"no": "774", "name": "メテノ", "form": "りゅうせいのすがた", "display": "メテノ(りゅうせいのすがた)"}, {"no": "774", "name": "メテノ", "form": "りゅうせいのすがた", "display": "メテノ(りゅうせいのすがた)"}, {"no": "774", "name": "メテノ", "form": "りゅうせいのすがた", "display": "メテノ(りゅうせいのすがた)"}, {"no": "774", "name": "メテノ", "form": "りゅうせいのすがた", "display": "メテノ(りゅうせいのすがた)"}, {"no": "774", "name": "メテノ", "form": "りゅうせいのすがた", "display": "メテノ(りゅうせいのすがた)"}, {"no": "774", "name": "メテノ", "form": "あかいろのコア", "display": "メテノ(あかいろのコア)"}, {"no": "774", "name": "メテノ", "form": "だいだいいろのコア", "display": "メテノ(だいだいいろのコア)"}, {"no": "774", "name": "メテノ", "form": "きいろのコア", "display": "メテノ(きいろのコア)"}, {"no": "774", "name": "メテノ", "form": "みどりいろのコア", "display": "メテノ(みどりいろのコア)"}, {"no": "774", "name": "メテノ", "form": "みずいろのコア", "display": "メテノ(みずいろのコア)"}, {"no": "774", "name": "メテノ", "form": "あおいろのコア", "display": "メテノ(あおいろのコア)"}, {"no": "774", "name": "メテノ", "form": "むらさきいろのコア", "display": "メテノ(むらさきいろのコア)"}, {"no": "775", "name": "ネッコアラ", "form": "通常", "display": "ネッコアラ"}, {"no": "776", "name": "バクガメス", "form": "通常", "display": "バクガメス"}, {"no": "777", "name": "トゲデマル", "form": "通常", "display": "トゲデマル"}, {"no": "777", "name": "トゲデマル", "form": "ぬし", "display": "トゲデマル(ぬし)"}, {"no": "778", "name": "ミミッキュ", "form": "ばけたすがた", "display": "ミミッキュ(ばけたすがた)"}, {"no": "778", "name": "ミミッキュ", "form": "ばれたすがた", "display": "ミミッキュ(ばれたすがた)"}, {"no": "778", "name": "ミミッキュ", "form": "ぬし（ばけたすがた）", "display": "ミミッキュ(ぬし（ばけたすがた）)"}, {"no": "778", "name": "ミミッキュ", "form": "ぬし（ばれたすがた）", "display": "ミミッキュ(ぬし（ばれたすがた）)"}, {"no": "779", "name": "ハギギシリ", "form": "通常", "display": "ハギギシリ"}, {"no": "780", "name": "ジジーロン", "form": "通常", "display": "ジジーロン"}, {"no": "781", "name": "ダダリン", "form": "通常", "display": "ダダリン"}, {"no": "782", "name": "ジャラコ", "form": "通常", "display": "ジャラコ"}, {"no": "783", "name": "ジャランゴ", "form": "通常", "display": "ジャランゴ"}, {"no": "784", "name": "ジャラランガ", "form": "通常", "display": "ジャラランガ"}, {"no": "784", "name": "ジャラランガ", "form": "ぬし", "display": "ジャラランガ(ぬし)"}, {"no": "785", "name": "カプ・コケコ", "form": "通常", "display": "カプ・コケコ"}, {"no": "786", "name": "カプ・テテフ", "form": "通常", "display": "カプ・テテフ"}, {"no": "787", "name": "カプ・ブルル", "form": "通常", "display": "カプ・ブルル"}, {"no": "788", "name": "カプ・レヒレ", "form": "通常", "display": "カプ・レヒレ"}, {"no": "789", "name": "コスモッグ", "form": "通常", "display": "コスモッグ"}, {"no": "790", "name": "コスモウム", "form": "通常", "display": "コスモウム"}, {"no": "791", "name": "ソルガレオ", "form": "通常", "display": "ソルガレオ"}, {"no": "792", "name": "ルナアーラ", "form": "通常", "display": "ルナアーラ"}, {"no": "793", "name": "ウツロイド", "form": "通常", "display": "ウツロイド"}, {"no": "794", "name": "マッシブーン", "form": "通常", "display": "マッシブーン"}, {"no": "795", "name": "フェローチェ", "form": "通常", "display": "フェローチェ"}, {"no": "796", "name": "デンジュモク", "form": "通常", "display": "デンジュモク"}, {"no": "797", "name": "テッカグヤ", "form": "通常", "display": "テッカグヤ"}, {"no": "798", "name": "カミツルギ", "form": "通常", "display": "カミツルギ"}, {"no": "799", "name": "アクジキング", "form": "通常", "display": "アクジキング"}, {"no": "800", "name": "ネクロズマ", "form": "通常", "display": "ネクロズマ"}, {"no": "800", "name": "ネクロズマ", "form": "たそがれのたてがみ", "display": "ネクロズマ(たそがれのたてがみ)"}, {"no": "800", "name": "ネクロズマ", "form": "あかつきのつばさ", "display": "ネクロズマ(あかつきのつばさ)"}, {"no": "800", "name": "ネクロズマ", "form": "ウルトラネクロズマ", "display": "ネクロズマ(ウルトラネクロズマ)"}, {"no": "801", "name": "マギアナ", "form": "通常", "display": "マギアナ"}, {"no": "801", "name": "マギアナ", "form": "５００ねんまえのいろ", "display": "マギアナ(５００ねんまえのいろ)"}, {"no": "802", "name": "マーシャドー", "form": "通常", "display": "マーシャドー"}, {"no": "803", "name": "ベベノム", "form": "通常", "display": "ベベノム"}, {"no": "804", "name": "アーゴヨン", "form": "通常", "display": "アーゴヨン"}, {"no": "805", "name": "ツンデツンデ", "form": "通常", "display": "ツンデツンデ"}, {"no": "806", "name": "ズガドーン", "form": "通常", "display": "ズガドーン"}, {"no": "807", "name": "ゼラオラ", "form": "通常", "display": "ゼラオラ"}, {"no": "808", "name": "メルタン", "form": "通常", "display": "メルタン"}, {"no": "809", "name": "メルメタル", "form": "通常", "display": "メルメタル"}, {"no": "809", "name": "メルメタル", "form": "キョダイマックス", "display": "メルメタル(キョダイマックス)"}, {"no": "810", "name": "サルノリ", "form": "通常", "display": "サルノリ"}, {"no": "811", "name": "バチンキー", "form": "通常", "display": "バチンキー"}, {"no": "812", "name": "ゴリランダー", "form": "通常", "display": "ゴリランダー"}, {"no": "812", "name": "ゴリランダー", "form": "キョダイマックス", "display": "ゴリランダー(キョダイマックス)"}, {"no": "813", "name": "ヒバニー", "form": "通常", "display": "ヒバニー"}, {"no": "814", "name": "ラビフット", "form": "通常", "display": "ラビフット"}, {"no": "815", "name": "エースバーン", "form": "通常", "display": "エースバーン"}, {"no": "815", "name": "エースバーン", "form": "キョダイマックス", "display": "エースバーン(キョダイマックス)"}, {"no": "816", "name": "メッソン", "form": "通常", "display": "メッソン"}, {"no": "817", "name": "ジメレオン", "form": "通常", "display": "ジメレオン"}, {"no": "818", "name": "インテレオン", "form": "通常", "display": "インテレオン"}, {"no": "818", "name": "インテレオン", "form": "キョダイマックス", "display": "インテレオン(キョダイマックス)"}, {"no": "819", "name": "ホシガリス", "form": "通常", "display": "ホシガリス"}, {"no": "820", "name": "ヨクバリス", "form": "通常", "display": "ヨクバリス"}, {"no": "821", "name": "ココガラ", "form": "通常", "display": "ココガラ"}, {"no": "822", "name": "アオガラス", "form": "通常", "display": "アオガラス"}, {"no": "823", "name": "アーマーガア", "form": "通常", "display": "アーマーガア"}, {"no": "823", "name": "アーマーガア", "form": "キョダイマックス", "display": "アーマーガア(キョダイマックス)"}, {"no": "824", "name": "サッチムシ", "form": "通常", "display": "サッチムシ"}, {"no": "825", "name": "レドームシ", "form": "通常", "display": "レドームシ"}, {"no": "826", "name": "イオルブ", "form": "通常", "display": "イオルブ"}, {"no": "826", "name": "イオルブ", "form": "キョダイマックス", "display": "イオルブ(キョダイマックス)"}, {"no": "827", "name": "クスネ", "form": "通常", "display": "クスネ"}, {"no": "828", "name": "フォクスライ", "form": "通常", "display": "フォクスライ"}, {"no": "829", "name": "ヒメンカ", "form": "通常", "display": "ヒメンカ"}, {"no": "830", "name": "ワタシラガ", "form": "通常", "display": "ワタシラガ"}, {"no": "831", "name": "ウールー", "form": "通常", "display": "ウールー"}, {"no": "832", "name": "バイウールー", "form": "通常", "display": "バイウールー"}, {"no": "833", "name": "カムカメ", "form": "通常", "display": "カムカメ"}, {"no": "834", "name": "カジリガメ", "form": "通常", "display": "カジリガメ"}, {"no": "834", "name": "カジリガメ", "form": "キョダイマックス", "display": "カジリガメ(キョダイマックス)"}, {"no": "835", "name": "ワンパチ", "form": "通常", "display": "ワンパチ"}, {"no": "836", "name": "パルスワン", "form": "通常", "display": "パルスワン"}, {"no": "837", "name": "タンドン", "form": "通常", "display": "タンドン"}, {"no": "838", "name": "トロッゴン", "form": "通常", "display": "トロッゴン"}, {"no": "839", "name": "セキタンザン", "form": "通常", "display": "セキタンザン"}, {"no": "839", "name": "セキタンザン", "form": "キョダイマックス", "display": "セキタンザン(キョダイマックス)"}, {"no": "840", "name": "カジッチュ", "form": "通常", "display": "カジッチュ"}, {"no": "841", "name": "アップリュー", "form": "通常", "display": "アップリュー"}, {"no": "841", "name": "アップリュー", "form": "キョダイマックス", "display": "アップリュー(キョダイマックス)"}, {"no": "842", "name": "タルップル", "form": "通常", "display": "タルップル"}, {"no": "842", "name": "タルップル", "form": "キョダイマックス", "display": "タルップル(キョダイマックス)"}, {"no": "843", "name": "スナヘビ", "form": "通常", "display": "スナヘビ"}, {"no": "844", "name": "サダイジャ", "form": "通常", "display": "サダイジャ"}, {"no": "844", "name": "サダイジャ", "form": "キョダイマックス", "display": "サダイジャ(キョダイマックス)"}, {"no": "845", "name": "ウッウ", "form": "通常", "display": "ウッウ"}, {"no": "845", "name": "ウッウ", "form": "うのみのすがた", "display": "ウッウ(うのみのすがた)"}, {"no": "845", "name": "ウッウ", "form": "まるのみのすがた", "display": "ウッウ(まるのみのすがた)"}, {"no": "846", "name": "サシカマス", "form": "通常", "display": "サシカマス"}, {"no": "847", "name": "カマスジョー", "form": "通常", "display": "カマスジョー"}, {"no": "848", "name": "エレズン", "form": "通常", "display": "エレズン"}, {"no": "849", "name": "ストリンダー", "form": "ハイなすがた", "display": "ストリンダー(ハイなすがた)"}, {"no": "849", "name": "ストリンダー", "form": "ローなすがた", "display": "ストリンダー(ローなすがた)"}, {"no": "849", "name": "ストリンダー", "form": "キョダイマックス", "display": "ストリンダー(キョダイマックス)"}, {"no": "849", "name": "ストリンダー", "form": "キョダイマックス", "display": "ストリンダー(キョダイマックス)"}, {"no": "850", "name": "ヤクデ", "form": "通常", "display": "ヤクデ"}, {"no": "851", "name": "マルヤクデ", "form": "通常", "display": "マルヤクデ"}, {"no": "851", "name": "マルヤクデ", "form": "キョダイマックス", "display": "マルヤクデ(キョダイマックス)"}, {"no": "852", "name": "タタッコ", "form": "通常", "display": "タタッコ"}, {"no": "853", "name": "オトスパス", "form": "通常", "display": "オトスパス"}, {"no": "854", "name": "ヤバチャ", "form": "通常", "display": "ヤバチャ"}, {"no": "855", "name": "ポットデス", "form": "通常", "display": "ポットデス"}, {"no": "856", "name": "ミブリム", "form": "通常", "display": "ミブリム"}, {"no": "857", "name": "テブリム", "form": "通常", "display": "テブリム"}, {"no": "858", "name": "ブリムオン", "form": "通常", "display": "ブリムオン"}, {"no": "858", "name": "ブリムオン", "form": "キョダイマックス", "display": "ブリムオン(キョダイマックス)"}, {"no": "859", "name": "ベロバー", "form": "通常", "display": "ベロバー"}, {"no": "860", "name": "ギモー", "form": "通常", "display": "ギモー"}, {"no": "861", "name": "オーロンゲ", "form": "通常", "display": "オーロンゲ"}, {"no": "861", "name": "オーロンゲ", "form": "キョダイマックス", "display": "オーロンゲ(キョダイマックス)"}, {"no": "862", "name": "タチフサグマ", "form": "通常", "display": "タチフサグマ"}, {"no": "863", "name": "ニャイキング", "form": "通常", "display": "ニャイキング"}, {"no": "864", "name": "サニゴーン", "form": "通常", "display": "サニゴーン"}, {"no": "865", "name": "ネギガナイト", "form": "通常", "display": "ネギガナイト"}, {"no": "866", "name": "バリコオル", "form": "通常", "display": "バリコオル"}, {"no": "867", "name": "デスバーン", "form": "通常", "display": "デスバーン"}, {"no": "868", "name": "マホミル", "form": "通常", "display": "マホミル"}, {"no": "869", "name": "マホイップ", "form": "通常", "display": "マホイップ"}, {"no": "869", "name": "マホイップ", "form": "キョダイマックス", "display": "マホイップ(キョダイマックス)"}, {"no": "870", "name": "タイレーツ", "form": "通常", "display": "タイレーツ"}, {"no": "871", "name": "バチンウニ", "form": "通常", "display": "バチンウニ"}, {"no": "872", "name": "ユキハミ", "form": "通常", "display": "ユキハミ"}, {"no": "873", "name": "モスノウ", "form": "通常", "display": "モスノウ"}, {"no": "874", "name": "イシヘンジン", "form": "通常", "display": "イシヘンジン"}, {"no": "875", "name": "コオリッポ", "form": "アイスフェイス", "display": "コオリッポ(アイスフェイス)"}, {"no": "875", "name": "コオリッポ", "form": "ナイスフェイス", "display": "コオリッポ(ナイスフェイス)"}, {"no": "876", "name": "イエッサン", "form": "オスのすがた", "display": "イエッサン(オスのすがた)"}, {"no": "876", "name": "イエッサン", "form": "メスのすがた", "display": "イエッサン(メスのすがた)"}, {"no": "877", "name": "モルペコ", "form": "まんぷくもよう", "display": "モルペコ(まんぷくもよう)"}, {"no": "877", "name": "モルペコ", "form": "はらぺこもよう", "display": "モルペコ(はらぺこもよう)"}, {"no": "878", "name": "ゾウドウ", "form": "通常", "display": "ゾウドウ"}, {"no": "879", "name": "ダイオウドウ", "form": "通常", "display": "ダイオウドウ"}, {"no": "879", "name": "ダイオウドウ", "form": "キョダイマックス", "display": "ダイオウドウ(キョダイマックス)"}, {"no": "880", "name": "パッチラゴン", "form": "通常", "display": "パッチラゴン"}, {"no": "881", "name": "パッチルドン", "form": "通常", "display": "パッチルドン"}, {"no": "882", "name": "ウオノラゴン", "form": "通常", "display": "ウオノラゴン"}, {"no": "883", "name": "ウオチルドン", "form": "通常", "display": "ウオチルドン"}, {"no": "884", "name": "ジュラルドン", "form": "通常", "display": "ジュラルドン"}, {"no": "884", "name": "ジュラルドン", "form": "キョダイマックス", "display": "ジュラルドン(キョダイマックス)"}, {"no": "885", "name": "ドラメシヤ", "form": "通常", "display": "ドラメシヤ"}, {"no": "886", "name": "ドロンチ", "form": "通常", "display": "ドロンチ"}, {"no": "887", "name": "ドラパルト", "form": "通常", "display": "ドラパルト"}, {"no": "888", "name": "ザシアン", "form": "れきせんのゆうしゃ", "display": "ザシアン(れきせんのゆうしゃ)"}, {"no": "888", "name": "ザシアン", "form": "けんのおう", "display": "ザシアン(けんのおう)"}, {"no": "889", "name": "ザマゼンタ", "form": "れきせんのゆうしゃ", "display": "ザマゼンタ(れきせんのゆうしゃ)"}, {"no": "889", "name": "ザマゼンタ", "form": "たてのおう", "display": "ザマゼンタ(たてのおう)"}, {"no": "890", "name": "ムゲンダイナ", "form": "通常", "display": "ムゲンダイナ"}, {"no": "890", "name": "ムゲンダイナ", "form": "ムゲンダイマックス", "display": "ムゲンダイナ(ムゲンダイマックス)"}, {"no": "891", "name": "ダクマ", "form": "通常", "display": "ダクマ"}, {"no": "892", "name": "ウーラオス", "form": "いちげきのかた", "display": "ウーラオス(いちげきのかた)"}, {"no": "892", "name": "ウーラオス", "form": "れんげきのかた", "display": "ウーラオス(れんげきのかた)"}, {"no": "892", "name": "ウーラオス", "form": "キョダイマックス", "display": "ウーラオス(キョダイマックス)"}, {"no": "892", "name": "ウーラオス", "form": "キョダイマックス", "display": "ウーラオス(キョダイマックス)"}, {"no": "893", "name": "ザルード", "form": "通常", "display": "ザルード"}, {"no": "893", "name": "ザルード", "form": "とうちゃん", "display": "ザルード(とうちゃん)"}, {"no": "894", "name": "レジエレキ", "form": "通常", "display": "レジエレキ"}, {"no": "895", "name": "レジドラゴ", "form": "通常", "display": "レジドラゴ"}, {"no": "896", "name": "ブリザポス", "form": "通常", "display": "ブリザポス"}, {"no": "897", "name": "レイスポス", "form": "通常", "display": "レイスポス"}, {"no": "898", "name": "バドレックス", "form": "通常", "display": "バドレックス"}, {"no": "898", "name": "バドレックス", "form": "はくばじょうのすがた", "display": "バドレックス(はくばじょうのすがた)"}, {"no": "898", "name": "バドレックス", "form": "こくばじょうのすがた", "display": "バドレックス(こくばじょうのすがた)"}, {"no": "899", "name": "アヤシシ", "form": "通常", "display": "アヤシシ"}, {"no": "900", "name": "バサギリ", "form": "通常", "display": "バサギリ"}, {"no": "901", "name": "ガチグマ", "form": "通常", "display": "ガチグマ"}, {"no": "901", "name": "ガチグマ", "form": "アカツキ", "display": "ガチグマ(アカツキ)"}, {"no": "902", "name": "イダイトウ", "form": "オスのすがた", "display": "イダイトウ(オスのすがた)"}, {"no": "902", "name": "イダイトウ", "form": "メスのすがた", "display": "イダイトウ(メスのすがた)"}, {"no": "903", "name": "オオニューラ", "form": "通常", "display": "オオニューラ"}, {"no": "904", "name": "ハリーマン", "form": "通常", "display": "ハリーマン"}, {"no": "905", "name": "ラブトロス", "form": "けしんフォルム", "display": "ラブトロス(けしんフォルム)"}, {"no": "905", "name": "ラブトロス", "form": "れいじゅうフォルム", "display": "ラブトロス(れいじゅうフォルム)"}, {"no": "906", "name": "ニャオハ", "form": "通常", "display": "ニャオハ"}, {"no": "907", "name": "ニャローテ", "form": "通常", "display": "ニャローテ"}, {"no": "908", "name": "マスカーニャ", "form": "通常", "display": "マスカーニャ"}, {"no": "909", "name": "ホゲータ", "form": "通常", "display": "ホゲータ"}, {"no": "910", "name": "アチゲータ", "form": "通常", "display": "アチゲータ"}, {"no": "911", "name": "ラウドボーン", "form": "通常", "display": "ラウドボーン"}, {"no": "912", "name": "クワッス", "form": "通常", "display": "クワッス"}, {"no": "913", "name": "ウェルカモ", "form": "通常", "display": "ウェルカモ"}, {"no": "914", "name": "ウェーニバル", "form": "通常", "display": "ウェーニバル"}, {"no": "915", "name": "グルトン", "form": "通常", "display": "グルトン"}, {"no": "916", "name": "パフュートン", "form": "オスのすがた", "display": "パフュートン(オスのすがた)"}, {"no": "916", "name": "パフュートン", "form": "メスのすがた", "display": "パフュートン(メスのすがた)"}, {"no": "917", "name": "タマンチュラ", "form": "通常", "display": "タマンチュラ"}, {"no": "918", "name": "ワナイダー", "form": "通常", "display": "ワナイダー"}, {"no": "919", "name": "マメバッタ", "form": "通常", "display": "マメバッタ"}, {"no": "920", "name": "エクスレッグ", "form": "通常", "display": "エクスレッグ"}, {"no": "921", "name": "パモ", "form": "通常", "display": "パモ"}, {"no": "922", "name": "パモット", "form": "通常", "display": "パモット"}, {"no": "923", "name": "パーモット", "form": "通常", "display": "パーモット"}, {"no": "924", "name": "ワッカネズミ", "form": "通常", "display": "ワッカネズミ"}, {"no": "925", "name": "イッカネズミ", "form": "４ひきかぞく", "display": "イッカネズミ(４ひきかぞく)"}, {"no": "925", "name": "イッカネズミ", "form": "３びきかぞく", "display": "イッカネズミ(３びきかぞく)"}, {"no": "926", "name": "パピモッチ", "form": "通常", "display": "パピモッチ"}, {"no": "927", "name": "バウッツェル", "form": "通常", "display": "バウッツェル"}, {"no": "928", "name": "ミニーブ", "form": "通常", "display": "ミニーブ"}, {"no": "929", "name": "オリーニョ", "form": "通常", "display": "オリーニョ"}, {"no": "930", "name": "オリーヴァ", "form": "通常", "display": "オリーヴァ"}, {"no": "931", "name": "イキリンコ", "form": "グリーンフェザー", "display": "イキリンコ(グリーンフェザー)"}, {"no": "931", "name": "イキリンコ", "form": "ブルーフェザー", "display": "イキリンコ(ブルーフェザー)"}, {"no": "931", "name": "イキリンコ", "form": "イエローフェザー", "display": "イキリンコ(イエローフェザー)"}, {"no": "931", "name": "イキリンコ", "form": "ホワイトフェザー", "display": "イキリンコ(ホワイトフェザー)"}, {"no": "932", "name": "コジオ", "form": "通常", "display": "コジオ"}, {"no": "933", "name": "ジオヅム", "form": "通常", "display": "ジオヅム"}, {"no": "934", "name": "キョジオーン", "form": "通常", "display": "キョジオーン"}, {"no": "935", "name": "カルボウ", "form": "通常", "display": "カルボウ"}, {"no": "936", "name": "グレンアルマ", "form": "通常", "display": "グレンアルマ"}, {"no": "937", "name": "ソウブレイズ", "form": "通常", "display": "ソウブレイズ"}, {"no": "938", "name": "ズピカ", "form": "通常", "display": "ズピカ"}, {"no": "939", "name": "ハラバリー", "form": "通常", "display": "ハラバリー"}, {"no": "940", "name": "カイデン", "form": "通常", "display": "カイデン"}, {"no": "941", "name": "タイカイデン", "form": "通常", "display": "タイカイデン"}, {"no": "942", "name": "オラチフ", "form": "通常", "display": "オラチフ"}, {"no": "943", "name": "マフィティフ", "form": "通常", "display": "マフィティフ"}, {"no": "944", "name": "シルシュルー", "form": "通常", "display": "シルシュルー"}, {"no": "945", "name": "タギングル", "form": "通常", "display": "タギングル"}, {"no": "946", "name": "アノクサ", "form": "通常", "display": "アノクサ"}, {"no": "947", "name": "アノホラグサ", "form": "通常", "display": "アノホラグサ"}, {"no": "948", "name": "ノノクラゲ", "form": "通常", "display": "ノノクラゲ"}, {"no": "949", "name": "リククラゲ", "form": "通常", "display": "リククラゲ"}, {"no": "950", "name": "ガケガニ", "form": "通常", "display": "ガケガニ"}, {"no": "951", "name": "カプサイジ", "form": "通常", "display": "カプサイジ"}, {"no": "952", "name": "スコヴィラン", "form": "通常", "display": "スコヴィラン"}, {"no": "953", "name": "シガロコ", "form": "通常", "display": "シガロコ"}, {"no": "954", "name": "ベラカス", "form": "通常", "display": "ベラカス"}, {"no": "955", "name": "ヒラヒナ", "form": "通常", "display": "ヒラヒナ"}, {"no": "956", "name": "クエスパトラ", "form": "通常", "display": "クエスパトラ"}, {"no": "957", "name": "カヌチャン", "form": "通常", "display": "カヌチャン"}, {"no": "958", "name": "ナカヌチャン", "form": "通常", "display": "ナカヌチャン"}, {"no": "959", "name": "デカヌチャン", "form": "通常", "display": "デカヌチャン"}, {"no": "960", "name": "ウミディグダ", "form": "通常", "display": "ウミディグダ"}, {"no": "961", "name": "ウミトリオ", "form": "通常", "display": "ウミトリオ"}, {"no": "962", "name": "オトシドリ", "form": "通常", "display": "オトシドリ"}, {"no": "963", "name": "ナミイルカ", "form": "通常", "display": "ナミイルカ"}, {"no": "964", "name": "イルカマン", "form": "ナイーブフォルム", "display": "イルカマン(ナイーブフォルム)"}, {"no": "964", "name": "イルカマン", "form": "マイティフォルム", "display": "イルカマン(マイティフォルム)"}, {"no": "965", "name": "ブロロン", "form": "通常", "display": "ブロロン"}, {"no": "966", "name": "ブロロローム", "form": "通常", "display": "ブロロローム"}, {"no": "967", "name": "モトトカゲ", "form": "通常", "display": "モトトカゲ"}, {"no": "968", "name": "ミミズズ", "form": "通常", "display": "ミミズズ"}, {"no": "969", "name": "キラーメ", "form": "通常", "display": "キラーメ"}, {"no": "970", "name": "キラフロル", "form": "通常", "display": "キラフロル"}, {"no": "971", "name": "ボチ", "form": "通常", "display": "ボチ"}, {"no": "972", "name": "ハカドッグ", "form": "通常", "display": "ハカドッグ"}, {"no": "973", "name": "カラミンゴ", "form": "通常", "display": "カラミンゴ"}, {"no": "974", "name": "アルクジラ", "form": "通常", "display": "アルクジラ"}, {"no": "975", "name": "ハルクジラ", "form": "通常", "display": "ハルクジラ"}, {"no": "976", "name": "ミガルーサ", "form": "通常", "display": "ミガルーサ"}, {"no": "977", "name": "ヘイラッシャ", "form": "通常", "display": "ヘイラッシャ"}, {"no": "978", "name": "シャリタツ", "form": "そったすがた", "display": "シャリタツ(そったすがた)"}, {"no": "978", "name": "シャリタツ", "form": "たれたすがた", "display": "シャリタツ(たれたすがた)"}, {"no": "978", "name": "シャリタツ", "form": "のびたすがた", "display": "シャリタツ(のびたすがた)"}, {"no": "979", "name": "コノヨザル", "form": "通常", "display": "コノヨザル"}, {"no": "980", "name": "ドオー", "form": "通常", "display": "ドオー"}, {"no": "981", "name": "リキキリン", "form": "通常", "display": "リキキリン"}, {"no": "982", "name": "ノココッチ", "form": "ふたふしフォルム", "display": "ノココッチ(ふたふしフォルム)"}, {"no": "982", "name": "ノココッチ", "form": "みつふしフォルム", "display": "ノココッチ(みつふしフォルム)"}, {"no": "983", "name": "ドドゲザン", "form": "通常", "display": "ドドゲザン"}, {"no": "984", "name": "イダイナキバ", "form": "通常", "display": "イダイナキバ"}, {"no": "985", "name": "サケブシッポ", "form": "通常", "display": "サケブシッポ"}, {"no": "986", "name": "アラブルタケ", "form": "通常", "display": "アラブルタケ"}, {"no": "987", "name": "ハバタクカミ", "form": "通常", "display": "ハバタクカミ"}, {"no": "988", "name": "チヲハウハネ", "form": "通常", "display": "チヲハウハネ"}, {"no": "989", "name": "スナノケガワ", "form": "通常", "display": "スナノケガワ"}, {"no": "990", "name": "テツノワダチ", "form": "通常", "display": "テツノワダチ"}, {"no": "991", "name": "テツノツツミ", "form": "通常", "display": "テツノツツミ"}, {"no": "992", "name": "テツノカイナ", "form": "通常", "display": "テツノカイナ"}, {"no": "993", "name": "テツノコウベ", "form": "通常", "display": "テツノコウベ"}, {"no": "994", "name": "テツノドクガ", "form": "通常", "display": "テツノドクガ"}, {"no": "995", "name": "テツノイバラ", "form": "通常", "display": "テツノイバラ"}, {"no": "996", "name": "セビエ", "form": "通常", "display": "セビエ"}, {"no": "997", "name": "セゴール", "form": "通常", "display": "セゴール"}, {"no": "998", "name": "セグレイブ", "form": "通常", "display": "セグレイブ"}, {"no": "999", "name": "コレクレー", "form": "通常", "display": "コレクレー"}, {"no": "999", "name": "コレクレー", "form": "とほフォルム", "display": "コレクレー(とほフォルム)"}, {"no": "1000", "name": "サーフゴー", "form": "通常", "display": "サーフゴー"}, {"no": "1001", "name": "チオンジェン", "form": "通常", "display": "チオンジェン"}, {"no": "1002", "name": "パオジアン", "form": "通常", "display": "パオジアン"}, {"no": "1003", "name": "ディンルー", "form": "通常", "display": "ディンルー"}, {"no": "1004", "name": "イーユイ", "form": "通常", "display": "イーユイ"}, {"no": "1005", "name": "トドロクツキ", "form": "通常", "display": "トドロクツキ"}, {"no": "1006", "name": "テツノブジン", "form": "通常", "display": "テツノブジン"}, {"no": "1007", "name": "コライドン", "form": "通常", "display": "コライドン"}, {"no": "1007", "name": "コライドン", "form": "せいげんけいたい", "display": "コライドン(せいげんけいたい)"}, {"no": "1007", "name": "コライドン", "form": "しっそうけいたい", "display": "コライドン(しっそうけいたい)"}, {"no": "1007", "name": "コライドン", "form": "ゆうえいけいたい", "display": "コライドン(ゆうえいけいたい)"}, {"no": "1007", "name": "コライドン", "form": "かっくうけいたい", "display": "コライドン(かっくうけいたい)"}, {"no": "1008", "name": "ミライドン", "form": "通常", "display": "ミライドン"}, {"no": "1008", "name": "ミライドン", "form": "リミテッドモード", "display": "ミライドン(リミテッドモード)"}, {"no": "1008", "name": "ミライドン", "form": "ドライブモード", "display": "ミライドン(ドライブモード)"}, {"no": "1008", "name": "ミライドン", "form": "フロートモード", "display": "ミライドン(フロートモード)"}, {"no": "1008", "name": "ミライドン", "form": "グライドモード", "display": "ミライドン(グライドモード)"}, {"no": "1009", "name": "ウネルミナモ", "form": "通常", "display": "ウネルミナモ"}, {"no": "1010", "name": "テツノイサハ", "form": "通常", "display": "テツノイサハ"}, {"no": "1011", "name": "カミッチュ", "form": "通常", "display": "カミッチュ"}, {"no": "1012", "name": "チャデス", "form": "通常", "display": "チャデス"}, {"no": "1013", "name": "ヤバソチャ", "form": "通常", "display": "ヤバソチャ"}, {"no": "1014", "name": "イイネイヌ", "form": "通常", "display": "イイネイヌ"}, {"no": "1015", "name": "マシマシラ", "form": "通常", "display": "マシマシラ"}, {"no": "1016", "name": "キチキギス", "form": "通常", "display": "キチキギス"}, {"no": "1017", "name": "オーガポン", "form": "みどりのめん", "display": "オーガポン(みどりのめん)"}, {"no": "1017", "name": "オーガポン", "form": "いどのめん", "display": "オーガポン(いどのめん)"}, {"no": "1017", "name": "オーガポン", "form": "かまどのめん", "display": "オーガポン(かまどのめん)"}, {"no": "1017", "name": "オーガポン", "form": "いしずえのめん", "display": "オーガポン(いしずえのめん)"}, {"no": "1018", "name": "ブリジュラス", "form": "通常", "display": "ブリジュラス"}, {"no": "1019", "name": "カミツオロチ", "form": "通常", "display": "カミツオロチ"}, {"no": "1020", "name": "ウガツホムラ", "form": "通常", "display": "ウガツホムラ"}, {"no": "1021", "name": "タケルライコ", "form": "通常", "display": "タケルライコ"}, {"no": "1022", "name": "テツノイワオ", "form": "通常", "display": "テツノイワオ"}, {"no": "1023", "name": "テツノカシラ", "form": "通常", "display": "テツノカシラ"}, {"no": "1024", "name": "テラパゴス", "form": "ノーマルフォルム", "display": "テラパゴス(ノーマルフォルム)"}, {"no": "1024", "name": "テラパゴス", "form": "テラスタルフォルム", "display": "テラパゴス(テラスタルフォルム)"}, {"no": "1024", "name": "テラパゴス", "form": "ステラフォルム", "display": "テラパゴス(ステラフォルム)"}, {"no": "1025", "name": "モモワロウ", "form": "通常", "display": "モモワロウ"}];
+
+// ---- DATA ----
+let parties = JSON.parse(localStorage.getItem('pkm_parties') || '[]');
+let records = JSON.parse(localStorage.getItem('pkm_records') || '[]');
+let selectedPartyId = null;
+let recordResult = null;
+let editingPartyId = null;
+const mySelFilter = [];
+const oppSelFilter = [];
+let currentUser = null;
+let _fbReady = false;
+
+// Firestore保存（ログイン中のみ、localStorageにも同時保存）
+async function saveData() {
+  localStorage.setItem('pkm_parties', JSON.stringify(parties));
+  localStorage.setItem('pkm_records', JSON.stringify(records));
+  if (!currentUser || !_fbReady) return;
+  const { doc, setDoc } = window._firestoreOps;
+  const db = window._db;
+  const uid = currentUser.uid;
+  try {
+    await setDoc(doc(db, 'users', uid, 'data', 'main'), {
+      parties, records, updatedAt: window._firestoreOps.serverTimestamp()
+    });
+  } catch(e) { console.error('Firestore save error:', e); }
+}
+
+// Firestoreからロード
+async function loadFromFirestore() {
+  if (!currentUser || !_fbReady) return;
+  const { doc, getDoc } = window._firestoreOps;
+  const db = window._db;
+  const uid = currentUser.uid;
+  try {
+    const snap = await getDoc(doc(db, 'users', uid, 'data', 'main'));
+    if (snap.exists()) {
+      const data = snap.data();
+      parties = data.parties || [];
+      records = data.records || [];
+      // localStorageも更新
+      localStorage.setItem('pkm_parties', JSON.stringify(parties));
+      localStorage.setItem('pkm_records', JSON.stringify(records));
+    }
+  } catch(e) { console.error('Firestore load error:', e); }
+}
+
+// 認証トグル
+async function toggleAuth() {
+  if (currentUser) {
+    await window._signOut(window._auth);
+  } else {
+    const provider = new window._GoogleAuthProvider();
+    try {
+      await window._signInWithPopup(window._auth, provider);
+    } catch(e) { console.error('Auth error:', e); }
+  }
+}
+
+// Firebase初期化待ちでAuth監視を開始
+function initFirebase() {
+  _fbReady = true;
+  window._onAuthStateChanged(window._auth, async (user) => {
+    currentUser = user;
+    const nameEl = document.getElementById('user-name');
+    const btnEl = document.getElementById('auth-btn');
+    const banner = document.getElementById('login-banner');
+    if (user) {
+      nameEl.textContent = user.displayName || user.email;
+      btnEl.textContent = 'ログアウト';
+      banner.style.display = 'none';
+      await loadFromFirestore();
+      renderParties();
+      renderHistory();
+    } else {
+      nameEl.textContent = '';
+      btnEl.textContent = 'ログイン';
+      banner.style.display = 'block';
+    }
+  });
+}
+
+// Firebase準備完了イベント待ち
+if (window._firebaseReady) {
+  initFirebase();
+} else {
+  document.addEventListener('firebase-ready', initFirebase);
+}
+
+// ---- NAVIGATION ----
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  event.target.classList.add('active');
+  if (name === 'parties') renderParties();
+  if (name === 'record') renderRecordPage();
+  if (name === 'history') renderHistory();
+}
+
+// ---- AUTOCOMPLETE ----
+function createPokemonSlot(containerId, index, label) {
+  const wrap = document.createElement('div');
+  wrap.className = 'pokemon-slot';
+  wrap.innerHTML = `
+    <div class="slot-label">${label}</div>
+    <div class="slot-input-wrap" style="position:relative">
+      <input type="text" placeholder="ポケモン名を入力" autocomplete="off"
+        data-container="${containerId}" data-index="${index}"
+        oninput="onSlotInput(this)" onkeydown="onSlotKeydown(event, this)">
+      <button class="slot-clear" onclick="clearSlot(this)" tabindex="-1">×</button>
+      <div class="autocomplete-list" id="ac-${containerId}-${index}"></div>
+    </div>
+  `;
+  return wrap;
+}
+
+// カタカナ↔ひらがな変換
+function toHiragana(str) {
+  return str.replace(/[ァ-ヶ]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60));
+}
+function toKatakana(str) {
+  return str.replace(/[ぁ-ゖ]/g, c => String.fromCharCode(c.charCodeAt(0) + 0x60));
+}
+
+function onSlotInput(input) {
+  const val = input.value.trim();
+  const listId = `ac-${input.dataset.container}-${input.dataset.index}`;
+  const list = document.getElementById(listId);
+  if (!val || val.length < 1) { list.classList.remove('open'); return; }
+  const valKana = toKatakana(val);
+  const valHira = toHiragana(val);
+  const allMatches = POKEMON_LIST.filter(p => {
+    const d = p.display;
+    const dH = toHiragana(d);
+    return d.includes(valKana) || dH.includes(valHira);
+  });
+  // 頭文字一致を先に、途中一致を後に並べる
+  const startsWith = allMatches.filter(p => {
+    const dH = toHiragana(p.display);
+    return dH.startsWith(valHira) || p.display.startsWith(valKana);
+  });
+  const others = allMatches.filter(p => {
+    const dH = toHiragana(p.display);
+    return !dH.startsWith(valHira) && !p.display.startsWith(valKana);
+  });
+  const matches = [...startsWith, ...others].slice(0, 20);
+  if (!matches.length) { list.classList.remove('open'); return; }
+  list.innerHTML = matches.map(p =>
+    `<div class="autocomplete-item" data-display="${p.display}">${p.display}</div>`
+  ).join('');
+  // mousedownでクリック選択（inputのblur前に発火する）
+  list.querySelectorAll('.autocomplete-item').forEach(item => {
+    item.addEventListener('mousedown', e => {
+      e.preventDefault();
+      input.value = item.dataset.display;
+      list.classList.remove('open');
+    });
+  });
+  list.classList.add('open');
+}
+
+function onSlotKeydown(e, input) {
+  const listId = `ac-${input.dataset.container}-${input.dataset.index}`;
+  const list = document.getElementById(listId);
+  const items = list.querySelectorAll('.autocomplete-item');
+  const current = list.querySelector('.selected');
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    if (!current) items[0]?.classList.add('selected');
+    else { current.classList.remove('selected'); (current.nextElementSibling || items[0])?.classList.add('selected'); }
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (current) { current.classList.remove('selected'); (current.previousElementSibling || items[items.length-1])?.classList.add('selected'); }
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    const sel = list.querySelector('.selected') || items[0];
+    if (sel) { input.value = sel.dataset.display; list.classList.remove('open'); }
+  } else if (e.key === 'Escape') {
+    list.classList.remove('open');
+  }
+}
+
+function selectPokemon(el, listId) {
+  const list = document.getElementById(listId);
+  const input = list.closest('.slot-input-wrap').querySelector('input[type=text]');
+  if (input) input.value = el.dataset.display;
+  list.classList.remove('open');
+}
+
+function clearSlot(btn) {
+  // btn の親 (.slot-input-wrap) の中の input を取得
+  btn.closest('.slot-input-wrap').querySelector('input[type=text]').value = '';
+}
+
+// 選出用プルダウン生成（自分/相手のパーティ6体のみ）
+function createSelectionDropdown(containerId, index, label, options) {
+  const wrap = document.createElement('div');
+  wrap.className = 'pokemon-slot';
+  const opts = options.filter(Boolean).map(p => `<option value="${p}">${p}</option>`).join('');
+  wrap.innerHTML = `
+    <div class="slot-label">${label}</div>
+    <select data-container="${containerId}" data-index="${index}">
+      <option value="">-- 選択 --</option>
+      ${opts}
+    </select>
+  `;
+  return wrap;
+}
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.pokemon-slot')) {
+    document.querySelectorAll('.autocomplete-list').forEach(l => l.classList.remove('open'));
+  }
+});
+
+function getSlotValues(containerId, count) {
+  const container = document.getElementById(containerId);
+  // input[type=text] と select 両方に対応
+  const inputs = Array.from(container.querySelectorAll('input[type=text], select'));
+  return inputs.slice(0, count).map(i => i.value.trim());
+}
+
+function setSlotValues(containerId, values) {
+  const container = document.getElementById(containerId);
+  const inputs = container.querySelectorAll('input[type=text]');
+  values.forEach((v, i) => { if (inputs[i]) inputs[i].value = v; });
+}
+
+// ---- FILTER SELECTS ----
+// 自分の選出フィルター: パーティ選択に連動して選択肢を更新
+function updateMySelFilterSelect() {
+  const sel = document.getElementById('my-sel-filter-select');
+  const hint = document.getElementById('my-sel-filter-hint');
+  const filterVal = document.getElementById('history-filter').value;
+  const party = filterVal ? parties.find(p => p.id === filterVal) : null;
+  const options = party ? party.pokemon.filter(Boolean) : [];
+  if (!options.length) {
+    sel.disabled = true;
+    sel.innerHTML = '<option value="">-- 選択 --</option>';
+    if (hint) hint.textContent = '（パーティを先に選択してください）';
+    return;
+  }
+  sel.disabled = false;
+  if (hint) hint.textContent = '';
+  sel.innerHTML = '<option value="">-- 選択 --</option>' +
+    options.map(p => `<option value="${p}">${p}</option>`).join('');
+}
+
+// 相手の選出フィルター: 全試合の相手選出から重複除去して選択肢を生成
+function updateOppSelFilterSelect() {
+  const sel = document.getElementById('opp-sel-filter-select');
+  const all = [...new Set(records.flatMap(r => r.oppSelection.filter(Boolean)))].sort();
+  sel.innerHTML = '<option value="">-- 選択 --</option>' +
+    all.map(p => `<option value="${p}">${p}</option>`).join('');
+}
+
+function addFilterTagFromSelect(selectEl, filterKey) {
+  const name = selectEl.value;
+  if (!name) return;
+  selectEl.value = ''; // 選択後リセット
+  addFilterTag(name, filterKey);
+}
+
+function addFilterTag(name, filterKey) {
+  const arr = filterKey === 'mySelFilter' ? mySelFilter : oppSelFilter;
+  if (arr.includes(name)) return;
+  arr.push(name);
+  renderFilterTags(filterKey);
+  renderHistory();
+}
+
+function removeFilterTag(name, filterKey) {
+  const arr = filterKey === 'mySelFilter' ? mySelFilter : oppSelFilter;
+  const idx = arr.indexOf(name);
+  if (idx >= 0) arr.splice(idx, 1);
+  renderFilterTags(filterKey);
+  renderHistory();
+}
+
+function renderFilterTags(filterKey) {
+  const arr = filterKey === 'mySelFilter' ? mySelFilter : oppSelFilter;
+  const containerId = filterKey === 'mySelFilter' ? 'my-sel-filter-tags' : 'opp-sel-filter-tags';
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = arr.map(name =>
+    `<span class="filter-tag">${name}<button onclick="removeFilterTag('${name}','${filterKey}')" title="削除">×</button></span>`
+  ).join('');
+}
+
+// ---- PARTIES ----
+function renderParties() {
+  const grid = document.getElementById('party-grid');
+  if (!parties.length) {
+    grid.innerHTML = '<div class="empty"><div class="empty-icon">🎮</div><p>パーティがまだありません</p><p>右上のボタンから登録してください</p></div>';
+    return;
+  }
+  grid.innerHTML = parties.map(p => `
+    <div class="party-card" data-party-id="${p.id}">
+      <div class="flex justify-between items-center mb-3">
+        <div class="party-name party-edit-trigger" data-party-id="${p.id}" style="cursor:pointer;flex:1">${p.name}</div>
+        <button class="btn btn-ghost btn-sm party-delete-btn" data-party-id="${p.id}">削除</button>
+      </div>
+      <div class="party-pokemon party-edit-trigger" data-party-id="${p.id}" style="cursor:pointer">
+        ${p.pokemon.filter(Boolean).map(pk => `<span class="poke-tag">${pk}</span>`).join('')}
+      </div>
+    </div>
+  `).join('');
+  // イベント委譲で削除・編集を処理
+  grid.querySelectorAll('.party-delete-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      deleteParty(btn.dataset.partyId);
+    });
+  });
+  grid.querySelectorAll('.party-edit-trigger').forEach(el => {
+    el.addEventListener('click', () => editParty(el.dataset.partyId));
+  });
+}
+
+function openPartyModal(id) {
+  editingPartyId = id || null;
+  const modal = document.getElementById('party-modal');
+  document.getElementById('party-modal-title').textContent = id ? 'パーティを編集' : 'パーティを登録';
+  const slotsEl = document.getElementById('party-modal-slots');
+  slotsEl.innerHTML = '';
+  for (let i = 0; i < 6; i++) {
+    slotsEl.appendChild(createPokemonSlot('party-modal-slots', i, `${i+1}体目`));
+  }
+  document.getElementById('party-name-input').value = '';
+  if (id) {
+    const p = parties.find(x => x.id === id);
+    if (p) {
+      document.getElementById('party-name-input').value = p.name;
+      setSlotValues('party-modal-slots', p.pokemon);
+    }
+  }
+  modal.classList.add('open');
+}
+
+function closePartyModal() {
+  document.getElementById('party-modal').classList.remove('open');
+}
+
+function saveParty() {
+  const name = document.getElementById('party-name-input').value.trim();
+  if (!name) { alert('パーティ名を入力してください'); return; }
+  const pokemon = getSlotValues('party-modal-slots', 6);
+  if (!pokemon.some(Boolean)) { alert('少なくとも1体は入力してください'); return; }
+  if (editingPartyId) {
+    const idx = parties.findIndex(p => p.id === editingPartyId);
+    if (idx >= 0) { parties[idx].name = name; parties[idx].pokemon = pokemon; }
+  } else {
+    if (parties.length >= 50) { alert('パーティは最大50個まで登録できます'); return; }
+    parties.push({ id: Date.now().toString(), name, pokemon });
+  }
+  saveData();
+  closePartyModal();
+  renderParties();
+}
+
+function editParty(id) {
+  openPartyModal(id);
+}
+
+function deleteParty(id) {
+  if (!confirm('このパーティを削除しますか？')) return;
+  parties = parties.filter(p => p.id !== id);
+  saveData();
+  renderParties();
+}
+
+// ---- RECORD PAGE ----
+function renderRecordPage() {
+  const grid = document.getElementById('party-select-grid');
+  if (!parties.length) {
+    grid.innerHTML = '<div class="empty"><p>先にパーティを登録してください</p></div>';
+    document.getElementById('record-form-card').style.display = 'none';
+    return;
+  }
+  grid.innerHTML = parties.map(p => `
+    <div class="party-card ${selectedPartyId === p.id ? 'selected' : ''}" onclick="selectPartyForRecord('${p.id}')">
+      <div class="party-name">${p.name}</div>
+      <div class="party-pokemon">
+        ${p.pokemon.filter(Boolean).map(pk => `<span class="poke-tag">${pk}</span>`).join('')}
+      </div>
+    </div>
+  `).join('');
+
+  if (selectedPartyId) showRecordForm();
+}
+
+function selectPartyForRecord(id) {
+  selectedPartyId = id;
+  recordResult = null;
+  document.getElementById('btn-win').classList.remove('active');
+  document.getElementById('btn-lose').classList.remove('active');
+  renderRecordPage();
+  showRecordForm();
+}
+
+function showRecordForm() {
+  const form = document.getElementById('record-form-card');
+  form.style.display = 'block';
+
+  // Set datetime
+  const now = new Date();
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+  document.getElementById('rec-date').value = local.toISOString().slice(0, 16);
+
+  // 自分のパーティ
+  const myParty = parties.find(p => p.id === selectedPartyId);
+  const myPokemon = myParty ? myParty.pokemon : [];
+
+  // 相手パーティスロット（フリー入力）
+  const oppParty = document.getElementById('opp-party-slots');
+  oppParty.innerHTML = '';
+  for (let i = 0; i < 6; i++) oppParty.appendChild(createPokemonSlot('opp-party-slots', i, `${i+1}体目`));
+
+  // 相手パーティ入力後に選出プルダウンを更新するため変更検知
+  oppParty.querySelectorAll('input[type=text]').forEach(input => {
+    input.addEventListener('change', rebuildOppSelectionDropdowns);
+    input.addEventListener('blur', rebuildOppSelectionDropdowns);
+  });
+
+  // 自分の選出プルダウン（自パーティ6体）
+  buildMySelectionDropdowns(myPokemon);
+
+  // 相手の選出プルダウン（初期は空）
+  buildOppSelectionDropdowns([]);
+
+  document.getElementById('rec-memo').value = '';
+  form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function buildMySelectionDropdowns(options) {
+  const mySelection = document.getElementById('my-selection-slots');
+  mySelection.innerHTML = '';
+  for (let i = 0; i < 4; i++) mySelection.appendChild(createSelectionDropdown('my-selection-slots', i, `${i+1}体目`, options));
+}
+
+function buildOppSelectionDropdowns(options) {
+  const oppSelection = document.getElementById('opp-selection-slots');
+  oppSelection.innerHTML = '';
+  for (let i = 0; i < 4; i++) oppSelection.appendChild(createSelectionDropdown('opp-selection-slots', i, `${i+1}体目`, options));
+}
+
+function rebuildOppSelectionDropdowns() {
+  const oppPokemon = getSlotValues('opp-party-slots', 6).filter(Boolean);
+  buildOppSelectionDropdowns(oppPokemon);
+}
+
+function setResult(r) {
+  recordResult = r;
+  document.getElementById('btn-win').classList.toggle('active', r === 'win');
+  document.getElementById('btn-lose').classList.toggle('active', r === 'lose');
+}
+
+function saveRecord() {
+  if (!selectedPartyId) { alert('パーティを選択してください'); return; }
+  if (!recordResult) { alert('勝敗を選択してください'); return; }
+  const oppParty = getSlotValues('opp-party-slots', 6);
+  if (!oppParty.some(Boolean)) { alert('相手のパーティを1体以上入力してください'); return; }
+
+  const rec = {
+    id: Date.now().toString(),
+    partyId: selectedPartyId,
+    date: document.getElementById('rec-date').value,
+    oppParty,
+    mySelection: getSlotValues('my-selection-slots', 4),
+    oppSelection: getSlotValues('opp-selection-slots', 4),
+    result: recordResult,
+    memo: document.getElementById('rec-memo').value.trim()
+  };
+  records.unshift(rec);
+  saveData();
+  alert('記録を保存しました！');
+  selectedPartyId = null;
+  recordResult = null;
+  document.getElementById('record-form-card').style.display = 'none';
+  renderRecordPage();
+}
+
+// ---- HISTORY ----
+function renderHistory() {
+  // Update filter options
+  const filter = document.getElementById('history-filter');
+  const current = filter.value;
+  filter.innerHTML = '<option value="">すべてのパーティ</option>';
+  parties.forEach(p => {
+    filter.innerHTML += `<option value="${p.id}" ${current === p.id ? 'selected' : ''}>${p.name}</option>`;
+  });
+  // プルダウンを最新状態に更新
+  updateMySelFilterSelect();
+  updateOppSelFilterSelect();
+
+  const filterVal = filter.value;
+  const resultFilterVal = document.getElementById('history-result-filter').value;
+  let filtered = filterVal ? records.filter(r => r.partyId === filterVal) : records;
+  if (resultFilterVal) filtered = filtered.filter(r => r.result === resultFilterVal);
+  // 自分の選出ポケモン絞り込み（AND条件）
+  if (mySelFilter.length) {
+    filtered = filtered.filter(r =>
+      mySelFilter.every(name => r.mySelection.includes(name))
+    );
+  }
+  // 相手の選出ポケモン絞り込み（AND条件）
+  if (oppSelFilter.length) {
+    filtered = filtered.filter(r =>
+      oppSelFilter.every(name => r.oppSelection.includes(name))
+    );
+  }
+
+  // Stats
+  const stats = document.getElementById('history-stats');
+  if (filtered.length) {
+    stats.style.display = 'block';
+    const wins = filtered.filter(r => r.result === 'win').length;
+    const loses = filtered.filter(r => r.result === 'lose').length;
+    document.getElementById('stat-total').textContent = filtered.length;
+    document.getElementById('stat-win').textContent = wins;
+    document.getElementById('stat-lose').textContent = loses;
+    document.getElementById('stat-rate').textContent = Math.round(wins / filtered.length * 100) + '%';
+  } else stats.style.display = 'none';
+
+  const list = document.getElementById('history-list');
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><p>記録がありません</p></div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(r => {
+    const party = parties.find(p => p.id === r.partyId);
+    const dateStr = r.date ? new Date(r.date).toLocaleString('ja-JP', {month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+    const mySelList = r.mySelection.filter(Boolean);
+    const oppPartyList = r.oppParty.filter(Boolean);
+    const oppSelList = r.oppSelection.filter(Boolean);
+    const isWin = r.result === 'win';
+
+    const tagRow = (arr, color, filterArr) => arr.length
+      ? arr.map(p => {
+          const isHighlight = filterArr && filterArr.includes(p);
+          const bg = isHighlight ? 'rgba(108,99,255,0.55)' : color;
+          const border = isHighlight ? '1px solid var(--accent)' : '1px solid transparent';
+          return `<span style="font-size:11px;background:${bg};padding:2px 8px;border-radius:20px;white-space:nowrap;border:${border};font-weight:${isHighlight?'700':'400'}">${p}</span>`;
+        }).join('')
+      : '<span style="font-size:11px;color:var(--text-muted)">なし</span>';
+
+    return `<div class="record-item" onclick="openDetail('${r.id}')" style="border-left:3px solid ${isWin ? 'var(--win)' : 'var(--lose)'}">
+      <div class="record-header" style="margin-bottom:10px">
+        <span class="${isWin ? 'badge-win' : 'badge-lose'}">${isWin ? '🏆 勝ち' : '💀 負け'}</span>
+        <span style="font-weight:600">${party ? party.name : '(削除済み)'}</span>
+        <span class="record-date" style="margin-left:auto">${dateStr}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
+        <div>
+          <div style="color:var(--text-muted);margin-bottom:4px">自分の選出</div>
+          <div style="display:flex;flex-wrap:wrap;gap:3px">${tagRow(mySelList, 'rgba(108,99,255,0.25)', mySelFilter)}</div>
+        </div>
+        <div>
+          <div style="color:var(--text-muted);margin-bottom:4px">相手の選出</div>
+          <div style="display:flex;flex-wrap:wrap;gap:3px">${tagRow(oppSelList, 'rgba(255,101,132,0.2)', oppSelFilter)}</div>
+        </div>
+        <div style="grid-column:1/-1">
+          <div style="color:var(--text-muted);margin-bottom:4px">相手のパーティ</div>
+          <div style="display:flex;flex-wrap:wrap;gap:3px">${tagRow(oppPartyList, 'rgba(255,255,255,0.06)')}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ---- DETAIL MODAL ----
+function openDetail(id) {
+  const r = records.find(x => x.id === id);
+  if (!r) return;
+  const party = parties.find(p => p.id === r.partyId);
+  const dateStr = r.date ? new Date(r.date).toLocaleString('ja-JP') : '';
+
+  document.getElementById('detail-content').innerHTML = `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
+      <span class="${r.result === 'win' ? 'badge-win' : 'badge-lose'}" style="font-size:16px;padding:4px 16px">${r.result === 'win' ? '🏆 勝ち' : '💀 負け'}</span>
+      <span style="color:var(--text-muted);font-size:13px">${dateStr}</span>
+    </div>
+    <div class="detail-section">
+      <h4>自分のパーティ</h4>
+      <div class="detail-pokemon">
+        ${(party ? party.pokemon.filter(Boolean) : []).map(p => `<span class="detail-poke-tag">${p}</span>`).join('') || '<span class="text-muted">(削除済み)</span>'}
+      </div>
+    </div>
+    <div class="detail-section">
+      <h4>相手のパーティ（6体）</h4>
+      <div class="detail-pokemon">
+        ${r.oppParty.filter(Boolean).map(p => `<span class="detail-poke-tag">${p}</span>`).join('') || '<span class="text-muted">記録なし</span>'}
+      </div>
+    </div>
+    <div class="detail-section">
+      <h4>自分の選出（4体）</h4>
+      <div class="detail-pokemon">
+        ${r.mySelection.filter(Boolean).map(p => `<span class="detail-poke-tag">${p}</span>`).join('') || '<span class="text-muted">記録なし</span>'}
+      </div>
+    </div>
+    <div class="detail-section">
+      <h4>相手の選出（4体）</h4>
+      <div class="detail-pokemon">
+        ${r.oppSelection.filter(Boolean).map(p => `<span class="detail-poke-tag">${p}</span>`).join('') || '<span class="text-muted">記録なし</span>'}
+      </div>
+    </div>
+    ${r.memo ? `<div class="detail-section"><h4>メモ</h4><p style="font-size:13px">${r.memo}</p></div>` : ''}
+  `;
+
+  document.getElementById('detail-delete-btn').onclick = () => deleteRecord(id);
+  document.getElementById('detail-modal').classList.add('open');
+}
+
+function closeDetailModal() {
+  document.getElementById('detail-modal').classList.remove('open');
+}
+
+function deleteRecord(id) {
+  if (!confirm('この記録を削除しますか？')) return;
+  records = records.filter(r => r.id !== id);
+  saveData();
+  closeDetailModal();
+  renderHistory();
+}
+
+// ---- INIT ----
+renderParties();
+
+// ---- PWA: Service Worker 登録 ----
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(() => console.log('SW registered'))
+      .catch(e => console.log('SW error:', e));
+  });
+}
+</script>
+</body>
+</html>
