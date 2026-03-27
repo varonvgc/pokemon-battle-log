@@ -1109,14 +1109,14 @@ function dmShowForm(idx) {
       <div style="margin-bottom:6px;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">基本情報</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px">
         <div><label>図鑑No</label><input type="text" id="dmf-no"      value="${v('no')}"></div>
-        <div><label>名前（日本語）</label><input type="text" id="dmf-name"    value="${v('name')}"    oninput="dmAutoDisplay()"></div>
-        <div><label>フォルム名（通常の場合は「通常」）</label><input type="text" id="dmf-form"    value="${v('form')}"    oninput="dmAutoDisplay()"></div>
-        <div><label>表示名（自動生成）</label><input type="text" id="dmf-display" value="${v('display')}" readonly style="opacity:0.6"></div>
+        <div><label>名前</label><input type="text" id="dmf-name"    value="${v('name')}"    oninput="dmAutoDisplay()"></div>
+        <div><label>フォルム名</label><input type="text" id="dmf-form"    value="${v('form')}"    oninput="dmAutoDisplay()"></div>
+        <div><label>表示名</label><input type="text" id="dmf-display" value="${v('display')}" readonly style="opacity:0.6"></div>
       </div>
       <div style="margin-bottom:6px;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">タイプ</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px">
         <div><label>タイプ1</label><input type="text" id="dmf-type1" value="${v('type1')}"></div>
-        <div><label>タイプ2（なければ空欄）</label><input type="text" id="dmf-type2" value="${v('type2')}"></div>
+        <div><label>タイプ2</label><input type="text" id="dmf-type2" value="${v('type2')}"></div>
       </div>
       <div style="margin-bottom:6px;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">種族値</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px;margin-bottom:14px">
@@ -1130,8 +1130,8 @@ function dmShowForm(idx) {
       <div style="margin-bottom:6px;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">特性</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px">
         <div><label>特性1</label><input type="text" id="dmf-ability1"        value="${v('ability1')}"></div>
-        <div><label>特性2（なければ空欄）</label><input type="text" id="dmf-ability2"  value="${v('ability2')}"></div>
-        <div style="grid-column:1/-1"><label>夢特性（なければ空欄）</label><input type="text" id="dmf-ability-hidden" value="${v('ability_hidden')}"></div>
+        <div><label>特性2</label><input type="text" id="dmf-ability2"  value="${v('ability2')}"></div>
+        <div style="grid-column:1/-1"><label>夢特性</label><input type="text" id="dmf-ability-hidden" value="${v('ability_hidden')}"></div>
       </div>`;
   } else {
     title.textContent = idx === null ? '技を追加' : '技を編集';
