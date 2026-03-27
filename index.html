@@ -92,6 +92,7 @@
   .slot-grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .pokemon-slot { position: relative; }
   .slot-input-wrap { position: relative; }
+  .slot-input-wrap input { border-radius: 8px 8px 0 0 !important; border-bottom-color: transparent !important; }
   .slot-input-wrap input { padding-right: 32px; }
   .slot-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; padding: 2px 4px; }
   .slot-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
@@ -165,9 +166,9 @@
   .highlight-tag { background: rgba(108,99,255,0.3) !important; border-color: var(--accent) !important; }
 
   /* ポケモン選択ポップアップ */
-  .picker-overlay { position:fixed; inset:0; background:rgba(0,0,0,.8); z-index:500; display:none; align-items:center; justify-content:center; padding:12px; }
+  .picker-overlay { position:fixed; inset:0; background:rgba(0,0,0,.8); z-index:500; display:none; align-items:flex-end; justify-content:center; padding:0; }
   .picker-overlay.open { display:flex; }
-  .picker-modal { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); width:100%; max-width:560px; max-height:92vh; display:flex; flex-direction:column; overflow:hidden; }
+  .picker-modal { background:var(--surface); border:1px solid var(--border); border-radius:16px 16px 0 0; width:100%; max-width:600px; height:78vh; display:flex; flex-direction:column; overflow:hidden; }
   .picker-header { padding:12px 16px; border-bottom:1px solid var(--border); flex-shrink:0; }
   .picker-title { font-size:14px; font-weight:700; color:var(--text-muted); margin-bottom:10px; }
   .picker-search { width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:8px; padding:8px 12px; font-size:16px; outline:none; }
@@ -185,7 +186,8 @@
   .poke-icon-btn:hover .poke-icon-name, .poke-icon-btn.selected .poke-icon-name { color:#fff; }
   .picker-empty { text-align:center; color:var(--text-muted); padding:40px; font-size:14px; }
   /* 入力欄にピッカー開くボタン追加 */
-  .slot-picker-btn { position:absolute; right:32px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--accent); cursor:pointer; font-size:18px; padding:2px 4px; line-height:1; }
+  .slot-picker-btn { display:block; width:100%; background:none; border:1px solid var(--border); border-top:none; border-radius:0 0 8px 8px; color:var(--accent); cursor:pointer; font-size:11px; font-weight:600; padding:3px 0; text-align:center; letter-spacing:.03em; transition:background .15s; }
+  .slot-picker-btn:hover { background:var(--surface2); }
 
   /* タイプカラー */
   .type-btn[data-type="ノーマル"]  { background:#9e9e9e; }
@@ -440,6 +442,24 @@ let recordResult = null;
 let editingPartyId = null;
 const mySelFilter = [];
 const oppSelFilter = [];
+// 最近選んだポケモン（最大20件、先頭が最新）
+let recentPicks = JSON.parse(localStorage.getItem('pkm_recent_picks') || '[]');
+function recordRecentPick(displayName) {
+  recentPicks = recentPicks.filter(n => n !== displayName);
+  recentPicks.unshift(displayName);
+  if (recentPicks.length > 20) recentPicks = recentPicks.slice(0, 20);
+  localStorage.setItem('pkm_recent_picks', JSON.stringify(recentPicks));
+}
+function sortByRecent(arr) {
+  return [...arr].sort((a, b) => {
+    const ai = recentPicks.indexOf(a.display);
+    const bi = recentPicks.indexOf(b.display);
+    if (ai === -1 && bi === -1) return 0;
+    if (ai === -1) return 1;
+    if (bi === -1) return -1;
+    return ai - bi;
+  });
+}
 let currentUser = null;
 let _fbReady = false;
 
@@ -545,10 +565,10 @@ function createPokemonSlot(containerId, index, label) {
       <input type="text" placeholder="ポケモン名を入力" autocomplete="off"
         data-container="${containerId}" data-index="${index}"
         oninput="onSlotInput(this)" onkeydown="onSlotKeydown(event, this)">
-      <button class="slot-picker-btn" onclick="openPokemonPicker(this)" tabindex="-1" title="アイコンから選ぶ">🎮</button>
       <button class="slot-clear" onclick="clearSlot(this)" tabindex="-1">×</button>
       <div class="autocomplete-list" id="ac-${containerId}-${index}"></div>
     </div>
+    <button class="slot-picker-btn" onclick="openPokemonPicker(this)" tabindex="-1">🎮 アイコンから選ぶ</button>
   `;
   return wrap;
 }
@@ -584,7 +604,8 @@ function onSlotInput(input) {
     const dH = toHiragana(p.display);
     return !dH.startsWith(valHira) && !p.display.startsWith(valKana);
   });
-  const matches = [...startsWith, ...others].slice(0, 20);
+  // 各グループ内で最近選んだものを先頭に
+  const matches = [...sortByRecent(startsWith), ...sortByRecent(others)].slice(0, 20);
   if (!matches.length) { list.classList.remove('open'); return; }
   list.innerHTML = matches.map(p =>
     `<div class="autocomplete-item" data-display="${p.display}">${p.display}</div>`
@@ -594,6 +615,7 @@ function onSlotInput(input) {
     item.addEventListener('mousedown', e => {
       e.preventDefault();
       input.value = item.dataset.display;
+      recordRecentPick(item.dataset.display);
       list.classList.remove('open');
     });
   });
@@ -1365,7 +1387,9 @@ function pickerToggleType(type) {
 }
 
 function openPokemonPicker(btn) {
-  pickerTargetInput = btn.closest('.slot-input-wrap').querySelector('input[type=text]');
+  // ボタンが .slot-input-wrap の外にある場合も対応
+  const wrap = btn.closest('.pokemon-slot');
+  pickerTargetInput = wrap ? wrap.querySelector('input[type=text]') : btn.closest('.slot-input-wrap').querySelector('input[type=text]');
   pickerActiveType = null;
   document.getElementById('picker-search').value = '';
   document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
@@ -1405,6 +1429,11 @@ function renderPickerGrid(searchVal) {
     return;
   }
 
+  // 最近選んだ順でソート（絞り込みがない場合のみ）
+  if (!searchVal.trim() && !pickerActiveType) {
+    filtered = sortByRecent(filtered);
+  }
+
   grid.innerHTML = filtered.map(p => {
     const style = getIconStyle(p.no);
     const current = pickerTargetInput ? pickerTargetInput.value : '';
@@ -1419,6 +1448,7 @@ function renderPickerGrid(searchVal) {
 function selectFromPicker(displayName) {
   if (pickerTargetInput) {
     pickerTargetInput.value = displayName;
+    recordRecentPick(displayName);
   }
   closePokemonPicker();
 }
