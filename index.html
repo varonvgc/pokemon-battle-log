@@ -91,12 +91,12 @@
   .slot-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .slot-grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .pokemon-slot { position: relative; }
-  .slot-input-wrap { position: relative; }
-  .slot-input-wrap input { border-radius: 8px 8px 0 0 !important; border-bottom-color: transparent !important; }
+  .slot-input-wrap { position: relative; display:flex; align-items:stretch; }
+  .slot-input-wrap input { border-radius: 8px 0 0 8px !important; border-right:none !important; flex:1; min-width:0; }
   .slot-input-wrap input { padding-right: 32px; }
   .slot-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; padding: 2px 4px; }
   .slot-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
-  .autocomplete-list { position: absolute; top: calc(100% + 2px); left: 0; right: 0; background: var(--surface2); border: 1px solid var(--accent); border-radius: 8px; max-height: 200px; overflow-y: auto; z-index: 200; display: none; }
+  .autocomplete-list { position: absolute; top: calc(100% + 2px); left: 0; right: 44px; background: var(--surface2); border: 1px solid var(--accent); border-radius: 8px; max-height: 200px; overflow-y: auto; z-index: 200; display: none; }
   .autocomplete-list.open { display: block; }
   .autocomplete-item { padding: 8px 12px; cursor: pointer; font-size: 13px; transition: background .15s; }
   .autocomplete-item:hover, .autocomplete-item.selected { background: var(--accent); color: #fff; }
@@ -186,8 +186,8 @@
   .poke-icon-btn:hover .poke-icon-name, .poke-icon-btn.selected .poke-icon-name { color:#fff; }
   .picker-empty { text-align:center; color:var(--text-muted); padding:40px; font-size:14px; }
   /* 入力欄にピッカー開くボタン追加 */
-  .slot-picker-btn { display:block; width:100%; background:none; border:1px solid var(--border); border-top:none; border-radius:0 0 8px 8px; color:var(--accent); cursor:pointer; font-size:11px; font-weight:600; padding:3px 0; text-align:center; letter-spacing:.03em; transition:background .15s; }
-  .slot-picker-btn:hover { background:var(--surface2); }
+  .slot-picker-btn { display:flex; align-items:center; justify-content:center; background:var(--surface2); border:1px solid var(--border); border-radius:0 8px 8px 0; color:var(--text-muted); cursor:pointer; font-size:20px; padding:0 10px; flex-shrink:0; transition:background .15s, color .15s; line-height:1; }
+  .slot-picker-btn:hover { background:var(--accent); color:#fff; }
 
   /* タイプカラー */
   .type-btn[data-type="ノーマル"]  { background:#9e9e9e; }
@@ -561,14 +561,14 @@ function createPokemonSlot(containerId, index, label) {
   wrap.className = 'pokemon-slot';
   wrap.innerHTML = `
     <div class="slot-label">${label}</div>
-    <div class="slot-input-wrap" style="position:relative">
+    <div class="slot-input-wrap">
       <input type="text" placeholder="ポケモン名を入力" autocomplete="off"
         data-container="${containerId}" data-index="${index}"
-        oninput="onSlotInput(this)" onkeydown="onSlotKeydown(event, this)">
-      <button class="slot-clear" onclick="clearSlot(this)" tabindex="-1">×</button>
+        oninput="onSlotInput(this)" onkeydown="onSlotKeydown(event, this)"
+        onfocus="onSlotFocus(this)">
+      <button class="slot-picker-btn" onclick="openPokemonPicker(this)" tabindex="-1" title="アイコンから選ぶ">⚾</button>
       <div class="autocomplete-list" id="ac-${containerId}-${index}"></div>
     </div>
-    <button class="slot-picker-btn" onclick="openPokemonPicker(this)" tabindex="-1">🎮 アイコンから選ぶ</button>
   `;
   return wrap;
 }
@@ -588,9 +588,14 @@ function onSlotInput(input) {
   if (!val || val.length < 1) { list.classList.remove('open'); return; }
   const valKana = toKatakana(val);
   const valHira = toHiragana(val);
-  const pokemonSource = window.localPokemon || POKEMON_LIST;
+  // opp-selection-slots は相手パーティ6体のみから候補を出す
+  let pokemonSource;
+  if (input.dataset.container === 'opp-selection-slots' && window._oppPartyOptions && window._oppPartyOptions.length) {
+    pokemonSource = window._oppPartyOptions.map(name => ({ display: name, confirmed: true, no: '', type1: '', type2: '' }));
+  } else {
+    pokemonSource = (window.localPokemon || POKEMON_LIST).filter(p => p.confirmed);
+  }
   const allMatches = pokemonSource.filter(p => {
-    if (!p.confirmed) return false;
     const d = p.display;
     const dH = toHiragana(d);
     return d.includes(valKana) || dH.includes(valHira);
@@ -651,8 +656,12 @@ function selectPokemon(el, listId) {
 }
 
 function clearSlot(btn) {
-  // btn の親 (.slot-input-wrap) の中の input を取得
   btn.closest('.slot-input-wrap').querySelector('input[type=text]').value = '';
+}
+
+// フォーカス時に予測変換を即座に表示（最近選んだ順）
+function onSlotFocus(input) {
+  onSlotInput(input);
 }
 
 // 選出用プルダウン生成（自分/相手のパーティ6体のみ）
@@ -904,7 +913,12 @@ function buildMySelectionDropdowns(options) {
 function buildOppSelectionDropdowns(options) {
   const oppSelection = document.getElementById('opp-selection-slots');
   oppSelection.innerHTML = '';
-  for (let i = 0; i < 4; i++) oppSelection.appendChild(createSelectionDropdown('opp-selection-slots', i, `${i+1}体目`, options));
+  for (let i = 0; i < 4; i++) {
+    const slot = createPokemonSlot('opp-selection-slots', i, `${i+1}体目`);
+    oppSelection.appendChild(slot);
+  }
+  // 相手パーティ6体の候補をオートコンプリートのソース候補として保持
+  window._oppPartyOptions = options.filter(Boolean);
 }
 
 function rebuildOppSelectionDropdowns() {
@@ -1387,9 +1401,11 @@ function pickerToggleType(type) {
 }
 
 function openPokemonPicker(btn) {
-  // ボタンが .slot-input-wrap の外にある場合も対応
   const wrap = btn.closest('.pokemon-slot');
   pickerTargetInput = wrap ? wrap.querySelector('input[type=text]') : btn.closest('.slot-input-wrap').querySelector('input[type=text]');
+  // opp-selection-slotsの場合は相手パーティのみ表示
+  const containerId = pickerTargetInput ? pickerTargetInput.dataset.container : '';
+  window._pickerOppOnly = (containerId === 'opp-selection-slots' && window._oppPartyOptions && window._oppPartyOptions.length > 0);
   pickerActiveType = null;
   document.getElementById('picker-search').value = '';
   document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
@@ -1408,7 +1424,13 @@ function pickerOnSearch(val) {
 
 function renderPickerGrid(searchVal) {
   const grid = document.getElementById('picker-grid');
-  const src = window.localPokemon || POKEMON_LIST;
+  // 相手選出ピッカーは相手パーティ6体のみ表示
+  let src;
+  if (window._pickerOppOnly && window._oppPartyOptions) {
+    src = window._oppPartyOptions.map(name => ({ display: name, confirmed: true, no: '', type1: '', type2: '' }));
+  } else {
+    src = window.localPokemon || POKEMON_LIST;
+  }
   const valKana = toKatakana(searchVal.trim());
   const valHira = toHiragana(searchVal.trim());
 
