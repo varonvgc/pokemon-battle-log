@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no, maximum-scale=1.0">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -83,7 +83,7 @@
   .btn-sm { padding: 6px 12px; font-size: 12px; }
 
   /* FORM */
-  input, select, textarea { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 10px 12px; font-size: 14px; width: 100%; outline: none; transition: border .2s; }
+  input, select, textarea { background: var(--surface2); border: 1px solid var(--border); color: var(--text); border-radius: 8px; padding: 10px 12px; font-size: 16px; width: 100%; outline: none; transition: border .2s; }
   input:focus, select:focus { border-color: var(--accent); }
   label { font-size: 13px; color: var(--text-muted); margin-bottom: 6px; display: block; }
 
@@ -1107,19 +1107,19 @@ function dmShowForm(idx) {
     const v = k => (d[k] ?? '').replace(/"/g,'&quot;');
     fields.innerHTML = `
       <div style="margin-bottom:6px;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">基本情報</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px">
         <div><label>図鑑No</label><input type="text" id="dmf-no"      value="${v('no')}"></div>
         <div><label>名前（日本語）</label><input type="text" id="dmf-name"    value="${v('name')}"    oninput="dmAutoDisplay()"></div>
         <div><label>フォルム名（通常の場合は「通常」）</label><input type="text" id="dmf-form"    value="${v('form')}"    oninput="dmAutoDisplay()"></div>
         <div><label>表示名（自動生成）</label><input type="text" id="dmf-display" value="${v('display')}" readonly style="opacity:0.6"></div>
       </div>
       <div style="margin-bottom:6px;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">タイプ</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px">
         <div><label>タイプ1</label><input type="text" id="dmf-type1" value="${v('type1')}"></div>
         <div><label>タイプ2（なければ空欄）</label><input type="text" id="dmf-type2" value="${v('type2')}"></div>
       </div>
       <div style="margin-bottom:6px;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">種族値</div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px;margin-bottom:14px">
         <div><label>HP</label><input    type="text" id="dmf-hp"    value="${v('hp')}"></div>
         <div><label>攻撃</label><input  type="text" id="dmf-atk"   value="${v('atk')}"></div>
         <div><label>防御</label><input  type="text" id="dmf-def"   value="${v('def')}"></div>
@@ -1128,7 +1128,7 @@ function dmShowForm(idx) {
         <div><label>素早さ</label><input type="text" id="dmf-spd"   value="${v('spd')}"></div>
       </div>
       <div style="margin-bottom:6px;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">特性</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px">
         <div><label>特性1</label><input type="text" id="dmf-ability1"        value="${v('ability1')}"></div>
         <div><label>特性2（なければ空欄）</label><input type="text" id="dmf-ability2"  value="${v('ability2')}"></div>
         <div style="grid-column:1/-1"><label>夢特性（なければ空欄）</label><input type="text" id="dmf-ability-hidden" value="${v('ability_hidden')}"></div>
@@ -1138,7 +1138,7 @@ function dmShowForm(idx) {
     const d = idx !== null ? localMoves[idx] : { name:'', type:'', category:'', power:'', pp:'', desc:'', effect:'' };
     const v = k => (d[k] ?? '').replace(/"/g,'&quot;');
     fields.innerHTML = `
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px">
         <div><label>技名</label><input      type="text" id="dmf-move-name"     value="${v('name')}"></div>
         <div><label>タイプ</label><input    type="text" id="dmf-move-type"     value="${v('type')}"></div>
         <div><label>分類</label><input      type="text" id="dmf-move-category" value="${v('category')}"></div>
@@ -1248,6 +1248,19 @@ async function dmLoadMasterData() {
     }
   } catch(e) { console.error('Master load error:', e); }
 }
+
+// ---- ピンチズーム無効化（iOS対応）----
+document.addEventListener('touchstart', e => {
+  if (e.touches.length > 1) e.preventDefault();
+}, { passive: false });
+let lastTouchEnd = 0;
+document.addEventListener('touchend', e => {
+  const now = Date.now();
+  if (now - lastTouchEnd < 300) e.preventDefault();
+  lastTouchEnd = now;
+}, { passive: false });
+document.addEventListener('gesturestart',  e => e.preventDefault(), { passive: false });
+document.addEventListener('gesturechange', e => e.preventDefault(), { passive: false });
 
 // ---- INIT ----
 renderParties();
