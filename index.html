@@ -91,12 +91,12 @@
   .slot-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
   .slot-grid-4 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .pokemon-slot { position: relative; }
-  .slot-input-wrap { position: relative; display:flex; align-items:stretch; }
+  .slot-input-wrap { position: relative; }
   .slot-input-wrap input { border-radius: 8px 0 0 8px !important; border-right:none !important; flex:1; min-width:0; }
   .slot-input-wrap input { padding-right: 32px; }
   .slot-clear { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 16px; padding: 2px 4px; }
   .slot-label { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
-  .autocomplete-list { position: absolute; top: calc(100% + 2px); left: 0; right: 44px; background: var(--surface2); border: 1px solid var(--accent); border-radius: 8px; max-height: 200px; overflow-y: auto; z-index: 200; display: none; }
+  .autocomplete-list { position: absolute; top: calc(100% + 2px); left: 0; right: 0; background: var(--surface2); border: 1px solid var(--accent); border-radius: 8px; max-height: 200px; overflow-y: auto; z-index: 200; display: none; }
   .autocomplete-list.open { display: block; }
   .autocomplete-item { padding: 8px 12px; cursor: pointer; font-size: 13px; transition: background .15s; }
   .autocomplete-item:hover, .autocomplete-item.selected { background: var(--accent); color: #fff; }
@@ -186,8 +186,9 @@
   .poke-icon-btn:hover .poke-icon-name, .poke-icon-btn.selected .poke-icon-name { color:#fff; }
   .picker-empty { text-align:center; color:var(--text-muted); padding:40px; font-size:14px; }
   /* 入力欄にピッカー開くボタン追加 */
-  .slot-picker-btn { display:flex; align-items:center; justify-content:center; background:var(--surface2); border:1px solid var(--border); border-radius:0 8px 8px 0; color:var(--text-muted); cursor:pointer; font-size:20px; padding:0 10px; flex-shrink:0; transition:background .15s, color .15s; line-height:1; }
-  .slot-picker-btn:hover { background:var(--accent); color:#fff; }
+  .slot-picker-btn { display:flex; align-items:center; justify-content:center; width:100%; background:var(--bg); border:none; cursor:pointer; padding:4px 0; border-radius:8px 8px 0 0; transition:opacity .15s; }
+  .slot-picker-btn:hover { opacity:0.7; }
+  .slot-picker-btn img { width:40px; height:40px; display:block; object-fit:contain; mix-blend-mode:lighten; }
 
   /* タイプカラー */
   .type-btn[data-type="ノーマル"]  { background:#9e9e9e; }
@@ -559,17 +560,22 @@ function showPage(name) {
 function createPokemonSlot(containerId, index, label) {
   const wrap = document.createElement('div');
   wrap.className = 'pokemon-slot';
+  const ballImg = 'data:image/jpeg;base64,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';
   wrap.innerHTML = `
     <div class="slot-label">${label}</div>
-    <div class="slot-input-wrap">
+    <button class="slot-picker-btn" onclick="openPokemonPicker(this)" tabindex="-1" title="アイコンから選ぶ">
+      <img src="${ballImg}" alt="選ぶ">
+    </button>
+    <div class="slot-input-wrap" style="position:relative">
       <input type="text" placeholder="ポケモン名を入力" autocomplete="off"
         data-container="${containerId}" data-index="${index}"
         oninput="onSlotInput(this)" onkeydown="onSlotKeydown(event, this)"
         onfocus="onSlotFocus(this)">
-      <button class="slot-picker-btn" onclick="openPokemonPicker(this)" tabindex="-1" title="アイコンから選ぶ">⚾</button>
+      <button class="slot-clear" onclick="clearSlot(this)" tabindex="-1">×</button>
       <div class="autocomplete-list" id="ac-${containerId}-${index}"></div>
     </div>
   `;
+
   return wrap;
 }
 
@@ -588,10 +594,12 @@ function onSlotInput(input) {
   if (!val || val.length < 1) { list.classList.remove('open'); return; }
   const valKana = toKatakana(val);
   const valHira = toHiragana(val);
-  // opp-selection-slots は相手パーティ6体のみから候補を出す
+  // 選出スロットはパーティから絞り込む
   let pokemonSource;
   if (input.dataset.container === 'opp-selection-slots' && window._oppPartyOptions && window._oppPartyOptions.length) {
     pokemonSource = window._oppPartyOptions.map(name => ({ display: name, confirmed: true, no: '', type1: '', type2: '' }));
+  } else if (input.dataset.container === 'my-selection-slots' && window._myPartyOptions && window._myPartyOptions.length) {
+    pokemonSource = window._myPartyOptions.map(name => ({ display: name, confirmed: true, no: '', type1: '', type2: '' }));
   } else {
     pokemonSource = (window.localPokemon || POKEMON_LIST).filter(p => p.confirmed);
   }
@@ -622,6 +630,8 @@ function onSlotInput(input) {
       input.value = item.dataset.display;
       recordRecentPick(item.dataset.display);
       list.classList.remove('open');
+      // 相手パーティスロットで選択したら選出プルダウンを更新
+      if (input.dataset.container === 'opp-party-slots') rebuildOppSelectionDropdowns();
     });
   });
   list.classList.add('open');
@@ -642,7 +652,9 @@ function onSlotKeydown(e, input) {
   } else if (e.key === 'Enter') {
     e.preventDefault();
     const sel = list.querySelector('.selected') || items[0];
-    if (sel) { input.value = sel.dataset.display; list.classList.remove('open'); }
+    if (sel) { input.value = sel.dataset.display; list.classList.remove('open');
+      recordRecentPick(sel.dataset.display);
+      if (input.dataset.container === 'opp-party-slots') rebuildOppSelectionDropdowns(); }
   } else if (e.key === 'Escape') {
     list.classList.remove('open');
   }
@@ -656,12 +668,45 @@ function selectPokemon(el, listId) {
 }
 
 function clearSlot(btn) {
-  btn.closest('.slot-input-wrap').querySelector('input[type=text]').value = '';
+  const input = btn.closest('.slot-input-wrap').querySelector('input[type=text]');
+  input.value = '';
+  if (input.dataset.container === 'opp-party-slots') rebuildOppSelectionDropdowns();
 }
 
-// フォーカス時に予測変換を即座に表示（最近選んだ順）
+// フォーカス時に予測変換を即座に表示（空でも最近選んだ順で表示）
 function onSlotFocus(input) {
-  onSlotInput(input);
+  const listId = `ac-${input.dataset.container}-${input.dataset.index}`;
+  const list = document.getElementById(listId);
+  if (!list) return;
+  if (input.value.trim()) {
+    // 文字が入っている場合は通常のフィルタ
+    onSlotInput(input);
+    return;
+  }
+  // 空の場合: パーティ候補 or 最近選んだ順で最大10件表示
+  let candidates;
+  const cid = input.dataset.container;
+  if (cid === 'opp-selection-slots' && window._oppPartyOptions && window._oppPartyOptions.length) {
+    candidates = window._oppPartyOptions.map(n => ({ display: n, no: '', type1: '', type2: '' }));
+  } else if (cid === 'my-selection-slots' && window._myPartyOptions && window._myPartyOptions.length) {
+    candidates = window._myPartyOptions.map(n => ({ display: n, no: '', type1: '', type2: '' }));
+  } else {
+    const src = (window.localPokemon || POKEMON_LIST).filter(p => p.confirmed);
+    candidates = sortByRecent(src).slice(0, 10);
+  }
+  if (!candidates.length) return;
+  list.innerHTML = candidates.map(p =>
+    `<div class="autocomplete-item" data-display="${p.display}">${p.display}</div>`
+  ).join('');
+  list.querySelectorAll('.autocomplete-item').forEach(item => {
+    item.addEventListener('mousedown', e => {
+      e.preventDefault();
+      input.value = item.dataset.display;
+      recordRecentPick(item.dataset.display);
+      list.classList.remove('open');
+    });
+  });
+  list.classList.add('open');
 }
 
 // 選出用プルダウン生成（自分/相手のパーティ6体のみ）
@@ -888,10 +933,11 @@ function showRecordForm() {
   oppParty.innerHTML = '';
   for (let i = 0; i < 6; i++) oppParty.appendChild(createPokemonSlot('opp-party-slots', i, `${i+1}体目`));
 
-  // 相手パーティ入力後に選出プルダウンを更新するため変更検知
+  // 相手パーティ: 直接テキスト入力してフォーカスを外した場合に対応
   oppParty.querySelectorAll('input[type=text]').forEach(input => {
-    input.addEventListener('change', rebuildOppSelectionDropdowns);
-    input.addEventListener('blur', rebuildOppSelectionDropdowns);
+    input.addEventListener('blur', () => {
+      rebuildOppSelectionDropdowns();
+    });
   });
 
   // 自分の選出プルダウン（自パーティ6体）
@@ -913,12 +959,7 @@ function buildMySelectionDropdowns(options) {
 function buildOppSelectionDropdowns(options) {
   const oppSelection = document.getElementById('opp-selection-slots');
   oppSelection.innerHTML = '';
-  for (let i = 0; i < 4; i++) {
-    const slot = createPokemonSlot('opp-selection-slots', i, `${i+1}体目`);
-    oppSelection.appendChild(slot);
-  }
-  // 相手パーティ6体の候補をオートコンプリートのソース候補として保持
-  window._oppPartyOptions = options.filter(Boolean);
+  for (let i = 0; i < 4; i++) oppSelection.appendChild(createSelectionDropdown('opp-selection-slots', i, `${i+1}体目`, options));
 }
 
 function rebuildOppSelectionDropdowns() {
@@ -1406,6 +1447,7 @@ function openPokemonPicker(btn) {
   // opp-selection-slotsの場合は相手パーティのみ表示
   const containerId = pickerTargetInput ? pickerTargetInput.dataset.container : '';
   window._pickerOppOnly = (containerId === 'opp-selection-slots' && window._oppPartyOptions && window._oppPartyOptions.length > 0);
+  window._pickerMyOnly  = (containerId === 'my-selection-slots'  && window._myPartyOptions  && window._myPartyOptions.length  > 0);
   pickerActiveType = null;
   document.getElementById('picker-search').value = '';
   document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
@@ -1424,10 +1466,12 @@ function pickerOnSearch(val) {
 
 function renderPickerGrid(searchVal) {
   const grid = document.getElementById('picker-grid');
-  // 相手選出ピッカーは相手パーティ6体のみ表示
+  // 選出ピッカーはパーティから絞り込み
   let src;
   if (window._pickerOppOnly && window._oppPartyOptions) {
     src = window._oppPartyOptions.map(name => ({ display: name, confirmed: true, no: '', type1: '', type2: '' }));
+  } else if (window._pickerMyOnly && window._myPartyOptions) {
+    src = window._myPartyOptions.map(name => ({ display: name, confirmed: true, no: '', type1: '', type2: '' }));
   } else {
     src = window.localPokemon || POKEMON_LIST;
   }
@@ -1471,6 +1515,9 @@ function selectFromPicker(displayName) {
   if (pickerTargetInput) {
     pickerTargetInput.value = displayName;
     recordRecentPick(displayName);
+    if (pickerTargetInput.dataset.container === 'opp-party-slots') {
+      rebuildOppSelectionDropdowns();
+    }
   }
   closePokemonPicker();
 }
