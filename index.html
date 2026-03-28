@@ -227,6 +227,14 @@
 
   /* dex個別PNG */
   .poke-tag-dex { width:40px; height:40px; object-fit:contain; image-rendering:pixelated; display:block; }
+
+  /* 履歴カードグリッド */
+  .history-card-grid { display:grid; grid-template-columns: 2fr 1fr 1fr; gap:8px; font-size:12px; }
+  @media (max-width: 600px) {
+    .history-card-grid { display:flex; flex-wrap:wrap; gap:8px; }
+    .history-opp-party { width:100%; }
+    .history-my-sel, .history-opp-sel { flex:1; min-width:0; }
+  }
 </style>
 </head>
 <body>
@@ -337,7 +345,7 @@
       <div id="my-sel-filter-tags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
     </div>
     <div>
-      <label>相手の選出ポケモンで絞り込み
+      <label>相手のパーティで絞り込み
         <span style="color:var(--text-muted);font-weight:400;font-size:11px">（記録済みの試合から）</span>
       </label>
       <select id="opp-sel-filter-select" onchange="addFilterTagFromSelect(this,'oppSelFilter')">
@@ -819,10 +827,10 @@ function updateMySelFilterSelect() {
     options.map(p => `<option value="${p}">${p}</option>`).join('');
 }
 
-// 相手の選出フィルター: 全試合の相手選出から重複除去して選択肢を生成
+// 相手のパーティフィルター: 全試合の相手パーティから重複除去して選択肢を生成
 function updateOppSelFilterSelect() {
   const sel = document.getElementById('opp-sel-filter-select');
-  const all = [...new Set(records.flatMap(r => r.oppSelection.filter(Boolean)))].sort();
+  const all = [...new Set(records.flatMap(r => r.oppParty.filter(Boolean)))].sort();
   sel.innerHTML = '<option value="">-- 選択 --</option>' +
     all.map(p => `<option value="${p}">${p}</option>`).join('');
 }
@@ -1098,10 +1106,10 @@ function renderHistory() {
       mySelFilter.every(name => r.mySelection.includes(name))
     );
   }
-  // 相手の選出ポケモン絞り込み（AND条件）
+  // 相手のパーティ絞り込み（AND条件）
   if (oppSelFilter.length) {
     filtered = filtered.filter(r =>
-      oppSelFilter.every(name => r.oppSelection.includes(name))
+      oppSelFilter.every(name => r.oppParty.includes(name))
     );
   }
 
@@ -1145,18 +1153,18 @@ function renderHistory() {
         <span style="font-weight:600">${party ? party.name : '(削除済み)'}</span>
         <span class="record-date" style="margin-left:auto">${dateStr}</span>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
-        <div>
-          <div style="color:var(--text-muted);margin-bottom:4px">自分の選出</div>
+      <div class="history-card-grid">
+        <div class="history-opp-party">
+          <div style="color:var(--text-muted);margin-bottom:4px;font-size:12px">相手のパーティ</div>
+          <div style="display:flex;flex-wrap:wrap;gap:3px">${tagRow(oppPartyList, 'rgba(255,255,255,0.06)', oppSelFilter)}</div>
+        </div>
+        <div class="history-my-sel">
+          <div style="color:var(--text-muted);margin-bottom:4px;font-size:12px">自分の選出</div>
           <div style="display:flex;flex-wrap:wrap;gap:3px">${tagRow(mySelList, 'rgba(108,99,255,0.25)', mySelFilter)}</div>
         </div>
-        <div>
-          <div style="color:var(--text-muted);margin-bottom:4px">相手の選出</div>
-          <div style="display:flex;flex-wrap:wrap;gap:3px">${tagRow(oppSelList, 'rgba(255,101,132,0.2)', oppSelFilter)}</div>
-        </div>
-        <div style="grid-column:1/-1">
-          <div style="color:var(--text-muted);margin-bottom:4px">相手のパーティ</div>
-          <div style="display:flex;flex-wrap:wrap;gap:3px">${tagRow(oppPartyList, 'rgba(255,255,255,0.06)')}</div>
+        <div class="history-opp-sel">
+          <div style="color:var(--text-muted);margin-bottom:4px;font-size:12px">相手の選出</div>
+          <div style="display:flex;flex-wrap:wrap;gap:3px">${tagRow(oppSelList, 'rgba(255,101,132,0.2)')}</div>
         </div>
       </div>
     </div>`;
