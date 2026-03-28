@@ -215,6 +215,15 @@
   .type-btn[data-type="あく"]      { background:#2c2840; }
   .type-btn[data-type="はがね"]    { background:#8e9eb8; }
   .type-btn[data-type="フェアリー"]{ background:#e87890; }
+
+  /* ポケモンアイコン表示（履歴・パーティ） */
+  .poke-tag-icon { display:inline-flex; flex-direction:column; align-items:center; gap:1px; vertical-align:top; }
+  .poke-tag-sprite { display:block; width:40px; height:30px;
+    background-image:url('https://play.pokemonshowdown.com/sprites/pokemonicons-sheet.png');
+    background-repeat:no-repeat; image-rendering:pixelated; }
+  .poke-tag-label { font-size:8px; color:var(--text); text-align:center; width:40px;
+    overflow:hidden; white-space:nowrap; text-overflow:ellipsis; line-height:1.2; }
+  .poke-tags-wrap { display:flex; flex-wrap:wrap; gap:4px; }
 </style>
 </head>
 <body>
@@ -852,7 +861,7 @@ function renderParties() {
         <button class="btn btn-ghost btn-sm party-delete-btn" data-party-id="${p.id}">削除</button>
       </div>
       <div class="party-pokemon party-edit-trigger" data-party-id="${p.id}" style="cursor:pointer">
-        ${p.pokemon.filter(Boolean).map(pk => `<span class="poke-tag">${pk}</span>`).join('')}
+        ${p.pokemon.filter(Boolean).map(pk => getPokeSpriteHTMLByDisplay(pk)).join('')}
       </div>
     </div>
   `).join('');
@@ -932,7 +941,7 @@ function renderRecordPage() {
     <div class="party-card ${selectedPartyId === p.id ? 'selected' : ''}" onclick="selectPartyForRecord('${p.id}')">
       <div class="party-name">${p.name}</div>
       <div class="party-pokemon">
-        ${p.pokemon.filter(Boolean).map(pk => `<span class="poke-tag">${pk}</span>`).join('')}
+        ${p.pokemon.filter(Boolean).map(pk => getPokeSpriteHTMLByDisplay(pk)).join('')}
       </div>
     </div>
   `).join('');
@@ -1091,9 +1100,8 @@ function renderHistory() {
     const tagRow = (arr, color, filterArr) => arr.length
       ? arr.map(p => {
           const isHighlight = filterArr && filterArr.includes(p);
-          const bg = isHighlight ? 'rgba(108,99,255,0.55)' : color;
-          const border = isHighlight ? '1px solid var(--accent)' : '1px solid transparent';
-          return `<span style="font-size:11px;background:${bg};padding:2px 8px;border-radius:20px;white-space:nowrap;border:${border};font-weight:${isHighlight?'700':'400'}">${p}</span>`;
+          const sprite = getPokeSpriteHTMLByDisplay(p);
+          return `<div style="display:inline-flex;flex-direction:column;align-items:center;${isHighlight?'outline:2px solid var(--accent);border-radius:4px;':''}vertical-align:top">${sprite}</div>`;
         }).join('')
       : '<span style="font-size:11px;color:var(--text-muted)">なし</span>';
 
@@ -1142,19 +1150,19 @@ function openDetail(id) {
     <div class="detail-section">
       <h4>相手のパーティ（6体）</h4>
       <div class="detail-pokemon">
-        ${r.oppParty.filter(Boolean).map(p => `<span class="detail-poke-tag">${p}</span>`).join('') || '<span class="text-muted">記録なし</span>'}
+        ${r.oppParty.filter(Boolean).map(p => getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">記録なし</span>'}
       </div>
     </div>
     <div class="detail-section">
       <h4>自分の選出（4体）</h4>
       <div class="detail-pokemon">
-        ${r.mySelection.filter(Boolean).map(p => `<span class="detail-poke-tag">${p}</span>`).join('') || '<span class="text-muted">記録なし</span>'}
+        ${r.mySelection.filter(Boolean).map(p => getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">記録なし</span>'}
       </div>
     </div>
     <div class="detail-section">
       <h4>相手の選出（4体）</h4>
       <div class="detail-pokemon">
-        ${r.oppSelection.filter(Boolean).map(p => `<span class="detail-poke-tag">${p}</span>`).join('') || '<span class="text-muted">記録なし</span>'}
+        ${r.oppSelection.filter(Boolean).map(p => getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">記録なし</span>'}
       </div>
     </div>
     ${r.memo ? `<div class="detail-section"><h4>メモ</h4><p style="font-size:13px">${r.memo}</p></div>` : ''}
@@ -1694,6 +1702,57 @@ function isMegaForm(pokemon) {
   // メガニウム(form=通常)やメガヤンマ(form=通常)は除外しない
   // メガニウム(form=メガメガニウム)はformにメガが含まれるので除外対象
   return pokemon.form && pokemon.form.includes('メガ');
+}
+
+
+// フォーム名からアイコン下の短縮ラベルを生成
+function getFormLabel(form, pokemonName) {
+  if (!form || form === '通常') return '';
+  let label = form;
+
+  // メガ進化: ポケモン名を除いて「メガ」+末尾記号だけ残す
+  if (label.startsWith('メガ')) {
+    const suffix = label.slice(2);
+    const nameRemoved = pokemonName && suffix.startsWith(pokemonName)
+      ? suffix.slice(pokemonName.length) : suffix;
+    return 'メガ' + nameRemoved;
+  }
+
+  // ロトムフォーム: 末尾の「ロトム」を除去
+  if (label.endsWith('ロトム') && label !== 'ロトムのすがた') {
+    return label.slice(0, -3);
+  }
+  if (label === 'ロトムのすがた') return '';
+
+  // 不要な文言を除去
+  for (const word of ['のすがた', 'すがた', 'フォルム', 'のサイズ', 'サイズ']) {
+    label = label.replace(word, '');
+  }
+  return label.trim();
+}
+
+// ポケモンのdisplayからスプライトHTML（アイコン+フォームラベル）を生成
+function getPokeSpriteHTML(display, no, form, pokemonName) {
+  const n = parseInt(no) || 0;
+  const x = (n % 12) * 40;
+  const y = Math.floor(n / 12) * 30;
+  const pos = `-${x}px -${y}px`;
+  const label = getFormLabel(form, pokemonName);
+  return `<div class="poke-tag-icon">
+    <span class="poke-tag-sprite" style="background-position:${pos}"></span>
+    ${label ? `<div class="poke-tag-label">${label}</div>` : ''}
+  </div>`;
+}
+
+// display名からポケモンデータを取得してスプライトHTMLを返す
+function getPokeSpriteHTMLByDisplay(display) {
+  if (!display) return '';
+  const p = (localPokemon || POKEMON_LIST).find(pk => pk.display === display);
+  if (!p) {
+    // データが見つからない場合はテキスト表示
+    return `<span class="poke-tag">${display}</span>`;
+  }
+  return getPokeSpriteHTML(display, p.no, p.form, p.name);
 }
 
 // ---- INIT ----
