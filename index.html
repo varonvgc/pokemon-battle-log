@@ -1700,9 +1700,11 @@ function dmCancelList() {
 // ---- SPRITE / ICON FUNCTIONS ----
 // ============================================================
 
-// フォーム別 PokeAPI IDマッピング
-const POKEAPI_ID_MAP = {"フシギバナ(メガフシギバナ)": 10033, "リザードン(メガリザードンＸ)": 10034, "リザードン(メガリザードンＹ)": 10035, "カメックス(メガカメックス)": 10036, "スピアー(メガスピアー)": 10090, "ピジョット(メガピジョット)": 10094, "フーディン(メガフーディン)": 10037, "ヤドラン(メガヤドラン)": 10053, "ゲンガー(メガゲンガー)": 10038, "ガルーラ(メガガルーラ)": 10039, "カイロス(メガカイロス)": 10040, "ギャラドス(メガギャラドス)": 10041, "プテラ(メガプテラ)": 10042, "デンリュウ(メガデンリュウ)": 10045, "ハガネール(メガハガネール)": 10055, "ハッサム(メガハッサム)": 10046, "ヘラクロス(メガヘラクロス)": 10047, "ヘルガー(メガヘルガー)": 10048, "バンギラス(メガバンギラス)": 10049, "サーナイト(メガサーナイト)": 10051, "ヤミラミ(メガヤミラミ)": 10064, "ボスゴドラ(メガボスゴドラ)": 10056, "ライボルト(メガライボルト)": 10057, "チルタリス(メガチルタリス)": 10062, "ジュペッタ(メガジュペッタ)": 10065, "アブソル(メガアブソル)": 10067, "アブソル(メガアブソルZ)": 10067, "オニゴーリ(メガオニゴーリ)": 10068, "メタグロス(メガメタグロス)": 10076, "ミミロップ(メガミミロップ)": 10069, "ガブリアス(メガガブリアス)": 10075, "ガブリアス(メガガブリアスZ)": 10075, "ルカリオ(メガルカリオ)": 10071, "ルカリオ(メガルカリオZ)": 10071, "ユキノオー(メガユキノオー)": 10072, "エルレイド(メガエルレイド)": 10082, "ユキメノコ(メガユキメノコ)": 10081, "ニャオニクス(メガニャオニクス)": 10091, "ライチュウ(メガライチュウX)": 10100, "ライチュウ(メガライチュウY)": 10100, "ライチュウ(アローラのすがた)": 10100, "キュウコン(アローラのすがた)": 10103, "ヤドキング(ガラルのすがた)": 10182, "マッギョ(ガラルのすがた)": 10195, "ウインディ(ヒスイのすがた)": 10242, "バクフーン(ヒスイのすがた)": 10243, "ジュナイパー(ヒスイのすがた)": 10244, "ダイケンキ(ヒスイのすがた)": 10246, "ゾロアーク(ヒスイのすがた)": 10252, "ヌメルゴン(ヒスイのすがた)": 10255, "ロトム(ヒートロトム)": 10011, "ロトム(ウォッシュロトム)": 10012, "ロトム(フロストロトム)": 10013, "ロトム(スピンロトム)": 10014, "ロトム(カットロトム)": 10015, "ギルガルド(ブレードフォルム)": 10120, "ニャオニクス(メスのすがた)": 10091, "イダイトウ(メスのすがた)": 10250, "イルカマン(マイティフォルム)": 10263, "パンプジン(ちいさいサイズ)": 10139, "パンプジン(おおきいサイズ)": 10140, "パンプジン(とくだいサイズ)": 10141, "ルガルガン(まよなかのすがた)": 10152, "シャリタツ(たれたすがた)": 10267, "シャリタツ(のびたすがた)": 10268};
-const POKEAPI_BASE = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
+// スプライトシート座標を返す（40x30px）
+function getSpritePos(no) {
+  const n = parseInt(no) || 0;
+  return { x: (n % 12) * 40, y: Math.floor(n / 12) * 30 };
+}
 
 // フォーム名からアイコン下の短縮ラベルを生成
 function getFormLabel(form, pokemonName) {
@@ -1725,10 +1727,8 @@ function getFormLabel(form, pokemonName) {
 function getPokeSpriteHTML(display, no, form, pokemonName) {
   const label = getFormLabel(form, pokemonName);
   const labelHTML = label ? '<div class="poke-tag-label">' + label + '</div>' : '';
-  const formId = POKEAPI_ID_MAP[display];
-  const pokeId = formId !== undefined ? formId : (parseInt(no) || 0);
-  const url = POKEAPI_BASE + pokeId + '.png';
-  return '<div class="poke-tag-icon"><img class="poke-tag-dex" src="' + url + '" loading="lazy">' + labelHTML + '</div>';
+  const pos = getSpritePos(no);
+  return '<div class="poke-tag-icon"><span class="poke-tag-sprite" style="background-position:-' + pos.x + 'px -' + pos.y + 'px"></span>' + labelHTML + '</div>';
 }
 
 // display名からポケモンデータを取得してスプライトHTMLを返す
@@ -1738,6 +1738,7 @@ function getPokeSpriteHTMLByDisplay(display) {
   if (!p) return '<span class="poke-tag">' + display + '</span>';
   return getPokeSpriteHTML(display, p.no, p.form, p.name);
 }
+
 
 // ポケモンスロットのアイコンを更新（ポケモン名があればスプライト、なければボール）
 function updateSlotIcon(input, displayName) {
@@ -1766,20 +1767,13 @@ function updateSlotIcon(input, displayName) {
     return;
   }
   const no = parseInt(poke.no) || 0;
-  const formId = POKEAPI_ID_MAP[displayName];
-  const pokeId = formId !== undefined ? formId : no;
-  const url = POKEAPI_BASE + pokeId + '.png';
+  const x = (no % 12) * 40, y = Math.floor(no / 12) * 30;
+  spriteEl.style.backgroundPosition = '-' + x + 'px -' + y + 'px';
   ballImg.style.display = 'none';
-  spriteEl.style.display = 'none';
-  let dexImg = btn.querySelector('.slot-dex-img');
-  if (!dexImg) {
-    dexImg = document.createElement('img');
-    dexImg.className = 'slot-dex-img';
-    dexImg.style.cssText = 'width:40px;height:40px;object-fit:contain;display:block;image-rendering:pixelated';
-    btn.appendChild(dexImg);
-  }
-  dexImg.src = url;
-  dexImg.style.display = 'block';
+  spriteEl.style.display = 'block';
+  // slot-dex-imgがあれば非表示
+  const di = btn.querySelector('.slot-dex-img');
+  if (di) di.style.display = 'none';
 }
 
 // ---- INIT ----
