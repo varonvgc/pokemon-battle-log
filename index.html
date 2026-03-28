@@ -178,8 +178,8 @@
   .picker-title { font-size:14px; font-weight:700; color:var(--text-muted); margin-bottom:10px; }
   .picker-search { width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:8px; padding:8px 12px; font-size:16px; outline:none; }
   .picker-search:focus { border-color:var(--accent); }
-  .picker-types { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; margin-top:10px; }
-  .type-btn { border:none; border-radius:8px; width:100%; aspect-ratio:1; font-size:12px; font-weight:700; cursor:pointer; color:#fff; opacity:0.6; transition:opacity .15s; display:flex; align-items:center; justify-content:center; }
+  .picker-types { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+  .type-btn { border:none; border-radius:8px; width:48px; height:48px; flex-shrink:0; font-size:12px; font-weight:700; cursor:pointer; color:#fff; opacity:0.6; transition:opacity .15s; display:flex; align-items:center; justify-content:center; }
   .type-btn.active { opacity:1; box-shadow:0 0 0 2px #fff; }
   .picker-body { flex:1; overflow-y:auto; padding:10px; }
   .picker-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(56px,1fr)); gap:4px; }
@@ -719,7 +719,12 @@ function onSlotFocus(input) {
   } else if (cid === 'my-selection-slots' && window._myPartyOptions && window._myPartyOptions.length) {
     candidates = window._myPartyOptions.map(n => ({ display: n, no: '', type1: '', type2: '' }));
   } else {
-    const src = (localPokemon || POKEMON_LIST).filter(p => p.confirmed);
+    const focusExcludeMega = cid === 'opp-party-slots';
+    const src = (localPokemon || POKEMON_LIST).filter(p => {
+      if (!p.confirmed) return false;
+      if (focusExcludeMega && isMegaForm(p)) return false;
+      return true;
+    });
     candidates = sortByRecent(src).slice(0, 10);
   }
   if (!candidates.length) return;
