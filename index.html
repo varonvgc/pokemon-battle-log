@@ -236,18 +236,17 @@
     .hist-card-body { grid-template-columns:1fr; gap:6px; }
     .hist-sel-row { display:grid !important; grid-template-columns:1fr 1fr; gap:6px; }
     .hist-opp-party { width:100%; }
-    /* 選出欄: transform:scaleで縮小（スプライトオフセットを崩さない） */
+    /* 選出欄: transform:scaleで縮小 */
     .hist-my-sel .poke-tag-icon,
     .hist-opp-sel .poke-tag-icon {
       transform:scale(0.75);
       transform-origin:top left;
-      width:30px; /* 40 * 0.75 */
-      height:30px;
-      gap:0;
+      margin-right:-10px; /* 40*(1-0.75)=10px 詰める */
+      margin-bottom:-6px; /* ラベルの高さ分も詰める */
     }
-    /* wrapを無効にして1行固定、はみ出しは非表示 */
+    /* 1行に収めるがoverflowはvisible（ラベルが切れないように） */
     .hist-my-sel > div,
-    .hist-opp-sel > div { flex-wrap:nowrap; overflow:hidden; }
+    .hist-opp-sel > div { flex-wrap:nowrap; overflow:visible; }
   }
 </style>
 </head>
