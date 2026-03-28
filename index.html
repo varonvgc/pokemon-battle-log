@@ -224,6 +224,9 @@
   .poke-tag-label { font-size:8px; color:var(--text); text-align:center; width:40px;
     overflow:hidden; white-space:nowrap; text-overflow:ellipsis; line-height:1.2; }
   .poke-tags-wrap { display:flex; flex-wrap:wrap; gap:4px; }
+
+  /* dex個別PNG */
+  .poke-tag-dex { width:40px; height:40px; object-fit:contain; image-rendering:pixelated; display:block; }
 </style>
 </head>
 <body>
@@ -1707,6 +1710,8 @@ function updateSlotIcon(input, displayName) {
     // ボールを表示
     ballImg.style.display  = 'block';
     spriteEl.style.display = 'none';
+    const dexImgClear = btn.querySelector('.slot-dex-img');
+    if (dexImgClear) dexImgClear.style.display = 'none';
     return;
   }
 
@@ -1718,11 +1723,38 @@ function updateSlotIcon(input, displayName) {
     return;
   }
   const no = parseInt(poke.no) || 0;
-  const x  = (no % 12) * 40;
-  const y  = Math.floor(no / 12) * 30;
-  spriteEl.style.backgroundPosition = `-${x}px -${y}px`;
-  ballImg.style.display  = 'none';
-  spriteEl.style.display = 'block';
+  const slug = FORM_SLUG_MAP[displayName];
+  if (slug) {
+    // dex/個別PNG使用: imgタグで表示
+    ballImg.style.display  = 'none';
+    spriteEl.style.display = 'none';
+    // 既存のdex-imgがあれば更新、なければ追加
+    let dexImg = btn.querySelector('.slot-dex-img');
+    if (!dexImg) {
+      dexImg = document.createElement('img');
+      dexImg.className = 'slot-dex-img';
+      dexImg.style.cssText = 'width:40px;height:40px;object-fit:contain;display:block;mix-blend-mode:lighten;image-rendering:pixelated';
+      btn.appendChild(dexImg);
+    }
+    dexImg.src = `https://play.pokemonshowdown.com/sprites/dex/${slug}.png`;
+    dexImg.onerror = () => {
+      dexImg.remove();
+      const x = (no % 12) * 40, y = Math.floor(no / 12) * 30;
+      spriteEl.style.backgroundPosition = `-${x}px -${y}px`;
+      spriteEl.style.display = 'block';
+    };
+    dexImg.style.display = 'block';
+  } else {
+    // スプライトシート使用
+    const x = (no % 12) * 40;
+    const y = Math.floor(no / 12) * 30;
+    spriteEl.style.backgroundPosition = `-${x}px -${y}px`;
+    ballImg.style.display  = 'none';
+    spriteEl.style.display = 'block';
+    // dex-imgがあれば非表示
+    const dexImg = btn.querySelector('.slot-dex-img');
+    if (dexImg) dexImg.style.display = 'none';
+  }
 }
 
 
@@ -1762,17 +1794,39 @@ function getFormLabel(form, pokemonName) {
   return label.trim();
 }
 
+// フォーム別 dex/ スラッグマッピング
+const FORM_SLUG_MAP = {"フシギバナ(メガフシギバナ)": "venusaurmega", "リザードン(メガリザードンＸ)": "charizard-mega-x", "リザードン(メガリザードンＹ)": "charizard-mega-y", "カメックス(メガカメックス)": "blastoisemega", "スピアー(メガスピアー)": "beedrilmega", "ピジョット(メガピジョット)": "pidgeotmega", "フーディン(メガフーディン)": "alakazammega", "ヤドラン(メガヤドラン)": "slowbromega", "ゲンガー(メガゲンガー)": "gengarmega", "ガルーラ(メガガルーラ)": "kangaskhanmega", "カイロス(メガカイロス)": "pinsirmega", "ギャラドス(メガギャラドス)": "gyaradosmega", "プテラ(メガプテラ)": "aerodactylmega", "デンリュウ(メガデンリュウ)": "ampharosmega", "ハガネール(メガハガネール)": "steelixmega", "ハッサム(メガハッサム)": "scissormega", "ヘラクロス(メガヘラクロス)": "heracrossmega", "ヘルガー(メガヘルガー)": "houndoommega", "バンギラス(メガバンギラス)": "tyranitarmega", "サーナイト(メガサーナイト)": "gardevoirmega", "ヤミラミ(メガヤミラミ)": "sableyemega", "ボスゴドラ(メガボスゴドラ)": "aggronmega", "ライボルト(メガライボルト)": "manectricmega", "チルタリス(メガチルタリス)": "altariamega", "ジュペッタ(メガジュペッタ)": "banettmega", "アブソル(メガアブソル)": "absolmega", "アブソル(メガアブソルZ)": "absolmega", "オニゴーリ(メガオニゴーリ)": "glaaliemega", "メタグロス(メガメタグロス)": "metagrossmega", "ミミロップ(メガミミロップ)": "lopunnymega", "ガブリアス(メガガブリアス)": "garchompmega", "ガブリアス(メガガブリアスZ)": "garchompmega", "ルカリオ(メガルカリオ)": "lucariomega", "ルカリオ(メガルカリオZ)": "lucariomega", "ユキノオー(メガユキノオー)": "abomasnowmega", "エルレイド(メガエルレイド)": "gallademega", "フラエッテ(メガフラエッテ)": "floette-eternal", "ライチュウ(アローラのすがた)": "raichu-alola", "ライチュウ(メガライチュウX)": "raichu-alola", "ライチュウ(メガライチュウY)": "raichu-alola", "キュウコン(アローラのすがた)": "ninetales-alola", "ヤドキング(ガラルのすがた)": "slowking-galar", "マッギョ(ガラルのすがた)": "stunfisk-galar", "ウインディ(ヒスイのすがた)": "arcanine-hisui", "バクフーン(ヒスイのすがた)": "typhlosion-hisui", "ダイケンキ(ヒスイのすがた)": "samurott-hisui", "ゾロアーク(ヒスイのすがた)": "zoroark-hisui", "ジュナイパー(ヒスイのすがた)": "decidueye-hisui", "ヌメルゴン(ヒスイのすがた)": "goodra-hisui", "ロトム(ロトムのすがた)": "rotom", "ロトム(ヒートロトム)": "rotom-heat", "ロトム(ウォッシュロトム)": "rotom-wash", "ロトム(フロストロトム)": "rotom-frost", "ロトム(スピンロトム)": "rotom-fan", "ロトム(カットロトム)": "rotom-mow", "ギルガルド(シールドフォルム)": "aegislash", "ギルガルド(ブレードフォルム)": "aegislash-blade", "ニャオニクス(オスのすがた)": "meowstic", "ニャオニクス(メスのすがた)": "meowstic-f", "ニャオニクス(メガニャオニクス)": "meowstic-f", "イダイトウ(オスのすがた)": "basculegion", "イダイトウ(メスのすがた)": "basculegion-f", "イルカマン(ナイーブフォルム)": "palafin", "イルカマン(マイティフォルム)": "palafin-hero", "パンプジン(ふつうのサイズ)": "gourgeist", "パンプジン(ちいさいサイズ)": "gourgeist-small", "パンプジン(おおきいサイズ)": "gourgeist-large", "パンプジン(とくだいサイズ)": "gourgeist-super", "ルガルガン(まひるのすがた)": "lycanroc", "ルガルガン(まよなかのすがた)": "lycanroc-midnight", "フラエッテ(えいえんのはな)": "floette-eternal", "シャリタツ(そったすがた)": "tatsugiri-curly", "シャリタツ(たれたすがた)": "tatsugiri-droopy", "シャリタツ(のびたすがた)": "tatsugiri-stretchy", "シャリタツ(メガシャリタツ)": "tatsugiri-curly"};
+
 // ポケモンのdisplayからスプライトHTML（アイコン+フォームラベル）を生成
 function getPokeSpriteHTML(display, no, form, pokemonName) {
+  const label = getFormLabel(form, pokemonName);
+  const slug = FORM_SLUG_MAP[display];
+
+  if (slug) {
+    // フォーム別個別PNG (sprites/dex/)
+    const url = `https://play.pokemonshowdown.com/sprites/dex/${slug}.png`;
+    return `<div class="poke-tag-icon">
+      <img class="poke-tag-dex" src="${url}" loading="lazy"
+           onerror="this.parentNode.innerHTML=fallbackSprite(${parseInt(no)||0})+'${label ? `<div class=\"poke-tag-label\">${label}</div>` : ''}'">
+      ${label ? `<div class="poke-tag-label">${label}</div>` : ''}
+    </div>`;
+  }
+  // 通常フォーム: スプライトシート
   const n = parseInt(no) || 0;
   const x = (n % 12) * 40;
   const y = Math.floor(n / 12) * 30;
   const pos = `-${x}px -${y}px`;
-  const label = getFormLabel(form, pokemonName);
   return `<div class="poke-tag-icon">
     <span class="poke-tag-sprite" style="background-position:${pos}"></span>
     ${label ? `<div class="poke-tag-label">${label}</div>` : ''}
   </div>`;
+}
+
+// スプライトシートへのフォールバック用HTML文字列生成
+function fallbackSprite(n) {
+  const x = (n % 12) * 40;
+  const y = Math.floor(n / 12) * 30;
+  return `<span class="poke-tag-sprite" style="background-position:-${x}px -${y}px"></span>`;
 }
 
 // display名からポケモンデータを取得してスプライトHTMLを返す
