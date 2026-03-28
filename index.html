@@ -361,13 +361,20 @@
       <div id="my-sel-filter-tags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
     </div>
     <div>
-      <label>相手の選出ポケモンで絞り込み
-        <span style="color:var(--text-muted);font-weight:400;font-size:11px">（記録済みの試合から）</span>
+      <label>相手のパーティで絞り込み
+        <span style="color:var(--text-muted);font-weight:400;font-size:11px">（選択中パーティの試合から）</span>
       </label>
-      <select id="opp-sel-filter-select" onchange="addFilterTagFromSelect(this,'oppSelFilter')">
-        <option value="">-- 選択 --</option>
-      </select>
-      <div id="opp-sel-filter-tags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+      <div style="position:relative;margin-top:4px">
+        <input type="text" id="opp-party-filter-input" placeholder="ポケモン名を入力..." autocomplete="off"
+          oninput="onOppPartyFilterInput(this)" onfocus="onOppPartyFilterFocus(this)"
+          onkeydown="onOppPartyFilterKeydown(event,this)"
+          style="font-size:16px;width:100%;box-sizing:border-box">
+        <div id="opp-party-filter-ac" class="autocomplete-list"></div>
+      </div>
+      <div id="opp-party-filter-tag" style="display:none;align-items:center;gap:6px;margin-top:6px">
+        <span id="opp-party-filter-name" style="background:var(--surface2);padding:3px 10px;border-radius:20px;font-size:13px"></span>
+        <button class="btn btn-ghost btn-sm" onclick="clearOppPartyFilter()">×クリア</button>
+      </div>
     </div>
   </div>
 
@@ -844,12 +851,7 @@ function updateMySelFilterSelect() {
 }
 
 // 相手の選出フィルター: 全試合の相手選出から重複除去して選択肢を生成
-function updateOppSelFilterSelect() {
-  const sel = document.getElementById('opp-sel-filter-select');
-  const all = [...new Set(records.flatMap(r => r.oppSelection.filter(Boolean)))].sort();
-  sel.innerHTML = '<option value="">-- 選択 --</option>' +
-    all.map(p => `<option value="${p}">${p}</option>`).join('');
-}
+function updateOppSelFilterSelect() { /* 廃止: テキストAC方式に変更 */ }
 
 function addFilterTagFromSelect(selectEl, filterKey) {
   const name = selectEl.value;
@@ -1130,11 +1132,9 @@ function renderHistory() {
       mySelFilter.every(name => r.mySelection.includes(name))
     );
   }
-  // 相手の選出ポケモン絞り込み（AND条件）
-  if (oppSelFilter.length) {
-    filtered = filtered.filter(r =>
-      oppSelFilter.every(name => r.oppSelection.includes(name))
-    );
+  // 相手のパーティ絞り込み（1体、oppPartyで判定）
+  if (oppPartyFilterName) {
+    filtered = filtered.filter(r => r.oppParty.includes(oppPartyFilterName));
   }
 
   // Stats
@@ -1873,6 +1873,96 @@ function initPartyDragSort(grid) {
     });
   });
 }
+
+
+// ============================================================
+// ---- 相手パーティ絞り込み（テキスト入力AC） ----
+// ============================================================
+let oppPartyFilterName = '';
+
+function onOppPartyFilterFocus(input) { showOppPartyAC(input.value); }
+function onOppPartyFilterInput(input) { showOppPartyAC(input.value); }
+
+function onOppPartyFilterKeydown(e, input) {
+  const list = document.getElementById('opp-party-filter-ac');
+  const items = list.querySelectorAll('.autocomplete-item');
+  let sel = list.querySelector('.autocomplete-item.selected');
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    if (!sel && items.length) items[0].classList.add('selected');
+    else if (sel) { sel.classList.remove('selected'); if (sel.nextElementSibling) sel.nextElementSibling.classList.add('selected'); }
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (sel) { sel.classList.remove('selected'); if (sel.previousElementSibling) sel.previousElementSibling.classList.add('selected'); }
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (sel) { setOppPartyFilter(sel.dataset.name); input.value = ''; list.classList.remove('open'); }
+  } else if (e.key === 'Escape') {
+    list.classList.remove('open');
+  }
+}
+
+function showOppPartyAC(val) {
+  const list = document.getElementById('opp-party-filter-ac');
+  if (!list) return;
+  // 現在選択中のパーティの試合の相手パーティから候補を生成
+  const filterVal = document.getElementById('history-filter').value;
+  const baseRecords = filterVal ? records.filter(r => r.partyId === filterVal) : records;
+  const allPokemon = [...new Set(baseRecords.flatMap(r => r.oppParty.filter(Boolean)))].sort();
+  let candidates;
+  if (!val) {
+    candidates = allPokemon.slice(0, 15);
+  } else {
+    const valKana = toKatakana(val), valHira = toHiragana(val);
+    candidates = allPokemon.filter(name => {
+      const nH = toHiragana(name);
+      return name.includes(valKana) || nH.includes(valHira) || name.includes(val);
+    }).slice(0, 15);
+  }
+  list.innerHTML = candidates.map(name =>
+    '<div class="autocomplete-item" data-name="' + name + '">' + name + '</div>'
+  ).join('');
+  list.querySelectorAll('.autocomplete-item').forEach(item => {
+    item.addEventListener('mousedown', e => {
+      e.preventDefault();
+      setOppPartyFilter(item.dataset.name);
+      document.getElementById('opp-party-filter-input').value = '';
+      list.classList.remove('open');
+    });
+  });
+  if (candidates.length) list.classList.add('open');
+  else list.classList.remove('open');
+}
+
+function setOppPartyFilter(name) {
+  oppPartyFilterName = name;
+  const tag = document.getElementById('opp-party-filter-tag');
+  const nameEl = document.getElementById('opp-party-filter-name');
+  if (tag) tag.style.display = name ? 'flex' : 'none';
+  if (nameEl) nameEl.textContent = name;
+  const input = document.getElementById('opp-party-filter-input');
+  if (input) input.value = '';
+  document.getElementById('opp-party-filter-ac')?.classList.remove('open');
+  renderHistory();
+}
+
+function clearOppPartyFilter() {
+  oppPartyFilterName = '';
+  const tag = document.getElementById('opp-party-filter-tag');
+  if (tag) tag.style.display = 'none';
+  const input = document.getElementById('opp-party-filter-input');
+  if (input) input.value = '';
+  renderHistory();
+}
+
+// AC外クリックで閉じる
+document.addEventListener('click', e => {
+  const ac = document.getElementById('opp-party-filter-ac');
+  const input = document.getElementById('opp-party-filter-input');
+  if (ac && input && !input.contains(e.target) && !ac.contains(e.target)) {
+    ac.classList.remove('open');
+  }
+});
 
 // ---- INIT ----
 renderParties();
