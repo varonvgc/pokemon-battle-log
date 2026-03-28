@@ -178,8 +178,8 @@
   .picker-title { font-size:14px; font-weight:700; color:var(--text-muted); margin-bottom:10px; }
   .picker-search { width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:8px; padding:8px 12px; font-size:16px; outline:none; }
   .picker-search:focus { border-color:var(--accent); }
-  .picker-types { display:flex; flex-wrap:wrap; gap:5px; margin-top:10px; }
-  .type-btn { border:none; border-radius:6px; padding:4px 8px; font-size:11px; font-weight:700; cursor:pointer; color:#fff; opacity:0.6; transition:opacity .15s; white-space:nowrap; }
+  .picker-types { display:grid; grid-template-columns:repeat(6,1fr); gap:6px; margin-top:10px; }
+  .type-btn { border:none; border-radius:8px; width:100%; aspect-ratio:1; font-size:12px; font-weight:700; cursor:pointer; color:#fff; opacity:0.6; transition:opacity .15s; display:flex; align-items:center; justify-content:center; }
   .type-btn.active { opacity:1; box-shadow:0 0 0 2px #fff; }
   .picker-body { flex:1; overflow-y:auto; padding:10px; }
   .picker-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(56px,1fr)); gap:4px; }
@@ -624,7 +624,11 @@ function onSlotInput(input) {
   } else {
     pokemonSource = (localPokemon || POKEMON_LIST).filter(p => p.confirmed);
   }
+  // 相手パーティスロットではメガシンカを除外
+  const acExcludeMega = input.dataset.container === 'opp-party-slots';
+
   const allMatches = pokemonSource.filter(p => {
+    if (acExcludeMega && isMegaForm(p)) return false;
     const d = p.display;
     const dH = toHiragana(d);
     return d.includes(valKana) || dH.includes(valHira);
@@ -1539,8 +1543,13 @@ function renderPickerGrid(searchVal) {
   const valKana = toKatakana(searchVal.trim());
   const valHira = toHiragana(searchVal.trim());
 
+  // 相手パーティスロットではメガシンカを除外
+  const excludeMega = pickerTargetInput && pickerTargetInput.dataset.container === 'opp-party-slots';
+
   let filtered = src.filter(p => {
     if (!p.confirmed) return false;
+    // 相手パーティにはメガシンカ不可
+    if (excludeMega && isMegaForm(p)) return false;
     // タイプ絞り込み
     if (pickerActiveType && p.type1 !== pickerActiveType && p.type2 !== pickerActiveType) return false;
     // テキスト絞り込み
@@ -1670,6 +1679,17 @@ function updateSlotIcon(input, displayName) {
   spriteEl.style.backgroundPosition = `-${x}px -${y}px`;
   ballImg.style.display  = 'none';
   spriteEl.style.display = 'block';
+}
+
+
+// メガシンカフォームかどうか判定（メガニウム・メガヤンマは除外しない）
+function isMegaForm(pokemon) {
+  if (!pokemon) return false;
+  // display に (メガ が含まれるのがメガ進化フォーム
+  // ただし name 自体がメガで始まるもの（メガニウム等）は通常ポケモン
+  if (!/\(メガ/.test(pokemon.display)) return false;
+  if (pokemon.name && pokemon.name.startsWith('メガ')) return false;
+  return true;
 }
 
 // ---- INIT ----
