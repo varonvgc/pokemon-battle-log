@@ -883,6 +883,8 @@ function renderParties() {
   grid.querySelectorAll('.party-edit-trigger').forEach(el => {
     el.addEventListener('click', () => editParty(el.dataset.partyId));
   });
+  // ドラッグ&ドロップ並び替え初期化
+  initPartyDragSort(grid);
 }
 
 function openPartyModal(id) {
@@ -1767,6 +1769,59 @@ function getPokeSpriteHTMLByDisplay(display) {
     return `<span class="poke-tag">${display}</span>`;
   }
   return getPokeSpriteHTML(display, p.no, p.form, p.name);
+}
+
+
+// パーティ並び替えドラッグ&ドロップ
+function initPartyDragSort(grid) {
+  let dragSrc = null;
+
+  grid.querySelectorAll('.party-card').forEach(card => {
+    card.setAttribute('draggable', 'true');
+
+    card.addEventListener('dragstart', e => {
+      dragSrc = card;
+      card.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', card.dataset.partyId);
+    });
+
+    card.addEventListener('dragend', () => {
+      card.classList.remove('dragging');
+      grid.querySelectorAll('.party-card').forEach(c => c.classList.remove('drag-over'));
+      dragSrc = null;
+    });
+
+    card.addEventListener('dragover', e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      if (dragSrc && dragSrc !== card) {
+        grid.querySelectorAll('.party-card').forEach(c => c.classList.remove('drag-over'));
+        card.classList.add('drag-over');
+      }
+    });
+
+    card.addEventListener('dragleave', () => {
+      card.classList.remove('drag-over');
+    });
+
+    card.addEventListener('drop', e => {
+      e.preventDefault();
+      if (!dragSrc || dragSrc === card) return;
+      card.classList.remove('drag-over');
+      const fromId = dragSrc.dataset.partyId;
+      const toId   = card.dataset.partyId;
+      const fromIdx = parties.findIndex(p => p.id === fromId);
+      const toIdx   = parties.findIndex(p => p.id === toId);
+      if (fromIdx < 0 || toIdx < 0) return;
+      // 並び替え
+      const [moved] = parties.splice(fromIdx, 1);
+      parties.splice(toIdx, 0, moved);
+      saveData();
+      renderParties();
+      renderRecordPage();
+    });
+  });
 }
 
 // ---- INIT ----
