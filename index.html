@@ -847,8 +847,20 @@ function updateMySelFilterSelect() {
     sel.disabled = true;
     sel.innerHTML = '<option value="">-- ポケモンを選択 --</option>';
     if (hint) hint.textContent = '（パーティを選択してください）';
-    clearMySelFilter();
-    clearOppPartyFilter();
+    // renderHistoryを呼ばずに状態だけリセット
+    mySelFilterName = '';
+    if (sel) sel.value = '';
+    const clearBtn = document.getElementById('my-sel-clear-btn');
+    if (clearBtn) clearBtn.style.display = 'none';
+    const myRateEl = document.getElementById('my-sel-rate');
+    if (myRateEl) myRateEl.style.display = 'none';
+    oppPartyFilterName = '';
+    const oppTag = document.getElementById('opp-party-filter-tag');
+    if (oppTag) oppTag.style.display = 'none';
+    const oppRateEl = document.getElementById('opp-party-rate');
+    if (oppRateEl) oppRateEl.style.display = 'none';
+    const oppInput = document.getElementById('opp-party-filter-input');
+    if (oppInput) oppInput.value = '';
     return;
   }
   sel.disabled = false;
@@ -1963,7 +1975,7 @@ function updateOppPartyRate() {
   const selected = partyRecs.filter(r => r.oppParty.includes(oppPartyFilterName) && r.oppSelection.includes(oppPartyFilterName)).length;
   if (!appeared) { rateEl.style.display = 'none'; return; }
   const pct = Math.round(selected / appeared * 100);
-  rateEl.textContent = selected + '/' + appeared + ' (+' + pct + '%)';
+  rateEl.textContent = selected + '/' + appeared + ' (' + pct + '%)';
   rateEl.style.display = 'block';
 }
 
@@ -2020,7 +2032,7 @@ function updateMySelRate() {
   const selected = partyRecs.filter(r => r.mySelection.includes(mySelFilterName)).length;
   if (!total) { rateEl.style.display = 'none'; return; }
   const pct = Math.round(selected / total * 100);
-  rateEl.textContent = selected + '/' + total + ' (+' + pct + '%)';
+  rateEl.textContent = selected + '/' + total + ' (' + pct + '%)';
   rateEl.style.display = 'block';
 }
 
