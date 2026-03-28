@@ -257,10 +257,10 @@
 
 <nav>
   <span class="logo">⚔️ 対戦記録</span>
-  <button class="active" onclick="showPage('parties')">パーティ管理</button>
-  <button onclick="showPage('record')">記録する</button>
-  <button onclick="showPage('history')">履歴</button>
-  <button onclick="showPage('datamanage')">データ管理</button>
+  <button class="active" onclick="showPage('parties',this)">パーティ管理</button>
+  <button onclick="showPage('record',this)">記録する</button>
+  <button onclick="showPage('history',this)">履歴</button>
+  <button onclick="showPage('datamanage',this)">データ管理</button>
   <div id="auth-area" style="margin-left:auto;display:flex;align-items:center;gap:8px">
     <span id="user-name" style="font-size:12px;color:var(--text-muted)"></span>
     <button id="auth-btn" class="btn btn-ghost btn-sm" onclick="toggleAuth()">ログイン</button>
@@ -612,11 +612,12 @@ if (window._firebaseReady) {
 }
 
 // ---- NAVIGATION ----
-function showPage(name) {
+function showPage(name, btn) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
-  event.target.classList.add('active');
+  if (btn) btn.classList.add('active');
+  else if (event && event.target) event.target.classList.add('active');
   if (name === 'parties') renderParties();
   if (name === 'record') renderRecordPage();
   if (name === 'history') renderHistory();
@@ -2037,6 +2038,13 @@ function updateMySelRate() {
 }
 
 // ---- INIT ----
+// localStorageから初期データを確実に読み込み
+try {
+  const lp = localStorage.getItem('pkm_parties');
+  const lr = localStorage.getItem('pkm_records');
+  if (lp) parties = JSON.parse(lp);
+  if (lr) records = JSON.parse(lr);
+} catch(e) {}
 renderParties();
 
 // ---- PWA: Service Worker 登録 ----
