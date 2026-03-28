@@ -263,7 +263,9 @@
 
   <div class="card">
     <div class="card-title">自分のパーティを選択</div>
-    <div id="party-select-grid" class="party-grid"></div>
+    <select id="party-select-dropdown" style="font-size:16px" onchange="onPartyDropdownChange(this.value)">
+      <option value="">-- パーティを選択 --</option>
+    </select>
   </div>
 
   <div class="card" id="record-form-card" style="display:none">
@@ -862,30 +864,49 @@ function renderParties() {
     grid.innerHTML = '<div class="empty"><div class="empty-icon">🎮</div><p>パーティがまだありません</p><p>右上のボタンから登録してください</p></div>';
     return;
   }
-  grid.innerHTML = parties.map(p => `
-    <div class="party-card" data-party-id="${p.id}">
-      <div class="flex justify-between items-center mb-3">
-        <div class="party-name party-edit-trigger" data-party-id="${p.id}" style="cursor:pointer;flex:1">${p.name}</div>
-        <button class="btn btn-ghost btn-sm party-delete-btn" data-party-id="${p.id}">削除</button>
-      </div>
-      <div class="party-pokemon party-edit-trigger" data-party-id="${p.id}" style="cursor:pointer">
-        ${p.pokemon.filter(Boolean).map(pk => getPokeSpriteHTMLByDisplay(pk)).join('')}
-      </div>
-    </div>
-  `).join('');
-  // イベント委譲で削除・編集を処理
-  grid.querySelectorAll('.party-delete-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      deleteParty(btn.dataset.partyId);
-    });
+  const cards = parties.map((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'party-card';
+    div.dataset.partyId = p.id;
+    div.innerHTML =
+      '<div style="display:flex;align-items:center;gap:6px;margin-bottom:10px">' +
+        '<div style="display:flex;flex-direction:column;gap:2px">' +
+          '<button class="btn btn-ghost btn-sm" style="padding:2px 6px;font-size:11px;line-height:1" data-action="up">▲</button>' +
+          '<button class="btn btn-ghost btn-sm" style="padding:2px 6px;font-size:11px;line-height:1" data-action="down">▼</button>' +
+        '</div>' +
+        '<div class="party-name" style="flex:1;cursor:pointer" data-action="edit">' + p.name + '</div>' +
+        '<button class="btn btn-ghost btn-sm" data-action="delete">削除</button>' +
+      '</div>' +
+      '<div style="cursor:pointer" data-action="edit">' +
+        p.pokemon.filter(Boolean).map(pk => getPokeSpriteHTMLByDisplay(pk)).join('') +
+      '</div>';
+    // ▲▼の disabled
+    div.querySelector('[data-action="up"]').disabled = (i === 0);
+    div.querySelector('[data-action="down"]').disabled = (i === parties.length - 1);
+    // イベント登録
+    div.querySelector('[data-action="up"]').addEventListener('click', e => { e.stopPropagation(); moveParty(p.id, -1); });
+    div.querySelector('[data-action="down"]').addEventListener('click', e => { e.stopPropagation(); moveParty(p.id, 1); });
+    div.querySelector('[data-action="delete"]').addEventListener('click', e => { e.stopPropagation(); deleteParty(p.id); });
+    div.querySelectorAll('[data-action="edit"]').forEach(el => el.addEventListener('click', () => editParty(p.id)));
+    return div;
   });
-  grid.querySelectorAll('.party-edit-trigger').forEach(el => {
-    el.addEventListener('click', () => editParty(el.dataset.partyId));
-  });
-  // ドラッグ&ドロップ並び替え初期化
-  initPartyDragSort(grid);
+  grid.innerHTML = '';
+  cards.forEach(c => grid.appendChild(c));
 }
+
+
+function moveParty(id, dir) {
+  const idx = parties.findIndex(p => p.id === id);
+  if (idx < 0) return;
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= parties.length) return;
+  const [moved] = parties.splice(idx, 1);
+  parties.splice(newIdx, 0, moved);
+  saveData();
+  renderParties();
+  renderRecordPage();
+}
+
 
 function openPartyModal(id) {
   editingPartyId = id || null;
@@ -916,16 +937,21 @@ function saveParty() {
   if (!name) { alert('パーティ名を入力してください'); return; }
   const pokemon = getSlotValues('party-modal-slots', 6);
   if (!pokemon.some(Boolean)) { alert('少なくとも1体は入力してください'); return; }
+  // ② 同名チェック（編集中のパーティ自身は除く）
+  const dup = parties.find(p => p.name === name && p.id !== editingPartyId);
+  if (dup) { alert(`「${name}」という名前のパーティはすでに存在します`); return; }
   if (editingPartyId) {
     const idx = parties.findIndex(p => p.id === editingPartyId);
     if (idx >= 0) { parties[idx].name = name; parties[idx].pokemon = pokemon; }
   } else {
     if (parties.length >= 50) { alert('パーティは最大50個まで登録できます'); return; }
-    parties.push({ id: Date.now().toString(), name, pokemon });
+    // ③ 新規は先頭に追加
+    parties.unshift({ id: Date.now().toString(), name, pokemon });
   }
   saveData();
   closePartyModal();
   renderParties();
+  renderRecordPage();
 }
 
 function editParty(id) {
@@ -941,22 +967,30 @@ function deleteParty(id) {
 
 // ---- RECORD PAGE ----
 function renderRecordPage() {
-  const grid = document.getElementById('party-select-grid');
+  const sel = document.getElementById('party-select-dropdown');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">-- パーティを選択 --</option>';
+  parties.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.id;
+    opt.textContent = p.name;
+    if (p.id === selectedPartyId) opt.selected = true;
+    sel.appendChild(opt);
+  });
   if (!parties.length) {
-    grid.innerHTML = '<div class="empty"><p>先にパーティを登録してください</p></div>';
     document.getElementById('record-form-card').style.display = 'none';
     return;
   }
-  grid.innerHTML = parties.map(p => `
-    <div class="party-card ${selectedPartyId === p.id ? 'selected' : ''}" onclick="selectPartyForRecord('${p.id}')">
-      <div class="party-name">${p.name}</div>
-      <div class="party-pokemon">
-        ${p.pokemon.filter(Boolean).map(pk => getPokeSpriteHTMLByDisplay(pk)).join('')}
-      </div>
-    </div>
-  `).join('');
-
   if (selectedPartyId) showRecordForm();
+}
+
+function onPartyDropdownChange(id) {
+  if (!id) {
+    selectedPartyId = null;
+    document.getElementById('record-form-card').style.display = 'none';
+    return;
+  }
+  selectPartyForRecord(id);
 }
 
 function selectPartyForRecord(id) {
@@ -1773,56 +1807,11 @@ function getPokeSpriteHTMLByDisplay(display) {
 
 
 // パーティ並び替えドラッグ&ドロップ
-function initPartyDragSort(grid) {
-  let dragSrc = null;
+function initPartyDragSort(grid) { /* 廃止: ↑↓ボタン方式に変更 */ }
 
-  grid.querySelectorAll('.party-card').forEach(card => {
-    card.setAttribute('draggable', 'true');
 
-    card.addEventListener('dragstart', e => {
-      dragSrc = card;
-      card.classList.add('dragging');
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', card.dataset.partyId);
-    });
 
-    card.addEventListener('dragend', () => {
-      card.classList.remove('dragging');
-      grid.querySelectorAll('.party-card').forEach(c => c.classList.remove('drag-over'));
-      dragSrc = null;
-    });
 
-    card.addEventListener('dragover', e => {
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-      if (dragSrc && dragSrc !== card) {
-        grid.querySelectorAll('.party-card').forEach(c => c.classList.remove('drag-over'));
-        card.classList.add('drag-over');
-      }
-    });
-
-    card.addEventListener('dragleave', () => {
-      card.classList.remove('drag-over');
-    });
-
-    card.addEventListener('drop', e => {
-      e.preventDefault();
-      if (!dragSrc || dragSrc === card) return;
-      card.classList.remove('drag-over');
-      const fromId = dragSrc.dataset.partyId;
-      const toId   = card.dataset.partyId;
-      const fromIdx = parties.findIndex(p => p.id === fromId);
-      const toIdx   = parties.findIndex(p => p.id === toId);
-      if (fromIdx < 0 || toIdx < 0) return;
-      // 並び替え
-      const [moved] = parties.splice(fromIdx, 1);
-      parties.splice(toIdx, 0, moved);
-      saveData();
-      renderParties();
-      renderRecordPage();
-    });
-  });
-}
 
 // ---- INIT ----
 renderParties();
