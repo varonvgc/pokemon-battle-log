@@ -601,7 +601,7 @@ function onSlotInput(input) {
   } else if (input.dataset.container === 'my-selection-slots' && window._myPartyOptions && window._myPartyOptions.length) {
     pokemonSource = window._myPartyOptions.map(name => ({ display: name, confirmed: true, no: '', type1: '', type2: '' }));
   } else {
-    pokemonSource = (window.localPokemon || POKEMON_LIST).filter(p => p.confirmed);
+    pokemonSource = (localPokemon || POKEMON_LIST).filter(p => p.confirmed);
   }
   const allMatches = pokemonSource.filter(p => {
     const d = p.display;
@@ -691,7 +691,7 @@ function onSlotFocus(input) {
   } else if (cid === 'my-selection-slots' && window._myPartyOptions && window._myPartyOptions.length) {
     candidates = window._myPartyOptions.map(n => ({ display: n, no: '', type1: '', type2: '' }));
   } else {
-    const src = (window.localPokemon || POKEMON_LIST).filter(p => p.confirmed);
+    const src = (localPokemon || POKEMON_LIST).filter(p => p.confirmed);
     candidates = sortByRecent(src).slice(0, 10);
   }
   if (!candidates.length) return;
@@ -1473,7 +1473,7 @@ function renderPickerGrid(searchVal) {
   } else if (window._pickerMyOnly && window._myPartyOptions) {
     src = window._myPartyOptions.map(name => ({ display: name, confirmed: true, no: '', type1: '', type2: '' }));
   } else {
-    src = window.localPokemon || POKEMON_LIST;
+    src = localPokemon || POKEMON_LIST;
   }
   const valKana = toKatakana(searchVal.trim());
   const valHira = toHiragana(searchVal.trim());
