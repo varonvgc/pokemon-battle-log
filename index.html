@@ -224,6 +224,26 @@
   .poke-tag-label { font-size:8px; color:var(--text); text-align:center; width:40px;
     overflow:hidden; white-space:nowrap; text-overflow:ellipsis; line-height:1.2; }
   .poke-tags-wrap { display:flex; flex-wrap:wrap; gap:4px; }
+
+  /* 履歴カードレイアウト */
+  .hist-card-body { display:grid; grid-template-columns:2fr 1fr 1fr; gap:8px; font-size:12px; }
+  .hist-opp-party {}
+  .hist-my-sel {}
+  .hist-opp-sel {}
+
+  /* スマホ: パーティ1行 + 選出2列1行 */
+  @media (max-width:640px) {
+    .hist-card-body { grid-template-columns:1fr; gap:6px; }
+    .hist-sel-row { display:grid !important; grid-template-columns:1fr 1fr; gap:6px; }
+    .hist-opp-party { width:100%; }
+    /* 選出欄のアイコンを縮小して4体が1行に収まるよう */
+    .hist-my-sel .poke-tag-sprite,
+    .hist-opp-sel .poke-tag-sprite { width:30px; height:22.5px; }
+    .hist-my-sel .poke-tag-label,
+    .hist-opp-sel .poke-tag-label { width:30px; font-size:7px; }
+    .hist-my-sel .poke-tag-icon,
+    .hist-opp-sel .poke-tag-icon { gap:0; }
+  }
 </style>
 </head>
 <body>
@@ -1142,18 +1162,20 @@ function renderHistory() {
         <span style="font-weight:600">${party ? party.name : '(削除済み)'}</span>
         <span class="record-date" style="margin-left:auto">${dateStr}</span>
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px">
-        <div>
-          <div style="color:var(--text-muted);margin-bottom:4px">自分の選出</div>
-          <div style="display:flex;flex-wrap:wrap;gap:3px">${tagRow(mySelList, 'rgba(108,99,255,0.25)', mySelFilter)}</div>
-        </div>
-        <div>
-          <div style="color:var(--text-muted);margin-bottom:4px">相手の選出</div>
-          <div style="display:flex;flex-wrap:wrap;gap:3px">${tagRow(oppSelList, 'rgba(255,101,132,0.2)', oppSelFilter)}</div>
-        </div>
-        <div style="grid-column:1/-1">
+      <div class="hist-card-body">
+        <div class="hist-opp-party">
           <div style="color:var(--text-muted);margin-bottom:4px">相手のパーティ</div>
-          <div style="display:flex;flex-wrap:wrap;gap:3px">${tagRow(oppPartyList, 'rgba(255,255,255,0.06)')}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:3px">${tagRow(oppPartyList, 'rgba(255,255,255,0.06)', oppSelFilter)}</div>
+        </div>
+        <div class="hist-sel-row" style="display:contents">
+          <div class="hist-my-sel">
+            <div style="color:var(--text-muted);margin-bottom:4px">自分の選出</div>
+            <div style="display:flex;flex-wrap:nowrap;gap:2px;overflow:hidden">${tagRow(mySelList, 'rgba(108,99,255,0.25)', mySelFilter)}</div>
+          </div>
+          <div class="hist-opp-sel">
+            <div style="color:var(--text-muted);margin-bottom:4px">相手の選出</div>
+            <div style="display:flex;flex-wrap:nowrap;gap:2px;overflow:hidden">${tagRow(oppSelList, 'rgba(255,101,132,0.2)', oppSelFilter)}</div>
+          </div>
         </div>
       </div>
     </div>`;
