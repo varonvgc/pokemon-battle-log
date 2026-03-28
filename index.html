@@ -1372,10 +1372,23 @@ async function dmSaveMasterData() {
 }
 
 async function dmLoadMasterData() {
+  // POKEMON_LISTをベースにして保存済みconfirmedフラグのみをマージ
+  // display名→confirmedのマップを使い、保存データで変更されたものだけ上書き
+  function applyConfirmedMap(savedList) {
+    if (!savedList || !savedList.length) return;
+    const savedMap = {};
+    savedList.forEach(p => { if (p.display !== undefined) savedMap[p.display] = p.confirmed; });
+    localPokemon.forEach(p => {
+      if (p.display in savedMap) p.confirmed = savedMap[p.display];
+    });
+  }
+
+  // localStorageから読み込み（confirmedフラグのみマージ）
   const lp = localStorage.getItem('pkm_master_pokemon');
   const lm = localStorage.getItem('pkm_master_moves');
-  if (lp) localPokemon = JSON.parse(lp);
-  if (lm) localMoves   = JSON.parse(lm);
+  if (lp) { try { applyConfirmedMap(JSON.parse(lp)); } catch(e) {} }
+  if (lm) { try { localMoves = JSON.parse(lm); } catch(e) {} }
+
   if (!currentUser || !_fbReady) return;
   try {
     const snap = await window._firestoreOps.getDoc(
@@ -1383,8 +1396,14 @@ async function dmLoadMasterData() {
     );
     if (snap.exists()) {
       const d = snap.data();
-      if (d.pokemon) { localPokemon = d.pokemon; localStorage.setItem('pkm_master_pokemon', JSON.stringify(localPokemon)); }
-      if (d.moves)   { localMoves   = d.moves;   localStorage.setItem('pkm_master_moves',   JSON.stringify(localMoves)); }
+      if (d.pokemon) {
+        applyConfirmedMap(d.pokemon);
+        localStorage.setItem('pkm_master_pokemon', JSON.stringify(localPokemon));
+      }
+      if (d.moves) {
+        localMoves = d.moves;
+        localStorage.setItem('pkm_master_moves', JSON.stringify(localMoves));
+      }
     }
   } catch(e) { console.error('Master load error:', e); }
 }
