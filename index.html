@@ -2047,12 +2047,10 @@ try {
 } catch(e) {}
 renderParties();
 
-// ---- PWA: Service Worker 登録 ----
+// ---- PWA: Service Worker 解除（キャッシュ問題対策） ----
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then(() => console.log('SW registered'))
-      .catch(e => console.log('SW error:', e));
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    regs.forEach(reg => reg.unregister());
   });
 }
 </script>
