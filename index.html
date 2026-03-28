@@ -231,9 +231,18 @@
   /* 履歴カードグリッド */
   .history-card-grid { display:grid; grid-template-columns: 2fr 1fr 1fr; gap:8px; font-size:12px; }
   @media (max-width: 600px) {
-    .history-card-grid { display:flex; flex-wrap:wrap; gap:8px; }
+    .history-card-grid { display:flex; flex-wrap:wrap; gap:6px; }
     .history-opp-party { width:100%; }
-    .history-my-sel, .history-opp-sel { flex:1; min-width:0; }
+    .history-my-sel, .history-opp-sel { flex:1; min-width:0; overflow:hidden; }
+    /* 選出欄のアイコンを縮小して1行に収める */
+    .history-my-sel .poke-tag-sprite,
+    .history-opp-sel .poke-tag-sprite { width:28px; height:21px; transform:scale(0.7); transform-origin:top left; margin-right:-8px; margin-bottom:-4px; }
+    .history-my-sel .poke-tag-icon,
+    .history-opp-sel .poke-tag-icon { gap:0; }
+    .history-my-sel .poke-tag-label,
+    .history-opp-sel .poke-tag-label { font-size:7px; width:28px; }
+    .history-my-sel > div:last-child,
+    .history-opp-sel > div:last-child { flex-wrap:nowrap; overflow:hidden; }
   }
 </style>
 </head>
@@ -319,10 +328,10 @@
   </div>
 
   <div class="card mb-4">
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
       <div>
         <label>パーティで絞り込み</label>
-        <select id="history-filter" onchange="renderHistory()">
+        <select id="history-filter" onchange="onHistoryFilterChange()">
           <option value="">すべてのパーティ</option>
         </select>
       </div>
@@ -335,23 +344,38 @@
         </select>
       </div>
     </div>
-    <div style="margin-bottom:10px">
-      <label>自分の選出ポケモンで絞り込み
-        <span id="my-sel-filter-hint" style="color:var(--text-muted);font-weight:400;font-size:11px">（パーティを先に選択してください）</span>
+
+    <div style="margin-bottom:12px">
+      <label style="font-size:13px;font-weight:600">自分の選出で絞り込み
+        <span id="my-sel-filter-hint" style="color:var(--text-muted);font-weight:400;font-size:11px">（パーティを選択してください）</span>
       </label>
-      <select id="my-sel-filter-select" onchange="addFilterTagFromSelect(this,'mySelFilter')" disabled>
-        <option value="">-- 選択 --</option>
-      </select>
-      <div id="my-sel-filter-tags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap">
+        <select id="my-sel-filter-select" onchange="setMySelFilter(this.value)" disabled style="flex:1;min-width:120px">
+          <option value="">-- ポケモンを選択 --</option>
+        </select>
+        <button class="btn btn-ghost btn-sm" onclick="clearMySelFilter()" id="my-sel-clear-btn" style="display:none">×クリア</button>
+      </div>
+      <div id="my-sel-rate" style="font-size:12px;color:var(--accent);margin-top:6px;display:none"></div>
     </div>
+
     <div>
-      <label>相手のパーティで絞り込み
-        <span style="color:var(--text-muted);font-weight:400;font-size:11px">（記録済みの試合から）</span>
+      <label style="font-size:13px;font-weight:600">相手のパーティで絞り込み
+        <span style="color:var(--text-muted);font-weight:400;font-size:11px">（パーティを選択してください）</span>
       </label>
-      <select id="opp-sel-filter-select" onchange="addFilterTagFromSelect(this,'oppSelFilter')">
-        <option value="">-- 選択 --</option>
-      </select>
-      <div id="opp-sel-filter-tags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+      <div style="position:relative;margin-top:6px">
+        <input type="text" id="opp-party-filter-input" placeholder="ポケモン名を入力..." autocomplete="off"
+          oninput="onOppPartyFilterInput(this)" onfocus="onOppPartyFilterFocus(this)"
+          onkeydown="onOppPartyFilterKeydown(event,this)"
+          style="font-size:16px;width:100%;box-sizing:border-box" disabled>
+        <div id="opp-party-filter-ac" class="autocomplete-list"></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:6px;flex-wrap:wrap">
+        <div id="opp-party-filter-tag" style="display:none">
+          <span id="opp-party-filter-name" style="background:var(--surface2);padding:4px 10px;border-radius:20px;font-size:13px"></span>
+          <button class="btn btn-ghost btn-sm" onclick="clearOppPartyFilter()" style="margin-left:4px">×クリア</button>
+        </div>
+      </div>
+      <div id="opp-party-rate" style="font-size:12px;color:var(--accent2);margin-top:6px;display:none"></div>
     </div>
   </div>
 
@@ -835,228 +859,173 @@ function updateOppSelFilterSelect() {
     all.map(p => `<option value="${p}">${p}</option>`).join('');
 }
 
-function addFilterTagFromSelect(selectEl, filterKey) {
-  const name = selectEl.value;
-  if (!name) return;
-  selectEl.value = ''; // 選択後リセット
-  addFilterTag(name, filterKey);
-}
+function addFilterTagFromSelect() {} // 廃止
 
-function addFilterTag(name, filterKey) {
-  const arr = filterKey === 'mySelFilter' ? mySelFilter : oppSelFilter;
-  if (arr.includes(name)) return;
-  arr.push(name);
-  renderFilterTags(filterKey);
+// ============================================================
+// ---- HISTORY FILTER (刷新版) ----
+// ============================================================
+let mySelFilterName = '';
+let oppPartyFilterName = '';
+
+function setMySelFilter(name) {
+  mySelFilterName = name;
+  const clearBtn = document.getElementById('my-sel-clear-btn');
+  if (clearBtn) clearBtn.style.display = name ? 'inline-block' : 'none';
+  updateMySelRate();
   renderHistory();
 }
 
-function removeFilterTag(name, filterKey) {
-  const arr = filterKey === 'mySelFilter' ? mySelFilter : oppSelFilter;
-  const idx = arr.indexOf(name);
-  if (idx >= 0) arr.splice(idx, 1);
-  renderFilterTags(filterKey);
+function clearMySelFilter() {
+  mySelFilterName = '';
+  const sel = document.getElementById('my-sel-filter-select');
+  if (sel) sel.value = '';
+  const clearBtn = document.getElementById('my-sel-clear-btn');
+  if (clearBtn) clearBtn.style.display = 'none';
+  const rateEl = document.getElementById('my-sel-rate');
+  if (rateEl) rateEl.style.display = 'none';
   renderHistory();
 }
 
-function renderFilterTags(filterKey) {
-  const arr = filterKey === 'mySelFilter' ? mySelFilter : oppSelFilter;
-  const containerId = filterKey === 'mySelFilter' ? 'my-sel-filter-tags' : 'opp-sel-filter-tags';
-  const container = document.getElementById(containerId);
-  if (!container) return;
-  container.innerHTML = arr.map(name =>
-    `<span class="filter-tag">${name}<button onclick="removeFilterTag('${name}','${filterKey}')" title="削除">×</button></span>`
-  ).join('');
+function updateMySelRate() {
+  const rateEl = document.getElementById('my-sel-rate');
+  if (!rateEl) return;
+  if (!mySelFilterName) { rateEl.style.display = 'none'; return; }
+  const filterVal = document.getElementById('history-filter').value;
+  if (!filterVal) { rateEl.style.display = 'none'; return; }
+  const partyRecords = records.filter(r => r.partyId === filterVal);
+  const total = partyRecords.length;
+  const selected = partyRecords.filter(r => r.mySelection.includes(mySelFilterName)).length;
+  if (!total) { rateEl.textContent = '試合なし'; rateEl.style.display = 'block'; return; }
+  const pct = Math.round(selected / total * 100);
+  rateEl.textContent = '選出率: ' + selected + '/' + total + ' (+' + pct + '%)';
+  rateEl.style.display = 'block';
 }
 
-// ---- PARTIES ----
-function renderParties() {
-  const grid = document.getElementById('party-grid');
-  if (!parties.length) {
-    grid.innerHTML = '<div class="empty"><div class="empty-icon">🎮</div><p>パーティがまだありません</p><p>右上のボタンから登録してください</p></div>';
-    return;
-  }
-  grid.innerHTML = parties.map(p => `
-    <div class="party-card" data-party-id="${p.id}">
-      <div class="flex justify-between items-center mb-3">
-        <div class="party-name party-edit-trigger" data-party-id="${p.id}" style="cursor:pointer;flex:1">${p.name}</div>
-        <button class="btn btn-ghost btn-sm party-delete-btn" data-party-id="${p.id}">削除</button>
-      </div>
-      <div class="party-pokemon party-edit-trigger" data-party-id="${p.id}" style="cursor:pointer">
-        ${p.pokemon.filter(Boolean).map(pk => getPokeSpriteHTMLByDisplay(pk)).join('')}
-      </div>
-    </div>
-  `).join('');
-  // イベント委譲で削除・編集を処理
-  grid.querySelectorAll('.party-delete-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
-      e.stopPropagation();
-      deleteParty(btn.dataset.partyId);
-    });
-  });
-  grid.querySelectorAll('.party-edit-trigger').forEach(el => {
-    el.addEventListener('click', () => editParty(el.dataset.partyId));
-  });
-  // ドラッグ&ドロップ並び替え初期化
-  initPartyDragSort(grid);
+function onOppPartyFilterFocus(input) { showOppPartyFilterAC(input.value); }
+function onOppPartyFilterInput(input) { showOppPartyFilterAC(input.value); }
+
+function onOppPartyFilterKeydown(e, input) {
+  const list = document.getElementById('opp-party-filter-ac');
+  const items = list.querySelectorAll('.autocomplete-item');
+  let sel = list.querySelector('.autocomplete-item.selected');
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    if (!sel && items.length) { items[0].classList.add('selected'); return; }
+    if (sel) { sel.classList.remove('selected'); const next = sel.nextElementSibling; if (next) next.classList.add('selected'); }
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (sel) { sel.classList.remove('selected'); const prev = sel.previousElementSibling; if (prev) prev.classList.add('selected'); }
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (sel) { setOppPartyFilter(sel.dataset.name); input.value = ''; list.classList.remove('open'); }
+  } else if (e.key === 'Escape') { list.classList.remove('open'); }
 }
 
-function openPartyModal(id) {
-  editingPartyId = id || null;
-  const modal = document.getElementById('party-modal');
-  document.getElementById('party-modal-title').textContent = id ? 'パーティを編集' : 'パーティを登録';
-  const slotsEl = document.getElementById('party-modal-slots');
-  slotsEl.innerHTML = '';
-  for (let i = 0; i < 6; i++) {
-    slotsEl.appendChild(createPokemonSlot('party-modal-slots', i, `${i+1}体目`));
-  }
-  document.getElementById('party-name-input').value = '';
-  if (id) {
-    const p = parties.find(x => x.id === id);
-    if (p) {
-      document.getElementById('party-name-input').value = p.name;
-      setSlotValues('party-modal-slots', p.pokemon);
-    }
-  }
-  modal.classList.add('open');
-}
-
-function closePartyModal() {
-  document.getElementById('party-modal').classList.remove('open');
-}
-
-function saveParty() {
-  const name = document.getElementById('party-name-input').value.trim();
-  if (!name) { alert('パーティ名を入力してください'); return; }
-  const pokemon = getSlotValues('party-modal-slots', 6);
-  if (!pokemon.some(Boolean)) { alert('少なくとも1体は入力してください'); return; }
-  // ② 同名チェック（編集中のパーティ自身は除く）
-  const dup = parties.find(p => p.name === name && p.id !== editingPartyId);
-  if (dup) { alert(`「${name}」という名前のパーティはすでに存在します`); return; }
-  if (editingPartyId) {
-    const idx = parties.findIndex(p => p.id === editingPartyId);
-    if (idx >= 0) { parties[idx].name = name; parties[idx].pokemon = pokemon; }
+function showOppPartyFilterAC(val) {
+  const list = document.getElementById('opp-party-filter-ac');
+  const filterVal = document.getElementById('history-filter').value;
+  const baseRecords = filterVal ? records.filter(r => r.partyId === filterVal) : records;
+  const allPokemon = [...new Set(baseRecords.flatMap(r => r.oppParty.filter(Boolean)))].sort();
+  let candidates;
+  if (!val || val.length === 0) {
+    candidates = allPokemon.slice(0, 15);
   } else {
-    if (parties.length >= 50) { alert('パーティは最大50個まで登録できます'); return; }
-    // ③ 新規は先頭に追加
-    parties.unshift({ id: Date.now().toString(), name, pokemon });
+    const valKana = toKatakana(val), valHira = toHiragana(val);
+    candidates = allPokemon.filter(name => {
+      const n = toHiragana(name);
+      return name.includes(valKana) || n.includes(valHira) || name.includes(val);
+    }).slice(0, 15);
   }
-  saveData();
-  closePartyModal();
-  renderParties();
-  renderRecordPage();
-}
-
-function editParty(id) {
-  openPartyModal(id);
-}
-
-function deleteParty(id) {
-  if (!confirm('このパーティを削除しますか？')) return;
-  parties = parties.filter(p => p.id !== id);
-  saveData();
-  renderParties();
-}
-
-// ---- RECORD PAGE ----
-function renderRecordPage() {
-  const sel = document.getElementById('party-select-dropdown');
-  if (!sel) return;
-  sel.innerHTML = '<option value="">-- パーティを選択 --</option>';
-  parties.forEach(p => {
-    const opt = document.createElement('option');
-    opt.value = p.id;
-    opt.textContent = p.name;
-    if (p.id === selectedPartyId) opt.selected = true;
-    sel.appendChild(opt);
-  });
-  if (!parties.length) {
-    document.getElementById('record-form-card').style.display = 'none';
-    return;
-  }
-  if (selectedPartyId) showRecordForm();
-}
-
-function onPartyDropdownChange(id) {
-  if (!id) {
-    selectedPartyId = null;
-    document.getElementById('record-form-card').style.display = 'none';
-    return;
-  }
-  selectPartyForRecord(id);
-}
-
-function selectPartyForRecord(id) {
-  selectedPartyId = id;
-  recordResult = null;
-  document.getElementById('btn-win').classList.remove('active');
-  document.getElementById('btn-lose').classList.remove('active');
-  renderRecordPage();
-  showRecordForm();
-}
-
-function showRecordForm() {
-  const form = document.getElementById('record-form-card');
-  form.style.display = 'block';
-
-  // Set datetime
-  const now = new Date();
-  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
-  document.getElementById('rec-date').value = local.toISOString().slice(0, 16);
-
-  // 自分のパーティ
-  const myParty = parties.find(p => p.id === selectedPartyId);
-  const myPokemon = myParty ? myParty.pokemon : [];
-
-  // 相手パーティスロット（フリー入力）
-  const oppParty = document.getElementById('opp-party-slots');
-  oppParty.innerHTML = '';
-  for (let i = 0; i < 6; i++) oppParty.appendChild(createPokemonSlot('opp-party-slots', i, `${i+1}体目`));
-
-  // 相手パーティ: 直接テキスト入力してフォーカスを外した場合に対応
-  oppParty.querySelectorAll('input[type=text]').forEach(input => {
-    input.addEventListener('blur', () => {
-      rebuildOppSelectionDropdowns();
+  list.innerHTML = candidates.map(name => '<div class="autocomplete-item" data-name="' + name + '">' + name + '</div>').join('');
+  list.querySelectorAll('.autocomplete-item').forEach(item => {
+    item.addEventListener('mousedown', e => {
+      e.preventDefault();
+      setOppPartyFilter(item.dataset.name);
+      document.getElementById('opp-party-filter-input').value = '';
+      list.classList.remove('open');
     });
   });
+  if (candidates.length > 0) list.classList.add('open'); else list.classList.remove('open');
+}
 
-  // 自分のパーティアイコンを表示
-  const myIcons = document.getElementById('my-party-icons');
-  if (myIcons) {
-    myIcons.innerHTML = myPokemon.filter(Boolean).map(name => getPokeSpriteHTMLByDisplay(name)).join('');
+function setOppPartyFilter(name) {
+  oppPartyFilterName = name;
+  const tag = document.getElementById('opp-party-filter-tag');
+  const nameEl = document.getElementById('opp-party-filter-name');
+  if (tag) tag.style.display = name ? 'flex' : 'none';
+  if (nameEl) nameEl.textContent = name;
+  const input = document.getElementById('opp-party-filter-input');
+  if (input) { input.value = ''; }
+  document.getElementById('opp-party-filter-ac')?.classList.remove('open');
+  updateOppPartyRate();
+  renderHistory();
+}
+
+function clearOppPartyFilter() {
+  oppPartyFilterName = '';
+  const tag = document.getElementById('opp-party-filter-tag');
+  if (tag) tag.style.display = 'none';
+  const rateEl = document.getElementById('opp-party-rate');
+  if (rateEl) rateEl.style.display = 'none';
+  renderHistory();
+}
+
+function updateOppPartyRate() {
+  const rateEl = document.getElementById('opp-party-rate');
+  if (!rateEl) return;
+  if (!oppPartyFilterName) { rateEl.style.display = 'none'; return; }
+  const filterVal = document.getElementById('history-filter').value;
+  if (!filterVal) { rateEl.style.display = 'none'; return; }
+  const partyRecords = records.filter(r => r.partyId === filterVal);
+  const appeared = partyRecords.filter(r => r.oppParty.includes(oppPartyFilterName)).length;
+  const selected = partyRecords.filter(r => r.oppParty.includes(oppPartyFilterName) && r.oppSelection.includes(oppPartyFilterName)).length;
+  if (!appeared) { rateEl.textContent = '試合なし'; rateEl.style.display = 'block'; return; }
+  const pct = Math.round(selected / appeared * 100);
+  rateEl.textContent = '相手選出率: ' + selected + '/' + appeared + ' (+' + pct + '%)';
+  rateEl.style.display = 'block';
+}
+
+document.addEventListener('click', e => {
+  const ac = document.getElementById('opp-party-filter-ac');
+  const input = document.getElementById('opp-party-filter-input');
+  if (ac && input && !input.contains(e.target) && !ac.contains(e.target)) {
+    ac.classList.remove('open');
   }
+});
 
-  // 自分の選出プルダウン（自パーティ6体）
-  buildMySelectionDropdowns(myPokemon);
-
-  // 相手の選出プルダウン（初期は空）
-  buildOppSelectionDropdowns([]);
-
-  document.getElementById('rec-memo').value = '';
-  form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+function onHistoryFilterChange() {
+  updateMySelFilterSelect();
+  renderHistory();
 }
 
-function buildMySelectionDropdowns(options) {
-  const mySelection = document.getElementById('my-selection-slots');
-  mySelection.innerHTML = '';
-  for (let i = 0; i < 4; i++) mySelection.appendChild(createSelectionDropdown('my-selection-slots', i, `${i+1}体目`, options));
+function updateMySelFilterSelect() {
+  const sel = document.getElementById('my-sel-filter-select');
+  const hint = document.getElementById('my-sel-filter-hint');
+  const oppInput = document.getElementById('opp-party-filter-input');
+  const filterVal = document.getElementById('history-filter').value;
+  const party = filterVal ? parties.find(p => p.id === filterVal) : null;
+  const options = party ? party.pokemon.filter(Boolean) : [];
+  if (!filterVal || !options.length) {
+    if (sel) { sel.disabled = true; sel.innerHTML = '<option value="">-- 選択 --</option>'; }
+    if (hint) hint.textContent = '（パーティを選択してください）';
+    if (oppInput) oppInput.disabled = true;
+    clearMySelFilter();
+    clearOppPartyFilter();
+    return;
+  }
+  if (sel) {
+    sel.disabled = false;
+    sel.innerHTML = '<option value="">-- ポケモンを選択 --</option>' +
+      options.map(p => '<option value="' + p + '">' + p + '</option>').join('');
+  }
+  if (hint) hint.textContent = '';
+  if (oppInput) oppInput.disabled = false;
+  updateMySelRate();
+  updateOppPartyRate();
 }
 
-function buildOppSelectionDropdowns(options) {
-  const oppSelection = document.getElementById('opp-selection-slots');
-  oppSelection.innerHTML = '';
-  for (let i = 0; i < 4; i++) oppSelection.appendChild(createSelectionDropdown('opp-selection-slots', i, `${i+1}体目`, options));
-}
+function updateOppSelFilterSelect() {} // 廃止
 
-function rebuildOppSelectionDropdowns() {
-  const oppPokemon = getSlotValues('opp-party-slots', 6).filter(Boolean);
-  buildOppSelectionDropdowns(oppPokemon);
-}
-
-function setResult(r) {
-  recordResult = r;
-  document.getElementById('btn-win').classList.toggle('active', r === 'win');
-  document.getElementById('btn-lose').classList.toggle('active', r === 'lose');
-}
 
 function saveRecord() {
   if (!selectedPartyId) { alert('パーティを選択してください'); return; }
@@ -1100,17 +1069,13 @@ function renderHistory() {
   const resultFilterVal = document.getElementById('history-result-filter').value;
   let filtered = filterVal ? records.filter(r => r.partyId === filterVal) : records;
   if (resultFilterVal) filtered = filtered.filter(r => r.result === resultFilterVal);
-  // 自分の選出ポケモン絞り込み（AND条件）
-  if (mySelFilter.length) {
-    filtered = filtered.filter(r =>
-      mySelFilter.every(name => r.mySelection.includes(name))
-    );
+  // 自分の選出絞り込み（1体）
+  if (mySelFilterName) {
+    filtered = filtered.filter(r => r.mySelection.includes(mySelFilterName));
   }
-  // 相手のパーティ絞り込み（AND条件）
-  if (oppSelFilter.length) {
-    filtered = filtered.filter(r =>
-      oppSelFilter.every(name => r.oppParty.includes(name))
-    );
+  // 相手のパーティ絞り込み（1体）
+  if (oppPartyFilterName) {
+    filtered = filtered.filter(r => r.oppParty.includes(oppPartyFilterName));
   }
 
   // Stats
@@ -1139,11 +1104,11 @@ function renderHistory() {
     const oppSelList = r.oppSelection.filter(Boolean);
     const isWin = r.result === 'win';
 
-    const tagRow = (arr, color, filterArr) => arr.length
+    const tagRow = (arr, _color, highlightName) => arr.length
       ? arr.map(p => {
-          const isHighlight = filterArr && filterArr.includes(p);
+          const hl = highlightName && p === highlightName;
           const sprite = getPokeSpriteHTMLByDisplay(p);
-          return `<div style="display:inline-flex;flex-direction:column;align-items:center;${isHighlight?'outline:2px solid var(--accent);border-radius:4px;':''}vertical-align:top">${sprite}</div>`;
+          return '<div style="display:inline-flex;flex-direction:column;align-items:center;' + (hl ? 'outline:2px solid var(--accent);border-radius:4px;' : '') + 'vertical-align:top">' + sprite + '</div>';
         }).join('')
       : '<span style="font-size:11px;color:var(--text-muted)">なし</span>';
 
@@ -1156,15 +1121,15 @@ function renderHistory() {
       <div class="history-card-grid">
         <div class="history-opp-party">
           <div style="color:var(--text-muted);margin-bottom:4px;font-size:12px">相手のパーティ</div>
-          <div style="display:flex;flex-wrap:wrap;gap:3px">${tagRow(oppPartyList, 'rgba(255,255,255,0.06)', oppSelFilter)}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:3px">${tagRow(oppPartyList, '', oppPartyFilterName)}</div>
         </div>
         <div class="history-my-sel">
           <div style="color:var(--text-muted);margin-bottom:4px;font-size:12px">自分の選出</div>
-          <div style="display:flex;flex-wrap:wrap;gap:3px">${tagRow(mySelList, 'rgba(108,99,255,0.25)', mySelFilter)}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:3px">${tagRow(mySelList, '', mySelFilterName)}</div>
         </div>
         <div class="history-opp-sel">
           <div style="color:var(--text-muted);margin-bottom:4px;font-size:12px">相手の選出</div>
-          <div style="display:flex;flex-wrap:wrap;gap:3px">${tagRow(oppSelList, 'rgba(255,101,132,0.2)')}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:3px">${tagRow(oppSelList, '', '')}</div>
         </div>
       </div>
     </div>`;
