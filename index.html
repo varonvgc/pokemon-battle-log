@@ -248,6 +248,9 @@
     .hist-my-sel > div,
     .hist-opp-sel > div { flex-wrap:nowrap; overflow:visible; }
   }
+
+  /* 履歴カードのラベル行（高さ統一でずれ防止） */
+  .hist-row-label { height:20px; display:flex; align-items:center; margin-bottom:3px; }
 </style>
 </head>
 <body>
@@ -1171,7 +1174,7 @@ function renderHistory() {
     return `<div class="record-item" onclick="openDetail('${r.id}')" style="border-left:3px solid ${isWin ? 'var(--win)' : 'var(--lose)'}">
       <div class="hist-card-body">
         <div class="hist-opp-party">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+          <div class="hist-row-label" style="display:flex;align-items:center;gap:6px">
             <span class="${isWin ? 'badge-win' : 'badge-lose'}" style="font-size:10px;padding:2px 6px">${isWin ? '🏆勝' : '💀負'}</span>
             <span class="record-date" style="font-size:11px">${dateStr}</span>
           </div>
@@ -1179,9 +1182,11 @@ function renderHistory() {
         </div>
         <div class="hist-sel-row" style="display:contents">
           <div class="hist-my-sel">
+            <div class="hist-row-label" style="color:var(--text-muted);font-size:11px">自分の選出</div>
             <div style="display:flex;flex-wrap:nowrap;gap:2px;overflow:visible">${tagRow(mySelList, 'rgba(108,99,255,0.25)', mySelFilter)}</div>
           </div>
           <div class="hist-opp-sel">
+            <div class="hist-row-label" style="color:var(--text-muted);font-size:11px">相手の選出</div>
             <div style="display:flex;flex-wrap:nowrap;gap:2px;overflow:visible">${tagRow(oppSelList, 'rgba(255,101,132,0.2)', oppSelFilter)}</div>
           </div>
         </div>
