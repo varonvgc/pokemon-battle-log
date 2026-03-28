@@ -267,6 +267,9 @@
   </div>
 
   <div class="card" id="record-form-card" style="display:none">
+    <div class="section-label">自分のパーティ</div>
+    <div id="my-party-icons" style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:8px"></div>
+
     <div class="section-label">日時</div>
     <input type="datetime-local" id="rec-date" style="max-width:260px">
 
@@ -983,6 +986,12 @@ function showRecordForm() {
     });
   });
 
+  // 自分のパーティアイコンを表示
+  const myIcons = document.getElementById('my-party-icons');
+  if (myIcons) {
+    myIcons.innerHTML = myPokemon.filter(Boolean).map(name => getPokeSpriteHTMLByDisplay(name)).join('');
+  }
+
   // 自分の選出プルダウン（自パーティ6体）
   buildMySelectionDropdowns(myPokemon);
 
@@ -1144,7 +1153,7 @@ function openDetail(id) {
     <div class="detail-section">
       <h4>自分のパーティ</h4>
       <div class="detail-pokemon">
-        ${(party ? party.pokemon.filter(Boolean) : []).map(p => `<span class="detail-poke-tag">${p}</span>`).join('') || '<span class="text-muted">(削除済み)</span>'}
+        ${(party ? party.pokemon.filter(Boolean) : []).map(p => getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">(削除済み)</span>'}
       </div>
     </div>
     <div class="detail-section">
