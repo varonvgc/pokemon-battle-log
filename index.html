@@ -352,13 +352,16 @@
       </div>
     </div>
     <div style="margin-bottom:10px">
-      <label>自分の選出ポケモンで絞り込み
-        <span id="my-sel-filter-hint" style="color:var(--text-muted);font-weight:400;font-size:11px">（パーティを先に選択してください）</span>
+      <label>自分の選出で絞り込み
+        <span id="my-sel-filter-hint" style="color:var(--text-muted);font-weight:400;font-size:11px">（パーティを選択してください）</span>
       </label>
-      <select id="my-sel-filter-select" onchange="addFilterTagFromSelect(this,'mySelFilter')" disabled>
-        <option value="">-- 選択 --</option>
-      </select>
-      <div id="my-sel-filter-tags" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px"></div>
+      <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+        <select id="my-sel-filter-select" onchange="onMySelFilterChange(this.value)" disabled style="flex:1">
+          <option value="">-- ポケモンを選択 --</option>
+        </select>
+        <button class="btn btn-ghost btn-sm" id="my-sel-clear-btn" onclick="clearMySelFilter()" style="display:none">×</button>
+      </div>
+      <div id="my-sel-rate" style="font-size:12px;color:var(--accent);margin-top:4px;display:none"></div>
     </div>
     <div>
       <label>相手のパーティで絞り込み
@@ -373,8 +376,9 @@
       </div>
       <div id="opp-party-filter-tag" style="display:none;align-items:center;gap:6px;margin-top:6px">
         <span id="opp-party-filter-name" style="background:var(--surface2);padding:3px 10px;border-radius:20px;font-size:13px"></span>
-        <button class="btn btn-ghost btn-sm" onclick="clearOppPartyFilter()">×クリア</button>
+        <button class="btn btn-ghost btn-sm" onclick="clearOppPartyFilter()">×</button>
       </div>
+      <div id="opp-party-rate" style="font-size:12px;color:var(--accent2);margin-top:4px;display:none"></div>
     </div>
   </div>
 
@@ -839,16 +843,19 @@ function updateMySelFilterSelect() {
   const filterVal = document.getElementById('history-filter').value;
   const party = filterVal ? parties.find(p => p.id === filterVal) : null;
   const options = party ? party.pokemon.filter(Boolean) : [];
-  if (!options.length) {
+  if (!filterVal || !options.length) {
     sel.disabled = true;
-    sel.innerHTML = '<option value="">-- 選択 --</option>';
-    if (hint) hint.textContent = '（パーティを先に選択してください）';
+    sel.innerHTML = '<option value="">-- ポケモンを選択 --</option>';
+    if (hint) hint.textContent = '（パーティを選択してください）';
+    clearMySelFilter();
+    clearOppPartyFilter();
     return;
   }
   sel.disabled = false;
   if (hint) hint.textContent = '';
-  sel.innerHTML = '<option value="">-- 選択 --</option>' +
-    options.map(p => `<option value="${p}">${p}</option>`).join('');
+  // 現在選択中の値を維持
+  sel.innerHTML = '<option value="">-- ポケモンを選択 --</option>' +
+    options.map(p => '<option value="' + p + '"' + (p === mySelFilterName ? ' selected' : '') + '>' + p + '</option>').join('');
 }
 
 // 相手の選出フィルター: 全試合の相手選出から重複除去して選択肢を生成
@@ -1127,11 +1134,9 @@ function renderHistory() {
 
   let filtered = records.filter(r => r.partyId === filterVal);
   if (resultFilterVal) filtered = filtered.filter(r => r.result === resultFilterVal);
-  // 自分の選出ポケモン絞り込み（AND条件）
-  if (mySelFilter.length) {
-    filtered = filtered.filter(r =>
-      mySelFilter.every(name => r.mySelection.includes(name))
-    );
+  // 自分の選出絞り込み（1体）
+  if (mySelFilterName) {
+    filtered = filtered.filter(r => r.mySelection.includes(mySelFilterName));
   }
   // 相手のパーティ絞り込み（1体、oppPartyで判定）
   if (oppPartyFilterName) {
@@ -1184,7 +1189,7 @@ function renderHistory() {
         <div class="hist-sel-row" style="display:contents">
           <div class="hist-my-sel">
             <div class="hist-row-label" style="color:var(--text-muted);font-size:11px">自分の選出</div>
-            <div style="display:flex;flex-wrap:nowrap;gap:2px;overflow:visible">${tagRow(mySelList, 'rgba(108,99,255,0.25)', mySelFilter)}</div>
+            <div style="display:flex;flex-wrap:nowrap;gap:2px;overflow:visible">${tagRow(mySelList, 'rgba(108,99,255,0.25)', [mySelFilterName])}</div>
           </div>
           <div class="hist-opp-sel">
             <div class="hist-row-label" style="color:var(--text-muted);font-size:11px">相手の選出</div>
@@ -1944,13 +1949,30 @@ function setOppPartyFilter(name) {
   const input = document.getElementById('opp-party-filter-input');
   if (input) input.value = '';
   document.getElementById('opp-party-filter-ac')?.classList.remove('open');
+  updateOppPartyRate();
   renderHistory();
+}
+
+function updateOppPartyRate() {
+  const rateEl = document.getElementById('opp-party-rate');
+  if (!rateEl || !oppPartyFilterName) { if (rateEl) rateEl.style.display = 'none'; return; }
+  const filterVal = document.getElementById('history-filter').value;
+  if (!filterVal) { rateEl.style.display = 'none'; return; }
+  const partyRecs = records.filter(r => r.partyId === filterVal);
+  const appeared = partyRecs.filter(r => r.oppParty.includes(oppPartyFilterName)).length;
+  const selected = partyRecs.filter(r => r.oppParty.includes(oppPartyFilterName) && r.oppSelection.includes(oppPartyFilterName)).length;
+  if (!appeared) { rateEl.style.display = 'none'; return; }
+  const pct = Math.round(selected / appeared * 100);
+  rateEl.textContent = selected + '/' + appeared + ' (+' + pct + '%)';
+  rateEl.style.display = 'block';
 }
 
 function clearOppPartyFilter() {
   oppPartyFilterName = '';
   const tag = document.getElementById('opp-party-filter-tag');
   if (tag) tag.style.display = 'none';
+  const rateEl = document.getElementById('opp-party-rate');
+  if (rateEl) rateEl.style.display = 'none';
   const input = document.getElementById('opp-party-filter-input');
   if (input) input.value = '';
   renderHistory();
@@ -1964,6 +1986,43 @@ document.addEventListener('click', e => {
     ac.classList.remove('open');
   }
 });
+
+
+// ---- 自分の選出フィルター（1体） ----
+let mySelFilterName = '';
+
+function onMySelFilterChange(name) {
+  mySelFilterName = name;
+  const clearBtn = document.getElementById('my-sel-clear-btn');
+  if (clearBtn) clearBtn.style.display = name ? 'inline-block' : 'none';
+  updateMySelRate();
+  renderHistory();
+}
+
+function clearMySelFilter() {
+  mySelFilterName = '';
+  const sel = document.getElementById('my-sel-filter-select');
+  if (sel) sel.value = '';
+  const clearBtn = document.getElementById('my-sel-clear-btn');
+  if (clearBtn) clearBtn.style.display = 'none';
+  const rateEl = document.getElementById('my-sel-rate');
+  if (rateEl) rateEl.style.display = 'none';
+  renderHistory();
+}
+
+function updateMySelRate() {
+  const rateEl = document.getElementById('my-sel-rate');
+  if (!rateEl || !mySelFilterName) { if (rateEl) rateEl.style.display = 'none'; return; }
+  const filterVal = document.getElementById('history-filter').value;
+  if (!filterVal) { rateEl.style.display = 'none'; return; }
+  const partyRecs = records.filter(r => r.partyId === filterVal);
+  const total = partyRecs.length;
+  const selected = partyRecs.filter(r => r.mySelection.includes(mySelFilterName)).length;
+  if (!total) { rateEl.style.display = 'none'; return; }
+  const pct = Math.round(selected / total * 100);
+  rateEl.textContent = selected + '/' + total + ' (+' + pct + '%)';
+  rateEl.style.display = 'block';
+}
 
 // ---- INIT ----
 renderParties();
