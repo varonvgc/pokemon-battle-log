@@ -1690,11 +1690,10 @@ function updateSlotIcon(input, displayName) {
 // メガシンカフォームかどうか判定（メガニウム・メガヤンマは除外しない）
 function isMegaForm(pokemon) {
   if (!pokemon) return false;
-  // display に (メガ が含まれるのがメガ進化フォーム
-  // ただし name 自体がメガで始まるもの（メガニウム等）は通常ポケモン
-  if (!/\(メガ/.test(pokemon.display)) return false;
-  if (pokemon.name && pokemon.name.startsWith('メガ')) return false;
-  return true;
+  // form に「メガ」が含まれていればメガ進化フォーム
+  // メガニウム(form=通常)やメガヤンマ(form=通常)は除外しない
+  // メガニウム(form=メガメガニウム)はformにメガが含まれるので除外対象
+  return pokemon.form && pokemon.form.includes('メガ');
 }
 
 // ---- INIT ----
