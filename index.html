@@ -164,6 +164,11 @@
   .filter-tag button { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:14px; line-height:1; padding:0; }
   .filter-tag button:hover { color:var(--accent2); }
   .highlight-tag { background: rgba(108,99,255,0.3) !important; border-color: var(--accent) !important; }
+  .dm-list-row { display:flex; align-items:center; gap:10px; padding:8px 16px; border-bottom:1px solid var(--border); }
+  .dm-list-row:last-child { border-bottom:none; }
+  .dm-list-icon span { display:block; width:40px; height:30px; background-image:url('https://play.pokemonshowdown.com/sprites/pokemonicons-sheet.png'); background-repeat:no-repeat; image-rendering:pixelated; flex-shrink:0; }
+  .dm-list-name { flex:1; font-size:13px; }
+  .dm-list-check { width:22px; height:22px; cursor:pointer; accent-color:var(--accent); flex-shrink:0; }
 
   /* ポケモン選択ポップアップ */
   .picker-overlay { position:fixed; inset:0; background:rgba(0,0,0,.8); z-index:500; display:none; align-items:flex-end; justify-content:center; padding:0; }
@@ -361,6 +366,7 @@
     <div id="dm-action-area" style="display:none">
       <div class="section-label">操作</div>
       <div style="display:flex;gap:10px;margin-bottom:16px">
+        <button class="btn btn-ghost" id="dm-btn-list"   onclick="dmSelectAction('list')"   style="flex:1">📋 一覧</button>
         <button class="btn btn-ghost" id="dm-btn-search" onclick="dmSelectAction('search')" style="flex:1">🔍 検索・編集</button>
         <button class="btn btn-ghost" id="dm-btn-add"    onclick="dmSelectAction('add')"    style="flex:1">＋ 新規追加</button>
       </div>
@@ -383,6 +389,18 @@
     <div style="margin-top:20px;text-align:right">
       <button class="btn btn-ghost" onclick="dmCancelEdit()" style="margin-right:8px">キャンセル</button>
       <button class="btn btn-primary" onclick="dmSaveEntry()">💾 登録</button>
+    </div>
+  </div>
+
+  <!-- 内定一覧 -->
+  <div id="dm-list-card" style="display:none">
+    <div class="card" style="position:sticky;top:56px;z-index:50;margin-bottom:8px;display:flex;align-items:center;gap:10px">
+      <span style="font-size:13px;color:var(--text-muted);flex:1" id="dm-list-count"></span>
+      <button class="btn btn-ghost btn-sm" onclick="dmCancelList()">キャンセル</button>
+      <button class="btn btn-primary btn-sm" onclick="dmSaveList()">💾 登録</button>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden">
+      <div id="dm-list-body"></div>
     </div>
   </div>
 </div>
@@ -1149,6 +1167,8 @@ let dmAction = null;
 let dmEditIndex = null;
 let localPokemon = JSON.parse(JSON.stringify(POKEMON_LIST));
 let localMoves   = JSON.parse(JSON.stringify(MOVES_LIST));
+// 古いlocalStorageキーをクリア（pkm_master_pokemonは旧方式）
+localStorage.removeItem('pkm_master_pokemon');
 
 function dmSelectType(type) {
   dmType = type; dmAction = null; dmEditIndex = null;
@@ -1157,6 +1177,9 @@ function dmSelectType(type) {
   document.getElementById('dm-action-area').style.display = 'block';
   document.getElementById('dm-search-area').style.display = 'none';
   document.getElementById('dm-form-card').style.display   = 'none';
+  document.getElementById('dm-list-card').style.display   = 'none';
+  const btnList = document.getElementById('dm-btn-list');
+  if (btnList) btnList.className = 'btn btn-ghost';
   document.getElementById('dm-btn-search').className = 'btn btn-ghost';
   document.getElementById('dm-btn-add').className    = 'btn btn-ghost';
   document.getElementById('dm-search-input').value = '';
@@ -1165,8 +1188,15 @@ function dmSelectType(type) {
 
 function dmSelectAction(action) {
   dmAction = action;
+  const btnList = document.getElementById('dm-btn-list');
+  if (btnList) btnList.className = 'btn ' + (action==='list' ? 'btn-primary' : 'btn-ghost');
   document.getElementById('dm-btn-search').className = 'btn ' + (action==='search' ? 'btn-primary' : 'btn-ghost');
   document.getElementById('dm-btn-add').className    = 'btn ' + (action==='add'    ? 'btn-primary' : 'btn-ghost');
+  document.getElementById('dm-list-card').style.display = action === 'list' ? 'block' : 'none';
+  if (action === 'list') {
+    if (dmType === 'pokemon') renderDmList();
+    return;
+  }
   if (action === 'search') {
     document.getElementById('dm-search-area').style.display = 'block';
     document.getElementById('dm-search-label').textContent  = dmType==='pokemon' ? 'ポケモン名で検索' : '技名で検索';
@@ -1360,34 +1390,39 @@ function dmCancelEdit() {
 }
 
 async function dmSaveMasterData() {
-  localStorage.setItem('pkm_master_pokemon', JSON.stringify(localPokemon));
-  localStorage.setItem('pkm_master_moves',   JSON.stringify(localMoves));
+  // POKEMON_LISTのデフォルトと異なるconfirmedのみを差分として保存
+  const defaultConfirmed = {};
+  POKEMON_LIST.forEach(p => { defaultConfirmed[p.display] = p.confirmed; });
+  const overrides = {};
+  localPokemon.forEach(p => {
+    if (p.confirmed !== defaultConfirmed[p.display]) {
+      overrides[p.display] = p.confirmed;
+    }
+  });
+  localStorage.setItem('pkm_confirmed_overrides', JSON.stringify(overrides));
+  localStorage.setItem('pkm_master_moves', JSON.stringify(localMoves));
+
   if (!currentUser || !_fbReady) return;
   try {
     await window._firestoreOps.setDoc(
       window._firestoreOps.doc(window._db, 'users', currentUser.uid, 'master', 'data'),
-      { pokemon: localPokemon, moves: localMoves, updatedAt: window._firestoreOps.serverTimestamp() }
+      { overrides, moves: localMoves, updatedAt: window._firestoreOps.serverTimestamp() }
     );
   } catch(e) { console.error('Master save error:', e); }
 }
 
 async function dmLoadMasterData() {
-  // POKEMON_LISTをベースにして保存済みconfirmedフラグのみをマージ
-  // display名→confirmedのマップを使い、保存データで変更されたものだけ上書き
-  function applyConfirmedMap(savedList) {
-    if (!savedList || !savedList.length) return;
-    const savedMap = {};
-    savedList.forEach(p => { if (p.display !== undefined) savedMap[p.display] = p.confirmed; });
-    localPokemon.forEach(p => {
-      if (p.display in savedMap) p.confirmed = savedMap[p.display];
-    });
+  // pkm_confirmed_overrides: ユーザーが変更した差分のみを保存・適用
+  // POKEMON_LISTのデフォルト値を基準に、差分だけを上書きする
+  function applyOverrides() {
+    try {
+      const overrides = JSON.parse(localStorage.getItem('pkm_confirmed_overrides') || '{}');
+      localPokemon.forEach(p => {
+        if (p.display in overrides) p.confirmed = overrides[p.display];
+      });
+    } catch(e) {}
   }
-
-  // localStorageから読み込み（confirmedフラグのみマージ）
-  const lp = localStorage.getItem('pkm_master_pokemon');
-  const lm = localStorage.getItem('pkm_master_moves');
-  if (lp) { try { applyConfirmedMap(JSON.parse(lp)); } catch(e) {} }
-  if (lm) { try { localMoves = JSON.parse(lm); } catch(e) {} }
+  applyOverrides();
 
   if (!currentUser || !_fbReady) return;
   try {
@@ -1396,9 +1431,9 @@ async function dmLoadMasterData() {
     );
     if (snap.exists()) {
       const d = snap.data();
-      if (d.pokemon) {
-        applyConfirmedMap(d.pokemon);
-        localStorage.setItem('pkm_master_pokemon', JSON.stringify(localPokemon));
+      if (d.overrides) {
+        localStorage.setItem('pkm_confirmed_overrides', JSON.stringify(d.overrides));
+        applyOverrides();
       }
       if (d.moves) {
         localMoves = d.moves;
@@ -1553,6 +1588,48 @@ document.addEventListener('click', e => {
 document.addEventListener('DOMContentLoaded', buildPickerTypes);
 // DOMContentLoadedが既に発火している場合のフォールバック
 if (document.readyState !== 'loading') buildPickerTypes();
+
+
+// ---- 内定一覧 ----
+let dmListDraft = [];
+
+function renderDmList() {
+  const body = document.getElementById('dm-list-body');
+  const countEl = document.getElementById('dm-list-count');
+  dmListDraft = localPokemon.map(p => ({ ...p }));
+  const updateCount = () => {
+    const n = dmListDraft.filter(p => p.confirmed).length;
+    countEl.textContent = `全${dmListDraft.length}件 / 内定${n}件`;
+  };
+  updateCount();
+  body.innerHTML = dmListDraft.map((p, i) => {
+    const no = parseInt(p.no) || 0;
+    const x = (no % 12) * 40;
+    const y = Math.floor(no / 12) * 30;
+    return `<div class="dm-list-row">
+      <div class="dm-list-icon"><span style="background-position:-${x}px -${y}px"></span></div>
+      <div class="dm-list-name">${p.display}</div>
+      <input type="checkbox" class="dm-list-check" data-idx="${i}" ${p.confirmed ? 'checked' : ''}>
+    </div>`;
+  }).join('');
+  body.querySelectorAll('.dm-list-check').forEach(cb => {
+    cb.addEventListener('change', () => {
+      dmListDraft[parseInt(cb.dataset.idx)].confirmed = cb.checked;
+      updateCount();
+    });
+  });
+}
+
+async function dmSaveList() {
+  dmListDraft.forEach((p, i) => { localPokemon[i].confirmed = p.confirmed; });
+  await dmSaveMasterData();
+  alert('登録しました！');
+}
+
+function dmCancelList() {
+  dmListDraft = [];
+  dmSelectType(dmType);
+}
 
 // ---- INIT ----
 renderParties();
