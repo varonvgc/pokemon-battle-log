@@ -112,7 +112,7 @@
   .poke-tag { font-size: 11px; background: var(--bg); padding: 2px 8px; border-radius: 20px; color: var(--text-muted); }
 
   /* RECORD LIST */
-  .record-item { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin-bottom: 10px; cursor: pointer; transition: border .2s; }
+  .record-item { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px; margin-bottom: 10px; cursor: pointer; transition: border .2s; }
   .record-item:hover { border-color: var(--accent); }
   .record-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
   .badge-win { background: #14532d; color: var(--win); padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; }
@@ -1111,7 +1111,16 @@ function renderHistory() {
 
   const filterVal = filter.value;
   const resultFilterVal = document.getElementById('history-result-filter').value;
-  let filtered = filterVal ? records.filter(r => r.partyId === filterVal) : records;
+
+  // パーティ未選択時はメッセージ表示して終了
+  const list = document.getElementById('history-list');
+  if (!filterVal) {
+    document.getElementById('history-stats').style.display = 'none';
+    list.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><p>パーティを選択してください</p></div>';
+    return;
+  }
+
+  let filtered = records.filter(r => r.partyId === filterVal);
   if (resultFilterVal) filtered = filtered.filter(r => r.result === resultFilterVal);
   // 自分の選出ポケモン絞り込み（AND条件）
   if (mySelFilter.length) {
@@ -1161,24 +1170,20 @@ function renderHistory() {
       : '<span style="font-size:11px;color:var(--text-muted)">なし</span>';
 
     return `<div class="record-item" onclick="openDetail('${r.id}')" style="border-left:3px solid ${isWin ? 'var(--win)' : 'var(--lose)'}">
-      <div class="record-header" style="margin-bottom:10px">
-        <span class="${isWin ? 'badge-win' : 'badge-lose'}">${isWin ? '🏆 勝ち' : '💀 負け'}</span>
-        <span style="font-weight:600">${party ? party.name : '(削除済み)'}</span>
-        <span class="record-date" style="margin-left:auto">${dateStr}</span>
-      </div>
       <div class="hist-card-body">
         <div class="hist-opp-party">
-          <div style="color:var(--text-muted);margin-bottom:4px">相手のパーティ</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+            <span class="${isWin ? 'badge-win' : 'badge-lose'}" style="font-size:10px;padding:2px 6px">${isWin ? '🏆勝' : '💀負'}</span>
+            <span class="record-date" style="font-size:11px">${dateStr}</span>
+          </div>
           <div style="display:flex;flex-wrap:wrap;gap:3px">${tagRow(oppPartyList, 'rgba(255,255,255,0.06)', oppSelFilter)}</div>
         </div>
         <div class="hist-sel-row" style="display:contents">
           <div class="hist-my-sel">
-            <div style="color:var(--text-muted);margin-bottom:4px">自分の選出</div>
-            <div style="display:flex;flex-wrap:nowrap;gap:2px;overflow:hidden">${tagRow(mySelList, 'rgba(108,99,255,0.25)', mySelFilter)}</div>
+            <div style="display:flex;flex-wrap:nowrap;gap:2px;overflow:visible">${tagRow(mySelList, 'rgba(108,99,255,0.25)', mySelFilter)}</div>
           </div>
           <div class="hist-opp-sel">
-            <div style="color:var(--text-muted);margin-bottom:4px">相手の選出</div>
-            <div style="display:flex;flex-wrap:nowrap;gap:2px;overflow:hidden">${tagRow(oppSelList, 'rgba(255,101,132,0.2)', oppSelFilter)}</div>
+            <div style="display:flex;flex-wrap:nowrap;gap:2px;overflow:visible">${tagRow(oppSelList, 'rgba(255,101,132,0.2)', oppSelFilter)}</div>
           </div>
         </div>
       </div>
