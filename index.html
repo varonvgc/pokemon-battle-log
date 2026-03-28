@@ -548,7 +548,7 @@ async function saveData() {
 }
 
 // Firestoreからロード
-async function loadFromFirestore() {
+async async function loadFromFirestore() {
   if (!currentUser || !_fbReady) return;
   const { doc, getDoc } = window._firestoreOps;
   const db = window._db;
@@ -858,6 +858,166 @@ function updateOppSelFilterSelect() {
   sel.innerHTML = '<option value="">-- 選択 --</option>' +
     all.map(p => `<option value="${p}">${p}</option>`).join('');
 }
+
+// ============================================================
+// ---- PARTY MANAGEMENT ----
+// ============================================================
+function renderParties() {
+  const grid = document.getElementById('party-grid');
+  if (!parties.length) {
+    grid.innerHTML = '<div class="empty"><div class="empty-icon">🎮</div><p>パーティがまだありません</p><p>右上のボタンから登録してください</p></div>';
+    return;
+  }
+  grid.innerHTML = parties.map(p => `
+    <div class="party-card" data-party-id="${p.id}">
+      <div class="flex justify-between items-center mb-3">
+        <div class="party-name party-edit-trigger" data-party-id="${p.id}" style="cursor:pointer;flex:1">${p.name}</div>
+        <button class="btn btn-ghost btn-sm party-delete-btn" data-party-id="${p.id}">削除</button>
+      </div>
+      <div class="party-pokemon party-edit-trigger" data-party-id="${p.id}" style="cursor:pointer">
+        ${p.pokemon.filter(Boolean).map(pk => getPokeSpriteHTMLByDisplay(pk)).join('')}
+      </div>
+    </div>
+  `).join('');
+  grid.querySelectorAll('.party-delete-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      deleteParty(btn.dataset.partyId);
+    });
+  });
+  grid.querySelectorAll('.party-edit-trigger').forEach(el => {
+    el.addEventListener('click', () => editParty(el.dataset.partyId));
+  });
+  initPartyDragSort(grid);
+}
+
+function openPartyModal(id) {
+  editingPartyId = id || null;
+  const modal = document.getElementById('party-modal');
+  document.getElementById('party-modal-title').textContent = id ? 'パーティを編集' : 'パーティを登録';
+  const slotsEl = document.getElementById('party-modal-slots');
+  slotsEl.innerHTML = '';
+  for (let i = 0; i < 6; i++) slotsEl.appendChild(createPokemonSlot('party-modal-slots', i, `${i+1}体目`));
+  document.getElementById('party-name-input').value = '';
+  if (id) {
+    const p = parties.find(x => x.id === id);
+    if (p) {
+      document.getElementById('party-name-input').value = p.name;
+      setSlotValues('party-modal-slots', p.pokemon);
+    }
+  }
+  modal.classList.add('open');
+}
+
+function closePartyModal() {
+  document.getElementById('party-modal').classList.remove('open');
+}
+
+function saveParty() {
+  const name = document.getElementById('party-name-input').value.trim();
+  if (!name) { alert('パーティ名を入力してください'); return; }
+  const pokemon = getSlotValues('party-modal-slots', 6);
+  if (!pokemon.some(Boolean)) { alert('少なくとも1体は入力してください'); return; }
+  const dup = parties.find(p => p.name === name && p.id !== editingPartyId);
+  if (dup) { alert(`「${name}」という名前のパーティはすでに存在します`); return; }
+  if (editingPartyId) {
+    const idx = parties.findIndex(p => p.id === editingPartyId);
+    if (idx >= 0) { parties[idx].name = name; parties[idx].pokemon = pokemon; }
+  } else {
+    if (parties.length >= 50) { alert('パーティは最大50個まで登録できます'); return; }
+    parties.unshift({ id: Date.now().toString(), name, pokemon });
+  }
+  saveData();
+  closePartyModal();
+  renderParties();
+  renderRecordPage();
+}
+
+function editParty(id) { openPartyModal(id); }
+
+function deleteParty(id) {
+  if (!confirm('このパーティを削除しますか？')) return;
+  parties = parties.filter(p => p.id !== id);
+  saveData();
+  renderParties();
+}
+
+// ---- RECORD PAGE ----
+function renderRecordPage() {
+  const sel = document.getElementById('party-select-dropdown');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">-- パーティを選択 --</option>';
+  parties.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.id;
+    opt.textContent = p.name;
+    if (p.id === selectedPartyId) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  if (!parties.length) {
+    document.getElementById('record-form-card').style.display = 'none';
+    return;
+  }
+  if (selectedPartyId) showRecordForm();
+}
+
+function onPartyDropdownChange(id) {
+  if (!id) {
+    selectedPartyId = null;
+    document.getElementById('record-form-card').style.display = 'none';
+    return;
+  }
+  selectPartyForRecord(id);
+}
+
+function selectPartyForRecord(id) {
+  selectedPartyId = id;
+  recordResult = null;
+  document.getElementById('btn-win').classList.remove('active');
+  document.getElementById('btn-lose').classList.remove('active');
+  renderRecordPage();
+  showRecordForm();
+}
+
+function showRecordForm() {
+  const form = document.getElementById('record-form-card');
+  form.style.display = 'block';
+  const now = new Date();
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+  document.getElementById('rec-date').value = local.toISOString().slice(0, 16);
+  const myParty = parties.find(p => p.id === selectedPartyId);
+  const myPokemon = myParty ? myParty.pokemon : [];
+  const myIcons = document.getElementById('my-party-icons');
+  if (myIcons) myIcons.innerHTML = myPokemon.filter(Boolean).map(name => getPokeSpriteHTMLByDisplay(name)).join('');
+  const oppParty = document.getElementById('opp-party-slots');
+  oppParty.innerHTML = '';
+  for (let i = 0; i < 6; i++) oppParty.appendChild(createPokemonSlot('opp-party-slots', i, `${i+1}体目`));
+  oppParty.querySelectorAll('input[type=text]').forEach(input => {
+    input.addEventListener('blur', () => rebuildOppSelectionDropdowns());
+  });
+  buildMySelectionDropdowns(myPokemon);
+  buildOppSelectionDropdowns([]);
+  document.getElementById('rec-memo').value = '';
+  form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function buildMySelectionDropdowns(options) {
+  const mySelection = document.getElementById('my-selection-slots');
+  mySelection.innerHTML = '';
+  for (let i = 0; i < 4; i++) mySelection.appendChild(createSelectionDropdown('my-selection-slots', i, `${i+1}体目`, options));
+}
+
+function buildOppSelectionDropdowns(options) {
+  const oppSelection = document.getElementById('opp-selection-slots');
+  oppSelection.innerHTML = '';
+  for (let i = 0; i < 4; i++) oppSelection.appendChild(createSelectionDropdown('opp-selection-slots', i, `${i+1}体目`, options));
+}
+
+function rebuildOppSelectionDropdowns() {
+  const oppPokemon = getSlotValues('opp-party-slots', 6).filter(Boolean);
+  buildOppSelectionDropdowns(oppPokemon);
+}
+
 
 function addFilterTagFromSelect() {} // 廃止
 
