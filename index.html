@@ -263,7 +263,9 @@
 
   <div class="card">
     <div class="card-title">自分のパーティを選択</div>
-    <div id="party-select-grid" class="party-grid"></div>
+    <select id="party-select-dropdown" style="font-size:16px" onchange="onPartyDropdownChange(this.value)">
+      <option value="">-- パーティを選択 --</option>
+    </select>
   </div>
 
   <div class="card" id="record-form-card" style="display:none">
@@ -916,16 +918,21 @@ function saveParty() {
   if (!name) { alert('パーティ名を入力してください'); return; }
   const pokemon = getSlotValues('party-modal-slots', 6);
   if (!pokemon.some(Boolean)) { alert('少なくとも1体は入力してください'); return; }
+  // ② 同名チェック（編集中のパーティ自身は除く）
+  const dup = parties.find(p => p.name === name && p.id !== editingPartyId);
+  if (dup) { alert('「' + name + '」という名前のパーティはすでに存在します'); return; }
   if (editingPartyId) {
     const idx = parties.findIndex(p => p.id === editingPartyId);
     if (idx >= 0) { parties[idx].name = name; parties[idx].pokemon = pokemon; }
   } else {
     if (parties.length >= 50) { alert('パーティは最大50個まで登録できます'); return; }
-    parties.push({ id: Date.now().toString(), name, pokemon });
+    // ③ 新規は先頭に追加
+    parties.unshift({ id: Date.now().toString(), name, pokemon });
   }
   saveData();
   closePartyModal();
   renderParties();
+  renderRecordPage();
 }
 
 function editParty(id) {
@@ -941,22 +948,30 @@ function deleteParty(id) {
 
 // ---- RECORD PAGE ----
 function renderRecordPage() {
-  const grid = document.getElementById('party-select-grid');
+  const sel = document.getElementById('party-select-dropdown');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">-- パーティを選択 --</option>';
+  parties.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p.id;
+    opt.textContent = p.name;
+    if (p.id === selectedPartyId) opt.selected = true;
+    sel.appendChild(opt);
+  });
   if (!parties.length) {
-    grid.innerHTML = '<div class="empty"><p>先にパーティを登録してください</p></div>';
     document.getElementById('record-form-card').style.display = 'none';
     return;
   }
-  grid.innerHTML = parties.map(p => `
-    <div class="party-card ${selectedPartyId === p.id ? 'selected' : ''}" onclick="selectPartyForRecord('${p.id}')">
-      <div class="party-name">${p.name}</div>
-      <div class="party-pokemon">
-        ${p.pokemon.filter(Boolean).map(pk => getPokeSpriteHTMLByDisplay(pk)).join('')}
-      </div>
-    </div>
-  `).join('');
-
   if (selectedPartyId) showRecordForm();
+}
+
+function onPartyDropdownChange(id) {
+  if (!id) {
+    selectedPartyId = null;
+    document.getElementById('record-form-card').style.display = 'none';
+    return;
+  }
+  selectPartyForRecord(id);
 }
 
 function selectPartyForRecord(id) {
