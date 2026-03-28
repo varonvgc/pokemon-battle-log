@@ -1113,10 +1113,9 @@ function renderHistory() {
   const resultFilterVal = document.getElementById('history-result-filter').value;
 
   // パーティ未選択時はメッセージ表示して終了
-  const list = document.getElementById('history-list');
   if (!filterVal) {
     document.getElementById('history-stats').style.display = 'none';
-    list.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><p>パーティを選択してください</p></div>';
+    document.getElementById('history-list').innerHTML = '<div class="empty"><div class="empty-icon">📋</div><p>パーティを選択してください</p></div>';
     return;
   }
 
