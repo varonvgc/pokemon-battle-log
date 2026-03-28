@@ -369,7 +369,7 @@
           oninput="onOppPartyFilterInput(this)" onfocus="onOppPartyFilterFocus(this)"
           onkeydown="onOppPartyFilterKeydown(event,this)"
           style="font-size:16px;width:100%;box-sizing:border-box">
-        <div id="opp-party-filter-ac" class="autocomplete-list"></div>
+        <div id="opp-party-filter-ac" class="autocomplete-list opp-party-ac"></div>
       </div>
       <div id="opp-party-filter-tag" style="display:none;align-items:center;gap:6px;margin-top:6px">
         <span id="opp-party-filter-name" style="background:var(--surface2);padding:3px 10px;border-radius:20px;font-size:13px"></span>
@@ -808,7 +808,8 @@ function createSelectionDropdown(containerId, index, label, options) {
 
 document.addEventListener('click', e => {
   if (!e.target.closest('.pokemon-slot')) {
-    document.querySelectorAll('.autocomplete-list').forEach(l => l.classList.remove('open'));
+    // opp-party-ac は別のハンドラで管理するため除外
+    document.querySelectorAll('.autocomplete-list:not(.opp-party-ac)').forEach(l => l.classList.remove('open'));
   }
 });
 
