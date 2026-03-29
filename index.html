@@ -103,7 +103,7 @@
   .autocomplete-item .form-tag { font-size: 11px; opacity: .7; }
 
   /* PARTY LIST */
-  .party-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+  .party-grid { display: flex; flex-direction: column; gap: 12px; }
   .party-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; cursor: pointer; transition: all .2s; }
   .party-card:hover { border-color: var(--accent); transform: translateY(-2px); }
   .party-card.selected { border-color: var(--accent); background: #2a2a50; }
@@ -251,6 +251,67 @@
 
   /* 履歴カードのラベル行（高さ統一でずれ防止） */
   .hist-row-label { height:20px; display:flex; align-items:center; margin-bottom:3px; }
+
+  /* PARTY EDIT PAGE (fullscreen) */
+  #page-party-edit { display:none; position:fixed; inset:0; background:var(--bg); z-index:200; overflow-y:auto; padding:0; }
+  #page-party-edit.active { display:block; }
+  .pe-header { position:sticky; top:0; z-index:10; background:var(--surface); border-bottom:1px solid var(--border); padding:10px 16px; display:flex; align-items:center; gap:10px; }
+  .pe-body { padding:12px 16px; max-width:700px; margin:0 auto; }
+  .pe-pokemon-card { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:12px; overflow:hidden; }
+  .pe-pokemon-header { display:flex; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px solid var(--border); }
+  .pe-pokemon-body { padding:10px 12px; }
+  .pe-row { display:flex; gap:8px; align-items:flex-start; margin-bottom:8px; }
+  .pe-label { font-size:11px; color:var(--text-muted); font-weight:600; margin-bottom:3px; }
+  .pe-field { flex:1; min-width:0; }
+  .pe-input { width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:6px 10px; font-size:13px; outline:none; box-sizing:border-box; }
+  .pe-input:focus { border-color:var(--accent); }
+  .pe-select { width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:6px 8px; font-size:13px; outline:none; cursor:pointer; }
+  .pe-moves-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+  .pe-move-btn { background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:7px 10px; font-size:12px; cursor:pointer; text-align:left; width:100%; min-height:34px; transition:border-color .15s; }
+  .pe-move-btn:hover { border-color:var(--accent); }
+  .pe-move-btn.filled { color:var(--text); font-weight:500; }
+  .pe-stats-btn { background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:7px 12px; font-size:12px; cursor:pointer; width:100%; text-align:left; transition:border-color .15s; }
+  .pe-stats-btn:hover { border-color:var(--accent); }
+  /* slot picker inside party edit */
+  .pe-poke-picker-btn { width:52px; height:42px; background:var(--bg); border:1px solid var(--border); border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden; }
+  .pe-poke-picker-btn img.ball { width:32px; height:32px; object-fit:contain; mix-blend-mode:lighten; }
+  .pe-poke-picker-btn .poke-sprite { display:block; width:40px; height:30px; background-image:url('https://play.pokemonshowdown.com/sprites/pokemonicons-sheet.png'); background-repeat:no-repeat; image-rendering:pixelated; }
+
+  /* MOVE PICKER POPUP */
+  .move-picker-overlay { position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:500; display:none; align-items:flex-end; justify-content:center; }
+  .move-picker-overlay.open { display:flex; }
+  .move-picker-modal { background:var(--surface); border-radius:16px 16px 0 0; width:100%; max-width:600px; height:80vh; display:flex; flex-direction:column; overflow:hidden; }
+  .move-picker-header { padding:12px 16px; border-bottom:1px solid var(--border); flex-shrink:0; }
+  .move-picker-search { width:100%; background:var(--surface2); border:1px solid var(--border); color:var(--text); border-radius:8px; padding:8px 12px; font-size:16px; outline:none; box-sizing:border-box; }
+  .move-picker-search:focus { border-color:var(--accent); }
+  .move-picker-types { display:flex; flex-wrap:wrap; gap:4px; margin-top:8px; }
+  .move-picker-body { flex:1; overflow-y:auto; }
+  .move-picker-row { display:flex; align-items:center; gap:10px; padding:10px 16px; border-bottom:1px solid var(--border); cursor:pointer; }
+  .move-picker-row:hover { background:var(--surface2); }
+  .move-type-badge { font-size:10px; font-weight:700; padding:2px 7px; border-radius:10px; color:#fff; flex-shrink:0; }
+  .move-picker-name { font-size:14px; }
+  .move-picker-cat { font-size:11px; color:var(--text-muted); }
+  .move-picker-pwr { font-size:11px; color:var(--text-muted); min-width:30px; text-align:right; }
+
+  /* STATS POPUP */
+  .stats-popup-overlay { position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:500; display:none; align-items:center; justify-content:center; padding:16px; }
+  .stats-popup-overlay.open { display:flex; }
+  .stats-popup { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px; width:100%; max-width:500px; max-height:90vh; overflow-y:auto; }
+  .stats-popup-title { font-weight:700; margin-bottom:14px; font-size:16px; }
+  .stats-row { display:grid; grid-template-columns:3.5em 3em 1fr 4em 4em; align-items:center; gap:4px; margin-bottom:8px; }
+  .stats-lbl { font-size:12px; color:var(--text-muted); font-weight:600; }
+  .stats-base { font-size:13px; font-weight:700; text-align:right; padding-right:4px; }
+  .stats-bar-wrap { height:8px; background:var(--surface2); border-radius:4px; overflow:hidden; }
+  .stats-bar { height:100%; border-radius:4px; background:var(--accent); transition:width .3s; }
+  .stats-ev-input { width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:5px; padding:4px 5px; font-size:13px; text-align:center; outline:none; box-sizing:border-box; }
+  .stats-ev-input:focus { border-color:var(--accent); }
+  .stats-calc { font-size:13px; font-weight:700; text-align:right; }
+  .stats-nature-sel { width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:6px 8px; font-size:13px; margin-top:10px; }
+  .stats-ev-slider { width:100%; accent-color:var(--accent); }
+  .stats-remaining { font-size:12px; color:var(--text-muted); margin-top:6px; text-align:right; }
+  .stat-up { color:#4ade80; }
+  .stat-down { color:#f87171; }
+
 </style>
 </head>
 <body>
@@ -279,7 +340,7 @@
       <h2 style="font-size:20px;font-weight:700">自分のパーティ</h2>
       <p class="text-muted mt-2">最大50個まで登録できます</p>
     </div>
-    <button class="btn btn-primary" onclick="openPartyModal()">＋ 新規登録</button>
+    <button class="btn btn-primary" onclick="openPartyEdit(null)">＋ 新規登録</button>
   </div>
   <div id="party-grid" class="party-grid"></div>
 </div>
@@ -479,19 +540,47 @@
   </div>
 </div>
 
-<!-- PARTY MODAL -->
-<div class="modal-overlay" id="party-modal">
-  <div class="modal">
-    <div class="modal-title" id="party-modal-title">パーティを登録</div>
-    <div class="mb-4">
-      <label>パーティ名</label>
-      <input type="text" id="party-name-input" placeholder="例：雨パ、トリル軸など" maxlength="30">
+<!-- PARTY EDIT PAGE (fullscreen) -->
+<div id="page-party-edit">
+  <div class="pe-header">
+    <button class="btn btn-ghost btn-sm" onclick="closePartyEdit()">✕ 閉じる</button>
+    <input type="text" id="pe-name-input" placeholder="パーティ名" maxlength="30"
+      style="flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px 12px;font-size:15px;font-weight:600;outline:none;">
+    <button class="btn btn-primary btn-sm" onclick="savePartyEdit()">💾 保存</button>
+  </div>
+  <div class="pe-body" id="pe-body"></div>
+</div>
+
+<!-- MOVE PICKER POPUP -->
+<div class="move-picker-overlay" id="move-picker-overlay" onclick="if(event.target===this)closeMovePickerPopup()">
+  <div class="move-picker-modal">
+    <div class="move-picker-header">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span style="font-size:14px;font-weight:700;color:var(--text-muted)">技を選択</span>
+        <button class="btn btn-ghost btn-sm" onclick="closeMovePickerPopup()">✕</button>
+      </div>
+      <input type="text" class="move-picker-search" id="move-picker-search" placeholder="技名で検索..." autocomplete="off" oninput="filterMovePicker(this.value)">
+      <div class="move-picker-types" id="move-picker-types"></div>
     </div>
-    <div class="section-label">パーティのポケモン（最大6体）</div>
-    <div class="slot-grid" id="party-modal-slots"></div>
-    <div class="modal-footer">
-      <button class="btn btn-ghost" onclick="closePartyModal()">キャンセル</button>
-      <button class="btn btn-primary" onclick="saveParty()">保存</button>
+    <div class="move-picker-body" id="move-picker-body"></div>
+  </div>
+</div>
+
+<!-- STATS POPUP -->
+<div class="stats-popup-overlay" id="stats-popup-overlay" onclick="if(event.target===this)closeStatsPopup()">
+  <div class="stats-popup">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div class="stats-popup-title" id="stats-popup-title">ステータス</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeStatsPopup()">✕</button>
+    </div>
+    <div id="stats-popup-body"></div>
+    <div style="margin-top:10px">
+      <div class="pe-label">性格</div>
+      <select class="stats-nature-sel" id="stats-nature-sel" onchange="onNatureChange()"></select>
+    </div>
+    <div class="stats-remaining" id="stats-remaining">残り: 66</div>
+    <div style="margin-top:12px;text-align:right">
+      <button class="btn btn-primary btn-sm" onclick="applyStats()">OK</button>
     </div>
   </div>
 </div>
@@ -1160,7 +1249,7 @@ function updateMySelFilterSelect() {
   const hint = document.getElementById('my-sel-filter-hint');
   const filterVal = document.getElementById('history-filter').value;
   const party = filterVal ? parties.find(p => p.id === filterVal) : null;
-  const options = party ? party.pokemon.filter(Boolean) : [];
+  const options = party ? party.pokemon.map(pk=>typeof pk==='string'?pk:(pk&&pk.name||'')).filter(Boolean) : [];
   if (!filterVal || !options.length) {
     sel.disabled = true;
     sel.innerHTML = '<option value="">-- ポケモンを選択 --</option>';
@@ -1231,18 +1320,29 @@ function renderParties() {
     grid.innerHTML = '<div class="empty"><div class="empty-icon">🎮</div><p>パーティがまだありません</p><p>右上のボタンから登録してください</p></div>';
     return;
   }
-  grid.innerHTML = parties.map(p => `
+  grid.innerHTML = parties.map(p => {
+    // pokemon は文字列配列 or オブジェクト配列に対応
+    const pokeNames = p.pokemon.map(pk => typeof pk === 'string' ? pk : (pk && pk.name || ''));
+    return `
     <div class="party-card" data-party-id="${p.id}">
       <div class="flex justify-between items-center mb-3">
         <div class="party-name party-edit-trigger" data-party-id="${p.id}" style="cursor:pointer;flex:1">${p.name}</div>
+        <button class="btn btn-ghost btn-sm party-copy-btn" data-party-id="${p.id}" style="margin-right:4px">コピー</button>
         <button class="btn btn-ghost btn-sm party-delete-btn" data-party-id="${p.id}">削除</button>
       </div>
       <div class="party-pokemon party-edit-trigger" data-party-id="${p.id}" style="cursor:pointer">
-        ${p.pokemon.filter(Boolean).map(pk => getPokeSpriteHTMLByDisplay(pk)).join('')}
+        ${pokeNames.filter(Boolean).map(pk => getPokeSpriteHTMLByDisplay(pk)).join('')}
       </div>
-    </div>
-  `).join('');
-  // イベント委譲で削除・編集を処理
+    </div>`;
+  }).join('');
+  // コピーボタン
+  grid.querySelectorAll('.party-copy-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      copyParty(btn.dataset.partyId);
+    });
+  });
+  // 削除ボタン
   grid.querySelectorAll('.party-delete-btn').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
@@ -1270,7 +1370,7 @@ function openPartyModal(id) {
     const p = parties.find(x => x.id === id);
     if (p) {
       document.getElementById('party-name-input').value = p.name;
-      setSlotValues('party-modal-slots', p.pokemon);
+      setSlotValues('party-modal-slots', p.pokemon.map(pk=>typeof pk==='string'?pk:(pk&&pk.name||'')));
     }
   }
   modal.classList.add('open');
@@ -1378,11 +1478,11 @@ function showRecordForm() {
   // 自分のパーティアイコンを表示
   const myIcons = document.getElementById('my-party-icons');
   if (myIcons) {
-    myIcons.innerHTML = myPokemon.filter(Boolean).map(name => getPokeSpriteHTMLByDisplay(name)).join('');
+    myIcons.innerHTML = myPokemon.map(pk=>typeof pk==='string'?pk:(pk&&pk.name||'')).filter(Boolean).map(name => getPokeSpriteHTMLByDisplay(name)).join('');
   }
 
   // 自分の選出プルダウン（自パーティ6体）
-  buildMySelectionDropdowns(myPokemon);
+  buildMySelectionDropdowns(myPokemon.map(pk=>typeof pk==='string'?pk:(pk&&pk.name||'')).filter(Boolean));
 
   // 相手の選出プルダウン（初期は空）
   buildOppSelectionDropdowns([]);
@@ -1546,7 +1646,7 @@ function openDetail(id) {
     <div class="detail-section">
       <h4>自分のパーティ</h4>
       <div class="detail-pokemon">
-        ${(party ? party.pokemon.filter(Boolean) : []).map(p => getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">(削除済み)</span>'}
+        ${(party ? party.pokemon.map(pk=>typeof pk==='string'?pk:(pk&&pk.name||'')).filter(Boolean) : []).map(p=>getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">(削除済み)</span>'}
       </div>
     </div>
     <div class="detail-section">
@@ -1593,6 +1693,35 @@ let dmAction = null;
 let dmEditIndex = null;
 let localPokemon = JSON.parse(JSON.stringify(POKEMON_LIST));
 let localMoves   = JSON.parse(JSON.stringify(MOVES_LIST));
+
+const NATURES_DATA = [
+  { name:"さみしがり", up:"atk", down:"def" },
+  { name:"いじっぱり", up:"atk", down:"spa" },
+  { name:"やんちゃ", up:"atk", down:"spd" },
+  { name:"ゆうかん", up:"atk", down:"spe" },
+  { name:"ずぶとい", up:"def", down:"atk" },
+  { name:"わんぱく", up:"def", down:"spa" },
+  { name:"のうてんき", up:"def", down:"spd" },
+  { name:"のんき", up:"def", down:"spe" },
+  { name:"ひかえめ", up:"spa", down:"atk" },
+  { name:"おっとり", up:"spa", down:"def" },
+  { name:"うっかりや", up:"spa", down:"spd" },
+  { name:"れいせい", up:"spa", down:"spe" },
+  { name:"おだやか", up:"spd", down:"atk" },
+  { name:"おとなしい", up:"spd", down:"def" },
+  { name:"しんちょう", up:"spd", down:"spa" },
+  { name:"なまいき", up:"spd", down:"spe" },
+  { name:"おくびょう", up:"spe", down:"atk" },
+  { name:"せっかち", up:"spe", down:"def" },
+  { name:"ようき", up:"spe", down:"spa" },
+  { name:"むじゃき", up:"spe", down:"spd" },
+  { name:"てれや", up:null, down:null },
+  { name:"がんばりや", up:null, down:null },
+  { name:"すなお", up:null, down:null },
+  { name:"きまぐれ", up:null, down:null },
+  { name:"まじめ", up:null, down:null }
+];
+
 const localItems = ITEMS_LIST.slice(); // 持ち物リスト（変更不要・読み取り専用）
 // 古いlocalStorageキーをクリア（pkm_master_pokemonは旧方式）
 localStorage.removeItem('pkm_master_pokemon');
@@ -2055,6 +2184,15 @@ function renderPickerGrid(searchVal) {
 }
 
 function selectFromPicker(displayName) {
+  if (_pePickerTargetIdx >= 0) {
+    // パーティ編集ページ用
+    selectPePokeByName(_pePickerTargetIdx, displayName);
+    const card = document.querySelector('#pe-body .pe-pokemon-card[data-pe-idx="' + _pePickerTargetIdx + '"]');
+    if (card) { const inp = card.querySelector('.pe-pokemon-header input[type=text]'); if(inp) inp.value=displayName; }
+    _pePickerTargetIdx = -1;
+    closePokemonPicker();
+    return;
+  }
   if (pickerTargetInput) {
     pickerTargetInput.value = displayName;
     recordRecentPick(displayName);
@@ -2164,6 +2302,546 @@ function dmShowItemResult(name) {
   body.innerHTML = '<div class="dm-list-row"><div class="dm-list-name">' + name + '</div></div>';
   document.getElementById('dm-list-card').style.display = 'block';
 }
+
+
+// ---- パーティ編集ページ（フルスクリーン） ----
+let pePokemons = []; // 編集中の6体分データ [{name,item,ability,moves,nature,evs}, ...]
+// 各スロットの空データ
+function peEmptyPoke() {
+  return { name:'', item:'', ability:'', moves:['','','',''], nature:'まじめ',
+           evs:{hp:0,atk:0,def:0,spa:0,spd:0,spe:0} };
+}
+
+function openPartyModal(id) { openPartyEdit(id); }
+function closePartyModal() { closePartyEdit(); }
+
+function openPartyEdit(id) {
+  editingPartyId = id || null;
+  pePokemons = Array.from({length:6}, () => peEmptyPoke());
+  if (id) {
+    const p = parties.find(x => x.id === id);
+    if (p) {
+      document.getElementById('pe-name-input').value = p.name;
+      p.pokemon.forEach((pk, i) => {
+        if (!pk) return;
+        if (typeof pk === 'string') {
+          pePokemons[i].name = pk;
+        } else {
+          pePokemons[i] = { ...peEmptyPoke(), ...pk,
+            moves: [...(pk.moves || ['','','',''])],
+            evs: { hp:0,atk:0,def:0,spa:0,spd:0,spe:0, ...(pk.evs||{}) } };
+        }
+      });
+    }
+  } else {
+    document.getElementById('pe-name-input').value = '';
+  }
+  renderPartyEditBody();
+  document.getElementById('page-party-edit').classList.add('active');
+  document.getElementById('page-party-edit').scrollTop = 0;
+}
+
+function closePartyEdit() {
+  document.getElementById('page-party-edit').classList.remove('active');
+}
+
+function savePartyEdit() {
+  const name = document.getElementById('pe-name-input').value.trim();
+  if (!name) { alert('パーティ名を入力してください'); return; }
+  const dup = parties.find(p => p.name === name && p.id !== editingPartyId);
+  if (dup) { alert('「' + name + '」という名前のパーティはすでに存在します'); return; }
+  // pePokemons を保存形式に変換
+  const pokemon = pePokemons.map(pk => pk.name ? { ...pk, moves:[...pk.moves], evs:{...pk.evs} } : '');
+  if (editingPartyId) {
+    const idx = parties.findIndex(p => p.id === editingPartyId);
+    if (idx >= 0) { parties[idx].name = name; parties[idx].pokemon = pokemon; }
+  } else {
+    if (parties.length >= 50) { alert('パーティは最大50個まで登録できます'); return; }
+    parties.unshift({ id: Date.now().toString(), name, pokemon });
+  }
+  saveData();
+  closePartyEdit();
+  renderParties();
+  renderRecordPage();
+}
+
+// 後方互換: saveParty は savePartyEdit へ
+function saveParty() { savePartyEdit(); }
+
+function editParty(id) { openPartyEdit(id); }
+
+function copyParty(id) {
+  const p = parties.find(x => x.id === id);
+  if (!p) return;
+  if (parties.length >= 50) { alert('パーティは最大50個まで登録できます'); return; }
+  const copy = JSON.parse(JSON.stringify(p));
+  copy.id = Date.now().toString();
+  copy.name = p.name + 'のコピー';
+  parties.unshift(copy);
+  saveData();
+  renderParties();
+  renderRecordPage();
+}
+
+// パーティ編集ページのDOM構築
+function renderPartyEditBody() {
+  const body = document.getElementById('pe-body');
+  body.innerHTML = '';
+  for (let i = 0; i < 6; i++) {
+    body.appendChild(buildPePokeCard(i));
+  }
+}
+
+function buildPePokeCard(idx) {
+  const pk = pePokemons[idx];
+  const card = document.createElement('div');
+  card.className = 'pe-pokemon-card';
+  card.dataset.peIdx = idx;
+
+  // ヘッダー: アイコン + ポケモン名入力
+  const hdr = document.createElement('div');
+  hdr.className = 'pe-pokemon-header';
+
+  // ピッカーボタン（アイコン）
+  const pickerBtn = document.createElement('button');
+  pickerBtn.className = 'pe-poke-picker-btn';
+  pickerBtn.id = `pe-picker-btn-${idx}`;
+  pickerBtn.title = 'アイコンから選ぶ';
+  pickerBtn.onclick = () => openPokemonPickerForPe(idx);
+  setPePickerIcon(pickerBtn, pk.name);
+  hdr.appendChild(pickerBtn);
+
+  // ポケモン名入力
+  const nameWrap = document.createElement('div');
+  nameWrap.style.cssText = 'flex:1;min-width:0;position:relative';
+  const nameInput = document.createElement('input');
+  nameInput.type = 'text';
+  nameInput.className = 'pe-input';
+  nameInput.placeholder = `${idx+1}体目のポケモン名`;
+  nameInput.value = pk.name;
+  nameInput.autocomplete = 'off';
+  nameInput.dataset.peIdx = idx;
+  nameInput.oninput = function() { onPeNameInput(this, idx); };
+  nameInput.onkeydown = function(e) { onPeNameKeydown(e, this, idx); };
+  const nameAc = document.createElement('div');
+  nameAc.className = 'autocomplete-list';
+  nameAc.id = `pe-ac-${idx}`;
+  nameWrap.appendChild(nameInput);
+  nameWrap.appendChild(nameAc);
+  hdr.appendChild(nameWrap);
+  card.appendChild(hdr);
+
+  // ボディ
+  const bdy = document.createElement('div');
+  bdy.className = 'pe-pokemon-body';
+
+  // 持ち物 + 特性
+  const row1 = document.createElement('div');
+  row1.className = 'pe-row';
+
+  // 持ち物
+  const itemField = document.createElement('div');
+  itemField.className = 'pe-field';
+  itemField.innerHTML = '<div class="pe-label">持ち物</div>';
+  const itemWrap = document.createElement('div');
+  itemWrap.style.cssText = 'position:relative';
+  const itemInput = document.createElement('input');
+  itemInput.type = 'text';
+  itemInput.className = 'pe-input';
+  itemInput.placeholder = '持ち物を入力...';
+  itemInput.value = pk.item || '';
+  itemInput.autocomplete = 'off';
+  itemInput.oninput = function() { onPeItemInput(this, idx); };
+  const itemAc = document.createElement('div');
+  itemAc.className = 'autocomplete-list';
+  itemAc.id = `pe-item-ac-${idx}`;
+  itemWrap.appendChild(itemInput);
+  itemWrap.appendChild(itemAc);
+  itemField.appendChild(itemWrap);
+  row1.appendChild(itemField);
+
+  // 特性
+  const abilField = document.createElement('div');
+  abilField.className = 'pe-field';
+  abilField.innerHTML = '<div class="pe-label">特性</div>';
+  const abilSel = document.createElement('select');
+  abilSel.className = 'pe-select';
+  abilSel.id = `pe-ability-${idx}`;
+  buildAbilityOptions(abilSel, pk.name, pk.ability);
+  abilSel.onchange = function() {
+    pePokemons[idx].ability = this.value;
+  };
+  abilField.appendChild(abilSel);
+  row1.appendChild(abilField);
+  bdy.appendChild(row1);
+
+  // 技
+  const movesLabel = document.createElement('div');
+  movesLabel.innerHTML = '<div class="pe-label" style="margin-bottom:4px">技</div>';
+  bdy.appendChild(movesLabel);
+  const movesGrid = document.createElement('div');
+  movesGrid.className = 'pe-moves-grid';
+  for (let m = 0; m < 4; m++) {
+    const moveBtn = document.createElement('button');
+    moveBtn.className = 'pe-move-btn' + (pk.moves[m] ? ' filled' : '');
+    moveBtn.textContent = pk.moves[m] || `技${m+1}`;
+    moveBtn.onclick = () => openMovePickerPopup(idx, m);
+    moveBtn.id = `pe-move-${idx}-${m}`;
+    movesGrid.appendChild(moveBtn);
+  }
+  bdy.appendChild(movesGrid);
+
+  // ステータス
+  const statsRow = document.createElement('div');
+  statsRow.style.marginTop = '8px';
+  const statsBtn = document.createElement('button');
+  statsBtn.className = 'pe-stats-btn';
+  statsBtn.id = `pe-stats-btn-${idx}`;
+  statsBtn.onclick = () => openStatsPopup(idx);
+  statsBtn.textContent = buildStatsBtnText(idx);
+  statsRow.appendChild(statsBtn);
+  bdy.appendChild(statsRow);
+
+  card.appendChild(bdy);
+  return card;
+}
+
+function buildStatsBtnText(idx) {
+  const pk = pePokemons[idx];
+  const nd = NATURES_DATA.find(n => n.name === (pk.nature || 'まじめ')) || {up:null,down:null};
+  if (!pk.name) return 'ステータス（ポケモン未選択）';
+  const pd = (localPokemon||POKEMON_LIST).find(p=>p.display===pk.name);
+  if (!pd) return 'ステータス';
+  const hp = calcStat('hp', parseInt(pd.hp)||0, pk.evs.hp||0, nd);
+  const spe = calcStat('spe', parseInt(pd.spd)||0, pk.evs.spe||0, nd);
+  return `ステータス: H${hp} S${spe} [性格:${pk.nature||'まじめ'}]`;
+}
+
+function setPePickerIcon(btn, pokeName) {
+  btn.innerHTML = '';
+  if (!pokeName) {
+    const img = document.createElement('img');
+    img.className = 'ball';
+    img.src = 'data:image/jpeg;base64,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';
+    btn.appendChild(img);
+  } else {
+    const pd = (localPokemon||POKEMON_LIST).find(p=>p.display===pokeName);
+    if (pd) {
+      const n=parseInt(pd.no)||0, x=(n%12)*40, y=Math.floor(n/12)*30;
+      const sp=document.createElement('span');
+      sp.className='poke-sprite';
+      sp.style.backgroundPosition=`-${x}px -${y}px`;
+      btn.appendChild(sp);
+    } else {
+      const img2=document.createElement('img');
+      img2.className='ball';
+      img2.src='https://play.pokemonshowdown.com/sprites/pokemonicons-pokeball-sheet.png';
+      btn.appendChild(img2);
+    }
+  }
+}
+
+function buildAbilityOptions(sel, pokeName, current) {
+  sel.innerHTML = '<option value="">（なし）</option>';
+  if (pokeName) {
+    const pd = (localPokemon||POKEMON_LIST).find(p=>p.display===pokeName);
+    if (pd) {
+      [pd.ability1, pd.ability2, pd.ability_hidden].filter(Boolean).forEach(ab => {
+        const opt = document.createElement('option');
+        opt.value = ab; opt.textContent = ab;
+        if (ab === current) opt.selected = true;
+        sel.appendChild(opt);
+      });
+    }
+  }
+  if (current && !sel.value) {
+    const opt = document.createElement('option');
+    opt.value = current; opt.textContent = current; opt.selected = true;
+    sel.appendChild(opt);
+  }
+}
+
+// ポケモン名入力のオートコンプリート（パーティ編集用）
+function onPeNameInput(input, idx) {
+  const val = input.value.trim();
+  const listEl = document.getElementById(`pe-ac-${idx}`);
+  if (!listEl) return;
+  if (!val) { listEl.classList.remove('open'); return; }
+  const valKana = toKatakana(val), valHira = toHiragana(val);
+  const src = (localPokemon||POKEMON_LIST).filter(p=>p.confirmed);
+  const all = src.filter(p=>{ const h=toHiragana(p.display); return p.display.includes(valKana)||h.includes(valHira); });
+  const sw = all.filter(p=>toHiragana(p.display).startsWith(valHira)||p.display.startsWith(valKana));
+  const ot = all.filter(p=>!toHiragana(p.display).startsWith(valHira)&&!p.display.startsWith(valKana));
+  const hits = [...sw,...ot].slice(0,15);
+  if (!hits.length) { listEl.classList.remove('open'); return; }
+  listEl.innerHTML = hits.map(p=>`<div class="autocomplete-item">${p.display}</div>`).join('');
+  listEl.querySelectorAll('.autocomplete-item').forEach(item => {
+    item.addEventListener('mousedown', ev=>{
+      ev.preventDefault();
+      selectPePokeByName(idx, item.textContent);
+      input.value = item.textContent;
+      listEl.classList.remove('open');
+    });
+  });
+  listEl.classList.add('open');
+}
+
+function onPeNameKeydown(e, input, idx) {
+  const listEl = document.getElementById(`pe-ac-${idx}`);
+  const items = listEl?.querySelectorAll('.autocomplete-item') || [];
+  const cur = listEl?.querySelector('.selected');
+  if (e.key==='ArrowDown') { e.preventDefault(); if(!cur) items[0]?.classList.add('selected'); else {cur.classList.remove('selected');(cur.nextElementSibling||items[0])?.classList.add('selected');} }
+  else if (e.key==='ArrowUp') { e.preventDefault(); if(cur){cur.classList.remove('selected');(cur.previousElementSibling||items[items.length-1])?.classList.add('selected');} }
+  else if (e.key==='Enter') { e.preventDefault(); const sel=listEl?.querySelector('.selected')||items[0]; if(sel){ selectPePokeByName(idx, sel.textContent); input.value=sel.textContent; listEl.classList.remove('open'); } }
+  else if (e.key==='Escape') { listEl?.classList.remove('open'); }
+}
+
+function selectPePokeByName(idx, name) {
+  pePokemons[idx].name = name;
+  pePokemons[idx].ability = '';
+  // アイコン更新
+  const btn = document.getElementById(`pe-picker-btn-${idx}`);
+  if (btn) setPePickerIcon(btn, name);
+  // 特性選択肢更新
+  const abilSel = document.getElementById(`pe-ability-${idx}`);
+  if (abilSel) buildAbilityOptions(abilSel, name, '');
+  // ステータスボタン更新
+  updateStatsBtnText(idx);
+}
+
+// ピッカーからポケモン選択
+let _pePickerTargetIdx = -1;
+function openPokemonPickerForPe(idx) {
+  _pePickerTargetIdx = idx;
+  pickerOnSearch('');
+  const overlay = document.getElementById('pokemon-picker');
+  overlay.classList.add('open');
+}
+
+// 持ち物オートコンプリート
+function onPeItemInput(input, idx) {
+  const val = input.value.trim();
+  const listEl = document.getElementById(`pe-item-ac-${idx}`);
+  if (!listEl) return;
+  pePokemons[idx].item = val;
+  if (!val) { listEl.classList.remove('open'); return; }
+  const valKana = toKatakana(val), valHira = toHiragana(val);
+  const all = localItems.filter(name=>{ const h=toHiragana(name); return name.includes(valKana)||h.includes(valHira); });
+  const sw = all.filter(n=>toHiragana(n).startsWith(valHira)||n.startsWith(valKana));
+  const ot = all.filter(n=>!toHiragana(n).startsWith(valHira)&&!n.startsWith(valKana));
+  const hits = [...sw,...ot].slice(0,15);
+  if (!hits.length) { listEl.classList.remove('open'); return; }
+  listEl.innerHTML = hits.map(n=>`<div class="autocomplete-item">${n}</div>`).join('');
+  listEl.querySelectorAll('.autocomplete-item').forEach(item=>{
+    item.addEventListener('mousedown', ev=>{
+      ev.preventDefault();
+      input.value = item.textContent;
+      pePokemons[idx].item = item.textContent;
+      listEl.classList.remove('open');
+    });
+  });
+  listEl.classList.add('open');
+}
+
+function updateStatsBtnText(idx) {
+  const btn = document.getElementById(`pe-stats-btn-${idx}`);
+  if (btn) btn.textContent = buildStatsBtnText(idx);
+}
+
+// ---- ステータス計算 ----
+function calcStat(key, base, ev, nd) {
+  if (key==='hp') return base + (ev||0) + 75;
+  const mult = nd && nd.up===key ? 1.1 : (nd && nd.down===key ? 0.9 : 1.0);
+  return Math.floor((base + (ev||0) + 20) * mult);
+}
+function getNatureModifier(key, natureName) {
+  const nd = NATURES_DATA.find(n=>n.name===natureName)||{up:null,down:null};
+  if (nd.up===key) return '+';
+  if (nd.down===key) return '-';
+  return '';
+}
+
+// ---- 技ピッカー ----
+let _movePkIdx=-1, _moveMvIdx=-1, _movePkActiveType=null;
+function openMovePickerPopup(pkIdx, mvIdx) {
+  _movePkIdx=pkIdx; _moveMvIdx=mvIdx; _movePkActiveType=null;
+  buildMovePickerTypes();
+  filterMovePicker('');
+  document.getElementById('move-picker-search').value='';
+  document.getElementById('move-picker-overlay').classList.add('open');
+}
+function closeMovePickerPopup() {
+  document.getElementById('move-picker-overlay').classList.remove('open');
+}
+function buildMovePickerTypes() {
+  const container = document.getElementById('move-picker-types');
+  const types = [...new Set((localMoves||MOVES_LIST).map(m=>m.type).filter(Boolean))].sort();
+  container.innerHTML = types.map(t=>`<button class="type-btn" data-type="${t}" onclick="toggleMovePickerType('${t}')" style="font-size:10px;width:40px;height:32px">${t}</button>`).join('');
+  // タイプカラー適用
+  container.querySelectorAll('.type-btn').forEach(btn => {
+    const styles = window.getComputedStyle(btn);
+    // 既存CSSのタイプカラーをそのまま利用
+  });
+}
+function toggleMovePickerType(t) {
+  _movePkActiveType = _movePkActiveType===t ? null : t;
+  document.querySelectorAll('#move-picker-types .type-btn').forEach(btn=>{
+    btn.classList.toggle('active', btn.dataset.type===_movePkActiveType);
+  });
+  filterMovePicker(document.getElementById('move-picker-search').value);
+}
+function filterMovePicker(val) {
+  const body = document.getElementById('move-picker-body');
+  const valKana=toKatakana(val.trim()), valHira=toHiragana(val.trim());
+  let list = (localMoves||MOVES_LIST);
+  if (_movePkActiveType) list=list.filter(m=>m.type===_movePkActiveType);
+  if (val.trim()) list=list.filter(m=>{ const h=toHiragana(m.name); return m.name.includes(valKana)||h.includes(valHira); });
+  body.innerHTML = list.map(m=>{
+    const typeColor = document.querySelector(`.type-btn[data-type="${m.type}"]`)?.style.background
+      || (document.querySelector(`[data-type="${m.type}"]`) ? window.getComputedStyle(document.querySelector(`[data-type="${m.type}"]`)).backgroundColor : '#888');
+    return `<div class="move-picker-row" onclick="selectMoveFromPicker('${m.name.replace(/'/g,"\'")}')">
+      <span class="move-type-badge" style="background:${getTypeColor(m.type)}">${m.type}</span>
+      <span class="move-picker-name">${m.name}</span>
+      <span class="move-picker-cat" style="margin-left:auto">${m.category||''}</span>
+      <span class="move-picker-pwr">${m.power||'-'}</span>
+    </div>`;
+  }).join('');
+}
+function getTypeColor(type) {
+  const map={ノーマル:'#9e9e9e',ほのお:'#e8622e',みず:'#3a8fd1',でんき:'#e0b022',くさ:'#5a9e32',こおり:'#5aafc8',かくとう:'#c4501e',どく:'#8c3a8c',じめん:'#b8963c',ひこう:'#7a8ecd',エスパー:'#d43078',むし:'#8ea820',いわ:'#b0962a',ゴースト:'#5a4578',ドラゴン:'#5038c8',あく:'#2c2840',はがね:'#6878a8',フェアリー:'#d060a0'};
+  return map[type]||'#888';
+}
+function selectMoveFromPicker(name) {
+  if (_movePkIdx<0||_moveMvIdx<0) return;
+  pePokemons[_movePkIdx].moves[_moveMvIdx] = name;
+  const btn = document.getElementById(`pe-move-${_movePkIdx}-${_moveMvIdx}`);
+  if (btn) { btn.textContent=name; btn.classList.add('filled'); }
+  closeMovePickerPopup();
+}
+
+// ---- ステータスポップアップ ----
+let _statsPkIdx = -1;
+function openStatsPopup(idx) {
+  _statsPkIdx = idx;
+  renderStatsPopup();
+  document.getElementById('stats-popup-overlay').classList.add('open');
+}
+function closeStatsPopup() {
+  document.getElementById('stats-popup-overlay').classList.remove('open');
+}
+function applyStats() { closeStatsPopup(); updateStatsBtnText(_statsPkIdx); }
+
+function renderStatsPopup() {
+  const pk = pePokemons[_statsPkIdx];
+  const pd = pk.name ? (localPokemon||POKEMON_LIST).find(p=>p.display===pk.name) : null;
+  const nd = NATURES_DATA.find(n=>n.name===(pk.nature||'まじめ'))||{up:null,down:null};
+
+  document.getElementById('stats-popup-title').textContent = pk.name ? `${pk.name} のステータス` : 'ステータス';
+
+  // 性格セレクト
+  const natSel = document.getElementById('stats-nature-sel');
+  natSel.innerHTML = NATURES_DATA.map(n=>`<option value="${n.name}" ${n.name===(pk.nature||'まじめ')?'selected':''}>${n.name}</option>`).join('');
+
+  const STAT_KEYS = ['hp','atk','def','spa','spd','spe'];
+  const STAT_LABELS = ['HP','攻撃','防御','特攻','特防','素早さ'];
+  const BASE_KEYS = ['hp','atk','def','spatk','spdef','spd'];
+  const MAX_BASE = 255;
+  const evs = pk.evs || {hp:0,atk:0,def:0,spa:0,spd:0,spe:0};
+  const totalEv = Object.values(evs).reduce((a,b)=>a+(b||0),0);
+
+  document.getElementById('stats-remaining').textContent = `残り能力値: ${66-totalEv}`;
+
+  let html = '';
+  STAT_KEYS.forEach((key, i) => {
+    const base = pd ? (parseInt(pd[BASE_KEYS[i]])||0) : 0;
+    const ev = evs[key]||0;
+    const calc = pd ? calcStat(key, base, ev, nd) : '-';
+    const barPct = Math.min(100, Math.round(base/MAX_BASE*100));
+    const mod = getNatureModifier(key, pk.nature||'まじめ');
+    const modClass = mod==='+'?'stat-up':mod==='-'?'stat-down':'';
+    html += `<div class="stats-row">
+      <div class="stats-lbl ${modClass}">${STAT_LABELS[i]}${mod}</div>
+      <div class="stats-base">${base}</div>
+      <div class="stats-bar-wrap"><div class="stats-bar" style="width:${barPct}%"></div></div>
+      <div>
+        <input type="number" class="stats-ev-input" data-stat-key="${key}" min="0" max="32" value="${ev}"
+          oninput="onEvInput(this,'${key}')" style="font-size:12px">
+        <input type="range" class="stats-ev-slider" data-stat-key="${key}" min="0" max="32" value="${ev}"
+          oninput="onEvSlider(this,'${key}')" style="width:100%;margin-top:2px">
+      </div>
+      <div class="stats-calc" id="stats-calc-${key}">${calc}</div>
+    </div>`;
+  });
+  document.getElementById('stats-popup-body').innerHTML = html;
+}
+
+function onNatureChange() {
+  const val = document.getElementById('stats-nature-sel').value;
+  pePokemons[_statsPkIdx].nature = val;
+  refreshStatsCalc();
+}
+
+function onEvInput(input, key) {
+  let v = parseInt(input.value)||0;
+  const pk = pePokemons[_statsPkIdx];
+  const evs = pk.evs;
+  const others = Object.entries(evs).filter(([k])=>k!==key).reduce((a,[,b])=>a+(b||0),0);
+  v = Math.max(0, Math.min(32, Math.min(v, 66-others)));
+  input.value = v;
+  evs[key] = v;
+  // スライダー同期
+  const slider = document.querySelector(`.stats-ev-slider[data-stat-key="${key}"]`);
+  if (slider) slider.value = v;
+  refreshStatsCalc();
+}
+
+function onEvSlider(slider, key) {
+  let v = parseInt(slider.value)||0;
+  const pk = pePokemons[_statsPkIdx];
+  const evs = pk.evs;
+  const others = Object.entries(evs).filter(([k])=>k!==key).reduce((a,[,b])=>a+(b||0),0);
+  v = Math.max(0, Math.min(32, Math.min(v, 66-others)));
+  slider.value = v;
+  evs[key] = v;
+  // 数値入力同期
+  const numInput = document.querySelector(`.stats-ev-input[data-stat-key="${key}"]`);
+  if (numInput) numInput.value = v;
+  refreshStatsCalc();
+}
+
+function refreshStatsCalc() {
+  const pk = pePokemons[_statsPkIdx];
+  const pd = pk.name ? (localPokemon||POKEMON_LIST).find(p=>p.display===pk.name) : null;
+  const nd = NATURES_DATA.find(n=>n.name===(pk.nature||'まじめ'))||{up:null,down:null};
+  const STAT_KEYS = ['hp','atk','def','spa','spd','spe'];
+  const BASE_KEYS = ['hp','atk','def','spatk','spdef','spd'];
+  const STAT_LABELS = ['HP','攻撃','防御','特攻','特防','素早さ'];
+  const evs = pk.evs;
+  let total = 0;
+  STAT_KEYS.forEach((key, i) => {
+    const base = pd ? (parseInt(pd[BASE_KEYS[i]])||0) : 0;
+    const ev = evs[key]||0;
+    total += ev;
+    const calc = pd ? calcStat(key, base, ev, nd) : '-';
+    const el = document.getElementById(`stats-calc-${key}`);
+    if (el) el.textContent = calc;
+    const mod = getNatureModifier(key, pk.nature||'まじめ');
+    // ラベルの色更新
+    const row = document.querySelector(`.stats-ev-input[data-stat-key="${key}"]`)?.closest('.stats-row');
+    if (row) {
+      const lbl = row.querySelector('.stats-lbl');
+      if (lbl) {
+        lbl.textContent = STAT_LABELS[i] + mod;
+        lbl.className = 'stats-lbl ' + (mod==='+'?'stat-up':mod==='-'?'stat-down':'');
+      }
+    }
+  });
+  document.getElementById('stats-remaining').textContent = `残り能力値: ${66-total}`;
+}
+
+
+
+// ポケモンピッカーからパーティ編集への選択フック（selectFromPickerをPE対応に拡張）
 
 
 // ポケモンスロットのアイコンを更新（ポケモン名があればスプライト、なければボール）
