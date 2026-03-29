@@ -461,35 +461,6 @@
       <div id="dm-list-body"></div>
     </div>
   </div>
-
-  <!-- 持ち物セクション（全員閲覧可能） -->
-  <div class="card mb-4" id="dm-item-card">
-    <div class="section-label">持ち物</div>
-    <div style="display:flex;gap:10px;margin-bottom:16px">
-      <button class="btn btn-ghost" id="dm-item-btn-list"   onclick="dmItemSelectAction('list')"   style="flex:1">📋 一覧</button>
-      <button class="btn btn-ghost" id="dm-item-btn-search" onclick="dmItemSelectAction('search')" style="flex:1">🔍 検索</button>
-    </div>
-    <!-- 検索エリア -->
-    <div id="dm-item-search-area" style="display:none">
-      <div style="position:relative">
-        <input type="text" id="dm-item-search-input" placeholder="持ち物名を入力..." autocomplete="off"
-          oninput="dmItemOnSearch(this.value)" style="margin-bottom:0">
-      </div>
-    </div>
-  </div>
-
-  <!-- 持ち物リスト表示エリア -->
-  <div id="dm-item-list-card" style="display:none">
-    <div class="card" style="margin-bottom:8px;display:flex;align-items:center;gap:10px;padding:12px 16px">
-      <span style="font-size:13px;color:var(--text-muted);flex:1" id="dm-item-count"></span>
-      <button class="btn btn-ghost btn-sm" onclick="dmItemClear()">✕ 閉じる</button>
-    </div>
-    <div id="dm-item-loading" style="display:none;text-align:center;padding:40px;color:var(--text-muted)">
-      <div style="font-size:24px;margin-bottom:8px">⏳</div>
-      <div id="dm-item-loading-text">持ち物データを取得中...</div>
-    </div>
-    <div id="dm-item-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;padding:12px"></div>
-  </div>
 </div>
 
 
@@ -670,11 +641,7 @@ function showPage(name, btn) {
     ['dm-tab-pokemon','dm-tab-move','dm-btn-search'].forEach(id => { const el=document.getElementById(id); if(el) el.className='btn btn-ghost'; });
     document.getElementById('dm-action-area').style.display='none';
     document.getElementById('dm-form-card').style.display='none';
-    document.getElementById('dm-search-area').style.display='none';
-    // 持ち物UIもリセット
-    ['dm-item-btn-list','dm-item-btn-search'].forEach(id => { const el=document.getElementById(id); if(el) el.className='btn btn-ghost'; });
-    document.getElementById('dm-item-search-area').style.display='none';
-    document.getElementById('dm-item-list-card').style.display='none'; }
+    document.getElementById('dm-search-area').style.display='none'; }
 }
 
 // ---- AUTOCOMPLETE ----
@@ -2096,164 +2063,6 @@ function clearOppPartyFilter() {
   const input = document.getElementById('opp-party-filter-input');
   if (input) input.value = '';
   renderHistory();
-}
-
-
-// ============================================================
-// ---- 持ち物 (PokeAPI) ----
-// ============================================================
-let dmItemCache = null;      // { items: [{jaName, sprite}], fetchedAt }
-let dmItemAction = null;
-const DM_ITEM_CACHE_KEY = 'pkm_item_cache';
-const DM_ITEM_CACHE_TTL = 7 * 24 * 60 * 60 * 1000; // 7日
-
-function dmItemSelectAction(action) {
-  dmItemAction = action;
-  document.getElementById('dm-item-btn-list').className   = 'btn ' + (action === 'list'   ? 'btn-primary' : 'btn-ghost');
-  document.getElementById('dm-item-btn-search').className = 'btn ' + (action === 'search' ? 'btn-primary' : 'btn-ghost');
-  document.getElementById('dm-item-search-area').style.display = action === 'search' ? 'block' : 'none';
-  if (action === 'search') {
-    document.getElementById('dm-item-list-card').style.display = 'block';
-    document.getElementById('dm-item-search-input').value = '';
-    dmItemRender([]);
-    document.getElementById('dm-item-search-input').focus();
-  } else {
-    dmItemShowList();
-  }
-}
-
-function dmItemClear() {
-  dmItemAction = null;
-  ['dm-item-btn-list','dm-item-btn-search'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.className = 'btn btn-ghost';
-  });
-  document.getElementById('dm-item-search-area').style.display = 'none';
-  document.getElementById('dm-item-list-card').style.display = 'none';
-}
-
-async function dmItemShowList() {
-  document.getElementById('dm-item-list-card').style.display = 'block';
-  const items = await dmItemGetData();
-  if (!items) return;
-  dmItemRender(items);
-}
-
-async function dmItemGetData() {
-  // キャッシュ確認
-  try {
-    if (!dmItemCache) {
-      const cached = localStorage.getItem(DM_ITEM_CACHE_KEY);
-      if (cached) {
-        const parsed = JSON.parse(cached);
-        if (Date.now() - parsed.fetchedAt < DM_ITEM_CACHE_TTL) {
-          dmItemCache = parsed;
-        }
-      }
-    }
-  } catch(e) {}
-
-  if (dmItemCache) return dmItemCache.items;
-
-  // APIから取得
-  const loading = document.getElementById('dm-item-loading');
-  const loadingText = document.getElementById('dm-item-loading-text');
-  const grid = document.getElementById('dm-item-grid');
-  loading.style.display = 'block';
-  grid.style.display = 'none';
-
-  try {
-    // held-itemsカテゴリのみ取得（ポケモンに持たせられるアイテムに絞る）
-    loadingText.textContent = '持ち物リストを取得中...';
-    const listRes = await fetch('https://pokeapi.co/api/v2/item-category/held-items');
-    const listData = await listRes.json();
-    const allItems = listData.items; // [{name, url}]
-
-    // 並列で個別データ取得（50件ずつバッチ処理）
-    const items = [];
-    const batchSize = 50;
-    for (let i = 0; i < allItems.length; i += batchSize) {
-      const batch = allItems.slice(i, i + batchSize);
-      const pct = Math.round(i / allItems.length * 100);
-      loadingText.textContent = `持ち物データを取得中... ${pct}% (${i}/${allItems.length})`;
-      const results = await Promise.all(
-        batch.map(item => fetch(item.url).then(r => r.json()).catch(() => null))
-      );
-      for (const d of results) {
-        if (!d) continue;
-        const sprite = d.sprites?.default || null;
-        if (!sprite) continue; // 画像なしは除外
-        const jaName = d.names?.find(n => n.language.name === 'ja')?.name
-                    || d.names?.find(n => n.language.name === 'ja-Hrkt')?.name
-                    || null;
-        if (!jaName) continue; // 日本語名なしは除外
-        items.push({ jaName, sprite });
-      }
-    }
-
-    // 日本語順でソート
-    items.sort((a, b) => a.jaName.localeCompare(b.jaName, 'ja'));
-
-    // キャッシュ保存
-    dmItemCache = { items, fetchedAt: Date.now() };
-    try {
-      localStorage.setItem(DM_ITEM_CACHE_KEY, JSON.stringify(dmItemCache));
-    } catch(e) {}
-
-    loading.style.display = 'none';
-    grid.style.display = 'grid';
-    return items;
-
-  } catch(e) {
-    loadingText.textContent = 'データ取得に失敗しました。ネット接続を確認してください。';
-    console.error('Item fetch error:', e);
-    return null;
-  }
-}
-
-function dmItemRender(items) {
-  const grid = document.getElementById('dm-item-grid');
-  const countEl = document.getElementById('dm-item-count');
-  const loading = document.getElementById('dm-item-loading');
-  loading.style.display = 'none';
-  grid.style.display = 'grid';
-  countEl.textContent = `${items.length}件`;
-  if (!items.length) {
-    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-muted);padding:20px;font-size:13px">見つかりませんでした</div>';
-    return;
-  }
-  grid.innerHTML = items.map(item => `
-    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--surface2);border-radius:8px;padding:8px 4px;text-align:center">
-      <img src="${item.sprite}" alt="${item.jaName}" style="width:32px;height:32px;image-rendering:pixelated;object-fit:contain" loading="lazy" onerror="this.style.display='none'">
-      <div style="font-size:10px;color:var(--text);line-height:1.3;word-break:break-all">${item.jaName}</div>
-    </div>
-  `).join('');
-}
-
-function dmItemOnSearch(val) {
-  if (!dmItemCache) {
-    // まだ取得していなければ取得開始
-    dmItemGetData().then(items => {
-      if (items) dmItemFilter(val, items);
-    });
-    return;
-  }
-  dmItemFilter(val, dmItemCache.items);
-}
-
-function dmItemFilter(val, items) {
-  if (!val.trim()) {
-    dmItemRender([]);
-    return;
-  }
-  const v = val.trim();
-  const vH = toHiragana(v);
-  const vK = toKatakana(v);
-  const filtered = items.filter(item => {
-    const nH = toHiragana(item.jaName);
-    return item.jaName.includes(v) || item.jaName.includes(vK) || nH.includes(vH);
-  });
-  dmItemRender(filtered);
 }
 
 // AC外クリックで閉じる
