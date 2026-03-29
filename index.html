@@ -436,7 +436,7 @@
   <div class="card" id="dm-form-card" style="display:none">
     <div class="flex justify-between items-center mb-4">
       <div class="card-title" id="dm-form-title" style="margin-bottom:0">編集</div>
-      <button class="btn btn-danger btn-sm" id="dm-delete-btn" onclick="dmDeleteEntry()" style="display:none" data-admin-only="true">削除</button>
+      <button class="btn btn-danger btn-sm" id="dm-delete-btn" onclick="dmDeleteEntry()" style="display:none">削除</button>
     </div>
     <div id="dm-form-fields"></div>
     <div style="margin-top:20px;text-align:right">
@@ -596,10 +596,6 @@ function initFirebase() {
       await loadFromFirestore();
       renderParties();
       renderHistory();
-      // 管理者のみデータ管理の追加・削除ボタンを表示
-      if (user.uid === '9B0bfjR8TPNDAFvWQXkcssCDwbe2') {
-        document.querySelectorAll('[data-admin-only]').forEach(el => el.style.display = '');
-      }
     } else {
       nameEl.textContent = '';
       btnEl.textContent = 'ログイン';
@@ -1440,10 +1436,6 @@ function dmAutoDisplay() {
 }
 
 async function dmSaveEntry() {
-  if (!currentUser || currentUser.uid !== '9B0bfjR8TPNDAFvWQXkcssCDwbe2') {
-    alert('編集権限がありません');
-    return;
-  }
   let entry;
   if (dmType === 'pokemon') {
     const name = document.getElementById('dmf-name').value.trim();
@@ -1507,8 +1499,7 @@ function dmCancelEdit() {
 }
 
 async function dmSaveMasterData() {
-  // 管理者UIDのみ保存可能
-  const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
+  // POKEMON_LISTのデフォルトと異なるconfirmedのみを差分として保存
   const defaultConfirmed = {};
   POKEMON_LIST.forEach(p => { defaultConfirmed[p.display] = p.confirmed; });
   const overrides = {};
@@ -1521,15 +1512,9 @@ async function dmSaveMasterData() {
   localStorage.setItem('pkm_master_moves', JSON.stringify(localMoves));
 
   if (!currentUser || !_fbReady) return;
-  // 管理者以外は保存不可
-  if (currentUser.uid !== ADMIN_UID) {
-    console.log('編集権限がありません');
-    return;
-  }
   try {
-    // 共有パスに保存（全アカウント共通）
     await window._firestoreOps.setDoc(
-      window._firestoreOps.doc(window._db, 'shared', 'master'),
+      window._firestoreOps.doc(window._db, 'users', currentUser.uid, 'master', 'data'),
       { overrides, moves: localMoves, updatedAt: window._firestoreOps.serverTimestamp() }
     );
   } catch(e) { console.error('Master save error:', e); }
@@ -1550,9 +1535,8 @@ async function dmLoadMasterData() {
 
   if (!currentUser || !_fbReady) return;
   try {
-    // 共有パスから読み込み（全アカウント共通）
     const snap = await window._firestoreOps.getDoc(
-      window._firestoreOps.doc(window._db, 'shared', 'master')
+      window._firestoreOps.doc(window._db, 'users', currentUser.uid, 'master', 'data')
     );
     if (snap.exists()) {
       const d = snap.data();
@@ -1751,11 +1735,7 @@ function renderDmList() {
   });
 }
 
-async async function dmSaveList() {
-  if (!currentUser || currentUser.uid !== '9B0bfjR8TPNDAFvWQXkcssCDwbe2') {
-    alert('編集権限がありません');
-    return;
-  }
+async function dmSaveList() {
   dmListDraft.forEach((p, i) => { localPokemon[i].confirmed = p.confirmed; });
   await dmSaveMasterData();
   alert('登録しました！');
