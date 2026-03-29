@@ -322,10 +322,10 @@
     min-height: 0;
   }
 
-  /* 上段: アイコン列 (行1, 列1) */
+  /* アイコン列: 行1〜2 にまたがる（名前セルの高さ分も含む） */
   .pe-col-icon {
-    grid-column: 1; grid-row: 1;
-    display: flex; align-items: center; justify-content: center;
+    grid-column: 1; grid-row: 1 / 3;
+    display: flex; align-items: flex-start; justify-content: center;
     padding: 4px 3px;
     border-right: 1px solid var(--border);
   }
@@ -338,16 +338,20 @@
     display: flex; flex-direction: column; gap: 2px; min-width: 0;
   }
 
-  /* 上段: 技・ステータス列 (行1, 列3〜4) */
+  /* 技・ステータス列: 行1〜2 全体にまたがる → 名前行と底辺が揃う */
   .pe-col {
-    grid-row: 1;
+    grid-row: 1 / 3;
     padding: 3px 4px;
     border-right: 1px solid var(--border);
     display: flex; flex-direction: column; gap: 2px; min-width: 0;
   }
   .pe-col:last-child { border-right: none; }
 
-  /* 下段: 名前セル (行2, 列1〜2 span) — 縦線なし */
+  /* アイコン列も行1〜2にまたがる */
+  /* ただし pe-col-icon は flex-direction:column で
+     上部にアイコン、下部に名前セルの border-top で区切られた見た目になる */
+
+  /* 名前セル: 行2, 列1〜2 span — 縦線なし */
   .pe-name-cell {
     grid-column: 1 / 3; grid-row: 2;
     border-top: 1px solid var(--border);
@@ -364,14 +368,6 @@
   .pe-name-input-wrap {
     flex: 1; min-width: 0; position: relative;
   }
-
-  /* 下段: 技・ステータス列下の空セル (行2, 列3〜4) */
-  .pe-name-empty {
-    grid-row: 2;
-    border-top: 1px solid var(--border);
-    border-right: 1px solid var(--border);
-  }
-  .pe-name-empty:last-child { border-right: none; }
   .pe-poke-picker-btn {
     width:46px; height:38px; background:var(--bg); border:1px solid var(--border);
     border-radius:5px; cursor:pointer; display:flex; align-items:center;
@@ -2717,13 +2713,7 @@ function buildPePokeCard(idx) {
   nameCell.appendChild(nameWrap);
   inner.appendChild(nameCell);
 
-  // 行2・列3,4: 空セル
-  const ne3 = document.createElement('div');
-  ne3.className = 'pe-name-empty'; ne3.style.gridColumn = '3';
-  inner.appendChild(ne3);
-  const ne4 = document.createElement('div');
-  ne4.className = 'pe-name-empty'; ne4.style.gridColumn = '4';
-  inner.appendChild(ne4);
+  // 行2の列3・列4は .pe-col が grid-row:1/3 でまたがるため空セル不要
 
   card.appendChild(inner);
   return card;
