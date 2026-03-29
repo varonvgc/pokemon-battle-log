@@ -422,12 +422,13 @@
     <div style="display:flex;gap:10px;margin-bottom:16px">
       <button class="btn btn-ghost" id="dm-tab-pokemon" onclick="dmSelectType('pokemon')" style="flex:1">🐾 ポケモン</button>
       <button class="btn btn-ghost" id="dm-tab-move"    onclick="dmSelectType('move')"    style="flex:1">⚡ 技</button>
+      <button class="btn btn-ghost" id="dm-tab-item"    onclick="dmSelectType('item')"    style="flex:1">🎒 持ち物</button>
     </div>
     <div id="dm-action-area" style="display:none">
       <div class="section-label">操作</div>
       <div style="display:flex;gap:10px;margin-bottom:16px">
         <button class="btn btn-ghost" id="dm-btn-list"   onclick="dmSelectAction('list')"   style="flex:1">📋 一覧</button>
-        <button class="btn btn-ghost" id="dm-btn-search" onclick="dmSelectAction('search')" style="flex:1">🔍 検索・編集</button>
+        <button class="btn btn-ghost" id="dm-btn-search" onclick="dmSelectAction('search')" style="flex:1">🔍 検索</button>
       </div>
       <div id="dm-search-area" style="display:none">
         <label id="dm-search-label">名前で検索</label>
@@ -591,6 +592,8 @@ function initFirebase() {
   _fbReady = true;
   // 未ログインでも共通マスタデータは読み込む
   dmLoadMasterData();
+  // 持ち物データも事前ロード（Firestoreキャッシュがあれば即時）
+  dmLoadItems().catch(e => console.warn('Items preload failed:', e));
   window._onAuthStateChanged(window._auth, async (user) => {
     currentUser = user;
     const nameEl = document.getElementById('user-name');
@@ -638,10 +641,11 @@ function showPage(name, btn) {
   if (name === 'record') renderRecordPage();
   if (name === 'history') renderHistory();
   if (name === 'datamanage') { dmType=null; dmAction=null;
-    ['dm-tab-pokemon','dm-tab-move','dm-btn-search'].forEach(id => { const el=document.getElementById(id); if(el) el.className='btn btn-ghost'; });
+    ['dm-tab-pokemon','dm-tab-move','dm-tab-item','dm-btn-list','dm-btn-search'].forEach(id => { const el=document.getElementById(id); if(el) el.className='btn btn-ghost'; });
     document.getElementById('dm-action-area').style.display='none';
     document.getElementById('dm-form-card').style.display='none';
-    document.getElementById('dm-search-area').style.display='none'; }
+    document.getElementById('dm-search-area').style.display='none';
+    document.getElementById('dm-list-card').style.display='none'; }
 }
 
 // ---- AUTOCOMPLETE ----
@@ -1292,6 +1296,7 @@ let dmAction = null;
 let dmEditIndex = null;
 let localPokemon = JSON.parse(JSON.stringify(POKEMON_LIST));
 let localMoves   = JSON.parse(JSON.stringify(MOVES_LIST));
+let localItems   = []; // {id, ja} 形式: id=Showdownキー, ja=日本語名
 // 古いlocalStorageキーをクリア（pkm_master_pokemonは旧方式）
 localStorage.removeItem('pkm_master_pokemon');
 
@@ -1299,13 +1304,17 @@ function dmSelectType(type) {
   dmType = type; dmAction = null; dmEditIndex = null;
   document.getElementById('dm-tab-pokemon').className = 'btn ' + (type==='pokemon' ? 'btn-primary' : 'btn-ghost');
   document.getElementById('dm-tab-move').className    = 'btn ' + (type==='move'    ? 'btn-primary' : 'btn-ghost');
+  document.getElementById('dm-tab-item').className    = 'btn ' + (type==='item'    ? 'btn-primary' : 'btn-ghost');
   document.getElementById('dm-action-area').style.display = 'block';
   document.getElementById('dm-search-area').style.display = 'none';
   document.getElementById('dm-form-card').style.display   = 'none';
   document.getElementById('dm-list-card').style.display   = 'none';
   const btnList = document.getElementById('dm-btn-list');
   if (btnList) btnList.className = 'btn btn-ghost';
-  document.getElementById('dm-btn-search').className = 'btn btn-ghost';
+  const btnSearch = document.getElementById('dm-btn-search');
+  btnSearch.className = 'btn btn-ghost';
+  // 持ち物の場合は「検索」、それ以外は「検索・編集」
+  btnSearch.textContent = type === 'item' ? '🔍 検索' : '🔍 検索・編集';
   document.getElementById('dm-search-input').value = '';
   document.getElementById('dm-search-list').classList.remove('open');
 }
@@ -1313,8 +1322,7 @@ function dmSelectType(type) {
 function dmSelectAction(action) {
   const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
   const isAdmin = currentUser && currentUser.uid === ADMIN_UID;
-  // 一覧(list)は全員OK、searchは管理者のみ（addは廃止）
-  if (!isAdmin && action !== 'list') return;
+  if (!isAdmin) return;
   dmAction = action;
   const btnList = document.getElementById('dm-btn-list');
   if (btnList) btnList.className = 'btn ' + (action==='list' ? 'btn-primary' : 'btn-ghost');
@@ -1326,9 +1334,19 @@ function dmSelectAction(action) {
   }
   if (action === 'search') {
     document.getElementById('dm-search-area').style.display = 'block';
-    document.getElementById('dm-search-label').textContent  = dmType==='pokemon' ? 'ポケモン名で検索' : '技名で検索';
-    document.getElementById('dm-search-input').placeholder  = dmType==='pokemon' ? 'ポケモン名を入力...' : '技名を入力...';
-    document.getElementById('dm-form-card').style.display   = 'none';
+    if (dmType === 'pokemon') {
+      document.getElementById('dm-search-label').textContent = 'ポケモン名で検索';
+      document.getElementById('dm-search-input').placeholder = 'ポケモン名を入力...';
+    } else if (dmType === 'move') {
+      document.getElementById('dm-search-label').textContent = '技名で検索';
+      document.getElementById('dm-search-input').placeholder = '技名を入力...';
+    } else if (dmType === 'item') {
+      document.getElementById('dm-search-label').textContent = '持ち物名で検索';
+      document.getElementById('dm-search-input').placeholder = '持ち物名を入力（日本語）...';
+    }
+    document.getElementById('dm-form-card').style.display = 'none';
+    document.getElementById('dm-search-input').value = '';
+    document.getElementById('dm-search-list').classList.remove('open');
   }
 }
 
@@ -1347,6 +1365,15 @@ function dmOnSearchInput(input) {
     const sw = all.filter(p => toHiragana(p.display).startsWith(valHira) || p.display.startsWith(valKana));
     const ot = all.filter(p => !toHiragana(p.display).startsWith(valHira) && !p.display.startsWith(valKana));
     entries = [...sw, ...ot].slice(0,20).map(p => ({ label: p.display, idx: localPokemon.indexOf(p) }));
+  } else if (dmType === 'item') {
+    // 持ち物：日本語名で検索
+    const all = localItems.filter(it => {
+      const dH = toHiragana(it.ja);
+      return it.ja.includes(valKana) || dH.includes(valHira);
+    });
+    const sw = all.filter(it => toHiragana(it.ja).startsWith(valHira) || it.ja.startsWith(valKana));
+    const ot = all.filter(it => !toHiragana(it.ja).startsWith(valHira) && !it.ja.startsWith(valKana));
+    entries = [...sw, ...ot].slice(0,20).map(it => ({ label: it.ja, idx: localItems.indexOf(it), isItem: true }));
   } else {
     const all = localMoves.filter(m => {
       const dH = toHiragana(m.name);
@@ -1357,13 +1384,17 @@ function dmOnSearchInput(input) {
     entries = [...sw, ...ot].slice(0,20).map(m => ({ label: m.name, idx: localMoves.indexOf(m) }));
   }
   if (!entries.length) { list.classList.remove('open'); return; }
-  list.innerHTML = entries.map(e => `<div class="autocomplete-item" data-idx="${e.idx}">${e.label}</div>`).join('');
+  list.innerHTML = entries.map(e => `<div class="autocomplete-item" data-idx="${e.idx}" data-is-item="${e.isItem||false}">${e.label}</div>`).join('');
   list.querySelectorAll('.autocomplete-item').forEach(item => {
     item.addEventListener('mousedown', ev => {
       ev.preventDefault();
       input.value = item.textContent;
       list.classList.remove('open');
-      dmShowForm(parseInt(item.dataset.idx));
+      if (item.dataset.isItem === 'true') {
+        dmShowItemDetail(parseInt(item.dataset.idx));
+      } else {
+        dmShowForm(parseInt(item.dataset.idx));
+      }
     });
   });
   list.classList.add('open');
@@ -1375,12 +1406,25 @@ function dmOnSearchKeydown(e, input) {
   const cur = list.querySelector('.selected');
   if (e.key==='ArrowDown') { e.preventDefault(); if(!cur) items[0]?.classList.add('selected'); else { cur.classList.remove('selected'); (cur.nextElementSibling||items[0])?.classList.add('selected'); } }
   else if (e.key==='ArrowUp') { e.preventDefault(); if(cur) { cur.classList.remove('selected'); (cur.previousElementSibling||items[items.length-1])?.classList.add('selected'); } }
-  else if (e.key==='Enter') { e.preventDefault(); const sel=list.querySelector('.selected')||items[0]; if(sel){ input.value=sel.textContent; list.classList.remove('open'); dmShowForm(parseInt(sel.dataset.idx)); } }
+  else if (e.key==='Enter') {
+    e.preventDefault();
+    const sel = list.querySelector('.selected') || items[0];
+    if (sel) {
+      input.value = sel.textContent;
+      list.classList.remove('open');
+      if (sel.dataset.isItem === 'true') {
+        dmShowItemDetail(parseInt(sel.dataset.idx));
+      } else {
+        dmShowForm(parseInt(sel.dataset.idx));
+      }
+    }
+  }
   else if (e.key==='Escape') { list.classList.remove('open'); }
 }
 
 function dmShowForm(idx) {
   if (idx === null) return; // 新規追加は廃止
+  if (dmType === 'item') return; // 持ち物は編集フォームなし
   dmEditIndex = idx;
   const card    = document.getElementById('dm-form-card');
   const title   = document.getElementById('dm-form-title');
@@ -1546,6 +1590,20 @@ async function dmSaveMasterData() {
       { overrides, moves: localMoves, updatedAt: window._firestoreOps.serverTimestamp() }
     );
   } catch(e) { console.error('Master save error:', e); }
+}
+
+async function dmSaveItems() {
+  // 持ち物データをFirestoreに保存（管理者のみ）
+  const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
+  if (!currentUser || currentUser.uid !== ADMIN_UID) return;
+  if (!_fbReady || !localItems || localItems.length === 0) return;
+  try {
+    await window._firestoreOps.setDoc(
+      window._firestoreOps.doc(window._db, 'shared', 'items'),
+      { items: localItems, updatedAt: window._firestoreOps.serverTimestamp() }
+    );
+    console.log('Items saved to Firestore:', localItems.length);
+  } catch(e) { console.error('Items save error:', e); }
 }
 
 async function dmLoadMasterData() {
@@ -1760,6 +1818,38 @@ function renderDmList() {
   const body = document.getElementById('dm-list-body');
   const countEl = document.getElementById('dm-list-count');
 
+  if (dmType === 'item') {
+    // 持ち物一覧：画像＋日本語名
+    if (!localItems || localItems.length === 0) {
+      countEl.textContent = '読み込み中...';
+      body.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted)">⏳ 持ち物データを読み込み中...<br><small>初回は時間がかかる場合があります</small></div>';
+      dmLoadItems().then(() => {
+        countEl.textContent = `全${localItems.length}件`;
+        body.innerHTML = localItems.map((it, i) => `
+          <div class="dm-list-row">
+            <img src="https://play.pokemonshowdown.com/sprites/itemicons/${it.id}.png"
+              onerror="this.src='https://play.pokemonshowdown.com/sprites/itemicons/0.png'"
+              style="width:24px;height:24px;object-fit:contain;flex-shrink:0">
+            <div class="dm-list-name">${it.ja}</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-left:auto">${it.id}</div>
+          </div>`
+        ).join('');
+      });
+      return;
+    }
+    countEl.textContent = `全${localItems.length}件`;
+    body.innerHTML = localItems.map((it, i) => `
+      <div class="dm-list-row">
+        <img src="https://play.pokemonshowdown.com/sprites/itemicons/${it.id}.png"
+          onerror="this.src='https://play.pokemonshowdown.com/sprites/itemicons/0.png'"
+          style="width:24px;height:24px;object-fit:contain;flex-shrink:0">
+        <div class="dm-list-name">${it.ja}</div>
+        <div style="font-size:11px;color:var(--text-muted);margin-left:auto">${it.id}</div>
+      </div>`
+    ).join('');
+    return;
+  }
+
   if (dmType === 'move') {
     // 技一覧：名前のみ表示
     countEl.textContent = `全${localMoves.length}件`;
@@ -1818,6 +1908,146 @@ async function dmSaveList() {
 function dmCancelList() {
   dmListDraft = [];
   dmSelectType(dmType);
+}
+
+// ---- 持ち物 ----
+
+// ShowdownのIDをPokeAPIのslug形式に変換
+function showdownIdToPokeApiSlug(id) {
+  // 例: "choiceband" -> "choice-band", "lifeorb" -> "life-orb"
+  // ShowdownのIDはすべて小文字で結合されているので、大文字/ハイフン変換は不要
+  // PokeAPIのslugもほぼ同形式 (一部例外あり)
+  return id.toLowerCase();
+}
+
+// localStorageキャッシュキーと有効期限（7日）
+const ITEMS_CACHE_KEY = 'pkm_items_cache';
+const ITEMS_CACHE_TTL = 7 * 24 * 60 * 60 * 1000;
+
+async function dmLoadItems() {
+  // 1. Firestoreから試みる（最優先）
+  if (_fbReady) {
+    try {
+      const snap = await window._firestoreOps.getDoc(
+        window._firestoreOps.doc(window._db, 'shared', 'items')
+      );
+      if (snap.exists()) {
+        const d = snap.data();
+        if (d.items && d.items.length > 0) {
+          localItems = d.items;
+          // localStorageにもキャッシュ
+          localStorage.setItem(ITEMS_CACHE_KEY, JSON.stringify({ ts: Date.now(), items: localItems }));
+          return localItems;
+        }
+      }
+    } catch(e) { console.warn('Items Firestore load failed, trying cache:', e); }
+  }
+
+  // 2. localStorageキャッシュ確認（7日以内）
+  try {
+    const cached = JSON.parse(localStorage.getItem(ITEMS_CACHE_KEY) || 'null');
+    if (cached && cached.items && cached.items.length > 0 && (Date.now() - cached.ts) < ITEMS_CACHE_TTL) {
+      localItems = cached.items;
+      return localItems;
+    }
+  } catch(e) {}
+
+  // 3. Showdown items.js をfetchしてPokeAPIで日本語名取得
+  localItems = await fetchAndBuildItems();
+  if (localItems.length > 0) {
+    // localStorageにキャッシュ
+    localStorage.setItem(ITEMS_CACHE_KEY, JSON.stringify({ ts: Date.now(), items: localItems }));
+    // Firestoreにも保存（管理者のみ）
+    await dmSaveItems();
+  }
+  return localItems;
+}
+
+async function fetchAndBuildItems() {
+  // Showdown items.js をfetchしてアイテム名一覧取得
+  let itemIds = [];
+  try {
+    const res = await fetch('https://play.pokemonshowdown.com/data/items.js');
+    const text = await res.text();
+    // items.js は "var BattleItems = {...};" 形式
+    // キーを正規表現で抽出
+    const matches = text.matchAll(/"?([a-z0-9]+)"?\s*:/g);
+    const seen = new Set();
+    for (const m of matches) {
+      const key = m[1];
+      // BattleItemsのプロパティは小文字英数字のみ。除外パターン
+      if (key && key.length > 1 && !seen.has(key)) {
+        seen.add(key);
+        itemIds.push(key);
+      }
+    }
+    // 先頭の不要なキー（num, name, spritenum等のプロパティ名）を除外
+    const skipKeys = new Set(['num','name','spritenum','desc','shortdesc','gen','isnonstandard',
+      'fling','oneat','oneatuse','onfling','onresidual','onstart','onend','onswitch',
+      'onafterswitch','onhit','onprimal','onmega','onzpower','onkb','onkbfrom',
+      'onafterswitchin','onresidualorder','onfling','natural','gift','megastonefor',
+      'zfling','zflingboost','ignoreknockoff','boosts','volatilestatus','status',
+      'condition','weather','terrain','ondragonmode','onplatechange','onmemorychange',
+      'megastone','onbasepowermodifier','onmovebasepowermodifier','sidestart',
+      'pseudoweather','duration','onstart','force','alwayshit','stealth','nuzzle',
+      'isgemitem','dragontalisman','id','effect','price','pp','accuracy','priority',
+      'critRatio','multihit','hasCrashDamage','recoil','drain','heal','forceswitch',
+      'selfDrops','secondary','self','type','category','zMove','contestType','flags',
+      'ohko','thawsTarget','sleepUsable','isFutureMove','noMetronome','ignore',
+      'onlyofficialimplementation','nosideconditions','notditto','noinference']);
+    itemIds = itemIds.filter(k => !skipKeys.has(k));
+  } catch(e) {
+    console.error('Failed to fetch items.js:', e);
+    return [];
+  }
+
+  if (itemIds.length === 0) return [];
+
+  // PokeAPIで日本語名を並列取得（バッチ20件ずつ）
+  const results = [];
+  const BATCH = 20;
+  for (let i = 0; i < itemIds.length; i += BATCH) {
+    const batch = itemIds.slice(i, i + BATCH);
+    const batchResults = await Promise.all(batch.map(async id => {
+      try {
+        const res = await fetch(`https://pokeapi.co/api/v2/item/${id}/`);
+        if (!res.ok) return null;
+        const d = await res.json();
+        const jaName = d.names?.find(n => n.language?.name === 'ja-Hrkt')?.name
+                    || d.names?.find(n => n.language?.name === 'ja')?.name
+                    || null;
+        if (!jaName) return null;
+        return { id, ja: jaName };
+      } catch(e) { return null; }
+    }));
+    batchResults.forEach(r => { if (r) results.push(r); });
+    // APIレート制限対策：バッチ間に少し待機
+    if (i + BATCH < itemIds.length) await new Promise(r => setTimeout(r, 200));
+  }
+
+  // 日本語名でソート
+  results.sort((a, b) => a.ja.localeCompare(b.ja, 'ja'));
+  return results;
+}
+
+function dmShowItemDetail(idx) {
+  // 持ち物の検索結果クリック時：一覧カードに1件だけ表示
+  if (idx < 0 || idx >= localItems.length) return;
+  const it = localItems[idx];
+  const body = document.getElementById('dm-list-body');
+  const countEl = document.getElementById('dm-list-count');
+  countEl.textContent = it.ja;
+  body.innerHTML = `
+    <div class="dm-list-row" style="gap:16px;padding:16px">
+      <img src="https://play.pokemonshowdown.com/sprites/itemicons/${it.id}.png"
+        onerror="this.src='https://play.pokemonshowdown.com/sprites/itemicons/0.png'"
+        style="width:40px;height:40px;object-fit:contain;flex-shrink:0">
+      <div>
+        <div style="font-weight:700;font-size:16px">${it.ja}</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:2px">${it.id}</div>
+      </div>
+    </div>`;
+  document.getElementById('dm-list-card').style.display = 'block';
 }
 
 
