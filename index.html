@@ -410,6 +410,14 @@
 <!-- DATA MANAGE PAGE -->
 <div id="page-datamanage" class="page">
   <h2 style="font-size:20px;font-weight:700;margin-bottom:20px">データ管理</h2>
+
+  <!-- 非管理者向けメッセージ（管理者ログイン時は非表示） -->
+  <div id="dm-no-permission" class="card mb-4" style="display:none;border-color:var(--border);text-align:center;padding:32px 20px">
+    <div style="font-size:32px;margin-bottom:12px">🔒</div>
+    <div style="font-weight:600;font-size:15px;margin-bottom:8px">権限がないため、編集できません</div>
+    <div style="color:var(--text-muted);font-size:13px">データの閲覧（一覧表示）は可能です</div>
+  </div>
+
   <div class="card mb-4 dm-admin-only" style="display:none">
     <div class="section-label">編集するデータ</div>
     <div style="display:flex;gap:10px;margin-bottom:16px">
@@ -421,7 +429,6 @@
       <div style="display:flex;gap:10px;margin-bottom:16px">
         <button class="btn btn-ghost" id="dm-btn-list"   onclick="dmSelectAction('list')"   style="flex:1">📋 一覧</button>
         <button class="btn btn-ghost" id="dm-btn-search" onclick="dmSelectAction('search')" style="flex:1">🔍 検索・編集</button>
-        <button class="btn btn-ghost" id="dm-btn-add"    onclick="dmSelectAction('add')"    style="flex:1">＋ 新規追加</button>
       </div>
       <div id="dm-search-area" style="display:none">
         <label id="dm-search-label">名前で検索</label>
@@ -436,12 +443,11 @@
   <div class="card dm-admin-only" id="dm-form-card" style="display:none">
     <div class="flex justify-between items-center mb-4">
       <div class="card-title" id="dm-form-title" style="margin-bottom:0">編集</div>
-      <button class="btn btn-danger btn-sm" id="dm-delete-btn" onclick="dmDeleteEntry()" style="display:none">削除</button>
     </div>
     <div id="dm-form-fields"></div>
     <div style="margin-top:20px;text-align:right">
       <button class="btn btn-ghost" onclick="dmCancelEdit()" style="margin-right:8px">キャンセル</button>
-      <button class="btn btn-primary" onclick="dmSaveEntry()">💾 登録</button>
+      <button class="btn btn-primary" onclick="dmSaveEntry()">💾 保存</button>
     </div>
   </div>
 
@@ -597,6 +603,9 @@ function initFirebase() {
     document.querySelectorAll('.dm-admin-only').forEach(el => {
       el.style.display = isAdmin ? '' : 'none';
     });
+    // 非管理者向け「権限なし」メッセージの表示制御
+    const noPermEl = document.getElementById('dm-no-permission');
+    if (noPermEl) noPermEl.style.display = isAdmin ? 'none' : 'block';
     if (user) {
       nameEl.textContent = user.displayName || user.email;
       btnEl.textContent = 'ログアウト';
@@ -630,7 +639,7 @@ function showPage(name, btn) {
   if (name === 'record') renderRecordPage();
   if (name === 'history') renderHistory();
   if (name === 'datamanage') { dmType=null; dmAction=null;
-    ['dm-tab-pokemon','dm-tab-move','dm-btn-search','dm-btn-add'].forEach(id => { const el=document.getElementById(id); if(el) el.className='btn btn-ghost'; });
+    ['dm-tab-pokemon','dm-tab-move','dm-btn-search'].forEach(id => { const el=document.getElementById(id); if(el) el.className='btn btn-ghost'; });
     document.getElementById('dm-action-area').style.display='none';
     document.getElementById('dm-form-card').style.display='none';
     document.getElementById('dm-search-area').style.display='none'; }
@@ -1292,20 +1301,12 @@ function dmSelectType(type) {
   document.getElementById('dm-tab-pokemon').className = 'btn ' + (type==='pokemon' ? 'btn-primary' : 'btn-ghost');
   document.getElementById('dm-tab-move').className    = 'btn ' + (type==='move'    ? 'btn-primary' : 'btn-ghost');
   document.getElementById('dm-action-area').style.display = 'block';
-  // 管理者以外は 検索・編集 / 新規追加 ボタンを非表示にする
-  const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
-  const isAdmin = currentUser && currentUser.uid === ADMIN_UID;
-  const btnSearch = document.getElementById('dm-btn-search');
-  const btnAdd    = document.getElementById('dm-btn-add');
-  if (btnSearch) btnSearch.style.display = isAdmin ? '' : 'none';
-  if (btnAdd)    btnAdd.style.display    = isAdmin ? '' : 'none';
   document.getElementById('dm-search-area').style.display = 'none';
   document.getElementById('dm-form-card').style.display   = 'none';
   document.getElementById('dm-list-card').style.display   = 'none';
   const btnList = document.getElementById('dm-btn-list');
   if (btnList) btnList.className = 'btn btn-ghost';
   document.getElementById('dm-btn-search').className = 'btn btn-ghost';
-  document.getElementById('dm-btn-add').className    = 'btn btn-ghost';
   document.getElementById('dm-search-input').value = '';
   document.getElementById('dm-search-list').classList.remove('open');
 }
@@ -1313,13 +1314,12 @@ function dmSelectType(type) {
 function dmSelectAction(action) {
   const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
   const isAdmin = currentUser && currentUser.uid === ADMIN_UID;
-  // 一覧(list)は全員OK、search/addは管理者のみ
+  // 一覧(list)は全員OK、searchは管理者のみ（addは廃止）
   if (!isAdmin && action !== 'list') return;
   dmAction = action;
   const btnList = document.getElementById('dm-btn-list');
   if (btnList) btnList.className = 'btn ' + (action==='list' ? 'btn-primary' : 'btn-ghost');
   document.getElementById('dm-btn-search').className = 'btn ' + (action==='search' ? 'btn-primary' : 'btn-ghost');
-  document.getElementById('dm-btn-add').className    = 'btn ' + (action==='add'    ? 'btn-primary' : 'btn-ghost');
   document.getElementById('dm-list-card').style.display = action === 'list' ? 'block' : 'none';
   if (action === 'list') {
     if (dmType === 'pokemon') renderDmList();
@@ -1330,9 +1330,6 @@ function dmSelectAction(action) {
     document.getElementById('dm-search-label').textContent  = dmType==='pokemon' ? 'ポケモン名で検索' : '技名で検索';
     document.getElementById('dm-search-input').placeholder  = dmType==='pokemon' ? 'ポケモン名を入力...' : '技名を入力...';
     document.getElementById('dm-form-card').style.display   = 'none';
-  } else {
-    document.getElementById('dm-search-area').style.display = 'none';
-    dmShowForm(null);
   }
 }
 
@@ -1384,22 +1381,17 @@ function dmOnSearchKeydown(e, input) {
 }
 
 function dmShowForm(idx) {
+  if (idx === null) return; // 新規追加は廃止
   dmEditIndex = idx;
   const card    = document.getElementById('dm-form-card');
   const title   = document.getElementById('dm-form-title');
-  const delBtn  = document.getElementById('dm-delete-btn');
   const fields  = document.getElementById('dm-form-fields');
   card.style.display  = 'block';
-  delBtn.style.display = idx !== null ? 'inline-flex' : 'none';
   card.scrollIntoView({ behavior:'smooth', block:'start' });
 
   if (dmType === 'pokemon') {
-    title.textContent = idx === null ? 'ポケモンを追加' : 'ポケモンを編集';
-    const d = idx !== null ? localPokemon[idx] : {
-      no:'', name:'', form:'通常', display:'',
-      type1:'', type2:'', hp:'', atk:'', def:'', spatk:'', spdef:'', spd:'',
-      ability1:'', ability2:'', ability_hidden:'', confirmed: false
-    };
+    title.textContent = 'ポケモンを編集';
+    const d = localPokemon[idx];
     if (d.confirmed === undefined) d.confirmed = false;
     const v = k => (d[k] ?? '').replace(/"/g,'&quot;');
     fields.innerHTML = `
@@ -1431,8 +1423,8 @@ function dmShowForm(idx) {
         <div style="grid-column:1/-1"><label>夢特性</label><input type="text" id="dmf-ability-hidden" value="${v('ability_hidden')}"></div>
       </div>`;
   } else {
-    title.textContent = idx === null ? '技を追加' : '技を編集';
-    const d = idx !== null ? localMoves[idx] : { name:'', type:'', category:'', power:'', pp:'', desc:'', effect:'' };
+    title.textContent = '技を編集';
+    const d = localMoves[idx];
     const v = k => (d[k] ?? '').replace(/"/g,'&quot;');
     fields.innerHTML = `
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px">
@@ -1482,8 +1474,8 @@ async function dmSaveEntry() {
       ability_hidden: document.getElementById('dmf-ability-hidden').value.trim(),
       confirmed: document.getElementById('dmf-confirmed')?.checked || false,
     };
-    if (dmEditIndex !== null) localPokemon[dmEditIndex] = entry;
-    else localPokemon.push(entry);
+    if (dmEditIndex === null) { alert('新規追加はできません'); return; }
+    localPokemon[dmEditIndex] = entry;
   } else {
     const name = document.getElementById('dmf-move-name').value.trim();
     if (!name) { alert('技名を入力してください'); return; }
@@ -1496,8 +1488,8 @@ async function dmSaveEntry() {
       desc:     document.getElementById('dmf-move-desc').value.trim(),
       effect:   document.getElementById('dmf-move-effect').value.trim(),
     };
-    if (dmEditIndex !== null) localMoves[dmEditIndex] = entry;
-    else localMoves.push(entry);
+    if (dmEditIndex === null) { alert('新規追加はできません'); return; }
+    localMoves[dmEditIndex] = entry;
   }
   await dmSaveMasterData();
   alert('登録しました！');
