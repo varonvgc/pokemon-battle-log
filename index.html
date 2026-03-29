@@ -255,27 +255,103 @@
   /* PARTY EDIT PAGE (fullscreen) */
   #page-party-edit { display:none; position:fixed; inset:0; background:var(--bg); z-index:200; overflow-y:auto; padding:0; }
   #page-party-edit.active { display:block; }
-  .pe-header { position:sticky; top:0; z-index:10; background:var(--surface); border-bottom:1px solid var(--border); padding:10px 16px; display:flex; align-items:center; gap:10px; }
-  .pe-body { padding:12px 16px; max-width:700px; margin:0 auto; }
-  .pe-pokemon-card { background:var(--surface2); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:12px; overflow:hidden; }
-  .pe-pokemon-header { display:flex; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px solid var(--border); }
-  .pe-pokemon-body { padding:10px 12px; }
-  .pe-row { display:flex; gap:8px; align-items:flex-start; margin-bottom:8px; }
-  .pe-label { font-size:11px; color:var(--text-muted); font-weight:600; margin-bottom:3px; }
-  .pe-field { flex:1; min-width:0; }
-  .pe-input { width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:6px 10px; font-size:13px; outline:none; box-sizing:border-box; }
+
+  /* ヘッダー: 閉じる | [max-width内でパーティ名] | 保存 の3列 */
+  .pe-header {
+    position:sticky; top:0; z-index:10;
+    background:var(--surface); border-bottom:1px solid var(--border);
+    padding:8px 12px;
+    display:grid;
+    grid-template-columns: auto 1fr auto;
+    align-items:center; gap:8px;
+  }
+  /* パーティ名入力を本文(max-width:700px)と同幅に合わせるための内包要素 */
+  .pe-header-center {
+    min-width:0;
+    display:flex; justify-content:center;
+  }
+  .pe-header-center input {
+    width:100%; max-width:700px;
+    background:var(--bg); border:1px solid var(--border); color:var(--text);
+    border-radius:6px; padding:7px 12px; font-size:15px; font-weight:600; outline:none;
+  }
+  .pe-header-center input:focus { border-color:var(--accent); }
+
+  /* 本文エリア */
+  .pe-body { padding:8px 12px; max-width:700px; margin:0 auto; }
+
+  /* ポケモンカード */
+  .pe-pokemon-card {
+    background:var(--surface2); border:1px solid var(--border);
+    border-radius:var(--radius); margin-bottom:8px; overflow:hidden;
+  }
+  /* カード内レイアウト: 左にアイコン、右にグリッド */
+  .pe-card-inner {
+    display:grid;
+    grid-template-columns: 48px 1fr;
+    gap:0;
+  }
+  /* 左列: アイコン + ポケモン名 */
+  .pe-left-col {
+    display:flex; flex-direction:column; align-items:center;
+    padding:8px 6px 8px 8px; gap:4px; border-right:1px solid var(--border);
+  }
+  .pe-poke-picker-btn {
+    width:44px; height:36px; background:var(--bg); border:1px solid var(--border);
+    border-radius:6px; cursor:pointer; display:flex; align-items:center;
+    justify-content:center; flex-shrink:0; overflow:hidden;
+  }
+  .pe-poke-picker-btn img.ball { width:28px; height:28px; object-fit:contain; mix-blend-mode:lighten; }
+  .pe-poke-picker-btn .poke-sprite {
+    display:block; width:40px; height:30px;
+    background-image:url('https://play.pokemonshowdown.com/sprites/pokemonicons-sheet.png');
+    background-repeat:no-repeat; image-rendering:pixelated;
+  }
+  /* ポケモン名: 縦書き風に小さく */
+  .pe-name-input {
+    width:38px; font-size:9px; text-align:center; line-height:1.3;
+    background:var(--bg); border:1px solid var(--border); color:var(--text);
+    border-radius:4px; padding:3px 2px; outline:none; resize:none;
+    writing-mode:vertical-rl; min-height:60px; cursor:pointer;
+    overflow:hidden; word-break:break-all;
+  }
+  .pe-name-input:focus { border-color:var(--accent); }
+  /* 右列: 詳細グリッド */
+  .pe-right-col { padding:6px 8px; }
+  /* 持ち物・特性: 横並び */
+  .pe-item-ability-row { display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-bottom:5px; }
+  /* 技: 2×2 */
+  .pe-moves-grid { display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-bottom:5px; }
+  /* ラベル */
+  .pe-label { font-size:10px; color:var(--text-muted); font-weight:600; margin-bottom:2px; }
+  .pe-field { min-width:0; }
+  /* 共通入力 */
+  .pe-input {
+    width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text);
+    border-radius:5px; padding:4px 6px; font-size:12px; outline:none; box-sizing:border-box;
+  }
   .pe-input:focus { border-color:var(--accent); }
-  .pe-select { width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:6px 8px; font-size:13px; outline:none; cursor:pointer; }
-  .pe-moves-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
-  .pe-move-btn { background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:7px 10px; font-size:12px; cursor:pointer; text-align:left; width:100%; min-height:34px; transition:border-color .15s; }
+  .pe-select {
+    width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text);
+    border-radius:5px; padding:4px 5px; font-size:12px; outline:none; cursor:pointer;
+  }
+  /* 技ボタン */
+  .pe-move-btn {
+    background:var(--bg); border:1px solid var(--border); color:var(--text-muted);
+    border-radius:5px; padding:4px 6px; font-size:11px; cursor:pointer;
+    text-align:left; width:100%; min-height:28px; transition:border-color .15s;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
   .pe-move-btn:hover { border-color:var(--accent); }
-  .pe-move-btn.filled { color:var(--text); font-weight:500; }
-  .pe-stats-btn { background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:7px 12px; font-size:12px; cursor:pointer; width:100%; text-align:left; transition:border-color .15s; }
+  .pe-move-btn.filled { color:var(--text); font-weight:600; }
+  /* ステータスボタン */
+  .pe-stats-btn {
+    background:var(--bg); border:1px solid var(--border); color:var(--text-muted);
+    border-radius:5px; padding:4px 6px; font-size:11px; cursor:pointer;
+    width:100%; text-align:left; transition:border-color .15s;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
   .pe-stats-btn:hover { border-color:var(--accent); }
-  /* slot picker inside party edit */
-  .pe-poke-picker-btn { width:52px; height:42px; background:var(--bg); border:1px solid var(--border); border-radius:6px; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden; }
-  .pe-poke-picker-btn img.ball { width:32px; height:32px; object-fit:contain; mix-blend-mode:lighten; }
-  .pe-poke-picker-btn .poke-sprite { display:block; width:40px; height:30px; background-image:url('https://play.pokemonshowdown.com/sprites/pokemonicons-sheet.png'); background-repeat:no-repeat; image-rendering:pixelated; }
 
   /* MOVE PICKER POPUP */
   .move-picker-overlay { position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:500; display:none; align-items:flex-end; justify-content:center; }
@@ -543,10 +619,11 @@
 <!-- PARTY EDIT PAGE (fullscreen) -->
 <div id="page-party-edit">
   <div class="pe-header">
-    <button class="btn btn-ghost btn-sm" onclick="closePartyEdit()">✕ 閉じる</button>
-    <input type="text" id="pe-name-input" placeholder="パーティ名" maxlength="30"
-      style="flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px 12px;font-size:15px;font-weight:600;outline:none;">
-    <button class="btn btn-primary btn-sm" onclick="savePartyEdit()">💾 保存</button>
+    <button class="btn btn-ghost btn-sm" onclick="closePartyEdit()" style="white-space:nowrap">✕ 閉じる</button>
+    <div class="pe-header-center">
+      <input type="text" id="pe-name-input" placeholder="パーティ名" maxlength="30">
+    </div>
+    <button class="btn btn-primary btn-sm" onclick="savePartyEdit()" style="white-space:nowrap">💾 保存</button>
   </div>
   <div class="pe-body" id="pe-body"></div>
 </div>
@@ -2188,7 +2265,7 @@ function selectFromPicker(displayName) {
     // パーティ編集ページ用
     selectPePokeByName(_pePickerTargetIdx, displayName);
     const card = document.querySelector('#pe-body .pe-pokemon-card[data-pe-idx="' + _pePickerTargetIdx + '"]');
-    if (card) { const inp = card.querySelector('.pe-pokemon-header input[type=text]'); if(inp) inp.value=displayName; }
+    if (card) { const inp = card.querySelector('.pe-name-input'); if(inp) inp.value=displayName; }
     _pePickerTargetIdx = -1;
     closePokemonPicker();
     return;
@@ -2398,48 +2475,61 @@ function buildPePokeCard(idx) {
   card.className = 'pe-pokemon-card';
   card.dataset.peIdx = idx;
 
-  // ヘッダー: アイコン + ポケモン名入力
-  const hdr = document.createElement('div');
-  hdr.className = 'pe-pokemon-header';
+  // カード内: 左列（アイコン＋名前縦書き）＋ 右列（詳細）
+  const inner = document.createElement('div');
+  inner.className = 'pe-card-inner';
 
-  // ピッカーボタン（アイコン）
+  // ── 左列 ──
+  const leftCol = document.createElement('div');
+  leftCol.className = 'pe-left-col';
+
+  // ピッカーボタン
   const pickerBtn = document.createElement('button');
   pickerBtn.className = 'pe-poke-picker-btn';
   pickerBtn.id = `pe-picker-btn-${idx}`;
   pickerBtn.title = 'アイコンから選ぶ';
   pickerBtn.onclick = () => openPokemonPickerForPe(idx);
   setPePickerIcon(pickerBtn, pk.name);
-  hdr.appendChild(pickerBtn);
+  leftCol.appendChild(pickerBtn);
 
-  // ポケモン名入力
-  const nameWrap = document.createElement('div');
-  nameWrap.style.cssText = 'flex:1;min-width:0;position:relative';
-  const nameInput = document.createElement('input');
-  nameInput.type = 'text';
-  nameInput.className = 'pe-input';
-  nameInput.placeholder = `${idx+1}体目のポケモン名`;
+  // ポケモン名（縦書きテキストエリア）
+  const nameAcWrap = document.createElement('div');
+  nameAcWrap.style.cssText = 'position:relative;width:38px';
+  const nameInput = document.createElement('textarea');
+  nameInput.className = 'pe-name-input';
+  nameInput.placeholder = `${idx+1}体目`;
   nameInput.value = pk.name;
   nameInput.autocomplete = 'off';
+  nameInput.rows = 1;
   nameInput.dataset.peIdx = idx;
-  nameInput.oninput = function() { onPeNameInput(this, idx); };
-  nameInput.onkeydown = function(e) { onPeNameKeydown(e, this, idx); };
+  nameInput.oninput = function() {
+    // textareaの改行を除去して1行に
+    this.value = this.value.replace(/
+/g, '');
+    onPeNameInput(this, idx);
+  };
+  nameInput.onkeydown = function(e) {
+    if (e.key === 'Enter') e.preventDefault();
+    onPeNameKeydown(e, this, idx);
+  };
   const nameAc = document.createElement('div');
   nameAc.className = 'autocomplete-list';
   nameAc.id = `pe-ac-${idx}`;
-  nameWrap.appendChild(nameInput);
-  nameWrap.appendChild(nameAc);
-  hdr.appendChild(nameWrap);
-  card.appendChild(hdr);
+  nameAc.style.cssText = 'left:auto;right:-180px;width:180px;z-index:100';
+  nameAcWrap.appendChild(nameInput);
+  nameAcWrap.appendChild(nameAc);
+  leftCol.appendChild(nameAcWrap);
 
-  // ボディ
-  const bdy = document.createElement('div');
-  bdy.className = 'pe-pokemon-body';
+  inner.appendChild(leftCol);
+
+  // ── 右列 ──
+  const rightCol = document.createElement('div');
+  rightCol.className = 'pe-right-col';
 
   // 持ち物 + 特性
-  const row1 = document.createElement('div');
-  row1.className = 'pe-row';
+  const iaRow = document.createElement('div');
+  iaRow.className = 'pe-item-ability-row';
 
-  // 持ち物
   const itemField = document.createElement('div');
   itemField.className = 'pe-field';
   itemField.innerHTML = '<div class="pe-label">持ち物</div>';
@@ -2448,7 +2538,7 @@ function buildPePokeCard(idx) {
   const itemInput = document.createElement('input');
   itemInput.type = 'text';
   itemInput.className = 'pe-input';
-  itemInput.placeholder = '持ち物を入力...';
+  itemInput.placeholder = '持ち物...';
   itemInput.value = pk.item || '';
   itemInput.autocomplete = 'off';
   itemInput.oninput = function() { onPeItemInput(this, idx); };
@@ -2458,9 +2548,8 @@ function buildPePokeCard(idx) {
   itemWrap.appendChild(itemInput);
   itemWrap.appendChild(itemAc);
   itemField.appendChild(itemWrap);
-  row1.appendChild(itemField);
+  iaRow.appendChild(itemField);
 
-  // 特性
   const abilField = document.createElement('div');
   abilField.className = 'pe-field';
   abilField.innerHTML = '<div class="pe-label">特性</div>';
@@ -2468,17 +2557,15 @@ function buildPePokeCard(idx) {
   abilSel.className = 'pe-select';
   abilSel.id = `pe-ability-${idx}`;
   buildAbilityOptions(abilSel, pk.name, pk.ability);
-  abilSel.onchange = function() {
-    pePokemons[idx].ability = this.value;
-  };
+  abilSel.onchange = function() { pePokemons[idx].ability = this.value; };
   abilField.appendChild(abilSel);
-  row1.appendChild(abilField);
-  bdy.appendChild(row1);
+  iaRow.appendChild(abilField);
+  rightCol.appendChild(iaRow);
 
-  // 技
-  const movesLabel = document.createElement('div');
-  movesLabel.innerHTML = '<div class="pe-label" style="margin-bottom:4px">技</div>';
-  bdy.appendChild(movesLabel);
+  // 技 2×2
+  const movesLbl = document.createElement('div');
+  movesLbl.innerHTML = '<div class="pe-label">技</div>';
+  rightCol.appendChild(movesLbl);
   const movesGrid = document.createElement('div');
   movesGrid.className = 'pe-moves-grid';
   for (let m = 0; m < 4; m++) {
@@ -2489,32 +2576,35 @@ function buildPePokeCard(idx) {
     moveBtn.id = `pe-move-${idx}-${m}`;
     movesGrid.appendChild(moveBtn);
   }
-  bdy.appendChild(movesGrid);
+  rightCol.appendChild(movesGrid);
 
   // ステータス
-  const statsRow = document.createElement('div');
-  statsRow.style.marginTop = '8px';
   const statsBtn = document.createElement('button');
   statsBtn.className = 'pe-stats-btn';
   statsBtn.id = `pe-stats-btn-${idx}`;
   statsBtn.onclick = () => openStatsPopup(idx);
   statsBtn.textContent = buildStatsBtnText(idx);
-  statsRow.appendChild(statsBtn);
-  bdy.appendChild(statsRow);
+  rightCol.appendChild(statsBtn);
 
-  card.appendChild(bdy);
+  inner.appendChild(rightCol);
+  card.appendChild(inner);
   return card;
 }
 
 function buildStatsBtnText(idx) {
   const pk = pePokemons[idx];
+  if (!pk.name) return 'ステータス';
   const nd = NATURES_DATA.find(n => n.name === (pk.nature || 'まじめ')) || {up:null,down:null};
-  if (!pk.name) return 'ステータス（ポケモン未選択）';
   const pd = (localPokemon||POKEMON_LIST).find(p=>p.display===pk.name);
   if (!pd) return 'ステータス';
-  const hp = calcStat('hp', parseInt(pd.hp)||0, pk.evs.hp||0, nd);
-  const spe = calcStat('spe', parseInt(pd.spd)||0, pk.evs.spe||0, nd);
-  return `ステータス: H${hp} S${spe} [性格:${pk.nature||'まじめ'}]`;
+  const KEYS = ['hp','atk','def','spa','spd','spe'];
+  const BKEYS = ['hp','atk','def','spatk','spdef','spd'];
+  const ABBR = ['H','A','B','C','D','S'];
+  const parts = KEYS.map((k,i)=>{
+    const v = calcStat(k, parseInt(pd[BKEYS[i]])||0, pk.evs[k]||0, nd);
+    return ABBR[i]+v;
+  });
+  return `${pk.nature||'まじめ'} ${parts.join(' ')}`;
 }
 
 function setPePickerIcon(btn, pokeName) {
@@ -2605,6 +2695,9 @@ function selectPePokeByName(idx, name) {
   // 特性選択肢更新
   const abilSel = document.getElementById(`pe-ability-${idx}`);
   if (abilSel) buildAbilityOptions(abilSel, name, '');
+  // 名前入力欄も更新（textarea対応）
+  const card = document.querySelector(`#pe-body .pe-pokemon-card[data-pe-idx="${idx}"]`);
+  if (card) { const ta = card.querySelector('.pe-name-input'); if(ta) ta.value=name; }
   // ステータスボタン更新
   updateStatsBtnText(idx);
 }
