@@ -2504,8 +2504,7 @@ function buildPePokeCard(idx) {
   nameInput.dataset.peIdx = idx;
   nameInput.oninput = function() {
     // textareaの改行を除去して1行に
-    this.value = this.value.replace(/
-/g, '');
+    this.value = this.value.split('\n').join('');
     onPeNameInput(this, idx);
   };
   nameInput.onkeydown = function(e) {
