@@ -410,7 +410,7 @@
 <!-- DATA MANAGE PAGE -->
 <div id="page-datamanage" class="page">
   <h2 style="font-size:20px;font-weight:700;margin-bottom:20px">データ管理</h2>
-  <div class="card mb-4">
+  <div class="card mb-4 dm-admin-only" style="display:none">
     <div class="section-label">編集するデータ</div>
     <div style="display:flex;gap:10px;margin-bottom:16px">
       <button class="btn btn-ghost" id="dm-tab-pokemon" onclick="dmSelectType('pokemon')" style="flex:1">🐾 ポケモン</button>
@@ -433,7 +433,7 @@
       </div>
     </div>
   </div>
-  <div class="card" id="dm-form-card" style="display:none">
+  <div class="card dm-admin-only" id="dm-form-card" style="display:none">
     <div class="flex justify-between items-center mb-4">
       <div class="card-title" id="dm-form-title" style="margin-bottom:0">編集</div>
       <button class="btn btn-danger btn-sm" id="dm-delete-btn" onclick="dmDeleteEntry()" style="display:none">削除</button>
@@ -449,8 +449,8 @@
   <div id="dm-list-card" style="display:none">
     <div class="card" style="position:sticky;top:56px;z-index:50;margin-bottom:8px;display:flex;align-items:center;gap:10px">
       <span style="font-size:13px;color:var(--text-muted);flex:1" id="dm-list-count"></span>
-      <button class="btn btn-ghost btn-sm" onclick="dmCancelList()">キャンセル</button>
-      <button class="btn btn-primary btn-sm" onclick="dmSaveList()">💾 登録</button>
+      <button class="btn btn-ghost btn-sm dm-admin-only" style="display:none" onclick="dmCancelList()">キャンセル</button>
+      <button class="btn btn-primary btn-sm dm-admin-only" style="display:none" onclick="dmSaveList()">💾 登録</button>
     </div>
     <div class="card" style="padding:0;overflow:hidden">
       <div id="dm-list-body"></div>
@@ -584,11 +584,19 @@ async function toggleAuth() {
 // Firebase初期化待ちでAuth監視を開始
 function initFirebase() {
   _fbReady = true;
+  // 未ログインでも共通マスタデータは読み込む
+  dmLoadMasterData();
   window._onAuthStateChanged(window._auth, async (user) => {
     currentUser = user;
     const nameEl = document.getElementById('user-name');
     const btnEl = document.getElementById('auth-btn');
     const banner = document.getElementById('login-banner');
+    // 編集UIの表示制御（管理者のみ表示）
+    const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
+    const isAdmin = user && user.uid === ADMIN_UID;
+    document.querySelectorAll('.dm-admin-only').forEach(el => {
+      el.style.display = isAdmin ? '' : 'none';
+    });
     if (user) {
       nameEl.textContent = user.displayName || user.email;
       btnEl.textContent = 'ログアウト';
@@ -1284,6 +1292,13 @@ function dmSelectType(type) {
   document.getElementById('dm-tab-pokemon').className = 'btn ' + (type==='pokemon' ? 'btn-primary' : 'btn-ghost');
   document.getElementById('dm-tab-move').className    = 'btn ' + (type==='move'    ? 'btn-primary' : 'btn-ghost');
   document.getElementById('dm-action-area').style.display = 'block';
+  // 管理者以外は 検索・編集 / 新規追加 ボタンを非表示にする
+  const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
+  const isAdmin = currentUser && currentUser.uid === ADMIN_UID;
+  const btnSearch = document.getElementById('dm-btn-search');
+  const btnAdd    = document.getElementById('dm-btn-add');
+  if (btnSearch) btnSearch.style.display = isAdmin ? '' : 'none';
+  if (btnAdd)    btnAdd.style.display    = isAdmin ? '' : 'none';
   document.getElementById('dm-search-area').style.display = 'none';
   document.getElementById('dm-form-card').style.display   = 'none';
   document.getElementById('dm-list-card').style.display   = 'none';
@@ -1296,6 +1311,10 @@ function dmSelectType(type) {
 }
 
 function dmSelectAction(action) {
+  const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
+  const isAdmin = currentUser && currentUser.uid === ADMIN_UID;
+  // 一覧(list)は全員OK、search/addは管理者のみ
+  if (!isAdmin && action !== 'list') return;
   dmAction = action;
   const btnList = document.getElementById('dm-btn-list');
   if (btnList) btnList.className = 'btn ' + (action==='list' ? 'btn-primary' : 'btn-ghost');
@@ -1436,6 +1455,11 @@ function dmAutoDisplay() {
 }
 
 async function dmSaveEntry() {
+  const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
+  if (!currentUser || currentUser.uid !== ADMIN_UID) {
+    alert('編集権限がありません');
+    return;
+  }
   let entry;
   if (dmType === 'pokemon') {
     const name = document.getElementById('dmf-name').value.trim();
@@ -1482,6 +1506,11 @@ async function dmSaveEntry() {
 }
 
 async function dmDeleteEntry() {
+  const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
+  if (!currentUser || currentUser.uid !== ADMIN_UID) {
+    alert('編集権限がありません');
+    return;
+  }
   if (dmEditIndex === null) return;
   const label = dmType==='pokemon' ? localPokemon[dmEditIndex].display : localMoves[dmEditIndex].name;
   if (!confirm(`「${label}」を削除しますか？`)) return;
@@ -1499,6 +1528,13 @@ function dmCancelEdit() {
 }
 
 async function dmSaveMasterData() {
+  // 編集権限チェック（自分のUIDのみ保存可能）
+  const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
+  if (!currentUser || currentUser.uid !== ADMIN_UID) {
+    console.warn('Master data save blocked: no permission');
+    return;
+  }
+
   // POKEMON_LISTのデフォルトと異なるconfirmedのみを差分として保存
   const defaultConfirmed = {};
   POKEMON_LIST.forEach(p => { defaultConfirmed[p.display] = p.confirmed; });
@@ -1511,10 +1547,11 @@ async function dmSaveMasterData() {
   localStorage.setItem('pkm_confirmed_overrides', JSON.stringify(overrides));
   localStorage.setItem('pkm_master_moves', JSON.stringify(localMoves));
 
-  if (!currentUser || !_fbReady) return;
+  if (!_fbReady) return;
   try {
+    // 全アカウント共通の shared コレクションに保存
     await window._firestoreOps.setDoc(
-      window._firestoreOps.doc(window._db, 'users', currentUser.uid, 'master', 'data'),
+      window._firestoreOps.doc(window._db, 'shared', 'master'),
       { overrides, moves: localMoves, updatedAt: window._firestoreOps.serverTimestamp() }
     );
   } catch(e) { console.error('Master save error:', e); }
@@ -1533,10 +1570,11 @@ async function dmLoadMasterData() {
   }
   applyOverrides();
 
-  if (!currentUser || !_fbReady) return;
+  if (!_fbReady) return;
   try {
+    // 全アカウント共通の shared コレクションから読み込み（ログイン不要）
     const snap = await window._firestoreOps.getDoc(
-      window._firestoreOps.doc(window._db, 'users', currentUser.uid, 'master', 'data')
+      window._firestoreOps.doc(window._db, 'shared', 'master')
     );
     if (snap.exists()) {
       const d = snap.data();
@@ -1727,7 +1765,15 @@ function renderDmList() {
       <input type="checkbox" class="dm-list-check" data-idx="${i}" ${p.confirmed ? 'checked' : ''}>
     </div>`;
   }).join('');
+  const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
+  const isAdmin = currentUser && currentUser.uid === ADMIN_UID;
   body.querySelectorAll('.dm-list-check').forEach(cb => {
+    if (!isAdmin) {
+      cb.disabled = true;
+      cb.style.opacity = '0.4';
+      cb.style.cursor = 'not-allowed';
+      return;
+    }
     cb.addEventListener('change', () => {
       dmListDraft[parseInt(cb.dataset.idx)].confirmed = cb.checked;
       updateCount();
@@ -1736,6 +1782,11 @@ function renderDmList() {
 }
 
 async function dmSaveList() {
+  const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
+  if (!currentUser || currentUser.uid !== ADMIN_UID) {
+    alert('編集権限がありません');
+    return;
+  }
   dmListDraft.forEach((p, i) => { localPokemon[i].confirmed = p.confirmed; });
   await dmSaveMasterData();
   alert('登録しました！');
