@@ -1558,19 +1558,26 @@ async function dmSaveMasterData() {
 }
 
 async function dmLoadMasterData() {
-  // pkm_confirmed_overrides: ユーザーが変更した差分のみを保存・適用
-  // POKEMON_LISTのデフォルト値を基準に、差分だけを上書きする
-  function applyOverrides() {
+  // 常にFirestoreから最新データを取得してlocalStorageキャッシュを上書きする
+  // （localStorageを先読みしない→リロードで必ず最新が反映される）
+  function applyOverrides(overrides) {
     try {
-      const overrides = JSON.parse(localStorage.getItem('pkm_confirmed_overrides') || '{}');
       localPokemon.forEach(p => {
         if (p.display in overrides) p.confirmed = overrides[p.display];
       });
     } catch(e) {}
   }
-  applyOverrides();
 
-  if (!_fbReady) return;
+  if (!_fbReady) {
+    // Firebase未初期化時のフォールバック：localStorageから読む
+    try {
+      const overrides = JSON.parse(localStorage.getItem('pkm_confirmed_overrides') || '{}');
+      applyOverrides(overrides);
+      const cachedMoves = localStorage.getItem('pkm_master_moves');
+      if (cachedMoves) localMoves = JSON.parse(cachedMoves);
+    } catch(e) {}
+    return;
+  }
   try {
     // 全アカウント共通の shared コレクションから読み込み（ログイン不要）
     const snap = await window._firestoreOps.getDoc(
@@ -1579,15 +1586,27 @@ async function dmLoadMasterData() {
     if (snap.exists()) {
       const d = snap.data();
       if (d.overrides) {
+        // FirestoreのデータでlocalStorageを上書きしてから適用
         localStorage.setItem('pkm_confirmed_overrides', JSON.stringify(d.overrides));
-        applyOverrides();
+        applyOverrides(d.overrides);
       }
       if (d.moves) {
         localMoves = d.moves;
         localStorage.setItem('pkm_master_moves', JSON.stringify(localMoves));
       }
+    } else {
+      // shared/masterがまだ存在しない場合はデフォルト値を使用（何もしない）
     }
-  } catch(e) { console.error('Master load error:', e); }
+  } catch(e) {
+    console.error('Master load error:', e);
+    // Firestore取得失敗時のフォールバック：localStorageから読む
+    try {
+      const overrides = JSON.parse(localStorage.getItem('pkm_confirmed_overrides') || '{}');
+      applyOverrides(overrides);
+      const cachedMoves = localStorage.getItem('pkm_master_moves');
+      if (cachedMoves) localMoves = JSON.parse(cachedMoves);
+    } catch(e2) {}
+  }
 }
 
 // ---- ピンチズーム無効化（iOS対応）----
