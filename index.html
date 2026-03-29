@@ -263,7 +263,7 @@
   /* ヘッダー */
   .pe-header {
     padding:5px 10px; display:flex; align-items:center; gap:6px;
-    max-width:700px; margin:0 auto; box-sizing:border-box; width:100%;
+    max-width:900px; margin:0 auto; box-sizing:border-box; width:100%;
   }
   #page-party-edit > .pe-header-outer {
     position:sticky; top:0; z-index:10;
@@ -276,7 +276,7 @@
   }
   #pe-name-input:focus { border-color:var(--accent); }
 
-  .pe-body { padding:2px 6px; max-width:700px; margin:0 auto; }
+  .pe-body { padding:2px 6px; max-width:900px; margin:0 auto; }
 
   /* ポケモンカード */
   .pe-pokemon-card {
@@ -317,7 +317,7 @@
    */
   .pe-card-inner {
     display: grid;
-    grid-template-columns: 56px 0.85fr 0.75fr 1fr;
+    grid-template-columns: 60px 0.85fr 0.75fr 1fr;
     grid-template-rows: auto auto;
     min-height: 0;
   }
@@ -369,7 +369,7 @@
     flex: 1; min-width: 0; position: relative;
   }
   .pe-poke-picker-btn {
-    width:46px; height:38px; background:var(--bg); border:1px solid var(--border);
+    width:50px; height:42px; background:var(--bg); border:1px solid var(--border);
     border-radius:5px; cursor:pointer; display:flex; align-items:center;
     justify-content:center; flex-shrink:0; overflow:hidden;
   }
@@ -465,22 +465,54 @@
   /* STATS POPUP */
   .stats-popup-overlay { position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:500; display:none; align-items:center; justify-content:center; padding:16px; }
   .stats-popup-overlay.open { display:flex; }
-  .stats-popup { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px; width:100%; max-width:500px; max-height:90vh; overflow-y:auto; }
+  .stats-popup { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px; width:100%; max-width:560px; max-height:90vh; overflow-y:auto; }
   .stats-popup-title { font-weight:700; margin-bottom:14px; font-size:16px; }
-  .stats-row { display:grid; grid-template-columns:3.5em 3em 1fr 4em 4em; align-items:center; gap:4px; margin-bottom:8px; }
-  .stats-lbl { font-size:12px; color:var(--text-muted); font-weight:600; }
-  .stats-base { font-size:13px; font-weight:700; text-align:right; padding-right:4px; }
-  .stats-bar-wrap { height:8px; background:var(--surface2); border-radius:4px; overflow:hidden; }
-  .stats-bar { height:100%; border-radius:4px; background:var(--accent); transition:width .3s; }
-  .stats-ev-input { width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:5px; padding:4px 5px; font-size:13px; text-align:center; outline:none; box-sizing:border-box; }
+  /* ステータスポップアップ
+     列: ラベル | 基本値 | バー(最大) | EV数値+スライダー(狭) | 算出値
+  */
+  .stats-row {
+    display:grid;
+    grid-template-columns: 3em 2.2em 0.35fr 1fr 3.5em;
+    align-items:center; gap:4px; margin-bottom:6px;
+  }
+  .stats-lbl { font-size:11px; color:var(--text-muted); font-weight:600; }
+  .stats-base { font-size:11px; font-weight:700; text-align:right; padding-right:2px; color:var(--text-muted); }
+  .stats-bar-wrap { height:14px; background:var(--surface2); border-radius:7px; overflow:hidden; }
+  .stats-bar { height:100%; border-radius:7px; background:var(--accent); transition:width .3s; }
+  /* EV列: 数値入力 + スライダーを縦に小さくまとめる */
+  .stats-ev-col { display:flex; flex-direction:column; gap:1px; }
+  .stats-ev-input { width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:4px; padding:2px 3px; font-size:12px; text-align:center; outline:none; box-sizing:border-box; }
   .stats-ev-input:focus { border-color:var(--accent); }
   .stats-calc { font-size:13px; font-weight:700; text-align:right; }
-  .stats-nature-sel { width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:6px 8px; font-size:13px; margin-top:10px; }
+  .stats-nature-sel { width:100%; background:var(--bg); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:5px 8px; font-size:13px; margin-top:8px; }
   .stats-ev-slider { width:100%; accent-color:var(--accent); }
-  .stats-remaining { font-size:12px; color:var(--text-muted); margin-top:6px; text-align:right; }
+  .stats-remaining { font-size:12px; color:var(--text-muted); margin-top:4px; text-align:right; }
   .stat-up { color:#4ade80; }
   .stat-down { color:#f87171; }
 
+
+  /* PC版: 幅600px以上で個体詳細を大きく表示 */
+  @media (min-width: 600px) {
+    .pe-label { font-size:11px; }
+    .pe-input { font-size:12px; padding:4px 6px; }
+    .pe-select { font-size:12px; padding:4px 4px; }
+    .pe-move-btn { font-size:12px; padding:4px 6px; line-height:1.5; }
+    .pe-stats-btn { font-size:11px; padding:3px 5px; }
+    .pe-stat-row { font-size:11px; line-height:1.5; }
+    .pe-stat-key { min-width:24px; }
+    .pe-name-input { font-size:12px; padding:3px 6px; }
+    .pe-name-lbl { font-size:11px; padding:3px 7px; }
+    .pe-col { gap:3px; padding:4px 5px; }
+    .pe-col-item-ability { gap:3px; padding:4px 5px; }
+    .pe-col-icon { padding:5px 4px; }
+    .pe-poke-picker-btn { width:54px; height:46px; }
+    .pe-poke-picker-btn .poke-sprite { width:40px; height:30px; }
+    .pe-card-inner { grid-template-columns: 66px 0.85fr 0.75fr 1fr; }
+    .pe-poke-wrapper { margin-bottom:4px; }
+    .pe-name-cell { min-height:26px; }
+    .pe-card-btn { font-size:11px; }
+    .pe-card-btn-sep { font-size:11px; }
+  }
 </style>
 </head>
 <body>
@@ -1388,8 +1420,10 @@ function createSelectionDropdown(containerId, index, label, options) {
 }
 
 document.addEventListener('click', e => {
-  if (!e.target.closest('.pokemon-slot')) {
-    // opp-party-ac は別のハンドラで管理するため除外
+  // pe-col-item-ability(持ち物) / pe-name-cell(ポケモン名) 内のクリックはPEのACを閉じない
+  const inPeItemArea = e.target.closest('.pe-col-item-ability') || e.target.closest('.pe-name-input-wrap');
+  if (!e.target.closest('.pokemon-slot') && !inPeItemArea) {
+    // opp-party-ac / pe用ACは除外しない — すべて閉じる（PE内は上で守る）
     document.querySelectorAll('.autocomplete-list:not(.opp-party-ac)').forEach(l => l.classList.remove('open'));
   }
 });
@@ -2659,6 +2693,11 @@ function buildPePokeCard(idx) {
   itemInput.placeholder = '持ち物...'; itemInput.value = pk.item || '';
   itemInput.autocomplete = 'off';
   itemInput.oninput = function() { onPeItemInput(this, idx); };
+  itemInput.onfocus = function() { onPeItemFocus(this, idx); };
+  itemInput.onblur = function() {
+    if (window._peAcMousedown) return; // AC項目クリック中はblurで閉じない
+    const l=document.getElementById(`pe-item-ac-${idx}`); if(l) l.classList.remove('open');
+  };
   const itemAc = document.createElement('div');
   itemAc.className = 'autocomplete-list'; itemAc.id = `pe-item-ac-${idx}`;
   itemAc.style.cssText = 'z-index:100';
@@ -2715,6 +2754,11 @@ function buildPePokeCard(idx) {
   nameInput.oninput = function() {
     this.value = this.value.split('\n').join('');
     onPeNameInput(this, idx);
+  };
+  nameInput.onfocus = function() { onPeNameFocus(this, idx); };
+  nameInput.onblur = function() {
+    if (window._peAcMousedown) return; // AC項目クリック中はblurで閉じない
+    const l=document.getElementById(`pe-ac-${idx}`); if(l) l.classList.remove('open');
   };
   nameInput.onkeydown = function(e) {
     if (e.key === 'Enter') e.preventDefault();
@@ -2810,28 +2854,43 @@ function buildAbilityOptions(sel, pokeName, current) {
 }
 
 // ポケモン名入力のオートコンプリート（パーティ編集用）
-function onPeNameInput(input, idx) {
-  const val = input.value.trim();
+function showPeNameAc(input, idx, val) {
   const listEl = document.getElementById(`pe-ac-${idx}`);
   if (!listEl) return;
-  if (!val) { listEl.classList.remove('open'); return; }
-  const valKana = toKatakana(val), valHira = toHiragana(val);
   const src = (localPokemon||POKEMON_LIST).filter(p=>p.confirmed);
-  const all = src.filter(p=>{ const h=toHiragana(p.display); return p.display.includes(valKana)||h.includes(valHira); });
-  const sw = all.filter(p=>toHiragana(p.display).startsWith(valHira)||p.display.startsWith(valKana));
-  const ot = all.filter(p=>!toHiragana(p.display).startsWith(valHira)&&!p.display.startsWith(valKana));
-  const hits = [...sw,...ot].slice(0,15);
+  let hits;
+  if (!val) {
+    // 空: 最近選んだポケモンを表示（最大10件）
+    const recent = recentPicks
+      .map(name => src.find(p => p.display === name))
+      .filter(Boolean).slice(0, 10);
+    hits = recent.length ? recent : src.slice(0, 10);
+  } else {
+    const valKana = toKatakana(val), valHira = toHiragana(val);
+    const all = src.filter(p=>{ const h=toHiragana(p.display); return p.display.includes(valKana)||h.includes(valHira); });
+    const sw = all.filter(p=>toHiragana(p.display).startsWith(valHira)||p.display.startsWith(valKana));
+    const ot = all.filter(p=>!toHiragana(p.display).startsWith(valHira)&&!p.display.startsWith(valKana));
+    hits = [...sw,...ot].slice(0, 15);
+  }
   if (!hits.length) { listEl.classList.remove('open'); return; }
   listEl.innerHTML = hits.map(p=>`<div class="autocomplete-item">${p.display}</div>`).join('');
   listEl.querySelectorAll('.autocomplete-item').forEach(item => {
     item.addEventListener('mousedown', ev=>{
       ev.preventDefault();
+      window._peAcMousedown = true;
       selectPePokeByName(idx, item.textContent);
       input.value = item.textContent;
       listEl.classList.remove('open');
+      setTimeout(() => { window._peAcMousedown = false; }, 200);
     });
   });
   listEl.classList.add('open');
+}
+function onPeNameInput(input, idx) {
+  showPeNameAc(input, idx, input.value.trim());
+}
+function onPeNameFocus(input, idx) {
+  showPeNameAc(input, idx, input.value.trim());
 }
 
 function onPeNameKeydown(e, input, idx) {
@@ -2847,6 +2906,7 @@ function onPeNameKeydown(e, input, idx) {
 function selectPePokeByName(idx, name) {
   pePokemons[idx].name = name;
   pePokemons[idx].ability = '';
+  recordRecentPick(name); // 最近選んだポケモンに追加
   // アイコン更新
   const btn = document.getElementById(`pe-picker-btn-${idx}`);
   if (btn) setPePickerIcon(btn, name);
@@ -2869,29 +2929,53 @@ function openPokemonPickerForPe(idx) {
   overlay.classList.add('open');
 }
 
+// 持ち物の最近使用履歴
+let recentItems = JSON.parse(localStorage.getItem('pkm_recent_items') || '[]');
+function recordRecentItem(name) {
+  recentItems = recentItems.filter(n => n !== name);
+  recentItems.unshift(name);
+  if (recentItems.length > 20) recentItems = recentItems.slice(0, 20);
+  localStorage.setItem('pkm_recent_items', JSON.stringify(recentItems));
+}
+
 // 持ち物オートコンプリート
-function onPeItemInput(input, idx) {
-  const val = input.value.trim();
+function showPeItemAc(input, idx, val) {
   const listEl = document.getElementById(`pe-item-ac-${idx}`);
   if (!listEl) return;
-  pePokemons[idx].item = val;
-  if (!val) { listEl.classList.remove('open'); return; }
-  const valKana = toKatakana(val), valHira = toHiragana(val);
-  const all = localItems.filter(name=>{ const h=toHiragana(name); return name.includes(valKana)||h.includes(valHira); });
-  const sw = all.filter(n=>toHiragana(n).startsWith(valHira)||n.startsWith(valKana));
-  const ot = all.filter(n=>!toHiragana(n).startsWith(valHira)&&!n.startsWith(valKana));
-  const hits = [...sw,...ot].slice(0,15);
+  let hits;
+  if (!val) {
+    // 空: 最近選んだ持ち物を表示（最大10件）
+    hits = recentItems.slice(0, 10);
+    if (!hits.length) hits = localItems.slice(0, 10);
+  } else {
+    const valKana = toKatakana(val), valHira = toHiragana(val);
+    const all = localItems.filter(name=>{ const h=toHiragana(name); return name.includes(valKana)||h.includes(valHira); });
+    const sw = all.filter(n=>toHiragana(n).startsWith(valHira)||n.startsWith(valKana));
+    const ot = all.filter(n=>!toHiragana(n).startsWith(valHira)&&!n.startsWith(valKana));
+    hits = [...sw,...ot].slice(0, 15);
+  }
   if (!hits.length) { listEl.classList.remove('open'); return; }
   listEl.innerHTML = hits.map(n=>`<div class="autocomplete-item">${n}</div>`).join('');
   listEl.querySelectorAll('.autocomplete-item').forEach(item=>{
     item.addEventListener('mousedown', ev=>{
       ev.preventDefault();
-      input.value = item.textContent;
-      pePokemons[idx].item = item.textContent;
+      window._peAcMousedown = true;
+      const name = item.textContent;
+      input.value = name;
+      pePokemons[idx].item = name;
+      recordRecentItem(name);
       listEl.classList.remove('open');
+      setTimeout(() => { window._peAcMousedown = false; }, 200);
     });
   });
   listEl.classList.add('open');
+}
+function onPeItemInput(input, idx) {
+  pePokemons[idx].item = input.value.trim();
+  showPeItemAc(input, idx, input.value.trim());
+}
+function onPeItemFocus(input, idx) {
+  showPeItemAc(input, idx, input.value.trim());
 }
 
 function updateStatsBtnText(idx) {
@@ -3014,11 +3098,11 @@ function renderStatsPopup() {
       <div class="stats-lbl ${modClass}">${STAT_LABELS[i]}${mod}</div>
       <div class="stats-base">${base}</div>
       <div class="stats-bar-wrap"><div class="stats-bar" style="width:${barPct}%"></div></div>
-      <div>
+      <div class="stats-ev-col">
         <input type="number" class="stats-ev-input" data-stat-key="${key}" min="0" max="32" value="${ev}"
           oninput="onEvInput(this,'${key}')" style="font-size:12px">
         <input type="range" class="stats-ev-slider" data-stat-key="${key}" min="0" max="32" value="${ev}"
-          oninput="onEvSlider(this,'${key}')" style="width:100%;margin-top:2px">
+          oninput="onEvSlider(this,'${key}')">
       </div>
       <div class="stats-calc" id="stats-calc-${key}">${calc}</div>
     </div>`;
