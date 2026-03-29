@@ -281,26 +281,28 @@
   /* ポケモンカード */
   .pe-pokemon-card {
     background:var(--surface2); border:1px solid var(--border);
-    border-radius:5px; margin-bottom:3px; overflow:visible; position:relative;
+    border-radius:5px; overflow:visible;
   }
-  /* コピー/クリアボタン（カード右上） */
+  /* ポケモン枠ラッパー（ボタン行＋カード） */
+  .pe-poke-wrapper { margin-bottom:3px; }
+  /* コピー/クリアボタン行（カードの外・上） */
   .pe-card-actions {
-    position:absolute; top:2px; right:2px;
-    display:flex; gap:2px; z-index:5;
+    display:flex; justify-content:flex-end; align-items:center; gap:0;
+    padding-bottom:1px;
   }
   .pe-card-btn {
-    background:var(--surface); border:1px solid var(--border); color:var(--text-muted);
-    border-radius:3px; padding:1px 5px; font-size:9px; cursor:pointer; line-height:1.6;
+    background:transparent; border:none; color:var(--text-muted);
+    padding:0 6px; font-size:10px; cursor:pointer; line-height:1.8;
   }
-  .pe-card-btn:hover { border-color:var(--accent); color:var(--text); }
-  .pe-card-btn-clear:hover { border-color:#f87171; color:#f87171; }
+  .pe-card-btn:hover { color:var(--accent); }
+  .pe-card-btn-clear:hover { color:#f87171; }
+  .pe-card-btn-sep { color:var(--border); font-size:10px; line-height:1.8; }
 
-  /* 4列グリッド: [アイコン+名前] [持ち物+特性+名前下] [技×4] [ステータス] */
+  /* 4列グリッド */
   .pe-card-inner {
     display:grid;
     grid-template-columns: 56px 0.85fr 0.75fr 1fr;
     min-height:0;
-    padding-top:2px; /* アクションボタン分の余白は最小限 */
   }
 
   /* --- 列共通 --- */
@@ -2430,15 +2432,10 @@ function peEmptyPoke() {
            evs:{hp:0,atk:0,def:0,spa:0,spd:0,spe:0} };
 }
 
-function clearPeSlot(idx) {
+function clearPeSlot(idx, wrapper) {
   pePokemons[idx] = peEmptyPoke();
-  // カード再描画
-  const body = document.getElementById('pe-body');
-  const cards = body.querySelectorAll('.pe-pokemon-card');
-  if (cards[idx]) {
-    const newCard = buildPePokeCard(idx);
-    cards[idx].replaceWith(newCard);
-  }
+  const oldCard = wrapper.querySelector('.pe-pokemon-card');
+  if (oldCard) oldCard.replaceWith(buildPePokeCard(idx));
 }
 
 function openPartyModal(id) { openPartyEdit(id); }
@@ -2517,8 +2514,36 @@ function renderPartyEditBody() {
   const body = document.getElementById('pe-body');
   body.innerHTML = '';
   for (let i = 0; i < 6; i++) {
-    body.appendChild(buildPePokeCard(i));
+    body.appendChild(buildPePokeWrapper(i));
   }
+}
+
+function buildPePokeWrapper(idx) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'pe-poke-wrapper';
+  wrapper.dataset.wrapperIdx = idx;
+
+  // ── ボタン行（カードの外・上） ──
+  const actions = document.createElement('div');
+  actions.className = 'pe-card-actions';
+  const copyBtn = document.createElement('button');
+  copyBtn.className = 'pe-card-btn';
+  copyBtn.textContent = 'コピー';
+  copyBtn.onclick = () => { /* TODO */ };
+  actions.appendChild(copyBtn);
+  const sep = document.createElement('span');
+  sep.className = 'pe-card-btn-sep';
+  sep.textContent = '|';
+  actions.appendChild(sep);
+  const clearBtn = document.createElement('button');
+  clearBtn.className = 'pe-card-btn pe-card-btn-clear';
+  clearBtn.textContent = 'クリア';
+  clearBtn.onclick = () => clearPeSlot(idx, wrapper);
+  actions.appendChild(clearBtn);
+  wrapper.appendChild(actions);
+
+  wrapper.appendChild(buildPePokeCard(idx));
+  return wrapper;
 }
 
 function buildPePokeCard(idx) {
@@ -2526,25 +2551,6 @@ function buildPePokeCard(idx) {
   const card = document.createElement('div');
   card.className = 'pe-pokemon-card';
   card.dataset.peIdx = idx;
-
-  // ── コピー/クリアボタン（右上絶対配置） ──
-  const actions = document.createElement('div');
-  actions.className = 'pe-card-actions';
-
-  const copyBtn = document.createElement('button');
-  copyBtn.className = 'pe-card-btn';
-  copyBtn.textContent = 'コピー';
-  copyBtn.title = '個体をコピー（未実装）';
-  copyBtn.onclick = (e) => { e.stopPropagation(); /* TODO: copy */ };
-  actions.appendChild(copyBtn);
-
-  const clearBtn = document.createElement('button');
-  clearBtn.className = 'pe-card-btn pe-card-btn-clear';
-  clearBtn.textContent = 'クリア';
-  clearBtn.title = 'この個体をクリア';
-  clearBtn.onclick = (e) => { e.stopPropagation(); clearPeSlot(idx); };
-  actions.appendChild(clearBtn);
-  card.appendChild(actions);
 
   // ── メイングリッド（4列） ──
   const inner = document.createElement('div');
@@ -2629,16 +2635,25 @@ function buildPePokeCard(idx) {
 
   card.appendChild(inner);
 
-  // ── 名前行（アイコン〜技列の下に span-3 で配置） ──
+  // ── 名前行（1〜2列目: アイコン列 ＋ 持ち物特性列 の下） ──
+  // カードのgridは 56px 0.85fr 0.75fr 1fr。名前は1〜2列目に収める。
+  // カードをさらにgrid化して名前行を追加する形で実装。
   const nameRow = document.createElement('div');
-  nameRow.style.cssText = 'display:grid;grid-template-columns:56px 1fr;border-top:1px solid var(--border)';
-  // アイコン下空白（列1幅合わせ）
+  // pe-card-innerと同じgrid列幅 → 技・ステータス列には名前行を作らない
+  // displayをgridにしてsubgridで揃える代わりに、
+  // flexで「56px固定 + 持ち物列(flex:0.85)」のみ表示し、右側は空白
+  nameRow.style.cssText = [
+    'display:grid',
+    'grid-template-columns:56px 0.85fr 0.75fr 1fr',
+    'border-top:1px solid var(--border)'
+  ].join(';');
+  // 列1: アイコン幅のスペーサー（境界線あり）
   const nameBlank = document.createElement('div');
   nameBlank.style.cssText = 'border-right:1px solid var(--border)';
   nameRow.appendChild(nameBlank);
-  // 名前入力（2〜3列をまたぐ）
+  // 列2: 名前入力（持ち物特性列のみ）
   const nameWrap = document.createElement('div');
-  nameWrap.style.cssText = 'position:relative;grid-column:2/4';
+  nameWrap.style.cssText = 'position:relative;border-right:1px solid var(--border)';
   const nameInput = document.createElement('textarea');
   nameInput.className = 'pe-name-input';
   nameInput.placeholder = `${idx+1}体目のポケモン名`;
@@ -2661,6 +2676,12 @@ function buildPePokeCard(idx) {
   nameWrap.appendChild(nameInput);
   nameWrap.appendChild(nameAc);
   nameRow.appendChild(nameWrap);
+  // 列3,4は空（技・ステータス列の下段は使わない）
+  const nameEmpty3 = document.createElement('div');
+  nameEmpty3.style.cssText = 'border-right:1px solid var(--border)';
+  nameRow.appendChild(nameEmpty3);
+  const nameEmpty4 = document.createElement('div');
+  nameRow.appendChild(nameEmpty4);
   card.appendChild(nameRow);
 
   return card;
@@ -2678,13 +2699,23 @@ function buildStatsBtnHTML(idx) {
   const KEYS = ['hp','atk','def','spa','spd','spe'];
   const BKEYS = ['hp','atk','def','spatk','spdef','spd'];
   const ABBR = ['H','A','B','C','D','S'];
-  // 各ステータスを "H175" "A-93" "C+166" 形式で横並び
+  const evs = pk.evs || {hp:0,atk:0,def:0,spa:0,spd:0,spe:0};
+  // 各行: "H 22    175" / "A -        93" / "C 22+ 166"
+  // 3列: [キー+EV+補正(左寄せ)]  [算出値(右寄せ)]
   return KEYS.map((k,i) => {
-    const v = calcStat(k, parseInt(pd[BKEYS[i]])||0, pk.evs[k]||0, nd);
+    const base = parseInt(pd[BKEYS[i]]) || 0;
+    const ev = evs[k] || 0;
+    const v = calcStat(k, base, ev, nd);
     const mod = nd.up===k ? '+' : nd.down===k ? '-' : '';
-    const color = mod==='+' ? '#4ade80' : mod==='-' ? '#f87171' : 'var(--text-muted)';
-    // キー+補正 / 値 を縦2行で1枠
-    return `<div class="pe-stat-row"><span class="pe-stat-key" style="color:${color}">${ABBR[i]}${mod}</span><span class="pe-stat-val">${v}</span></div>`;
+    const color = mod==='+' ? '#4ade80' : mod==='-' ? '#f87171' : '';
+    // キー部分: "H" + EV値(>0なら表示) + 補正記号
+    // color は キー+EV+補正 の部分のみに適用
+    const evStr = ev > 0 ? String(ev) : '';
+    const keyPart = ABBR[i] + (evStr ? ' '+evStr : '') + (mod ? mod : '');
+    const keySpan = color
+      ? `<span style="color:${color}">${keyPart}</span>`
+      : `<span>${keyPart}</span>`;
+    return `<div class="pe-stat-row">${keySpan}<span class="pe-stat-val">${v}</span></div>`;
   }).join('');
 }
 
