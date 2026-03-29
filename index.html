@@ -298,55 +298,80 @@
   .pe-card-btn-clear:hover { color:#f87171; }
   .pe-card-btn-sep { color:var(--border); font-size:10px; line-height:1.8; }
 
-  /* カード全体グリッド: 4列×2行 */
+  /*
+   * カードグリッド: 4列 × 2行
+   *
+   * 行1 (上段):
+   *   col1: アイコン        [grid-column:1, grid-row:1]
+   *   col2: 持ち物+特性     [grid-column:2, grid-row:1]
+   *   col3: 技×4           [grid-column:3, grid-row:1]
+   *   col4: ステータス      [grid-column:4, grid-row:1]
+   *
+   * 行2 (下段):
+   *   名前セル              [grid-column:1/3, grid-row:2] ← 1〜2列span
+   *   col3下空白            [grid-column:3,   grid-row:2]
+   *   col4下空白            [grid-column:4,   grid-row:2]
+   *
+   * 1列目と2列目の間の縦線は上段(行1)のセルのborder-rightで実現。
+   * 下段(行2)の名前セルはgrid-column:1/3でまたぐため縦線なし。
+   */
   .pe-card-inner {
-    display:grid;
+    display: grid;
     grid-template-columns: 56px 0.85fr 0.75fr 1fr;
     grid-template-rows: auto auto;
-    min-height:0;
+    min-height: 0;
   }
-  /* 名前セル: 1〜2列をまたぐ（縦線なし）*/
+
+  /* 上段: アイコン列 (行1, 列1) */
+  .pe-col-icon {
+    grid-column: 1; grid-row: 1;
+    display: flex; align-items: center; justify-content: center;
+    padding: 4px 3px;
+    border-right: 1px solid var(--border);
+  }
+
+  /* 上段: 持ち物+特性列 (行1, 列2) */
+  .pe-col-item-ability {
+    grid-column: 2; grid-row: 1;
+    padding: 3px 4px;
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 2px; min-width: 0;
+  }
+
+  /* 上段: 技・ステータス列 (行1, 列3〜4) */
+  .pe-col {
+    grid-row: 1;
+    padding: 3px 4px;
+    border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; gap: 2px; min-width: 0;
+  }
+  .pe-col:last-child { border-right: none; }
+
+  /* 下段: 名前セル (行2, 列1〜2 span) — 縦線なし */
   .pe-name-cell {
-    grid-column: 1 / 3;
-    grid-row: 2;
+    grid-column: 1 / 3; grid-row: 2;
     border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    position: relative;
-    padding: 0;
-    overflow: visible;
+    display: flex; align-items: center;
+    position: relative; overflow: visible;
   }
-  /* 名前ラベル（左端・細め） */
+  /* 「名前」ラベル */
   .pe-name-lbl {
     flex: 0 0 auto;
     font-size: 9px; color: var(--text-muted); font-weight: 600;
-    padding: 2px 4px; white-space: nowrap;
-    border-right: none; /* 縦線なし */
+    padding: 2px 5px; white-space: nowrap;
+  }
+  /* 入力欄ラッパー */
+  .pe-name-input-wrap {
+    flex: 1; min-width: 0; position: relative;
   }
 
-  /* --- 技・ステータス列（row1） --- */
-  .pe-col {
-    grid-row: 1;
-    padding:3px 4px;
-    border-right:1px solid var(--border);
-    display:flex; flex-direction:column; gap:2px; min-width:0;
-  }
-  .pe-col:last-child { border-right:none; }
-  /* 名前行の3・4列下の空セル */
+  /* 下段: 技・ステータス列下の空セル (行2, 列3〜4) */
   .pe-name-empty {
     grid-row: 2;
     border-top: 1px solid var(--border);
     border-right: 1px solid var(--border);
   }
   .pe-name-empty:last-child { border-right: none; }
-
-  /* --- 1列目: アイコン（大）+ 名前は2列目下部 --- */
-  .pe-col-icon {
-    grid-column: 1; grid-row: 1;
-    display:flex; flex-direction:column; align-items:center;
-    justify-content:flex-start; gap:3px; padding:3px 3px;
-    border-right:1px solid var(--border);
-  }
   .pe-poke-picker-btn {
     width:46px; height:38px; background:var(--bg); border:1px solid var(--border);
     border-radius:5px; cursor:pointer; display:flex; align-items:center;
@@ -362,7 +387,6 @@
   /* --- 2列目: 持ち物 / 特性 / [下部に名前 colspan=2相当] --- */
   /* 名前は .pe-col-2-3 で 2列目と3列目をまたぐ行外に配置 */
   .pe-col-item-ability {
-    grid-column: 2; grid-row: 1;
     padding:3px 4px;
     border-right:1px solid var(--border);
     display:flex; flex-direction:column; gap:2px; min-width:0;
@@ -376,14 +400,14 @@
   }
   .pe-name-wrap { position:relative; }
   .pe-name-input {
-    flex:1; min-width:0;
-    font-size:10px; text-align:left; line-height:1.5;
-    background:transparent; border:none; color:var(--text);
-    border-radius:0; padding:2px 5px; outline:none; resize:none;
-    overflow:hidden; word-break:break-all;
-    box-sizing:border-box; display:block;
+    width: 100%;
+    font-size: 10px; line-height: 1.5;
+    background: var(--bg); border: none; color: var(--text);
+    padding: 2px 4px; outline: none; resize: none;
+    overflow: hidden; word-break: break-all;
+    box-sizing: border-box; display: block;
   }
-  .pe-name-input:focus { background:var(--surface2); }
+  .pe-name-input:focus { background: var(--surface); }
 
   /* --- 共通ラベル --- */
   .pe-label { font-size:9px; color:var(--text-muted); font-weight:600; line-height:1; margin-bottom:1px; }
@@ -2594,13 +2618,15 @@ function buildPePokeCard(idx) {
   card.className = 'pe-pokemon-card';
   card.dataset.peIdx = idx;
 
-  // ── カード全体グリッド（4列×2行） ──
-  // row1: アイコン | 持ち物+特性 | 技×4 | ステータス
-  // row2: [名前（1〜2列span）         ] | 空  | 空
+  // ── カード全体グリッド（4列×1行） ──
+  // col1: アイコン上部 ＋ 名前エリア下部（縦積みflex）
+  // 4列×2行グリッド:
+  //   行1: [アイコン] [持ち物+特性] [技×4] [ステータス]
+  //   行2: [名前(col1/3 span)      ] [空]  [空]
   const inner = document.createElement('div');
   inner.className = 'pe-card-inner';
 
-  // ── row1 列1: アイコン ──
+  // 行1・列1: アイコン
   const col1 = document.createElement('div');
   col1.className = 'pe-col-icon';
   const pickerBtn = document.createElement('button');
@@ -2612,47 +2638,36 @@ function buildPePokeCard(idx) {
   col1.appendChild(pickerBtn);
   inner.appendChild(col1);
 
-  // ── row1 列2: 持ち物 + 特性 ──
+  // 行1・列2: 持ち物 + 特性
   const col2 = document.createElement('div');
   col2.className = 'pe-col-item-ability';
   col2.innerHTML = '<div class="pe-label">持ち物</div>';
   const itemWrap = document.createElement('div');
   itemWrap.style.cssText = 'position:relative';
   const itemInput = document.createElement('input');
-  itemInput.type = 'text';
-  itemInput.className = 'pe-input';
-  itemInput.placeholder = '持ち物...';
-  itemInput.value = pk.item || '';
+  itemInput.type = 'text'; itemInput.className = 'pe-input';
+  itemInput.placeholder = '持ち物...'; itemInput.value = pk.item || '';
   itemInput.autocomplete = 'off';
   itemInput.oninput = function() { onPeItemInput(this, idx); };
   const itemAc = document.createElement('div');
-  itemAc.className = 'autocomplete-list';
-  itemAc.id = `pe-item-ac-${idx}`;
+  itemAc.className = 'autocomplete-list'; itemAc.id = `pe-item-ac-${idx}`;
   itemAc.style.cssText = 'z-index:100';
-  itemWrap.appendChild(itemInput);
-  itemWrap.appendChild(itemAc);
+  itemWrap.appendChild(itemInput); itemWrap.appendChild(itemAc);
   col2.appendChild(itemWrap);
   const abilLbl = document.createElement('div');
-  abilLbl.className = 'pe-label';
-  abilLbl.style.marginTop = '3px';
-  abilLbl.textContent = '特性';
-  col2.appendChild(abilLbl);
+  abilLbl.className = 'pe-label'; abilLbl.style.marginTop = '3px';
+  abilLbl.textContent = '特性'; col2.appendChild(abilLbl);
   const abilSel = document.createElement('select');
-  abilSel.className = 'pe-select';
-  abilSel.id = `pe-ability-${idx}`;
+  abilSel.className = 'pe-select'; abilSel.id = `pe-ability-${idx}`;
   buildAbilityOptions(abilSel, pk.name, pk.ability);
   abilSel.onchange = function() { pePokemons[idx].ability = this.value; };
   col2.appendChild(abilSel);
   inner.appendChild(col2);
 
-  // ── row1 列3: 技×4 ──
+  // 行1・列3: 技×4
   const col3 = document.createElement('div');
-  col3.className = 'pe-col';
-  col3.style.gridColumn = '3';
-  const movLbl = document.createElement('div');
-  movLbl.className = 'pe-label';
-  movLbl.textContent = '技';
-  col3.appendChild(movLbl);
+  col3.className = 'pe-col'; col3.style.gridColumn = '3';
+  col3.innerHTML = '<div class="pe-label">技</div>';
   for (let m = 0; m < 4; m++) {
     const moveBtn = document.createElement('button');
     moveBtn.className = 'pe-move-btn' + (pk.moves[m] ? ' filled' : '');
@@ -2663,38 +2678,30 @@ function buildPePokeCard(idx) {
   }
   inner.appendChild(col3);
 
-  // ── row1 列4: ステータス ──
+  // 行1・列4: ステータス
   const col4 = document.createElement('div');
-  col4.className = 'pe-col';
-  col4.style.gridColumn = '4';
-  const stLbl = document.createElement('div');
-  stLbl.className = 'pe-label';
-  stLbl.textContent = 'ステータス';
-  col4.appendChild(stLbl);
+  col4.className = 'pe-col'; col4.style.gridColumn = '4';
+  col4.innerHTML = '<div class="pe-label">ステータス</div>';
   const statsBtn = document.createElement('button');
-  statsBtn.className = 'pe-stats-btn';
-  statsBtn.id = `pe-stats-btn-${idx}`;
+  statsBtn.className = 'pe-stats-btn'; statsBtn.id = `pe-stats-btn-${idx}`;
   statsBtn.onclick = () => openStatsPopup(idx);
   statsBtn.innerHTML = buildStatsBtnHTML(idx);
   col4.appendChild(statsBtn);
   inner.appendChild(col4);
 
-  // ── row2: 名前セル（1〜2列span・縦線なし）+ 空×2 ──
+  // 行2・列1〜2: 名前セル (grid-column:1/3 でspan)
   const nameCell = document.createElement('div');
-  nameCell.className = 'pe-name-cell';
-  // 「名前」ラベル
-  const nameLbl = document.createElement('span');
-  nameLbl.className = 'pe-name-lbl';
-  nameLbl.textContent = '名前';
+  nameCell.className = 'pe-name-cell'; // CSSで grid-column:1/3, grid-row:2
+  const nameLbl = document.createElement('div');
+  nameLbl.className = 'pe-name-lbl'; nameLbl.textContent = '名前';
   nameCell.appendChild(nameLbl);
-  // テキストエリア
+  const nameWrap = document.createElement('div');
+  nameWrap.className = 'pe-name-input-wrap';
   const nameInput = document.createElement('textarea');
   nameInput.className = 'pe-name-input';
   nameInput.placeholder = `${idx+1}体目のポケモン名`;
-  nameInput.value = pk.name;
-  nameInput.autocomplete = 'off';
-  nameInput.rows = 1;
-  nameInput.dataset.peIdx = idx;
+  nameInput.value = pk.name; nameInput.autocomplete = 'off';
+  nameInput.rows = 1; nameInput.dataset.peIdx = idx;
   nameInput.oninput = function() {
     this.value = this.value.split('\n').join('');
     onPeNameInput(this, idx);
@@ -2704,21 +2711,18 @@ function buildPePokeCard(idx) {
     onPeNameKeydown(e, this, idx);
   };
   const nameAc = document.createElement('div');
-  nameAc.className = 'autocomplete-list';
-  nameAc.id = `pe-ac-${idx}`;
+  nameAc.className = 'autocomplete-list'; nameAc.id = `pe-ac-${idx}`;
   nameAc.style.cssText = 'left:0;top:100%;width:200px;z-index:100';
-  nameCell.appendChild(nameInput);
-  nameCell.appendChild(nameAc);
+  nameWrap.appendChild(nameInput); nameWrap.appendChild(nameAc);
+  nameCell.appendChild(nameWrap);
   inner.appendChild(nameCell);
 
-  // 空セル（技列下・ステータス列下）
+  // 行2・列3,4: 空セル
   const ne3 = document.createElement('div');
-  ne3.className = 'pe-name-empty';
-  ne3.style.gridColumn = '3';
+  ne3.className = 'pe-name-empty'; ne3.style.gridColumn = '3';
   inner.appendChild(ne3);
   const ne4 = document.createElement('div');
-  ne4.className = 'pe-name-empty';
-  ne4.style.gridColumn = '4';
+  ne4.className = 'pe-name-empty'; ne4.style.gridColumn = '4';
   inner.appendChild(ne4);
 
   card.appendChild(inner);
