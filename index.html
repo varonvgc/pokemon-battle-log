@@ -1321,7 +1321,7 @@ function dmSelectAction(action) {
   document.getElementById('dm-btn-search').className = 'btn ' + (action==='search' ? 'btn-primary' : 'btn-ghost');
   document.getElementById('dm-list-card').style.display = action === 'list' ? 'block' : 'none';
   if (action === 'list') {
-    if (dmType === 'pokemon') renderDmList();
+    renderDmList();
     return;
   }
   if (action === 'search') {
@@ -1759,6 +1759,19 @@ let dmListDraft = [];
 function renderDmList() {
   const body = document.getElementById('dm-list-body');
   const countEl = document.getElementById('dm-list-count');
+
+  if (dmType === 'move') {
+    // 技一覧：名前のみ表示
+    countEl.textContent = `全${localMoves.length}件`;
+    body.innerHTML = localMoves.map((m, i) => `
+      <div class="dm-list-row" style="cursor:pointer" onclick="dmShowForm(${i})">
+        <div class="dm-list-name">${m.name}</div>
+      </div>`
+    ).join('');
+    return;
+  }
+
+  // ポケモン一覧（従来通り）
   dmListDraft = localPokemon.map(p => ({ ...p }));
   const updateCount = () => {
     const n = dmListDraft.filter(p => p.confirmed).length;
