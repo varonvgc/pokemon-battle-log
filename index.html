@@ -513,6 +513,16 @@
     .pe-card-btn { font-size:11px; }
     .pe-card-btn-sep { font-size:11px; }
   }
+
+  /* メモアイコンボタン */
+  .memo-icon-btn {
+    background:none; border:none; cursor:pointer;
+    font-size:14px; line-height:1; padding:1px 3px;
+    color:var(--text-muted); transition:color .15s;
+    flex-shrink:0;
+  }
+  .memo-icon-btn:hover { color:var(--accent); }
+  .memo-icon-btn.has-memo { color:#fbbf24; } /* メモあり = 黄色 */
 </style>
 </head>
 <body>
@@ -745,14 +755,30 @@
 <div id="page-party-edit">
   <div class="pe-header-outer">
     <div class="pe-header">
-      <input type="text" id="pe-name-input" placeholder="パーティ名" maxlength="30">
       <button class="btn btn-ghost btn-sm" onclick="closePartyEdit()" style="white-space:nowrap;flex-shrink:0">✕</button>
       <button class="btn btn-primary btn-sm" onclick="savePartyEdit()" style="white-space:nowrap;flex-shrink:0">💾</button>
+      <input type="text" id="pe-name-input" placeholder="パーティ名" maxlength="30">
     </div>
   </div>
   <div class="pe-body" id="pe-body"></div>
 </div>
 
+
+<!-- MEMO MODAL -->
+<div class="modal-overlay" id="memo-modal" onclick="if(event.target===this)closeMemoModal()">
+  <div class="modal" style="max-width:480px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="font-size:16px;font-weight:700" id="memo-modal-title">メモ</div>
+      <button class="btn btn-ghost btn-sm" onclick="closeMemoModal()">✕</button>
+    </div>
+    <textarea id="memo-modal-text" rows="8" placeholder="メモを入力..."
+      style="width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:10px;font-size:14px;resize:vertical;outline:none;box-sizing:border-box;line-height:1.6"></textarea>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+      <button class="btn btn-ghost" onclick="closeMemoModal()">キャンセル</button>
+      <button class="btn btn-primary" onclick="saveMemoModal()">💾 保存</button>
+    </div>
+  </div>
+</div>
 <!-- MOVE PICKER POPUP -->
 <div class="move-picker-overlay" id="move-picker-overlay" onclick="if(event.target===this)closeMovePickerPopup()">
   <div class="move-picker-modal">
@@ -1531,6 +1557,7 @@ function renderParties() {
     <div class="party-card" data-party-id="${p.id}">
       <div class="flex justify-between items-center mb-3">
         <div class="party-name party-edit-trigger" data-party-id="${p.id}" style="cursor:pointer;flex:1">${p.name}</div>
+        <button class="memo-icon-btn party-memo-btn ${p.memo ? 'has-memo' : ''}" data-party-id="${p.id}" title="${p.memo ? 'メモあり' : 'メモを追加'}">📝</button>
         <button class="btn btn-ghost btn-sm party-copy-btn" data-party-id="${p.id}" style="margin-right:4px">コピー</button>
         <button class="btn btn-ghost btn-sm party-delete-btn" data-party-id="${p.id}">削除</button>
       </div>
@@ -1539,6 +1566,13 @@ function renderParties() {
       </div>
     </div>`;
   }).join('');
+  // メモボタン
+  grid.querySelectorAll('.party-memo-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      openPartyMemo(btn.dataset.partyId);
+    });
+  });
   // コピーボタン
   grid.querySelectorAll('.party-copy-btn').forEach(btn => {
     btn.addEventListener('click', e => {
@@ -2523,9 +2557,74 @@ function dmShowItemResult(name) {
 // ---- パーティ編集ページ（フルスクリーン） ----
 let pePokemons = []; // 編集中の6体分データ [{name,item,ability,moves,nature,evs}, ...]
 // 各スロットの空データ
+
+// ---- メモ機能 ----
+// _memoContext: { type: 'party'|'pokemon', partyId, pokeIdx }
+let _memoContext = null;
+
+function openMemoModal(ctx, title, currentText) {
+  _memoContext = ctx;
+  document.getElementById('memo-modal-title').textContent = title;
+  document.getElementById('memo-modal-text').value = currentText || '';
+  document.getElementById('memo-modal').classList.add('open');
+  setTimeout(() => document.getElementById('memo-modal-text').focus(), 50);
+}
+
+function closeMemoModal() {
+  document.getElementById('memo-modal').classList.remove('open');
+  _memoContext = null;
+}
+
+function saveMemoModal() {
+  const text = document.getElementById('memo-modal-text').value;
+  if (!_memoContext) { closeMemoModal(); return; }
+
+  if (_memoContext.type === 'party') {
+    // パーティメモ
+    const p = parties.find(x => x.id === _memoContext.partyId);
+    if (p) {
+      p.memo = text;
+      saveData();
+      renderParties(); // メモアイコンの色を更新
+    }
+  } else if (_memoContext.type === 'pokemon') {
+    // 個体メモ
+    const idx = _memoContext.pokeIdx;
+    if (pePokemons[idx]) {
+      pePokemons[idx].memo = text;
+      // メモアイコンの色更新
+      const btn = document.getElementById(`pe-memo-btn-${idx}`);
+      if (btn) btn.className = 'memo-icon-btn' + (text ? ' has-memo' : '');
+    }
+  }
+  closeMemoModal();
+}
+
+// パーティメモを開く
+function openPartyMemo(partyId) {
+  const p = parties.find(x => x.id === partyId);
+  if (!p) return;
+  openMemoModal(
+    { type: 'party', partyId },
+    `📝 ${p.name} のメモ`,
+    p.memo || ''
+  );
+}
+
+// 個体メモを開く
+function openPokeMemo(idx) {
+  const pk = pePokemons[idx];
+  const title = pk.name ? `📝 ${pk.name} のメモ` : `📝 ${idx+1}体目のメモ`;
+  openMemoModal(
+    { type: 'pokemon', pokeIdx: idx },
+    title,
+    pk.memo || ''
+  );
+}
+
 function peEmptyPoke() {
   return { name:'', item:'', ability:'', moves:['','','',''], nature:'まじめ',
-           evs:{hp:0,atk:0,def:0,spa:0,spd:0,spe:0} };
+           evs:{hp:0,atk:0,def:0,spa:0,spd:0,spe:0}, memo:'' };
 }
 
 function clearPeSlot(idx, wrapper) {
@@ -2551,7 +2650,8 @@ function openPartyEdit(id) {
         } else {
           pePokemons[i] = { ...peEmptyPoke(), ...pk,
             moves: [...(pk.moves || ['','','',''])],
-            evs: { hp:0,atk:0,def:0,spa:0,spd:0,spe:0, ...(pk.evs||{}) } };
+            evs: { hp:0,atk:0,def:0,spa:0,spd:0,spe:0, ...(pk.evs||{}) },
+            memo: pk.memo || '' };
         }
       });
     }
@@ -2573,7 +2673,7 @@ function savePartyEdit() {
   const dup = parties.find(p => p.name === name && p.id !== editingPartyId);
   if (dup) { alert('「' + name + '」という名前のパーティはすでに存在します'); return; }
   // pePokemons を保存形式に変換
-  const pokemon = pePokemons.map(pk => pk.name ? { ...pk, moves:[...pk.moves], evs:{...pk.evs} } : '');
+  const pokemon = pePokemons.map(pk => pk.name ? { ...pk, moves:[...pk.moves], evs:{...pk.evs}, memo:(pk.memo||'') } : '');
   if (editingPartyId) {
     const idx = parties.findIndex(p => p.id === editingPartyId);
     if (idx >= 0) { parties[idx].name = name; parties[idx].pokemon = pokemon; }
@@ -2670,9 +2770,17 @@ function buildPePokeCard(idx) {
   const inner = document.createElement('div');
   inner.className = 'pe-card-inner';
 
-  // 行1・列1: アイコン
+  // 行1・列1: アイコン（上部にメモボタン、下部にアイコン）
   const col1 = document.createElement('div');
   col1.className = 'pe-col-icon';
+  // メモボタン（アイコンの上）
+  const memoBtn = document.createElement('button');
+  memoBtn.className = 'memo-icon-btn' + (pk.memo ? ' has-memo' : '');
+  memoBtn.id = `pe-memo-btn-${idx}`;
+  memoBtn.title = pk.memo ? 'メモを編集' : 'メモを追加';
+  memoBtn.textContent = '📝';
+  memoBtn.onclick = () => openPokeMemo(idx);
+  col1.appendChild(memoBtn);
   const pickerBtn = document.createElement('button');
   pickerBtn.className = 'pe-poke-picker-btn';
   pickerBtn.id = `pe-picker-btn-${idx}`;
