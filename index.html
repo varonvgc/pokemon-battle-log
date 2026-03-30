@@ -525,14 +525,15 @@
   .memo-icon-btn.has-memo { color:#fbbf24; } /* メモあり = 黄色 */
 
   /* ===== コピーボード ===== */
-  #pe-copy-board {
+  .pe-copy-board-box {
     background: var(--surface);
     border: 2px solid var(--accent);
     border-radius: var(--radius);
     padding: 10px 12px;
     margin-bottom: 10px;
-    display: none; /* JS で block に */
   }
+  /* パーティ一覧のボードは JS で visible クラスを付けた時だけ表示 */
+  #pe-copy-board { display: none; }
   #pe-copy-board.visible { display: block; }
   .pe-copy-board-header {
     display: flex; align-items: center; justify-content: space-between;
@@ -794,7 +795,7 @@
       <input type="text" id="pe-name-input" placeholder="パーティ名" maxlength="30">
     </div>
   </div>
-  <div id="pe-copy-board-pe" style="display:none;padding:4px 6px 0;max-width:900px;margin:0 auto;"></div>
+  <div id="pe-copy-board-pe" style="display:none;margin:4px 6px 6px;max-width:900px;margin-left:auto;margin-right:auto;"></div>
   <div class="pe-body" id="pe-body"></div>
 </div>
 
@@ -2861,7 +2862,7 @@ function showCopyBoard() {
     board.innerHTML = '';
     return;
   }
-  board.className = 'visible';
+  board.className = 'visible pe-copy-board-box';
   board.innerHTML = _buildBoardHTML();
 }
 
@@ -2871,9 +2872,11 @@ function syncCopyBoardToPE() {
   if (!peBoard) return;
   if (!_copiedPoke) {
     peBoard.style.display = 'none';
+    peBoard.className = '';
     peBoard.innerHTML = '';
     return;
   }
+  peBoard.className = 'pe-copy-board-box';
   peBoard.style.display = 'block';
   peBoard.innerHTML = _buildBoardHTML();
 }
