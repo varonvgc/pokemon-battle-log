@@ -1942,7 +1942,7 @@ let dmType = null;
 let dmAction = null;
 let dmEditIndex = null;
 let localPokemon = JSON.parse(JSON.stringify(POKEMON_LIST));
-let localMoves   = JSON.parse(JSON.stringify(MOVES_LIST));
+let localMoves   = JSON.parse(JSON.stringify(MOVES_LIST)).map(m => ({ confirmed: true, ...m }));
 
 const NATURES_DATA = [
   { name:"さみしがり", up:"atk", down:"def" },
@@ -1972,7 +1972,7 @@ const NATURES_DATA = [
   { name:"まじめ", up:null, down:null }
 ];
 
-const localItems = ITEMS_LIST.slice(); // 持ち物リスト（変更不要・読み取り専用）
+let localItems = ITEMS_LIST.map(name => ({ name, confirmed: true })); // 持ち物リスト（confirmed付き）
 // 古いlocalStorageキーをクリア（pkm_master_pokemonは旧方式）
 localStorage.removeItem('pkm_master_pokemon');
 
@@ -2006,6 +2006,16 @@ function dmSelectAction(action) {
   document.getElementById('dm-list-card').style.display = action === 'list' ? 'block' : 'none';
   if (action === 'list') {
     renderDmList();
+    // 技・持ち物の一覧でも管理者に保存ボタン表示
+    const saveBtn = document.querySelector('#dm-list-card .btn-primary');
+    const cancelBtn = document.querySelector('#dm-list-card .btn-ghost');
+    if (isAdmin && (dmType === 'move' || dmType === 'item')) {
+      if (saveBtn) saveBtn.style.display = 'inline-flex';
+      if (cancelBtn) cancelBtn.style.display = 'inline-flex';
+    } else {
+      if (saveBtn) saveBtn.style.display = '';
+      if (cancelBtn) cancelBtn.style.display = '';
+    }
     return;
   }
   if (action === 'search') {
@@ -2097,7 +2107,7 @@ function dmShowForm(idx) {
   if (dmType === 'pokemon') {
     title.textContent = 'ポケモンを編集';
     const d = localPokemon[idx];
-    if (d.confirmed === undefined) d.confirmed = false;
+    if (d.confirmed === undefined) d.confirmed = true;
     const v = k => (d[k] ?? '').replace(/"/g,'&quot;');
     fields.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">基本情報</div><label style="display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer"><input type="checkbox" id="dmf-confirmed" style="width:18px;height:18px;accent-color:var(--accent)" ${d.confirmed ? 'checked' : ''}><span style="color:var(--accent);font-weight:600">内定</span></label></div>
@@ -2241,15 +2251,20 @@ async function dmSaveMasterData() {
       overrides[p.display] = p.confirmed;
     }
   });
+  // 持ち物：confirmed=falseのものだけ差分保存（デフォルトtrue）
+  const itemOverrides = {};
+  localItems.forEach(it => { if (!it.confirmed) itemOverrides[it.name] = false; });
+
   localStorage.setItem('pkm_confirmed_overrides', JSON.stringify(overrides));
   localStorage.setItem('pkm_master_moves', JSON.stringify(localMoves));
+  localStorage.setItem('pkm_item_overrides', JSON.stringify(itemOverrides));
 
   if (!_fbReady) return;
   try {
     // 全アカウント共通の shared コレクションに保存
     await window._firestoreOps.setDoc(
       window._firestoreOps.doc(window._db, 'shared', 'master'),
-      { overrides, moves: localMoves, updatedAt: window._firestoreOps.serverTimestamp() }
+      { overrides, moves: localMoves, itemOverrides, updatedAt: window._firestoreOps.serverTimestamp() }
     );
   } catch(e) { console.error('Master save error:', e); }
 }
@@ -2271,7 +2286,9 @@ async function dmLoadMasterData() {
       const overrides = JSON.parse(localStorage.getItem('pkm_confirmed_overrides') || '{}');
       applyOverrides(overrides);
       const cachedMoves = localStorage.getItem('pkm_master_moves');
-      if (cachedMoves) localMoves = JSON.parse(cachedMoves);
+      if (cachedMoves) localMoves = JSON.parse(cachedMoves).map(m => ({ confirmed: true, ...m }));
+      const cachedItemOv = JSON.parse(localStorage.getItem('pkm_item_overrides') || '{}');
+      localItems.forEach(it => { it.confirmed = !(it.name in cachedItemOv && !cachedItemOv[it.name]); });
     } catch(e) {}
     return;
   }
@@ -2283,13 +2300,16 @@ async function dmLoadMasterData() {
     if (snap.exists()) {
       const d = snap.data();
       if (d.overrides) {
-        // FirestoreのデータでlocalStorageを上書きしてから適用
         localStorage.setItem('pkm_confirmed_overrides', JSON.stringify(d.overrides));
         applyOverrides(d.overrides);
       }
       if (d.moves) {
-        localMoves = d.moves;
+        localMoves = d.moves.map(m => ({ confirmed: true, ...m }));
         localStorage.setItem('pkm_master_moves', JSON.stringify(localMoves));
+      }
+      if (d.itemOverrides) {
+        localStorage.setItem('pkm_item_overrides', JSON.stringify(d.itemOverrides));
+        localItems.forEach(it => { it.confirmed = !(it.name in d.itemOverrides && !d.itemOverrides[it.name]); });
       }
     } else {
       // shared/masterがまだ存在しない場合はデフォルト値を使用（何もしない）
@@ -2301,7 +2321,9 @@ async function dmLoadMasterData() {
       const overrides = JSON.parse(localStorage.getItem('pkm_confirmed_overrides') || '{}');
       applyOverrides(overrides);
       const cachedMoves = localStorage.getItem('pkm_master_moves');
-      if (cachedMoves) localMoves = JSON.parse(cachedMoves);
+      if (cachedMoves) localMoves = JSON.parse(cachedMoves).map(m => ({ confirmed: true, ...m }));
+      const cachedItemOv2 = JSON.parse(localStorage.getItem('pkm_item_overrides') || '{}');
+      localItems.forEach(it => { it.confirmed = !(it.name in cachedItemOv2 && !cachedItemOv2[it.name]); });
     } catch(e2) {}
   }
 }
@@ -2476,22 +2498,48 @@ function renderDmList() {
   const countEl = document.getElementById('dm-list-count');
 
   if (dmType === 'item') {
-    // 持ち物一覧：名前のみ・クリック不要
-    countEl.textContent = '全' + localItems.length + '件';
-    body.innerHTML = localItems.map(name =>
-      '<div class="dm-list-row"><div class="dm-list-name">' + name + '</div></div>'
+    // 持ち物一覧：内定チェックボックス付き
+    const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
+    const isAdminItem = currentUser && currentUser.uid === ADMIN_UID;
+    const confirmedItemCount = localItems.filter(it => it.confirmed).length;
+    countEl.textContent = `全${localItems.length}件 / 内定${confirmedItemCount}件`;
+    body.innerHTML = localItems.map((it, i) =>
+      `<div class="dm-list-row">
+        <div class="dm-list-name">${it.name}</div>
+        <input type="checkbox" class="dm-list-check dm-item-check" data-idx="${i}" ${it.confirmed ? 'checked' : ''}>
+      </div>`
     ).join('');
+    body.querySelectorAll('.dm-item-check').forEach(cb => {
+      if (!isAdminItem) { cb.disabled = true; cb.style.opacity = '0.4'; cb.style.cursor = 'not-allowed'; return; }
+      cb.addEventListener('change', () => {
+        localItems[parseInt(cb.dataset.idx)].confirmed = cb.checked;
+        const n = localItems.filter(it => it.confirmed).length;
+        countEl.textContent = `全${localItems.length}件 / 内定${n}件`;
+      });
+    });
     return;
   }
 
   if (dmType === 'move') {
-    // 技一覧：名前のみ表示
-    countEl.textContent = `全${localMoves.length}件`;
+    // 技一覧：内定チェックボックス付き＋クリックで編集
+    const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
+    const isAdminMove = currentUser && currentUser.uid === ADMIN_UID;
+    const confirmedMoveCount = localMoves.filter(m => m.confirmed !== false).length;
+    countEl.textContent = `全${localMoves.length}件 / 内定${confirmedMoveCount}件`;
     body.innerHTML = localMoves.map((m, i) => `
-      <div class="dm-list-row" style="cursor:pointer" onclick="dmShowForm(${i})">
-        <div class="dm-list-name">${m.name}</div>
+      <div class="dm-list-row">
+        <div class="dm-list-name" style="cursor:pointer;flex:1" onclick="dmShowForm(${i})">${m.name}</div>
+        <input type="checkbox" class="dm-list-check dm-move-check" data-idx="${i}" ${m.confirmed !== false ? 'checked' : ''}>
       </div>`
     ).join('');
+    body.querySelectorAll('.dm-move-check').forEach(cb => {
+      if (!isAdminMove) { cb.disabled = true; cb.style.opacity = '0.4'; cb.style.cursor = 'not-allowed'; return; }
+      cb.addEventListener('change', () => {
+        localMoves[parseInt(cb.dataset.idx)].confirmed = cb.checked;
+        const n = localMoves.filter(m => m.confirmed !== false).length;
+        countEl.textContent = `全${localMoves.length}件 / 内定${n}件`;
+      });
+    });
     return;
   }
 
@@ -2534,23 +2582,47 @@ async function dmSaveList() {
     alert('編集権限がありません');
     return;
   }
-  dmListDraft.forEach((p, i) => { localPokemon[i].confirmed = p.confirmed; });
+  // ポケモンの場合のみ dmListDraft を localPokemon に反映
+  if (dmType === 'pokemon') {
+    dmListDraft.forEach((p, i) => { localPokemon[i].confirmed = p.confirmed; });
+  }
+  // 技・持ち物は renderDmList 内でチェックボックス変更時に localMoves/localItems を直接更新済み
   await dmSaveMasterData();
   alert('登録しました！');
 }
 
 function dmCancelList() {
-  dmListDraft = [];
+  // 変更前の状態にリセット
+  if (dmType === 'pokemon') {
+    dmListDraft = [];
+  }
+  // 技・持ち物はリロード時にFirestoreから最新を読み込むため、再表示のみ
   dmSelectType(dmType);
 }
 
 // 持ち物の検索結果を一覧カードに表示（編集なし）
 function dmShowItemResult(name) {
+  const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
+  const isAdmin = currentUser && currentUser.uid === ADMIN_UID;
   const body = document.getElementById('dm-list-body');
   const countEl = document.getElementById('dm-list-count');
   countEl.textContent = '検索結果: ' + name;
-  body.innerHTML = '<div class="dm-list-row"><div class="dm-list-name">' + name + '</div></div>';
+  const item = localItems.find(it => it.name === name);
+  const confirmed = item ? item.confirmed !== false : true;
+  body.innerHTML = `<div class="dm-list-row">
+    <div class="dm-list-name">${name}</div>
+    <input type="checkbox" class="dm-list-check" id="dm-item-result-check" ${confirmed ? 'checked' : ''} ${!isAdmin ? 'disabled style="opacity:0.4;cursor:not-allowed"' : ''}>
+  </div>`;
+  if (isAdmin && item) {
+    document.getElementById('dm-item-result-check').addEventListener('change', function() {
+      item.confirmed = this.checked;
+    });
+  }
   document.getElementById('dm-list-card').style.display = 'block';
+  // 保存ボタン表示
+  const saveBtn = document.querySelector('#dm-list-card .btn-primary');
+  const cancelBtn = document.querySelector('#dm-list-card .btn-ghost');
+  if (isAdmin) { if (saveBtn) saveBtn.style.display='inline-flex'; if (cancelBtn) cancelBtn.style.display='inline-flex'; }
 }
 
 
@@ -3053,11 +3125,14 @@ function showPeItemAc(input, idx, val) {
   let hits;
   if (!val) {
     // 空: 最近選んだ持ち物を表示（最大10件）
-    hits = recentItems.slice(0, 10);
-    if (!hits.length) hits = localItems.slice(0, 10);
+    const confirmedItems = localItems.filter(it => it.confirmed !== false).map(it => it.name);
+    const recentConfirmed = recentItems.filter(n => confirmedItems.includes(n));
+    hits = recentConfirmed.slice(0, 10);
+    if (!hits.length) hits = confirmedItems.slice(0, 10);
   } else {
     const valKana = toKatakana(val), valHira = toHiragana(val);
-    const all = localItems.filter(name=>{ const h=toHiragana(name); return name.includes(valKana)||h.includes(valHira); });
+    const confirmedNames = localItems.filter(it => it.confirmed !== false).map(it => it.name);
+    const all = confirmedNames.filter(name=>{ const h=toHiragana(name); return name.includes(valKana)||h.includes(valHira); });
     const sw = all.filter(n=>toHiragana(n).startsWith(valHira)||n.startsWith(valKana));
     const ot = all.filter(n=>!toHiragana(n).startsWith(valHira)&&!n.startsWith(valKana));
     hits = [...sw,...ot].slice(0, 15);
@@ -3136,7 +3211,7 @@ function toggleMovePickerType(t) {
 function filterMovePicker(val) {
   const body = document.getElementById('move-picker-body');
   const valKana=toKatakana(val.trim()), valHira=toHiragana(val.trim());
-  let list = (localMoves||MOVES_LIST);
+  let list = (localMoves||MOVES_LIST).filter(m => m.confirmed !== false); // 内定のみ
   if (_movePkActiveType) list=list.filter(m=>m.type===_movePkActiveType);
   if (val.trim()) list=list.filter(m=>{ const h=toHiragana(m.name); return m.name.includes(valKana)||h.includes(valHira); });
   body.innerHTML = list.map(m=>{
