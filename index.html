@@ -794,6 +794,7 @@
       <input type="text" id="pe-name-input" placeholder="パーティ名" maxlength="30">
     </div>
   </div>
+  <div id="pe-copy-board-pe" style="display:none;padding:4px 6px 0;max-width:900px;margin:0 auto;"></div>
   <div class="pe-body" id="pe-body"></div>
 </div>
 
@@ -2772,14 +2773,14 @@ function openPartyEdit(id) {
   document.getElementById('page-party-edit').classList.add('active');
   document.getElementById('page-party-edit').scrollTop = 0;
   // コピーボードがあれば party-edit 内にも表示
-  setTimeout(() => syncCopyBoardToPE(), 50);
+  syncCopyBoardToPE();
 }
 
 function closePartyEdit() {
   document.getElementById('page-party-edit').classList.remove('active');
-  // pe内のボードを削除（parties画面のボードは showPage>renderParties>showCopyBoard で復元）
-  const inner = document.getElementById('pe-copy-board-inner');
-  if (inner) inner.remove();
+  // pe内のボードをリセット（parties画面のボードは renderParties > showCopyBoard で復元）
+  const peBoard = document.getElementById('pe-copy-board-pe');
+  if (peBoard) { peBoard.style.display = 'none'; peBoard.innerHTML = ''; }
 }
 
 function savePartyEdit() {
@@ -2833,76 +2834,59 @@ function renderPartyEditBody() {
 // ===== コピーボード機能 =====
 let _copiedPoke = null; // コピーされたポケモンデータ
 
-// ボードのHTMLを生成して表示
-function showCopyBoard() {
+// コピーボードのHTML文字列を生成
+function _buildBoardHTML() {
   const pk = _copiedPoke;
-  if (!pk) return;
-
-  const board = document.getElementById('pe-copy-board');
-  if (!board) return;
-
+  if (!pk) return '';
   const moves = (pk.moves || []).filter(Boolean).join(' / ') || '技なし';
-  const item  = pk.item || 'なし';
-  const nature = pk.nature || 'まじめ';
-  const ability = pk.ability || 'なし';
-
-  board.className = 'visible';
-  board.innerHTML = `
-    <div class="pe-copy-board-header">
+  return `<div class="pe-copy-board-header">
       <span class="pe-copy-board-title">📋 クリップボード</span>
       <button class="pe-copy-board-del" onclick="clearCopyBoard()">✕ 削除</button>
     </div>
     <div class="pe-copy-board-body">
       <span class="pe-copy-board-name">${pk.name || '(未設定)'}</span>
-      <span class="pe-copy-board-tag">${item}</span>
-      <span class="pe-copy-board-tag">${ability}</span>
+      <span class="pe-copy-board-tag">${pk.item || 'なし'}</span>
+      <span class="pe-copy-board-tag">${pk.ability || 'なし'}</span>
       <span class="pe-copy-board-tag">${moves}</span>
-      <span class="pe-copy-board-tag">${nature}</span>
+      <span class="pe-copy-board-tag">${pk.nature || 'まじめ'}</span>
     </div>`;
+}
 
-  // page-party-edit内にもボードを同期表示
-  syncCopyBoardToPE();
+// パーティ一覧のボードを更新
+function showCopyBoard() {
+  const board = document.getElementById('pe-copy-board');
+  if (!board) return;
+  if (!_copiedPoke) {
+    board.className = '';
+    board.innerHTML = '';
+    return;
+  }
+  board.className = 'visible';
+  board.innerHTML = _buildBoardHTML();
 }
 
 // page-party-edit 内のボードを同期
 function syncCopyBoardToPE() {
-  let peBoard = document.getElementById('pe-copy-board-inner');
+  const peBoard = document.getElementById('pe-copy-board-pe');
+  if (!peBoard) return;
   if (!_copiedPoke) {
-    if (peBoard) peBoard.remove();
+    peBoard.style.display = 'none';
+    peBoard.innerHTML = '';
     return;
   }
-  if (!peBoard) {
-    peBoard = document.createElement('div');
-    peBoard.id = 'pe-copy-board-inner';
-    peBoard.style.cssText = 'margin:4px 6px 0;max-width:900px;margin-left:auto;margin-right:auto;';
-    const peBody = document.getElementById('pe-body');
-    if (peBody) peBody.parentElement.insertBefore(peBoard, peBody);
-  }
-  const pk = _copiedPoke;
-  const moves = (pk.moves || []).filter(Boolean).join(' / ') || '技なし';
-  peBoard.innerHTML = `
-    <div id="pe-copy-board" style="margin-bottom:6px">
-      <div class="pe-copy-board-header">
-        <span class="pe-copy-board-title">📋 クリップボード</span>
-        <button class="pe-copy-board-del" onclick="clearCopyBoard()">✕ 削除</button>
-      </div>
-      <div class="pe-copy-board-body">
-        <span class="pe-copy-board-name">${pk.name || '(未設定)'}</span>
-        <span class="pe-copy-board-tag">${pk.item || 'なし'}</span>
-        <span class="pe-copy-board-tag">${pk.ability || 'なし'}</span>
-        <span class="pe-copy-board-tag">${moves}</span>
-        <span class="pe-copy-board-tag">${pk.nature || 'まじめ'}</span>
-      </div>
-    </div>`;
+  peBoard.style.display = 'block';
+  peBoard.innerHTML = _buildBoardHTML();
 }
 
 // コピーボードを消去
 function clearCopyBoard() {
   _copiedPoke = null;
+  // パーティ一覧ボード
   const board = document.getElementById('pe-copy-board');
   if (board) { board.className = ''; board.innerHTML = ''; }
-  const inner = document.getElementById('pe-copy-board-inner');
-  if (inner) inner.remove();
+  // 個体詳細ボード
+  const peBoard = document.getElementById('pe-copy-board-pe');
+  if (peBoard) { peBoard.style.display = 'none'; peBoard.innerHTML = ''; }
 }
 
 // ポケモンをコピー
@@ -2919,7 +2903,8 @@ function copyPeSlot(idx) {
     evs: { ...(pk.evs || {hp:0,atk:0,def:0,spa:0,spd:0,spe:0}) },
     memo: pk.memo || ''
   };
-  showCopyBoard();
+  showCopyBoard();      // パーティ一覧ボード更新
+  syncCopyBoardToPE(); // 個体詳細ボード更新
 }
 
 // ペースト
