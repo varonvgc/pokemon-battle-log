@@ -3159,8 +3159,14 @@ function setPePickerIcon(btn, pokeName) {
 function buildAbilityOptions(sel, pokeName, current) {
   sel.innerHTML = '<option value="">（なし）</option>';
   if (pokeName) {
-    const pd = (localPokemon||POKEMON_LIST).find(p=>p.display===pokeName);
+    const src = localPokemon || POKEMON_LIST;
+    let pd = src.find(p => p.display === pokeName);
     if (pd) {
+      // メガフォームの場合はベースポケモン（同じname、formなし）の特性を使う
+      if (pd.form && pd.form.includes('メガ')) {
+        const base = src.find(p => p.name === pd.name && p.form === '通常');
+        if (base) pd = base;
+      }
       [pd.ability1, pd.ability2, pd.ability_hidden].filter(Boolean).forEach(ab => {
         const opt = document.createElement('option');
         opt.value = ab; opt.textContent = ab;
