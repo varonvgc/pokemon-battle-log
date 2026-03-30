@@ -766,13 +766,13 @@
 
 <!-- MEMO MODAL -->
 <div id="memo-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:600;align-items:flex-end;justify-content:center;padding:0">
-  <div style="background:var(--surface);border-radius:16px 16px 0 0;width:100%;max-width:600px;padding:20px;box-sizing:border-box;display:flex;flex-direction:column;max-height:92vh">
+  <div style="background:var(--surface);border-radius:16px 16px 0 0;width:100%;max-width:600px;padding:20px;box-sizing:border-box;display:flex;flex-direction:column;height:92vh">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-shrink:0">
       <div style="font-size:17px;font-weight:700" id="memo-modal-title">メモ</div>
       <button class="btn btn-ghost btn-sm" onclick="closeMemoModal()">✕</button>
     </div>
     <textarea id="memo-modal-text" placeholder="メモを入力..."
-      style="flex:1;min-height:200px;width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:12px;font-size:15px;resize:none;outline:none;box-sizing:border-box;line-height:1.7"></textarea>
+      style="flex:1;width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:12px;font-size:15px;resize:none;outline:none;box-sizing:border-box;line-height:1.7"></textarea>
     <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px;flex-shrink:0">
       <button class="btn btn-ghost" onclick="closeMemoModal()">キャンセル</button>
       <button class="btn btn-primary" onclick="saveMemoModal()">💾 保存</button>
