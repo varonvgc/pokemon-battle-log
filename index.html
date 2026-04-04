@@ -1329,6 +1329,8 @@ function showPage(name, btn) {
   // 記録・履歴・データ管理への遷移時はコピーボードを消去
   if (['record','history','datamanage'].includes(name)) clearCopyBoard();
   if (name === 'parties') { renderParties(); showCopyBoard(); checkAndPromptReload(); }
+  if (name === 'record') checkAndPromptReload();
+  if (name === 'history') checkAndPromptReload();
   if (name === 'record') renderRecordPage();
   if (name === 'history') renderHistory();
   if (name === 'datamanage') { dmType=null; dmAction=null;
@@ -1842,7 +1844,9 @@ function setResult(r) {
   document.getElementById('btn-lose').classList.toggle('active', r === 'lose');
 }
 
-function saveRecord() {
+async function saveRecord() {
+  const reloading = await checkAndPromptReload();
+  if (reloading) return;
   if (!selectedPartyId) { alert('パーティを選択してください'); return; }
   if (!recordResult) { alert('勝敗を選択してください'); return; }
   const oppParty = getSlotValues('opp-party-slots', 6);
@@ -2006,7 +2010,9 @@ function closeDetailModal() {
   document.getElementById('detail-modal').classList.remove('open');
 }
 
-function deleteRecord(id) {
+async function deleteRecord(id) {
+  const reloading = await checkAndPromptReload();
+  if (reloading) return;
   if (!confirm('この記録を削除しますか？')) return;
   records = records.filter(r => r.id !== id);
   saveData();
@@ -2240,6 +2246,8 @@ function dmAutoDisplay() {
 }
 
 async function dmSaveEntry() {
+  const reloading = await checkAndPromptReload();
+  if (reloading) return;
   const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
   if (!currentUser || currentUser.uid !== ADMIN_UID) {
     alert('編集権限がありません');
@@ -2655,6 +2663,8 @@ function renderDmList() {
 }
 
 async function dmSaveList() {
+  const reloading = await checkAndPromptReload();
+  if (reloading) return;
   const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
   if (!currentUser || currentUser.uid !== ADMIN_UID) {
     alert('編集権限がありません');
