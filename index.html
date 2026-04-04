@@ -557,9 +557,39 @@
   .pe-copy-board-tag {
     background: var(--surface2); border-radius: 4px; padding: 1px 5px;
   }
+
+  /* 他端末更新バナー */
+  #conflict-banner {
+    display: none;
+    position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+    background: #b45309; color: #fff;
+    padding: 10px 16px;
+    display: none; align-items: center; justify-content: space-between; gap: 10px;
+    font-size: 13px; font-weight: 600;
+    box-shadow: 0 2px 8px rgba(0,0,0,.4);
+  }
+  #conflict-banner.show { display: flex; }
+  #conflict-banner-reload {
+    background: #fff; color: #b45309;
+    border: none; border-radius: 6px;
+    padding: 4px 14px; font-size: 13px; font-weight: 700;
+    cursor: pointer; flex-shrink: 0;
+    white-space: nowrap;
+  }
+  #conflict-banner-dismiss {
+    background: none; border: none; color: rgba(255,255,255,.8);
+    cursor: pointer; font-size: 16px; padding: 0 4px; flex-shrink: 0;
+  }
 </style>
 </head>
 <body>
+<div id="conflict-banner">
+  <span>⚠️ 別の端末でデータが更新されています</span>
+  <div style="display:flex;align-items:center;gap:8px">
+    <button id="conflict-banner-reload" onclick="location.reload()">リロード</button>
+    <button id="conflict-banner-dismiss" onclick="dismissConflictBanner()" title="閉じる">✕</button>
+  </div>
+</div>
 
 <nav>
   <span class="logo">⚔️ 対戦記録</span>
@@ -1210,39 +1240,65 @@ async function saveData() {
       parties, records, updatedAt: window._firestoreOps.serverTimestamp()
     });
     _lastLoadedAt = Date.now();
+    // 自分が保存したのでバナーを消す
+    _conflictBannerDismissed = false;
+    const b = document.getElementById('conflict-banner');
+    if (b) b.classList.remove('show');
   } catch(e) { console.error('Firestore save error:', e); }
 }
 
 // 他端末の変更を検知してリロードを促す（入力前チェック用）
 // 変更あり→true、なし→false を返す
 let _conflictCheckBusy = false;
-async function checkAndPromptReload() {
-  if (!currentUser || !_fbReady || _lastLoadedAt === 0 || _conflictCheckBusy) return false;
+let _conflictBannerDismissed = false;
+
+// バナーを表示
+function showConflictBanner() {
+  const b = document.getElementById('conflict-banner');
+  if (b) b.classList.add('show');
+}
+// バナーを閉じる（「✕」押下時。保存時に自動消去もする）
+function dismissConflictBanner() {
+  _conflictBannerDismissed = true;
+  const b = document.getElementById('conflict-banner');
+  if (b) b.classList.remove('show');
+}
+
+// バックグラウンドで競合チェックし、変更があればバナー表示
+async function bgConflictCheck() {
+  if (!currentUser || !_fbReady || _lastLoadedAt === 0 || _conflictCheckBusy) return;
+  if (_conflictBannerDismissed) return; // 一度閉じたら再表示しない
   _conflictCheckBusy = true;
   try {
     const { doc, getDoc } = window._firestoreOps;
     const snap = await getDoc(doc(window._db, 'users', currentUser.uid, 'data', 'main'));
-    if (!snap.exists()) return false;
+    if (!snap.exists()) return;
     const ud = snap.data().updatedAt;
     const serverTime = (ud && ud.toMillis) ? ud.toMillis() : 0;
     if (serverTime > _lastLoadedAt) {
-      const ok = confirm(
-        '別の端末でデータが更新されています。\n' +
-        'リロードして最新データを取得しますか？\n\n' +
-        'OK → リロード（最新データに更新）\n' +
-        'キャンセル → このまま続ける（この端末の内容で上書きされる可能性があります）'
-      );
-      if (ok) {
-        location.reload();
-        return true;
-      }
+      showConflictBanner();
     }
-    return false;
   } catch(e) {
-    return false;
+    // チェック失敗は無視
   } finally {
     _conflictCheckBusy = false;
   }
+}
+
+// 保存・操作前の確認（バナーが出ていれば confirm で確認）
+async function checkAndPromptReload() {
+  const banner = document.getElementById('conflict-banner');
+  const bannerVisible = banner && banner.classList.contains('show');
+  if (!bannerVisible) return false;
+  // バナーが出ている = 他端末で変更あり → confirmで確認
+  const ok = confirm(
+    '別の端末でデータが更新されています。\n' +
+    'リロードして最新データを取得しますか？\n\n' +
+    'OK → リロード\n' +
+    'キャンセル → このまま続ける（この端末の内容で上書きされます）'
+  );
+  if (ok) { location.reload(); return true; }
+  return false;
 }
 
 // Firestoreからロード
@@ -1263,7 +1319,22 @@ async function loadFromFirestore() {
       const ud2 = data.updatedAt; _lastLoadedAt = (ud2 && ud2.toMillis) ? ud2.toMillis() : Date.now();
     }
     await dmLoadMasterData();
+    // 読み込み完了後にバックグラウンドチェックを開始
+    startConflictPolling();
   } catch(e) { console.error('Firestore load error:', e); }
+}
+
+// バックグラウンド競合チェックの開始
+let _conflictPollingStarted = false;
+function startConflictPolling() {
+  if (_conflictPollingStarted) return;
+  _conflictPollingStarted = true;
+  // タブがフォアグラウンドに戻った時にチェック
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) bgConflictCheck();
+  });
+  // 60秒ごとにバックグラウンドチェック
+  setInterval(bgConflictCheck, 60000);
 }
 
 // 認証トグル
