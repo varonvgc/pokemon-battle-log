@@ -1193,7 +1193,11 @@ function sortByRecent(arr) {
 let currentUser = null;
 let _fbReady = false;
 
+// 最後にこの端末が読み込んだ updatedAt（ミリ秒）
+let _lastLoadedAt = 0;
+
 // Firestore保存（ログイン中のみ、localStorageにも同時保存）
+// 保存前に他端末の変更を検知して警告する
 async function saveData() {
   localStorage.setItem('pkm_parties', JSON.stringify(parties));
   localStorage.setItem('pkm_records', JSON.stringify(records));
@@ -1205,7 +1209,40 @@ async function saveData() {
     await setDoc(doc(db, 'users', uid, 'data', 'main'), {
       parties, records, updatedAt: window._firestoreOps.serverTimestamp()
     });
+    _lastLoadedAt = Date.now();
   } catch(e) { console.error('Firestore save error:', e); }
+}
+
+// 他端末の変更を検知してリロードを促す（入力前チェック用）
+// 変更あり→true、なし→false を返す
+let _conflictCheckBusy = false;
+async function checkAndPromptReload() {
+  if (!currentUser || !_fbReady || _lastLoadedAt === 0 || _conflictCheckBusy) return false;
+  _conflictCheckBusy = true;
+  try {
+    const { doc, getDoc } = window._firestoreOps;
+    const snap = await getDoc(doc(window._db, 'users', currentUser.uid, 'data', 'main'));
+    if (!snap.exists()) return false;
+    const ud = snap.data().updatedAt;
+    const serverTime = (ud && ud.toMillis) ? ud.toMillis() : 0;
+    if (serverTime > _lastLoadedAt) {
+      const ok = confirm(
+        '別の端末でデータが更新されています。\n' +
+        'リロードして最新データを取得しますか？\n\n' +
+        'OK → リロード（最新データに更新）\n' +
+        'キャンセル → このまま続ける（この端末の内容で上書きされる可能性があります）'
+      );
+      if (ok) {
+        location.reload();
+        return true;
+      }
+    }
+    return false;
+  } catch(e) {
+    return false;
+  } finally {
+    _conflictCheckBusy = false;
+  }
 }
 
 // Firestoreからロード
@@ -1222,6 +1259,8 @@ async function loadFromFirestore() {
       records = data.records || [];
       localStorage.setItem('pkm_parties', JSON.stringify(parties));
       localStorage.setItem('pkm_records', JSON.stringify(records));
+      // 読み込み時刻を記録（競合検知用）
+      const ud2 = data.updatedAt; _lastLoadedAt = (ud2 && ud2.toMillis) ? ud2.toMillis() : Date.now();
     }
     await dmLoadMasterData();
   } catch(e) { console.error('Firestore load error:', e); }
@@ -1289,7 +1328,7 @@ function showPage(name, btn) {
   else if (event && event.target) event.target.classList.add('active');
   // 記録・履歴・データ管理への遷移時はコピーボードを消去
   if (['record','history','datamanage'].includes(name)) clearCopyBoard();
-  if (name === 'parties') { renderParties(); showCopyBoard(); }
+  if (name === 'parties') { renderParties(); showCopyBoard(); checkAndPromptReload(); }
   if (name === 'record') renderRecordPage();
   if (name === 'history') renderHistory();
   if (name === 'datamanage') { dmType=null; dmAction=null;
@@ -2747,7 +2786,10 @@ function clearPeSlot(idx, wrapper) {
 function openPartyModal(id) { openPartyEdit(id); }
 function closePartyModal() { closePartyEdit(); }
 
-function openPartyEdit(id) {
+async function openPartyEdit(id) {
+  // 入力前に他端末の変更をチェック
+  const reloading = await checkAndPromptReload();
+  if (reloading) return;
   editingPartyId = id || null;
   pePokemons = Array.from({length:6}, () => peEmptyPoke());
   if (id) {
