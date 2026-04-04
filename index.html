@@ -1285,20 +1285,30 @@ async function bgConflictCheck() {
   }
 }
 
-// 保存・操作前の確認（バナーが出ていれば confirm で確認）
+// 保存・操作前の確認（毎回Firestoreに問い合わせて即時判定）
 async function checkAndPromptReload() {
-  const banner = document.getElementById('conflict-banner');
-  const bannerVisible = banner && banner.classList.contains('show');
-  if (!bannerVisible) return false;
-  // バナーが出ている = 他端末で変更あり → confirmで確認
-  const ok = confirm(
-    '別の端末でデータが更新されています。\n' +
-    'リロードして最新データを取得しますか？\n\n' +
-    'OK → リロード\n' +
-    'キャンセル → このまま続ける（この端末の内容で上書きされます）'
-  );
-  if (ok) { location.reload(); return true; }
-  return false;
+  if (!currentUser || !_fbReady || _lastLoadedAt === 0) return false;
+  try {
+    const { doc, getDoc } = window._firestoreOps;
+    const snap = await getDoc(doc(window._db, 'users', currentUser.uid, 'data', 'main'));
+    if (!snap.exists()) return false;
+    const ud = snap.data().updatedAt;
+    const serverTime = (ud && ud.toMillis) ? ud.toMillis() : 0;
+    if (serverTime > _lastLoadedAt) {
+      // バナーも表示
+      showConflictBanner();
+      const ok = confirm(
+        '別の端末でデータが更新されています。\n' +
+        'リロードして最新データを取得しますか？\n\n' +
+        'OK → リロード\n' +
+        'キャンセル → このまま続ける（この端末の内容で上書きされます）'
+      );
+      if (ok) { location.reload(); return true; }
+    }
+    return false;
+  } catch(e) {
+    return false; // 通信失敗時は無視して続行
+  }
 }
 
 // Firestoreからロード
@@ -1404,7 +1414,7 @@ function showPage(name, btn) {
   if (name === 'history') checkAndPromptReload();
   if (name === 'record') renderRecordPage();
   if (name === 'history') renderHistory();
-  if (name === 'datamanage') { dmType=null; dmAction=null;
+  if (name === 'datamanage') { checkAndPromptReload(); dmType=null; dmAction=null;
     ['dm-tab-pokemon','dm-tab-move','dm-tab-item','dm-btn-list','dm-btn-search'].forEach(id => { const el=document.getElementById(id); if(el) el.className='btn btn-ghost'; });
     document.getElementById('dm-action-area').style.display='none';
     document.getElementById('dm-form-card').style.display='none';
