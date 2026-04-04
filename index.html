@@ -583,7 +583,7 @@
   <div class="flex justify-between items-center mb-4">
     <div>
       <h2 style="font-size:20px;font-weight:700">自分のパーティ</h2>
-      <p class="text-muted mt-2">最大50個まで登録できます</p>
+      <p class="text-muted mt-2">自由に登録できます</p>
     </div>
     <button class="btn btn-primary" onclick="openPartyEdit(null)">＋ 新規登録</button>
   </div>
@@ -1682,7 +1682,6 @@ function saveParty() {
     const idx = parties.findIndex(p => p.id === editingPartyId);
     if (idx >= 0) { parties[idx].name = name; parties[idx].pokemon = pokemon; }
   } else {
-    if (parties.length >= 50) { alert('パーティは最大50個まで登録できます'); return; }
     // ③ 新規は先頭に追加
     parties.unshift({ id: Date.now().toString(), name, pokemon });
   }
@@ -2795,7 +2794,6 @@ function savePartyEdit() {
     const idx = parties.findIndex(p => p.id === editingPartyId);
     if (idx >= 0) { parties[idx].name = name; parties[idx].pokemon = pokemon; }
   } else {
-    if (parties.length >= 50) { alert('パーティは最大50個まで登録できます'); return; }
     parties.unshift({ id: Date.now().toString(), name, pokemon });
   }
   saveData();
@@ -2812,7 +2810,6 @@ function editParty(id) { openPartyEdit(id); }
 function copyParty(id) {
   const p = parties.find(x => x.id === id);
   if (!p) return;
-  if (parties.length >= 50) { alert('パーティは最大50個まで登録できます'); return; }
   const copy = JSON.parse(JSON.stringify(p));
   copy.id = Date.now().toString();
   copy.name = p.name + 'のコピー';
