@@ -1239,7 +1239,18 @@ async function saveData() {
     await setDoc(doc(db, 'users', uid, 'data', 'main'), {
       parties, records, updatedAt: window._firestoreOps.serverTimestamp()
     });
-    _lastLoadedAt = Date.now();
+    // サーバー時刻と合わせるため、保存直後に読み直して _lastLoadedAt を更新
+    try {
+      const saved = await window._firestoreOps.getDoc(doc(db, 'users', uid, 'data', 'main'));
+      if (saved.exists()) {
+        const ud = saved.data().updatedAt;
+        _lastLoadedAt = (ud && ud.toMillis) ? ud.toMillis() : Date.now();
+      } else {
+        _lastLoadedAt = Date.now();
+      }
+    } catch(e2) {
+      _lastLoadedAt = Date.now();
+    }
     // 自分が保存したのでバナーを消す
     _conflictBannerDismissed = false;
     const b = document.getElementById('conflict-banner');
