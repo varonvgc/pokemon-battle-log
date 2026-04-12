@@ -689,20 +689,23 @@
       </div>
     </div>
     <div style="margin-bottom:10px">
-      <label>自分の選出で絞り込み
-        <span id="my-sel-filter-hint" style="color:var(--text-muted);font-weight:400;font-size:11px">（パーティを選択してください）</span>
-      </label>
-      <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
-        <select id="my-sel-filter-select" onchange="onMySelFilterChange(this.value)" disabled style="flex:1">
-          <option value="">-- ポケモンを選択 --</option>
-        </select>
-        <button class="btn btn-ghost btn-sm" id="my-sel-clear-btn" onclick="clearMySelFilter()" style="display:none">×</button>
+      <label>自分の選出で絞り込み</label>
+      <div style="position:relative;margin-top:4px">
+        <input type="text" id="my-sel-filter-input" placeholder="ポケモン名を入力..." autocomplete="off"
+          oninput="onMySelFilterInput(this)" onfocus="onMySelFilterFocus(this)"
+          onkeydown="onMySelFilterKeydown(event,this)"
+          style="font-size:16px;width:100%;box-sizing:border-box">
+        <div id="my-sel-filter-ac" class="autocomplete-list my-sel-ac"></div>
+      </div>
+      <div id="my-sel-filter-tag" style="display:none;align-items:center;gap:6px;margin-top:6px">
+        <span id="my-sel-filter-name" style="background:var(--surface2);padding:3px 10px;border-radius:20px;font-size:13px"></span>
+        <button class="btn btn-ghost btn-sm" onclick="clearMySelFilter()">×</button>
       </div>
       <div id="my-sel-rate" style="font-size:12px;color:var(--accent);margin-top:4px;display:none"></div>
     </div>
     <div>
       <label>相手のパーティで絞り込み
-        <span style="color:var(--text-muted);font-weight:400;font-size:11px">（選択中パーティの試合から）</span>
+        
       </label>
       <div style="position:relative;margin-top:4px">
         <input type="text" id="opp-party-filter-input" placeholder="ポケモン名を入力..." autocomplete="off"
@@ -1620,8 +1623,8 @@ document.addEventListener('click', e => {
   // pe-col-item-ability(持ち物) / pe-name-cell(ポケモン名) 内のクリックはPEのACを閉じない
   const inPeItemArea = e.target.closest('.pe-col-item-ability') || e.target.closest('.pe-name-input-wrap');
   if (!e.target.closest('.pokemon-slot') && !inPeItemArea) {
-    // opp-party-ac / pe用ACは除外しない — すべて閉じる（PE内は上で守る）
-    document.querySelectorAll('.autocomplete-list:not(.opp-party-ac)').forEach(l => l.classList.remove('open'));
+    // opp-party-ac / my-sel-ac / pe用ACは除外しない — すべて閉じる（PE内は上で守る）
+    document.querySelectorAll('.autocomplete-list:not(.opp-party-ac):not(.my-sel-ac)').forEach(l => l.classList.remove('open'));
   }
 });
 
@@ -1644,39 +1647,7 @@ function setSlotValues(containerId, values) {
 }
 
 // ---- FILTER SELECTS ----
-// 自分の選出フィルター: パーティ選択に連動して選択肢を更新
-function updateMySelFilterSelect() {
-  const sel = document.getElementById('my-sel-filter-select');
-  const hint = document.getElementById('my-sel-filter-hint');
-  const filterVal = document.getElementById('history-filter').value;
-  const party = filterVal ? parties.find(p => p.id === filterVal) : null;
-  const options = party ? party.pokemon.map(pk=>typeof pk==='string'?pk:(pk&&pk.name||'')).filter(Boolean) : [];
-  if (!filterVal || !options.length) {
-    sel.disabled = true;
-    sel.innerHTML = '<option value="">-- ポケモンを選択 --</option>';
-    if (hint) hint.textContent = '（パーティを選択してください）';
-    // renderHistoryを呼ばずに状態だけリセット
-    mySelFilterName = '';
-    if (sel) sel.value = '';
-    const clearBtn = document.getElementById('my-sel-clear-btn');
-    if (clearBtn) clearBtn.style.display = 'none';
-    const myRateEl = document.getElementById('my-sel-rate');
-    if (myRateEl) myRateEl.style.display = 'none';
-    oppPartyFilterName = '';
-    const oppTag = document.getElementById('opp-party-filter-tag');
-    if (oppTag) oppTag.style.display = 'none';
-    const oppRateEl = document.getElementById('opp-party-rate');
-    if (oppRateEl) oppRateEl.style.display = 'none';
-    const oppInput = document.getElementById('opp-party-filter-input');
-    if (oppInput) oppInput.value = '';
-    return;
-  }
-  sel.disabled = false;
-  if (hint) hint.textContent = '';
-  // 現在選択中の値を維持
-  sel.innerHTML = '<option value="">-- ポケモンを選択 --</option>' +
-    options.map(p => '<option value="' + p + '"' + (p === mySelFilterName ? ' selected' : '') + '>' + p + '</option>').join('');
-}
+function updateMySelFilterSelect() { /* テキストAC方式に変更のため不要 */ }
 
 // 相手の選出フィルター: 全試合の相手選出から重複除去して選択肢を生成
 function updateOppSelFilterSelect() { /* 廃止: テキストAC方式に変更 */ }
@@ -1979,14 +1950,8 @@ function renderHistory() {
   const filterVal = filter.value;
   const resultFilterVal = document.getElementById('history-result-filter').value;
 
-  // パーティ未選択時はメッセージ表示して終了
-  if (!filterVal) {
-    document.getElementById('history-stats').style.display = 'none';
-    document.getElementById('history-list').innerHTML = '<div class="empty"><div class="empty-icon">📋</div><p>パーティを選択してください</p></div>';
-    return;
-  }
-
-  let filtered = records.filter(r => r.partyId === filterVal);
+  // パーティ未選択 = 全試合表示
+  let filtered = filterVal ? records.filter(r => r.partyId === filterVal) : records.slice();
   if (resultFilterVal) filtered = filtered.filter(r => r.result === resultFilterVal);
   // 自分の選出絞り込み（1体）
   if (mySelFilterName) {
@@ -3875,8 +3840,7 @@ function updateOppPartyRate() {
   const rateEl = document.getElementById('opp-party-rate');
   if (!rateEl || !oppPartyFilterName) { if (rateEl) rateEl.style.display = 'none'; return; }
   const filterVal = document.getElementById('history-filter').value;
-  if (!filterVal) { rateEl.style.display = 'none'; return; }
-  const partyRecs = records.filter(r => r.partyId === filterVal);
+  const partyRecs = filterVal ? records.filter(r => r.partyId === filterVal) : records;
   const appeared = partyRecs.filter(r => r.oppParty.includes(oppPartyFilterName)).length;
   const selected = partyRecs.filter(r => r.oppParty.includes(oppPartyFilterName) && r.oppSelection.includes(oppPartyFilterName)).length;
   if (!appeared) { rateEl.style.display = 'none'; return; }
@@ -3906,25 +3870,88 @@ document.addEventListener('click', e => {
 });
 
 
-// ---- 自分の選出フィルター（1体） ----
+// ---- 自分の選出フィルター（テキストAC方式） ----
 let mySelFilterName = '';
 
-function onMySelFilterChange(name) {
+// 対象試合の自分の選出から候補を収集
+function getMySelCandidates() {
+  const filterVal = document.getElementById('history-filter').value;
+  const baseRecords = filterVal ? records.filter(r => r.partyId === filterVal) : records;
+  return [...new Set(baseRecords.flatMap(r => (r.mySelection || []).filter(Boolean)))].sort();
+}
+
+function showMySelAC(val) {
+  const list = document.getElementById('my-sel-filter-ac');
+  if (!list) return;
+  const allPokemon = getMySelCandidates();
+  let candidates;
+  if (!val) {
+    candidates = allPokemon.slice(0, 15);
+  } else {
+    const valKana = toKatakana(val), valHira = toHiragana(val);
+    candidates = allPokemon.filter(name => {
+      const nH = toHiragana(name);
+      return name.includes(valKana) || nH.includes(valHira) || name.includes(val);
+    }).slice(0, 15);
+  }
+  list.innerHTML = candidates.map(name =>
+    '<div class="autocomplete-item" data-name="' + name + '">' + name + '</div>'
+  ).join('');
+  list.querySelectorAll('.autocomplete-item').forEach(item => {
+    item.addEventListener('mousedown', e => {
+      e.preventDefault();
+      setMySelFilter(item.dataset.name);
+      document.getElementById('my-sel-filter-input').value = '';
+      list.classList.remove('open');
+    });
+  });
+  if (candidates.length) list.classList.add('open');
+  else list.classList.remove('open');
+}
+
+function onMySelFilterFocus(input) { showMySelAC(input.value); }
+function onMySelFilterInput(input) { showMySelAC(input.value); }
+
+function onMySelFilterKeydown(e, input) {
+  const list = document.getElementById('my-sel-filter-ac');
+  const items = list.querySelectorAll('.autocomplete-item');
+  let sel = list.querySelector('.autocomplete-item.selected');
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    if (!sel && items.length) items[0].classList.add('selected');
+    else if (sel) { sel.classList.remove('selected'); if (sel.nextElementSibling) sel.nextElementSibling.classList.add('selected'); }
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (sel) { sel.classList.remove('selected'); if (sel.previousElementSibling) sel.previousElementSibling.classList.add('selected'); }
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (sel) { setMySelFilter(sel.dataset.name); input.value = ''; list.classList.remove('open'); }
+  } else if (e.key === 'Escape') {
+    list.classList.remove('open');
+  }
+}
+
+function setMySelFilter(name) {
   mySelFilterName = name;
-  const clearBtn = document.getElementById('my-sel-clear-btn');
-  if (clearBtn) clearBtn.style.display = name ? 'inline-block' : 'none';
+  const tag = document.getElementById('my-sel-filter-tag');
+  const nameEl = document.getElementById('my-sel-filter-name');
+  if (tag) tag.style.display = name ? 'flex' : 'none';
+  if (nameEl) nameEl.textContent = name;
+  const input = document.getElementById('my-sel-filter-input');
+  if (input) input.value = '';
+  document.getElementById('my-sel-filter-ac').classList.remove('open');
   updateMySelRate();
   renderHistory();
 }
 
 function clearMySelFilter() {
   mySelFilterName = '';
-  const sel = document.getElementById('my-sel-filter-select');
-  if (sel) sel.value = '';
-  const clearBtn = document.getElementById('my-sel-clear-btn');
-  if (clearBtn) clearBtn.style.display = 'none';
+  const tag = document.getElementById('my-sel-filter-tag');
+  if (tag) tag.style.display = 'none';
   const rateEl = document.getElementById('my-sel-rate');
   if (rateEl) rateEl.style.display = 'none';
+  const input = document.getElementById('my-sel-filter-input');
+  if (input) input.value = '';
   renderHistory();
 }
 
@@ -3932,8 +3959,7 @@ function updateMySelRate() {
   const rateEl = document.getElementById('my-sel-rate');
   if (!rateEl || !mySelFilterName) { if (rateEl) rateEl.style.display = 'none'; return; }
   const filterVal = document.getElementById('history-filter').value;
-  if (!filterVal) { rateEl.style.display = 'none'; return; }
-  const partyRecs = records.filter(r => r.partyId === filterVal);
+  const partyRecs = filterVal ? records.filter(r => r.partyId === filterVal) : records;
   const total = partyRecs.length;
   const selected = partyRecs.filter(r => r.mySelection.includes(mySelFilterName)).length;
   if (!total) { rateEl.style.display = 'none'; return; }
@@ -3941,6 +3967,15 @@ function updateMySelRate() {
   rateEl.textContent = selected + '/' + total + ' (' + pct + '%)';
   rateEl.style.display = 'block';
 }
+
+// AC外クリックで閉じる（自分の選出）
+document.addEventListener('click', e => {
+  const ac = document.getElementById('my-sel-filter-ac');
+  const input = document.getElementById('my-sel-filter-input');
+  if (ac && input && !input.contains(e.target) && !ac.contains(e.target)) {
+    ac.classList.remove('open');
+  }
+});
 
 // ---- INIT ----
 // localStorageから初期データを確実に読み込み
