@@ -268,6 +268,7 @@
   #page-party-edit > .pe-header-outer {
     position:sticky; top:0; z-index:10;
     background:var(--surface); border-bottom:1px solid var(--border);
+    padding-top: env(safe-area-inset-top);
   }
   #pe-name-input {
     flex:1; min-width:0;
@@ -564,6 +565,7 @@
     position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
     background: #b45309; color: #fff;
     padding: 10px 16px;
+    padding-top: max(10px, env(safe-area-inset-top));
     display: none; align-items: center; justify-content: space-between; gap: 10px;
     font-size: 13px; font-weight: 600;
     box-shadow: 0 2px 8px rgba(0,0,0,.4);
