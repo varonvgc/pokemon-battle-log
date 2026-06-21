@@ -104,7 +104,7 @@
 
   /* PARTY LIST */
   .party-grid { display: flex; flex-direction: column; gap: 12px; }
-  .party-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; cursor: pointer; transition: all .2s; }
+  .party-card { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; cursor: pointer; transition: all .2s; touch-action: manipulation; }
   .party-card:hover { border-color: var(--accent); transform: translateY(-2px); }
   .party-card.selected { border-color: var(--accent); background: #2a2a50; }
   .party-name { font-weight: 600; margin-bottom: 8px; }
@@ -2856,9 +2856,12 @@ function openPartyModal(id) { openPartyEdit(id); }
 function closePartyModal() { closePartyEdit(); }
 
 async function openPartyEdit(id) {
-  // 入力前に他端末の変更をチェック
-  const reloading = await checkAndPromptReload();
-  if (reloading) return;
+  // バナーが出ている時だけ確認（毎回Firestore通信しない）
+  const banner = document.getElementById('conflict-banner');
+  if (banner && banner.classList.contains('show')) {
+    const ok = confirm('別の端末でデータが更新されています。\nリロードしますか？\n\nOK → リロード\nキャンセル → このまま続ける');
+    if (ok) { location.reload(); return; }
+  }
   editingPartyId = id || null;
   pePokemons = Array.from({length:6}, () => peEmptyPoke());
   if (id) {
@@ -3718,7 +3721,10 @@ function initPartyDragSort(grid) {
   let dragSrc = null;
 
   grid.querySelectorAll('.party-card').forEach(card => {
-    card.setAttribute('draggable', 'true');
+    // スマホ(タッチデバイス)ではdraggableを無効（タップ遅延を防ぐ）
+    if (!('ontouchstart' in window)) {
+      card.setAttribute('draggable', 'true');
+    }
 
     card.addEventListener('dragstart', e => {
       dragSrc = card;
