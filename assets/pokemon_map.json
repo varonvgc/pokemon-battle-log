@@ -1,0 +1,5938 @@
+﻿[
+    {
+        "pokeDexId":  906,
+        "appDexId":  1,
+        "nameJa":  "ニャオハ",
+        "nameEn":  "Sprigatito",
+        "fileName":  "sprigatito.png"
+    },
+    {
+        "pokeDexId":  907,
+        "appDexId":  2,
+        "nameJa":  "ニャローテ",
+        "nameEn":  "Floragato",
+        "fileName":  "floragato.png"
+    },
+    {
+        "pokeDexId":  908,
+        "appDexId":  3,
+        "nameJa":  "マスカーニャ",
+        "nameEn":  "Meowscarada",
+        "fileName":  "meowscarada.png"
+    },
+    {
+        "pokeDexId":  909,
+        "appDexId":  4,
+        "nameJa":  "ホゲータ",
+        "nameEn":  "Fuecoco",
+        "fileName":  "fuecoco.png"
+    },
+    {
+        "pokeDexId":  910,
+        "appDexId":  5,
+        "nameJa":  "アチゲータ",
+        "nameEn":  "Crocalor",
+        "fileName":  "crocalor.png"
+    },
+    {
+        "pokeDexId":  911,
+        "appDexId":  6,
+        "nameJa":  "ラウドボーン",
+        "nameEn":  "Skeledirge",
+        "fileName":  "skeledirge.png"
+    },
+    {
+        "pokeDexId":  912,
+        "appDexId":  7,
+        "nameJa":  "クワッス",
+        "nameEn":  "Quaxly",
+        "fileName":  "quaxly.png"
+    },
+    {
+        "pokeDexId":  913,
+        "appDexId":  8,
+        "nameJa":  "ウェルカモ",
+        "nameEn":  "Quaxwell",
+        "fileName":  "quaxwell.png"
+    },
+    {
+        "pokeDexId":  914,
+        "appDexId":  9,
+        "nameJa":  "ウェーニバル",
+        "nameEn":  "Quaquaval",
+        "fileName":  "quaquaval.png"
+    },
+    {
+        "pokeDexId":  915,
+        "appDexId":  10,
+        "nameJa":  "グルトン",
+        "nameEn":  "Lechonk",
+        "fileName":  "lechonk.png"
+    },
+    {
+        "pokeDexId":  916,
+        "appDexId":  11,
+        "nameJa":  "パフュートン(オス)",
+        "nameEn":  "Oinkologne(Male)",
+        "fileName":  "oinkologne-male.png"
+    },
+    {
+        "pokeDexId":  916,
+        "appDexId":  12,
+        "nameJa":  "パフュートン(メス)",
+        "nameEn":  "Oinkologne(Female)",
+        "fileName":  "oinkologne-female.png"
+    },
+    {
+        "pokeDexId":  917,
+        "appDexId":  13,
+        "nameJa":  "タマンチュラ",
+        "nameEn":  "Tarountula",
+        "fileName":  "tarountula.png"
+    },
+    {
+        "pokeDexId":  918,
+        "appDexId":  14,
+        "nameJa":  "ワナイダー",
+        "nameEn":  "Spidops",
+        "fileName":  "spidops.png"
+    },
+    {
+        "pokeDexId":  919,
+        "appDexId":  15,
+        "nameJa":  "マメバッタ",
+        "nameEn":  "Nymble",
+        "fileName":  "nymble.png"
+    },
+    {
+        "pokeDexId":  920,
+        "appDexId":  16,
+        "nameJa":  "エクスレッグ",
+        "nameEn":  "Lokix",
+        "fileName":  "lokix.png"
+    },
+    {
+        "pokeDexId":  187,
+        "appDexId":  17,
+        "nameJa":  "ハネッコ",
+        "nameEn":  "Hoppip",
+        "fileName":  "hoppip.png"
+    },
+    {
+        "pokeDexId":  188,
+        "appDexId":  18,
+        "nameJa":  "ポポッコ",
+        "nameEn":  "Skiploom",
+        "fileName":  "skiploom.png"
+    },
+    {
+        "pokeDexId":  189,
+        "appDexId":  19,
+        "nameJa":  "ワタッコ",
+        "nameEn":  "Jumpluff",
+        "fileName":  "jumpluff.png"
+    },
+    {
+        "pokeDexId":  661,
+        "appDexId":  20,
+        "nameJa":  "ヤヤコマ",
+        "nameEn":  "Fletchling",
+        "fileName":  "fletchling.png"
+    },
+    {
+        "pokeDexId":  662,
+        "appDexId":  21,
+        "nameJa":  "ヒノヤコマ",
+        "nameEn":  "Fletchinder",
+        "fileName":  "fletchinder.png"
+    },
+    {
+        "pokeDexId":  663,
+        "appDexId":  22,
+        "nameJa":  "ファイアロー",
+        "nameEn":  "Talonflame",
+        "fileName":  "talonflame.png"
+    },
+    {
+        "pokeDexId":  921,
+        "appDexId":  23,
+        "nameJa":  "パモ",
+        "nameEn":  "Pawmi",
+        "fileName":  "pawmi.png"
+    },
+    {
+        "pokeDexId":  922,
+        "appDexId":  24,
+        "nameJa":  "パモット",
+        "nameEn":  "Pawmo",
+        "fileName":  "pawmo.png"
+    },
+    {
+        "pokeDexId":  923,
+        "appDexId":  25,
+        "nameJa":  "パーモット",
+        "nameEn":  "Pawmot",
+        "fileName":  "pawmot.png"
+    },
+    {
+        "pokeDexId":  228,
+        "appDexId":  26,
+        "nameJa":  "デルビル",
+        "nameEn":  "Houndour",
+        "fileName":  "houndour.png"
+    },
+    {
+        "pokeDexId":  229,
+        "appDexId":  27,
+        "nameJa":  "ヘルガー",
+        "nameEn":  "Houndoom",
+        "fileName":  "houndoom.png"
+    },
+    {
+        "pokeDexId":  734,
+        "appDexId":  28,
+        "nameJa":  "ヤングース",
+        "nameEn":  "Yungoos",
+        "fileName":  "yungoos.png"
+    },
+    {
+        "pokeDexId":  735,
+        "appDexId":  29,
+        "nameJa":  "デカグース",
+        "nameEn":  "Gumshoos",
+        "fileName":  "gumshoos.png"
+    },
+    {
+        "pokeDexId":  819,
+        "appDexId":  30,
+        "nameJa":  "ホシガリス",
+        "nameEn":  "Skwovet",
+        "fileName":  "skwovet.png"
+    },
+    {
+        "pokeDexId":  820,
+        "appDexId":  31,
+        "nameJa":  "ヨクバリス",
+        "nameEn":  "Greedent",
+        "fileName":  "greedent.png"
+    },
+    {
+        "pokeDexId":  191,
+        "appDexId":  32,
+        "nameJa":  "ヒマナッツ",
+        "nameEn":  "Sunkern",
+        "fileName":  "sunkern.png"
+    },
+    {
+        "pokeDexId":  192,
+        "appDexId":  33,
+        "nameJa":  "キマワリ",
+        "nameEn":  "Sunflora",
+        "fileName":  "sunflora.png"
+    },
+    {
+        "pokeDexId":  401,
+        "appDexId":  34,
+        "nameJa":  "コロボーシ",
+        "nameEn":  "Kricketot",
+        "fileName":  "kricketot.png"
+    },
+    {
+        "pokeDexId":  402,
+        "appDexId":  35,
+        "nameJa":  "コロトック",
+        "nameEn":  "Kricketune",
+        "fileName":  "kricketune.png"
+    },
+    {
+        "pokeDexId":  664,
+        "appDexId":  36,
+        "nameJa":  "コフキムシ",
+        "nameEn":  "Scatterbug",
+        "fileName":  "scatterbug.png"
+    },
+    {
+        "pokeDexId":  665,
+        "appDexId":  37,
+        "nameJa":  "コフーライ",
+        "nameEn":  "Spewpa",
+        "fileName":  "spewpa.png"
+    },
+    {
+        "pokeDexId":  666,
+        "appDexId":  38,
+        "nameJa":  "ビビヨン",
+        "nameEn":  "Vivillon",
+        "fileName":  "vivillon.png"
+    },
+    {
+        "pokeDexId":  415,
+        "appDexId":  39,
+        "nameJa":  "ミツハニー",
+        "nameEn":  "Combee",
+        "fileName":  "combee.png"
+    },
+    {
+        "pokeDexId":  416,
+        "appDexId":  40,
+        "nameJa":  "ビークイン",
+        "nameEn":  "Vespiquen",
+        "fileName":  "vespiquen.png"
+    },
+    {
+        "pokeDexId":  821,
+        "appDexId":  41,
+        "nameJa":  "ココガラ",
+        "nameEn":  "Rookidee",
+        "fileName":  "rookidee.png"
+    },
+    {
+        "pokeDexId":  822,
+        "appDexId":  42,
+        "nameJa":  "アオガラス",
+        "nameEn":  "Corvisquire",
+        "fileName":  "corvisquire.png"
+    },
+    {
+        "pokeDexId":  823,
+        "appDexId":  43,
+        "nameJa":  "アーマーガア",
+        "nameEn":  "Corviknight",
+        "fileName":  "corviknight.png"
+    },
+    {
+        "pokeDexId":  440,
+        "appDexId":  44,
+        "nameJa":  "ピンプク",
+        "nameEn":  "Happiny",
+        "fileName":  "happiny.png"
+    },
+    {
+        "pokeDexId":  113,
+        "appDexId":  45,
+        "nameJa":  "ラッキー",
+        "nameEn":  "Chansey",
+        "fileName":  "chansey.png"
+    },
+    {
+        "pokeDexId":  242,
+        "appDexId":  46,
+        "nameJa":  "ハピナス",
+        "nameEn":  "Blissey",
+        "fileName":  "blissey.png"
+    },
+    {
+        "pokeDexId":  298,
+        "appDexId":  47,
+        "nameJa":  "ルリリ",
+        "nameEn":  "Azurill",
+        "fileName":  "azurill.png"
+    },
+    {
+        "pokeDexId":  183,
+        "appDexId":  48,
+        "nameJa":  "マリル",
+        "nameEn":  "Marill",
+        "fileName":  "marill.png"
+    },
+    {
+        "pokeDexId":  184,
+        "appDexId":  49,
+        "nameJa":  "マリルリ",
+        "nameEn":  "Azumarill",
+        "fileName":  "azumarill.png"
+    },
+    {
+        "pokeDexId":  283,
+        "appDexId":  50,
+        "nameJa":  "アメタマ",
+        "nameEn":  "Surskit",
+        "fileName":  "surskit.png"
+    },
+    {
+        "pokeDexId":  284,
+        "appDexId":  51,
+        "nameJa":  "アメモース",
+        "nameEn":  "Masquerain",
+        "fileName":  "masquerain.png"
+    },
+    {
+        "pokeDexId":  418,
+        "appDexId":  52,
+        "nameJa":  "ブイゼル",
+        "nameEn":  "Buizel",
+        "fileName":  "buizel.png"
+    },
+    {
+        "pokeDexId":  419,
+        "appDexId":  53,
+        "nameJa":  "フローゼル",
+        "nameEn":  "Floatzel",
+        "fileName":  "floatzel.png"
+    },
+    {
+        "pokeDexId":  194,
+        "appDexId":  54,
+        "nameJa":  "ウパー(パルデア)",
+        "nameEn":  "Wooper(Paldean)",
+        "fileName":  "wooper-paldean.png"
+    },
+    {
+        "pokeDexId":  980,
+        "appDexId":  55,
+        "nameJa":  "ドオー",
+        "nameEn":  "Clodsire",
+        "fileName":  "clodsire.png"
+    },
+    {
+        "pokeDexId":  54,
+        "appDexId":  56,
+        "nameJa":  "コダック",
+        "nameEn":  "Psyduck",
+        "fileName":  "psyduck.png"
+    },
+    {
+        "pokeDexId":  55,
+        "appDexId":  57,
+        "nameJa":  "ゴルダック",
+        "nameEn":  "Golduck",
+        "fileName":  "golduck.png"
+    },
+    {
+        "pokeDexId":  833,
+        "appDexId":  58,
+        "nameJa":  "カムカメ",
+        "nameEn":  "Chewtle",
+        "fileName":  "chewtle.png"
+    },
+    {
+        "pokeDexId":  834,
+        "appDexId":  59,
+        "nameJa":  "カジリガメ",
+        "nameEn":  "Drednaw",
+        "fileName":  "drednaw.png"
+    },
+    {
+        "pokeDexId":  174,
+        "appDexId":  60,
+        "nameJa":  "ププリン",
+        "nameEn":  "Igglybuff",
+        "fileName":  "igglybuff.png"
+    },
+    {
+        "pokeDexId":  39,
+        "appDexId":  61,
+        "nameJa":  "プリン",
+        "nameEn":  "Jigglypuff",
+        "fileName":  "jigglypuff.png"
+    },
+    {
+        "pokeDexId":  40,
+        "appDexId":  62,
+        "nameJa":  "プクリン",
+        "nameEn":  "Wigglytuff",
+        "fileName":  "wigglytuff.png"
+    },
+    {
+        "pokeDexId":  280,
+        "appDexId":  63,
+        "nameJa":  "ラルトス",
+        "nameEn":  "Ralts",
+        "fileName":  "ralts.png"
+    },
+    {
+        "pokeDexId":  281,
+        "appDexId":  64,
+        "nameJa":  "キルリア",
+        "nameEn":  "Kirlia",
+        "fileName":  "kirlia.png"
+    },
+    {
+        "pokeDexId":  282,
+        "appDexId":  65,
+        "nameJa":  "サーナイト",
+        "nameEn":  "Gardevoir",
+        "fileName":  "gardevoir.png"
+    },
+    {
+        "pokeDexId":  475,
+        "appDexId":  66,
+        "nameJa":  "エルレイド",
+        "nameEn":  "Gallade",
+        "fileName":  "gallade.png"
+    },
+    {
+        "pokeDexId":  96,
+        "appDexId":  67,
+        "nameJa":  "スリープ",
+        "nameEn":  "Drowzee",
+        "fileName":  "drowzee.png"
+    },
+    {
+        "pokeDexId":  97,
+        "appDexId":  68,
+        "nameJa":  "スリーパー",
+        "nameEn":  "Hypno",
+        "fileName":  "hypno.png"
+    },
+    {
+        "pokeDexId":  92,
+        "appDexId":  69,
+        "nameJa":  "ゴース",
+        "nameEn":  "Gastly",
+        "fileName":  "gastly.png"
+    },
+    {
+        "pokeDexId":  93,
+        "appDexId":  70,
+        "nameJa":  "ゴースト",
+        "nameEn":  "Haunter",
+        "fileName":  "haunter.png"
+    },
+    {
+        "pokeDexId":  94,
+        "appDexId":  71,
+        "nameJa":  "ゲンガー",
+        "nameEn":  "Gengar",
+        "fileName":  "gengar.png"
+    },
+    {
+        "pokeDexId":  924,
+        "appDexId":  72,
+        "nameJa":  "ワッカネズミ",
+        "nameEn":  "Tandemaus",
+        "fileName":  "tandemaus.png"
+    },
+    {
+        "pokeDexId":  925,
+        "appDexId":  73,
+        "nameJa":  "イッカネズミ(4匹)",
+        "nameEn":  "Maushold(Four)",
+        "fileName":  "maushold-four.png"
+    },
+    {
+        "pokeDexId":  172,
+        "appDexId":  74,
+        "nameJa":  "ピチュー",
+        "nameEn":  "Pichu",
+        "fileName":  "pichu.png"
+    },
+    {
+        "pokeDexId":  25,
+        "appDexId":  75,
+        "nameJa":  "ピカチュウ",
+        "nameEn":  "Pikachu",
+        "fileName":  "pikachu.png"
+    },
+    {
+        "pokeDexId":  26,
+        "appDexId":  76,
+        "nameJa":  "ライチュウ",
+        "nameEn":  "Raichu",
+        "fileName":  "raichu.png"
+    },
+    {
+        "pokeDexId":  926,
+        "appDexId":  77,
+        "nameJa":  "パピモッチ",
+        "nameEn":  "Fidough",
+        "fileName":  "fidough.png"
+    },
+    {
+        "pokeDexId":  927,
+        "appDexId":  78,
+        "nameJa":  "バウッツェル",
+        "nameEn":  "Dachsbun",
+        "fileName":  "dachsbun.png"
+    },
+    {
+        "pokeDexId":  287,
+        "appDexId":  79,
+        "nameJa":  "ナマケロ",
+        "nameEn":  "Slakoth",
+        "fileName":  "slakoth.png"
+    },
+    {
+        "pokeDexId":  288,
+        "appDexId":  80,
+        "nameJa":  "ヤルキモノ",
+        "nameEn":  "Vigoroth",
+        "fileName":  "vigoroth.png"
+    },
+    {
+        "pokeDexId":  289,
+        "appDexId":  81,
+        "nameJa":  "ケッキング",
+        "nameEn":  "Slaking",
+        "fileName":  "slaking.png"
+    },
+    {
+        "pokeDexId":  761,
+        "appDexId":  82,
+        "nameJa":  "アマカジ",
+        "nameEn":  "Bounsweet",
+        "fileName":  "bounsweet.png"
+    },
+    {
+        "pokeDexId":  762,
+        "appDexId":  83,
+        "nameJa":  "アママイコ",
+        "nameEn":  "Steenee",
+        "fileName":  "steenee.png"
+    },
+    {
+        "pokeDexId":  763,
+        "appDexId":  84,
+        "nameJa":  "アマージョ",
+        "nameEn":  "Tsareena",
+        "fileName":  "tsareena.png"
+    },
+    {
+        "pokeDexId":  928,
+        "appDexId":  85,
+        "nameJa":  "ミニーブ",
+        "nameEn":  "Smoliv",
+        "fileName":  "smoliv.png"
+    },
+    {
+        "pokeDexId":  929,
+        "appDexId":  86,
+        "nameJa":  "オリーニョ",
+        "nameEn":  "Dolliv",
+        "fileName":  "dolliv.png"
+    },
+    {
+        "pokeDexId":  930,
+        "appDexId":  87,
+        "nameJa":  "オリーヴァ",
+        "nameEn":  "Arboliva",
+        "fileName":  "arboliva.png"
+    },
+    {
+        "pokeDexId":  438,
+        "appDexId":  88,
+        "nameJa":  "ウソハチ",
+        "nameEn":  "Bonsly",
+        "fileName":  "bonsly.png"
+    },
+    {
+        "pokeDexId":  185,
+        "appDexId":  89,
+        "nameJa":  "ウソッキー",
+        "nameEn":  "Sudowoodo",
+        "fileName":  "sudowoodo.png"
+    },
+    {
+        "pokeDexId":  744,
+        "appDexId":  90,
+        "nameJa":  "イワンコ",
+        "nameEn":  "Rockruff",
+        "fileName":  "rockruff.png"
+    },
+    {
+        "pokeDexId":  745,
+        "appDexId":  91,
+        "nameJa":  "ルガルガン(まひる)",
+        "nameEn":  "Lycanroc(Midday)",
+        "fileName":  "lycanroc-midday.png"
+    },
+    {
+        "pokeDexId":  745,
+        "appDexId":  92,
+        "nameJa":  "ルガルガン(まよなか)",
+        "nameEn":  "Lycanroc(Midnight)",
+        "fileName":  "lycanroc-midnight.png"
+    },
+    {
+        "pokeDexId":  745,
+        "appDexId":  93,
+        "nameJa":  "ルガルガン(たそがれ)",
+        "nameEn":  "Lycanroc(Dusk)",
+        "fileName":  "lycanroc-dusk.png"
+    },
+    {
+        "pokeDexId":  837,
+        "appDexId":  94,
+        "nameJa":  "タンドン",
+        "nameEn":  "Rolycoly",
+        "fileName":  "rolycoly.png"
+    },
+    {
+        "pokeDexId":  838,
+        "appDexId":  95,
+        "nameJa":  "トロッゴン",
+        "nameEn":  "Carkol",
+        "fileName":  "carkol.png"
+    },
+    {
+        "pokeDexId":  839,
+        "appDexId":  96,
+        "nameJa":  "セキタンザン",
+        "nameEn":  "Coalossal",
+        "fileName":  "coalossal.png"
+    },
+    {
+        "pokeDexId":  403,
+        "appDexId":  97,
+        "nameJa":  "コリンク",
+        "nameEn":  "Shinx",
+        "fileName":  "shinx.png"
+    },
+    {
+        "pokeDexId":  404,
+        "appDexId":  98,
+        "nameJa":  "ルクシオ",
+        "nameEn":  "Luxio",
+        "fileName":  "luxio.png"
+    },
+    {
+        "pokeDexId":  405,
+        "appDexId":  99,
+        "nameJa":  "レントラー",
+        "nameEn":  "Luxray",
+        "fileName":  "luxray.png"
+    },
+    {
+        "pokeDexId":  396,
+        "appDexId":  100,
+        "nameJa":  "ムックル",
+        "nameEn":  "Starly",
+        "fileName":  "starly.png"
+    },
+    {
+        "pokeDexId":  397,
+        "appDexId":  101,
+        "nameJa":  "ムクバード",
+        "nameEn":  "Staravia",
+        "fileName":  "staravia.png"
+    },
+    {
+        "pokeDexId":  398,
+        "appDexId":  102,
+        "nameJa":  "ムクホーク",
+        "nameEn":  "Staraptor",
+        "fileName":  "staraptor.png"
+    },
+    {
+        "pokeDexId":  741,
+        "appDexId":  103,
+        "nameJa":  "オドリドリ(めらめら)",
+        "nameEn":  "Oricorio(Baile)",
+        "fileName":  "oricorio-baile.png"
+    },
+    {
+        "pokeDexId":  741,
+        "appDexId":  104,
+        "nameJa":  "オドリドリ(ぱちぱち)",
+        "nameEn":  "Oricorio(Pom-Pom)",
+        "fileName":  "oricorio-pom-pom.png"
+    },
+    {
+        "pokeDexId":  741,
+        "appDexId":  105,
+        "nameJa":  "オドリドリ(ふらふら)",
+        "nameEn":  "Oricorio(Pa\u0027u)",
+        "fileName":  "oricorio-pau.png"
+    },
+    {
+        "pokeDexId":  741,
+        "appDexId":  106,
+        "nameJa":  "オドリドリ(まいまい)",
+        "nameEn":  "Oricorio(Sensu)",
+        "fileName":  "oricorio-sensu.png"
+    },
+    {
+        "pokeDexId":  179,
+        "appDexId":  107,
+        "nameJa":  "メリープ",
+        "nameEn":  "Mareep",
+        "fileName":  "mareep.png"
+    },
+    {
+        "pokeDexId":  180,
+        "appDexId":  108,
+        "nameJa":  "モココ",
+        "nameEn":  "Flaaffy",
+        "fileName":  "flaaffy.png"
+    },
+    {
+        "pokeDexId":  181,
+        "appDexId":  109,
+        "nameJa":  "デンリュウ",
+        "nameEn":  "Ampharos",
+        "fileName":  "ampharos.png"
+    },
+    {
+        "pokeDexId":  548,
+        "appDexId":  110,
+        "nameJa":  "チュリネ",
+        "nameEn":  "Petilil",
+        "fileName":  "petilil.png"
+    },
+    {
+        "pokeDexId":  549,
+        "appDexId":  111,
+        "nameJa":  "ドレディア",
+        "nameEn":  "Lilligant",
+        "fileName":  "lilligant.png"
+    },
+    {
+        "pokeDexId":  285,
+        "appDexId":  112,
+        "nameJa":  "キノココ",
+        "nameEn":  "Shroomish",
+        "fileName":  "shroomish.png"
+    },
+    {
+        "pokeDexId":  286,
+        "appDexId":  113,
+        "nameJa":  "キノガッサ",
+        "nameEn":  "Breloom",
+        "fileName":  "breloom.png"
+    },
+    {
+        "pokeDexId":  840,
+        "appDexId":  114,
+        "nameJa":  "カジッチュ",
+        "nameEn":  "Applin",
+        "fileName":  "applin.png"
+    },
+    {
+        "pokeDexId":  841,
+        "appDexId":  115,
+        "nameJa":  "アップリュー",
+        "nameEn":  "Flapple",
+        "fileName":  "flapple.png"
+    },
+    {
+        "pokeDexId":  842,
+        "appDexId":  116,
+        "nameJa":  "タルップル",
+        "nameEn":  "Appletun",
+        "fileName":  "appletun.png"
+    },
+    {
+        "pokeDexId":  325,
+        "appDexId":  117,
+        "nameJa":  "バネブー",
+        "nameEn":  "Spoink",
+        "fileName":  "spoink.png"
+    },
+    {
+        "pokeDexId":  326,
+        "appDexId":  118,
+        "nameJa":  "ブーピッグ",
+        "nameEn":  "Grumpig",
+        "fileName":  "grumpig.png"
+    },
+    {
+        "pokeDexId":  931,
+        "appDexId":  119,
+        "nameJa":  "イキリンコ(グリーン)",
+        "nameEn":  "Squawkabilly(Green)",
+        "fileName":  "squawkabilly-green.png"
+    },
+    {
+        "pokeDexId":  931,
+        "appDexId":  120,
+        "nameJa":  "イキリンコ(イエロー)",
+        "nameEn":  "Squawkabilly(Yellow)",
+        "fileName":  "squawkabilly-yellow.png"
+    },
+    {
+        "pokeDexId":  200,
+        "appDexId":  121,
+        "nameJa":  "ムウマ",
+        "nameEn":  "Misdreavus",
+        "fileName":  "misdreavus.png"
+    },
+    {
+        "pokeDexId":  429,
+        "appDexId":  122,
+        "nameJa":  "ムウマージ",
+        "nameEn":  "Mismagius",
+        "fileName":  "mismagius.png"
+    },
+    {
+        "pokeDexId":  296,
+        "appDexId":  123,
+        "nameJa":  "マクノシタ",
+        "nameEn":  "Makuhita",
+        "fileName":  "makuhita.png"
+    },
+    {
+        "pokeDexId":  297,
+        "appDexId":  124,
+        "nameJa":  "ハリテヤマ",
+        "nameEn":  "Hariyama",
+        "fileName":  "hariyama.png"
+    },
+    {
+        "pokeDexId":  739,
+        "appDexId":  125,
+        "nameJa":  "マケンカニ",
+        "nameEn":  "Crabrawler",
+        "fileName":  "crabrawler.png"
+    },
+    {
+        "pokeDexId":  740,
+        "appDexId":  126,
+        "nameJa":  "ケケンカニ",
+        "nameEn":  "Crabominable",
+        "fileName":  "crabominable.png"
+    },
+    {
+        "pokeDexId":  757,
+        "appDexId":  127,
+        "nameJa":  "ヤトウモリ",
+        "nameEn":  "Salandit",
+        "fileName":  "salandit.png"
+    },
+    {
+        "pokeDexId":  758,
+        "appDexId":  128,
+        "nameJa":  "エンニュート",
+        "nameEn":  "Salazzle",
+        "fileName":  "salazzle.png"
+    },
+    {
+        "pokeDexId":  231,
+        "appDexId":  129,
+        "nameJa":  "ゴマゾウ",
+        "nameEn":  "Phanpy",
+        "fileName":  "phanpy.png"
+    },
+    {
+        "pokeDexId":  232,
+        "appDexId":  130,
+        "nameJa":  "ドンファン",
+        "nameEn":  "Donphan",
+        "fileName":  "donphan.png"
+    },
+    {
+        "pokeDexId":  878,
+        "appDexId":  131,
+        "nameJa":  "ゾウドウ",
+        "nameEn":  "Cufant",
+        "fileName":  "cufant.png"
+    },
+    {
+        "pokeDexId":  879,
+        "appDexId":  132,
+        "nameJa":  "ダイオウドウ",
+        "nameEn":  "Copperajah",
+        "fileName":  "copperajah.png"
+    },
+    {
+        "pokeDexId":  443,
+        "appDexId":  133,
+        "nameJa":  "フカマル",
+        "nameEn":  "Gible",
+        "fileName":  "gible.png"
+    },
+    {
+        "pokeDexId":  444,
+        "appDexId":  134,
+        "nameJa":  "ガバイト",
+        "nameEn":  "Gabite",
+        "fileName":  "gabite.png"
+    },
+    {
+        "pokeDexId":  445,
+        "appDexId":  135,
+        "nameJa":  "ガブリアス",
+        "nameEn":  "Garchomp",
+        "fileName":  "garchomp.png"
+    },
+    {
+        "pokeDexId":  932,
+        "appDexId":  136,
+        "nameJa":  "コジオ",
+        "nameEn":  "Nacli",
+        "fileName":  "nacli.png"
+    },
+    {
+        "pokeDexId":  933,
+        "appDexId":  137,
+        "nameJa":  "ジオヅム",
+        "nameEn":  "Naclstack",
+        "fileName":  "naclstack.png"
+    },
+    {
+        "pokeDexId":  934,
+        "appDexId":  138,
+        "nameJa":  "キョジオーン",
+        "nameEn":  "Garganacl",
+        "fileName":  "garganacl.png"
+    },
+    {
+        "pokeDexId":  278,
+        "appDexId":  139,
+        "nameJa":  "キャモメ",
+        "nameEn":  "Wingull",
+        "fileName":  "wingull.png"
+    },
+    {
+        "pokeDexId":  279,
+        "appDexId":  140,
+        "nameJa":  "ペリッパー",
+        "nameEn":  "Pelipper",
+        "fileName":  "pelipper.png"
+    },
+    {
+        "pokeDexId":  129,
+        "appDexId":  141,
+        "nameJa":  "コイキング",
+        "nameEn":  "Magikarp",
+        "fileName":  "magikarp.png"
+    },
+    {
+        "pokeDexId":  130,
+        "appDexId":  142,
+        "nameJa":  "ギャラドス",
+        "nameEn":  "Gyarados",
+        "fileName":  "gyarados.png"
+    },
+    {
+        "pokeDexId":  846,
+        "appDexId":  143,
+        "nameJa":  "サシカマス",
+        "nameEn":  "Arrokuda",
+        "fileName":  "arrokuda.png"
+    },
+    {
+        "pokeDexId":  847,
+        "appDexId":  144,
+        "nameJa":  "カマスジョー",
+        "nameEn":  "Barraskewda",
+        "fileName":  "barraskewda.png"
+    },
+    {
+        "pokeDexId":  550,
+        "appDexId":  145,
+        "nameJa":  "バスラオ(あかすじ)",
+        "nameEn":  "Basculin(Red)",
+        "fileName":  "basculin-red.png"
+    },
+    {
+        "pokeDexId":  550,
+        "appDexId":  146,
+        "nameJa":  "バスラオ(あおすじ)",
+        "nameEn":  "Basculin(Blue)",
+        "fileName":  "basculin-blue.png"
+    },
+    {
+        "pokeDexId":  316,
+        "appDexId":  147,
+        "nameJa":  "ゴクリン",
+        "nameEn":  "Gulpin",
+        "fileName":  "gulpin.png"
+    },
+    {
+        "pokeDexId":  317,
+        "appDexId":  148,
+        "nameJa":  "マルノーム",
+        "nameEn":  "Swalot",
+        "fileName":  "swalot.png"
+    },
+    {
+        "pokeDexId":  52,
+        "appDexId":  149,
+        "nameJa":  "ニャース",
+        "nameEn":  "Meowth",
+        "fileName":  "meowth.png"
+    },
+    {
+        "pokeDexId":  53,
+        "appDexId":  150,
+        "nameJa":  "ペルシアン",
+        "nameEn":  "Persian",
+        "fileName":  "persian.png"
+    },
+    {
+        "pokeDexId":  425,
+        "appDexId":  151,
+        "nameJa":  "フワンテ",
+        "nameEn":  "Drifloon",
+        "fileName":  "drifloon.png"
+    },
+    {
+        "pokeDexId":  426,
+        "appDexId":  152,
+        "nameJa":  "フワライド",
+        "nameEn":  "Drifblim",
+        "fileName":  "drifblim.png"
+    },
+    {
+        "pokeDexId":  669,
+        "appDexId":  153,
+        "nameJa":  "フラベベ",
+        "nameEn":  "Flabébé",
+        "fileName":  "flabb.png"
+    },
+    {
+        "pokeDexId":  670,
+        "appDexId":  154,
+        "nameJa":  "フラエッテ",
+        "nameEn":  "Floette",
+        "fileName":  "floette.png"
+    },
+    {
+        "pokeDexId":  671,
+        "appDexId":  155,
+        "nameJa":  "フラージェス",
+        "nameEn":  "Florges",
+        "fileName":  "florges.png"
+    },
+    {
+        "pokeDexId":  50,
+        "appDexId":  156,
+        "nameJa":  "ディグダ",
+        "nameEn":  "Diglett",
+        "fileName":  "diglett.png"
+    },
+    {
+        "pokeDexId":  51,
+        "appDexId":  157,
+        "nameJa":  "ダグトリオ",
+        "nameEn":  "Dugtrio",
+        "fileName":  "dugtrio.png"
+    },
+    {
+        "pokeDexId":  324,
+        "appDexId":  158,
+        "nameJa":  "コータス",
+        "nameEn":  "Torkoal",
+        "fileName":  "torkoal.png"
+    },
+    {
+        "pokeDexId":  322,
+        "appDexId":  159,
+        "nameJa":  "ドンメル",
+        "nameEn":  "Numel",
+        "fileName":  "numel.png"
+    },
+    {
+        "pokeDexId":  323,
+        "appDexId":  160,
+        "nameJa":  "バクーダ",
+        "nameEn":  "Camerupt",
+        "fileName":  "camerupt.png"
+    },
+    {
+        "pokeDexId":  436,
+        "appDexId":  161,
+        "nameJa":  "ドーミラー",
+        "nameEn":  "Bronzor",
+        "fileName":  "bronzor.png"
+    },
+    {
+        "pokeDexId":  437,
+        "appDexId":  162,
+        "nameJa":  "ドータクン",
+        "nameEn":  "Bronzong",
+        "fileName":  "bronzong.png"
+    },
+    {
+        "pokeDexId":  610,
+        "appDexId":  163,
+        "nameJa":  "キバゴ",
+        "nameEn":  "Axew",
+        "fileName":  "axew.png"
+    },
+    {
+        "pokeDexId":  611,
+        "appDexId":  164,
+        "nameJa":  "オノンド",
+        "nameEn":  "Fraxure",
+        "fileName":  "fraxure.png"
+    },
+    {
+        "pokeDexId":  612,
+        "appDexId":  165,
+        "nameJa":  "オノノクス",
+        "nameEn":  "Haxorus",
+        "fileName":  "haxorus.png"
+    },
+    {
+        "pokeDexId":  56,
+        "appDexId":  166,
+        "nameJa":  "マンキー",
+        "nameEn":  "Mankey",
+        "fileName":  "mankey.png"
+    },
+    {
+        "pokeDexId":  57,
+        "appDexId":  167,
+        "nameJa":  "オコリザル",
+        "nameEn":  "Primeape",
+        "fileName":  "primeape.png"
+    },
+    {
+        "pokeDexId":  979,
+        "appDexId":  168,
+        "nameJa":  "コノヨザル",
+        "nameEn":  "Annihilape",
+        "fileName":  "annihilape.png"
+    },
+    {
+        "pokeDexId":  307,
+        "appDexId":  169,
+        "nameJa":  "アサナン",
+        "nameEn":  "Meditite",
+        "fileName":  "meditite.png"
+    },
+    {
+        "pokeDexId":  308,
+        "appDexId":  170,
+        "nameJa":  "チャーレム",
+        "nameEn":  "Medicham",
+        "fileName":  "medicham.png"
+    },
+    {
+        "pokeDexId":  447,
+        "appDexId":  171,
+        "nameJa":  "リオル",
+        "nameEn":  "Riolu",
+        "fileName":  "riolu.png"
+    },
+    {
+        "pokeDexId":  448,
+        "appDexId":  172,
+        "nameJa":  "ルカリオ",
+        "nameEn":  "Lucario",
+        "fileName":  "lucario.png"
+    },
+    {
+        "pokeDexId":  935,
+        "appDexId":  173,
+        "nameJa":  "カルボウ",
+        "nameEn":  "Charcadet",
+        "fileName":  "charcadet.png"
+    },
+    {
+        "pokeDexId":  936,
+        "appDexId":  174,
+        "nameJa":  "グレンアルマ",
+        "nameEn":  "Armarouge",
+        "fileName":  "armarouge.png"
+    },
+    {
+        "pokeDexId":  937,
+        "appDexId":  175,
+        "nameJa":  "ソウブレイズ",
+        "nameEn":  "Ceruledge",
+        "fileName":  "ceruledge.png"
+    },
+    {
+        "pokeDexId":  339,
+        "appDexId":  176,
+        "nameJa":  "ドジョッチ",
+        "nameEn":  "Barboach",
+        "fileName":  "barboach.png"
+    },
+    {
+        "pokeDexId":  340,
+        "appDexId":  177,
+        "nameJa":  "ナマズン",
+        "nameEn":  "Whiscash",
+        "fileName":  "whiscash.png"
+    },
+    {
+        "pokeDexId":  938,
+        "appDexId":  178,
+        "nameJa":  "ズピカ",
+        "nameEn":  "Tadbulb",
+        "fileName":  "tadbulb.png"
+    },
+    {
+        "pokeDexId":  939,
+        "appDexId":  179,
+        "nameJa":  "ハラバリー",
+        "nameEn":  "Bellibolt",
+        "fileName":  "bellibolt.png"
+    },
+    {
+        "pokeDexId":  704,
+        "appDexId":  180,
+        "nameJa":  "ヌメラ",
+        "nameEn":  "Goomy",
+        "fileName":  "goomy.png"
+    },
+    {
+        "pokeDexId":  705,
+        "appDexId":  181,
+        "nameJa":  "ヌメイル",
+        "nameEn":  "Sliggoo",
+        "fileName":  "sliggoo.png"
+    },
+    {
+        "pokeDexId":  706,
+        "appDexId":  182,
+        "nameJa":  "ヌメルゴン",
+        "nameEn":  "Goodra",
+        "fileName":  "goodra.png"
+    },
+    {
+        "pokeDexId":  453,
+        "appDexId":  183,
+        "nameJa":  "グレッグル",
+        "nameEn":  "Croagunk",
+        "fileName":  "croagunk.png"
+    },
+    {
+        "pokeDexId":  454,
+        "appDexId":  184,
+        "nameJa":  "ドクロッグ",
+        "nameEn":  "Toxicroak",
+        "fileName":  "toxicroak.png"
+    },
+    {
+        "pokeDexId":  940,
+        "appDexId":  185,
+        "nameJa":  "カイデン",
+        "nameEn":  "Wattrel",
+        "fileName":  "wattrel.png"
+    },
+    {
+        "pokeDexId":  941,
+        "appDexId":  186,
+        "nameJa":  "タイカイデン",
+        "nameEn":  "Kilowattrel",
+        "fileName":  "kilowattrel.png"
+    },
+    {
+        "pokeDexId":  133,
+        "appDexId":  187,
+        "nameJa":  "イーブイ",
+        "nameEn":  "Eevee",
+        "fileName":  "eevee.png"
+    },
+    {
+        "pokeDexId":  134,
+        "appDexId":  188,
+        "nameJa":  "シャワーズ",
+        "nameEn":  "Vaporeon",
+        "fileName":  "vaporeon.png"
+    },
+    {
+        "pokeDexId":  135,
+        "appDexId":  189,
+        "nameJa":  "サンダース",
+        "nameEn":  "Jolteon",
+        "fileName":  "jolteon.png"
+    },
+    {
+        "pokeDexId":  136,
+        "appDexId":  190,
+        "nameJa":  "ブースター",
+        "nameEn":  "Flareon",
+        "fileName":  "flareon.png"
+    },
+    {
+        "pokeDexId":  196,
+        "appDexId":  191,
+        "nameJa":  "エーフィ",
+        "nameEn":  "Espeon",
+        "fileName":  "espeon.png"
+    },
+    {
+        "pokeDexId":  197,
+        "appDexId":  192,
+        "nameJa":  "ブラッキー",
+        "nameEn":  "Umbreon",
+        "fileName":  "umbreon.png"
+    },
+    {
+        "pokeDexId":  470,
+        "appDexId":  193,
+        "nameJa":  "リーフィア",
+        "nameEn":  "Leafeon",
+        "fileName":  "leafeon.png"
+    },
+    {
+        "pokeDexId":  471,
+        "appDexId":  194,
+        "nameJa":  "グレイシア",
+        "nameEn":  "Glaceon",
+        "fileName":  "glaceon.png"
+    },
+    {
+        "pokeDexId":  700,
+        "appDexId":  195,
+        "nameJa":  "ニンフィア",
+        "nameEn":  "Sylveon",
+        "fileName":  "sylveon.png"
+    },
+    {
+        "pokeDexId":  206,
+        "appDexId":  196,
+        "nameJa":  "ノコッチ",
+        "nameEn":  "Dunsparce",
+        "fileName":  "dunsparce.png"
+    },
+    {
+        "pokeDexId":  982,
+        "appDexId":  197,
+        "nameJa":  "ノココッチ(ふたふし)",
+        "nameEn":  "Dudunsparce",
+        "fileName":  "dudunsparce.png"
+    },
+    {
+        "pokeDexId":  585,
+        "appDexId":  198,
+        "nameJa":  "シキジカ(はる)",
+        "nameEn":  "Deerling(Spring)",
+        "fileName":  "deerling-spring.png"
+    },
+    {
+        "pokeDexId":  586,
+        "appDexId":  199,
+        "nameJa":  "メブキジカ(はる)",
+        "nameEn":  "Sawsbuck(Spring)",
+        "fileName":  "sawsbuck-spring.png"
+    },
+    {
+        "pokeDexId":  203,
+        "appDexId":  200,
+        "nameJa":  "キリンリキ",
+        "nameEn":  "Girafarig",
+        "fileName":  "girafarig.png"
+    },
+    {
+        "pokeDexId":  981,
+        "appDexId":  201,
+        "nameJa":  "リキキリン",
+        "nameEn":  "Farigiraf",
+        "fileName":  "farigiraf.png"
+    },
+    {
+        "pokeDexId":  88,
+        "appDexId":  202,
+        "nameJa":  "ベトベター",
+        "nameEn":  "Grimer",
+        "fileName":  "grimer.png"
+    },
+    {
+        "pokeDexId":  89,
+        "appDexId":  203,
+        "nameJa":  "ベトベトン",
+        "nameEn":  "Muk",
+        "fileName":  "muk.png"
+    },
+    {
+        "pokeDexId":  942,
+        "appDexId":  204,
+        "nameJa":  "オラチフ",
+        "nameEn":  "Maschiff",
+        "fileName":  "maschiff.png"
+    },
+    {
+        "pokeDexId":  943,
+        "appDexId":  205,
+        "nameJa":  "マフィティフ",
+        "nameEn":  "Mabosstiff",
+        "fileName":  "mabosstiff.png"
+    },
+    {
+        "pokeDexId":  848,
+        "appDexId":  206,
+        "nameJa":  "エレズン",
+        "nameEn":  "Toxel",
+        "fileName":  "toxel.png"
+    },
+    {
+        "pokeDexId":  849,
+        "appDexId":  207,
+        "nameJa":  "ストリンダー(ハイ)",
+        "nameEn":  "Toxtricity(Amped)",
+        "fileName":  "toxtricity-amped.png"
+    },
+    {
+        "pokeDexId":  849,
+        "appDexId":  208,
+        "nameJa":  "ストリンダー(ロー)",
+        "nameEn":  "Toxtricity(Low key)",
+        "fileName":  "toxtricity-low-key.png"
+    },
+    {
+        "pokeDexId":  702,
+        "appDexId":  209,
+        "nameJa":  "デデンネ",
+        "nameEn":  "Dedenne",
+        "fileName":  "dedenne.png"
+    },
+    {
+        "pokeDexId":  417,
+        "appDexId":  210,
+        "nameJa":  "パチリス",
+        "nameEn":  "Pachirisu",
+        "fileName":  "pachirisu.png"
+    },
+    {
+        "pokeDexId":  944,
+        "appDexId":  211,
+        "nameJa":  "シルシュルー",
+        "nameEn":  "Shroodle",
+        "fileName":  "shroodle.png"
+    },
+    {
+        "pokeDexId":  945,
+        "appDexId":  212,
+        "nameJa":  "タギングル",
+        "nameEn":  "Grafaiai",
+        "fileName":  "grafaiai.png"
+    },
+    {
+        "pokeDexId":  234,
+        "appDexId":  213,
+        "nameJa":  "オドシシ",
+        "nameEn":  "Stantler",
+        "fileName":  "stantler.png"
+    },
+    {
+        "pokeDexId":  590,
+        "appDexId":  214,
+        "nameJa":  "タマゲタケ",
+        "nameEn":  "Foongus",
+        "fileName":  "foongus.png"
+    },
+    {
+        "pokeDexId":  591,
+        "appDexId":  215,
+        "nameJa":  "モロバレル",
+        "nameEn":  "Amoonguss",
+        "fileName":  "amoonguss.png"
+    },
+    {
+        "pokeDexId":  100,
+        "appDexId":  216,
+        "nameJa":  "ビリリダマ",
+        "nameEn":  "Voltorb",
+        "fileName":  "voltorb.png"
+    },
+    {
+        "pokeDexId":  101,
+        "appDexId":  217,
+        "nameJa":  "マルマイン",
+        "nameEn":  "Electrode",
+        "fileName":  "electrode.png"
+    },
+    {
+        "pokeDexId":  81,
+        "appDexId":  218,
+        "nameJa":  "コイル",
+        "nameEn":  "Magnemite",
+        "fileName":  "magnemite.png"
+    },
+    {
+        "pokeDexId":  82,
+        "appDexId":  219,
+        "nameJa":  "レアコイル",
+        "nameEn":  "Magneton",
+        "fileName":  "magneton.png"
+    },
+    {
+        "pokeDexId":  462,
+        "appDexId":  220,
+        "nameJa":  "ジバコイル",
+        "nameEn":  "Magnezone",
+        "fileName":  "magnezone.png"
+    },
+    {
+        "pokeDexId":  132,
+        "appDexId":  221,
+        "nameJa":  "メタモン",
+        "nameEn":  "Ditto",
+        "fileName":  "ditto.png"
+    },
+    {
+        "pokeDexId":  58,
+        "appDexId":  222,
+        "nameJa":  "ガーディ",
+        "nameEn":  "Growlithe",
+        "fileName":  "growlithe.png"
+    },
+    {
+        "pokeDexId":  59,
+        "appDexId":  223,
+        "nameJa":  "ウインディ",
+        "nameEn":  "Arcanine",
+        "fileName":  "arcanine.png"
+    },
+    {
+        "pokeDexId":  216,
+        "appDexId":  224,
+        "nameJa":  "ヒメグマ",
+        "nameEn":  "Teddiursa",
+        "fileName":  "teddiursa.png"
+    },
+    {
+        "pokeDexId":  217,
+        "appDexId":  225,
+        "nameJa":  "リングマ",
+        "nameEn":  "Ursaring",
+        "fileName":  "ursaring.png"
+    },
+    {
+        "pokeDexId":  335,
+        "appDexId":  226,
+        "nameJa":  "ザングース",
+        "nameEn":  "Zangoose",
+        "fileName":  "zangoose.png"
+    },
+    {
+        "pokeDexId":  336,
+        "appDexId":  227,
+        "nameJa":  "ハブネーク",
+        "nameEn":  "Seviper",
+        "fileName":  "seviper.png"
+    },
+    {
+        "pokeDexId":  333,
+        "appDexId":  228,
+        "nameJa":  "チルット",
+        "nameEn":  "Swablu",
+        "fileName":  "swablu.png"
+    },
+    {
+        "pokeDexId":  334,
+        "appDexId":  229,
+        "nameJa":  "チルタリス",
+        "nameEn":  "Altaria",
+        "fileName":  "altaria.png"
+    },
+    {
+        "pokeDexId":  672,
+        "appDexId":  230,
+        "nameJa":  "メェークル",
+        "nameEn":  "Skiddo",
+        "fileName":  "skiddo.png"
+    },
+    {
+        "pokeDexId":  673,
+        "appDexId":  231,
+        "nameJa":  "ゴーゴート",
+        "nameEn":  "Gogoat",
+        "fileName":  "gogoat.png"
+    },
+    {
+        "pokeDexId":  128,
+        "appDexId":  232,
+        "nameJa":  "パルデアケンタロス(かくとう)",
+        "nameEn":  "Tauros(Paldean)(Combat)",
+        "fileName":  "tauros-paldean-combat.png"
+    },
+    {
+        "pokeDexId":  128,
+        "appDexId":  233,
+        "nameJa":  "パルデアケンタロス(みず)",
+        "nameEn":  "Tauros(Paldean)(Blaze)",
+        "fileName":  "tauros-paldean-blaze.png"
+    },
+    {
+        "pokeDexId":  128,
+        "appDexId":  234,
+        "nameJa":  "パルデアケンタロス(ほのお)",
+        "nameEn":  "Tauros(Paldean)(Aqua)",
+        "fileName":  "tauros-paldean-aqua.png"
+    },
+    {
+        "pokeDexId":  667,
+        "appDexId":  235,
+        "nameJa":  "シシコ",
+        "nameEn":  "Litleo",
+        "fileName":  "litleo.png"
+    },
+    {
+        "pokeDexId":  668,
+        "appDexId":  236,
+        "nameJa":  "カエンジシ(オス)",
+        "nameEn":  "Pyroar(Male)",
+        "fileName":  "pyroar-male.png"
+    },
+    {
+        "pokeDexId":  434,
+        "appDexId":  237,
+        "nameJa":  "スカンプー",
+        "nameEn":  "Stunky",
+        "fileName":  "stunky.png"
+    },
+    {
+        "pokeDexId":  435,
+        "appDexId":  238,
+        "nameJa":  "スカタンク",
+        "nameEn":  "Skuntank",
+        "fileName":  "skuntank.png"
+    },
+    {
+        "pokeDexId":  570,
+        "appDexId":  239,
+        "nameJa":  "ゾロア",
+        "nameEn":  "Zorua",
+        "fileName":  "zorua.png"
+    },
+    {
+        "pokeDexId":  571,
+        "appDexId":  240,
+        "nameJa":  "ゾロアーク",
+        "nameEn":  "Zoroark",
+        "fileName":  "zoroark.png"
+    },
+    {
+        "pokeDexId":  215,
+        "appDexId":  241,
+        "nameJa":  "ニューラ",
+        "nameEn":  "Sneasel",
+        "fileName":  "sneasel.png"
+    },
+    {
+        "pokeDexId":  461,
+        "appDexId":  242,
+        "nameJa":  "マニューラ",
+        "nameEn":  "Weavile",
+        "fileName":  "weavile.png"
+    },
+    {
+        "pokeDexId":  198,
+        "appDexId":  243,
+        "nameJa":  "ヤミカラス",
+        "nameEn":  "Murkrow",
+        "fileName":  "murkrow.png"
+    },
+    {
+        "pokeDexId":  430,
+        "appDexId":  244,
+        "nameJa":  "ドンカラス",
+        "nameEn":  "Honchkrow",
+        "fileName":  "honchkrow.png"
+    },
+    {
+        "pokeDexId":  574,
+        "appDexId":  245,
+        "nameJa":  "ゴチム",
+        "nameEn":  "Gothita",
+        "fileName":  "gothita.png"
+    },
+    {
+        "pokeDexId":  575,
+        "appDexId":  246,
+        "nameJa":  "ゴチミル",
+        "nameEn":  "Gothorita",
+        "fileName":  "gothorita.png"
+    },
+    {
+        "pokeDexId":  576,
+        "appDexId":  247,
+        "nameJa":  "ゴチルゼル",
+        "nameEn":  "Gothitelle",
+        "fileName":  "gothitelle.png"
+    },
+    {
+        "pokeDexId":  854,
+        "appDexId":  248,
+        "nameJa":  "ヤバチャ(がんさく)",
+        "nameEn":  "Sinistea",
+        "fileName":  "sinistea.png"
+    },
+    {
+        "pokeDexId":  855,
+        "appDexId":  249,
+        "nameJa":  "ポットデス(がんさく)",
+        "nameEn":  "Polteageist",
+        "fileName":  "polteageist.png"
+    },
+    {
+        "pokeDexId":  778,
+        "appDexId":  250,
+        "nameJa":  "ミミッキュ",
+        "nameEn":  "Mimikyu",
+        "fileName":  "mimikyu.png"
+    },
+    {
+        "pokeDexId":  707,
+        "appDexId":  251,
+        "nameJa":  "クレッフィ",
+        "nameEn":  "Klefki",
+        "fileName":  "klefki.png"
+    },
+    {
+        "pokeDexId":  876,
+        "appDexId":  252,
+        "nameJa":  "イエッサン(オス)",
+        "nameEn":  "Indeedee(Male)",
+        "fileName":  "indeedee-male.png"
+    },
+    {
+        "pokeDexId":  876,
+        "appDexId":  253,
+        "nameJa":  "イエッサン(メス)",
+        "nameEn":  "Indeedee(Female)",
+        "fileName":  "indeedee-female.png"
+    },
+    {
+        "pokeDexId":  946,
+        "appDexId":  254,
+        "nameJa":  "アノクサ",
+        "nameEn":  "Bramblin",
+        "fileName":  "bramblin.png"
+    },
+    {
+        "pokeDexId":  947,
+        "appDexId":  255,
+        "nameJa":  "アノホラグサ",
+        "nameEn":  "Brambleghast",
+        "fileName":  "brambleghast.png"
+    },
+    {
+        "pokeDexId":  948,
+        "appDexId":  256,
+        "nameJa":  "ノノクラゲ",
+        "nameEn":  "Toedscool",
+        "fileName":  "toedscool.png"
+    },
+    {
+        "pokeDexId":  949,
+        "appDexId":  257,
+        "nameJa":  "リククラゲ",
+        "nameEn":  "Toedscruel",
+        "fileName":  "toedscruel.png"
+    },
+    {
+        "pokeDexId":  357,
+        "appDexId":  258,
+        "nameJa":  "トロピウス",
+        "nameEn":  "Tropius",
+        "fileName":  "tropius.png"
+    },
+    {
+        "pokeDexId":  753,
+        "appDexId":  259,
+        "nameJa":  "カリキリ",
+        "nameEn":  "Fomantis",
+        "fileName":  "fomantis.png"
+    },
+    {
+        "pokeDexId":  754,
+        "appDexId":  260,
+        "nameJa":  "ラランテス",
+        "nameEn":  "Lurantis",
+        "fileName":  "lurantis.png"
+    },
+    {
+        "pokeDexId":  950,
+        "appDexId":  261,
+        "nameJa":  "ガケガニ",
+        "nameEn":  "Klawf",
+        "fileName":  "klawf.png"
+    },
+    {
+        "pokeDexId":  951,
+        "appDexId":  262,
+        "nameJa":  "カプサイジ",
+        "nameEn":  "Capsakid",
+        "fileName":  "capsakid.png"
+    },
+    {
+        "pokeDexId":  952,
+        "appDexId":  263,
+        "nameJa":  "スコヴィラン",
+        "nameEn":  "Scovillain",
+        "fileName":  "scovillain.png"
+    },
+    {
+        "pokeDexId":  331,
+        "appDexId":  264,
+        "nameJa":  "サボネア",
+        "nameEn":  "Cacnea",
+        "fileName":  "cacnea.png"
+    },
+    {
+        "pokeDexId":  332,
+        "appDexId":  265,
+        "nameJa":  "ノクタス",
+        "nameEn":  "Cacturne",
+        "fileName":  "cacturne.png"
+    },
+    {
+        "pokeDexId":  953,
+        "appDexId":  266,
+        "nameJa":  "シガロコ",
+        "nameEn":  "Rellor",
+        "fileName":  "rellor.png"
+    },
+    {
+        "pokeDexId":  954,
+        "appDexId":  267,
+        "nameJa":  "ベラカス",
+        "nameEn":  "Rabsca",
+        "fileName":  "rabsca.png"
+    },
+    {
+        "pokeDexId":  48,
+        "appDexId":  268,
+        "nameJa":  "コンパン",
+        "nameEn":  "Venonat",
+        "fileName":  "venonat.png"
+    },
+    {
+        "pokeDexId":  49,
+        "appDexId":  269,
+        "nameJa":  "モルフォン",
+        "nameEn":  "Venomoth",
+        "fileName":  "venomoth.png"
+    },
+    {
+        "pokeDexId":  204,
+        "appDexId":  270,
+        "nameJa":  "クヌギダマ",
+        "nameEn":  "Pineco",
+        "fileName":  "pineco.png"
+    },
+    {
+        "pokeDexId":  205,
+        "appDexId":  271,
+        "nameJa":  "フォレトス",
+        "nameEn":  "Forretress",
+        "fileName":  "forretress.png"
+    },
+    {
+        "pokeDexId":  123,
+        "appDexId":  272,
+        "nameJa":  "ストライク",
+        "nameEn":  "Scyther",
+        "fileName":  "scyther.png"
+    },
+    {
+        "pokeDexId":  212,
+        "appDexId":  273,
+        "nameJa":  "ハッサム",
+        "nameEn":  "Scizor",
+        "fileName":  "scizor.png"
+    },
+    {
+        "pokeDexId":  214,
+        "appDexId":  274,
+        "nameJa":  "ヘラクロス",
+        "nameEn":  "Heracross",
+        "fileName":  "heracross.png"
+    },
+    {
+        "pokeDexId":  955,
+        "appDexId":  275,
+        "nameJa":  "ヒラヒナ",
+        "nameEn":  "Flittle",
+        "fileName":  "flittle.png"
+    },
+    {
+        "pokeDexId":  956,
+        "appDexId":  276,
+        "nameJa":  "クエスパトラ",
+        "nameEn":  "Espathra",
+        "fileName":  "espathra.png"
+    },
+    {
+        "pokeDexId":  449,
+        "appDexId":  277,
+        "nameJa":  "ヒポポタス",
+        "nameEn":  "Hippopotas",
+        "fileName":  "hippopotas.png"
+    },
+    {
+        "pokeDexId":  450,
+        "appDexId":  278,
+        "nameJa":  "カバルドン(オス)",
+        "nameEn":  "Hippowdon(Male)",
+        "fileName":  "hippowdon-male.png"
+    },
+    {
+        "pokeDexId":  551,
+        "appDexId":  279,
+        "nameJa":  "メグロコ",
+        "nameEn":  "Sandile",
+        "fileName":  "sandile.png"
+    },
+    {
+        "pokeDexId":  552,
+        "appDexId":  280,
+        "nameJa":  "ワルビル",
+        "nameEn":  "Krokorok",
+        "fileName":  "krokorok.png"
+    },
+    {
+        "pokeDexId":  553,
+        "appDexId":  281,
+        "nameJa":  "ワルビアル",
+        "nameEn":  "Krookodile",
+        "fileName":  "krookodile.png"
+    },
+    {
+        "pokeDexId":  843,
+        "appDexId":  282,
+        "nameJa":  "スナヘビ",
+        "nameEn":  "Silicobra",
+        "fileName":  "silicobra.png"
+    },
+    {
+        "pokeDexId":  844,
+        "appDexId":  283,
+        "nameJa":  "サダイジャ",
+        "nameEn":  "Sandaconda",
+        "fileName":  "sandaconda.png"
+    },
+    {
+        "pokeDexId":  749,
+        "appDexId":  284,
+        "nameJa":  "ドロバンコ",
+        "nameEn":  "Mudbray",
+        "fileName":  "mudbray.png"
+    },
+    {
+        "pokeDexId":  750,
+        "appDexId":  285,
+        "nameJa":  "バンバドロ",
+        "nameEn":  "Mudsdale",
+        "fileName":  "mudsdale.png"
+    },
+    {
+        "pokeDexId":  636,
+        "appDexId":  286,
+        "nameJa":  "メラルバ",
+        "nameEn":  "Larvesta",
+        "fileName":  "larvesta.png"
+    },
+    {
+        "pokeDexId":  637,
+        "appDexId":  287,
+        "nameJa":  "ウルガモス",
+        "nameEn":  "Volcarona",
+        "fileName":  "volcarona.png"
+    },
+    {
+        "pokeDexId":  371,
+        "appDexId":  288,
+        "nameJa":  "タツベイ",
+        "nameEn":  "Bagon",
+        "fileName":  "bagon.png"
+    },
+    {
+        "pokeDexId":  372,
+        "appDexId":  289,
+        "nameJa":  "コモルー",
+        "nameEn":  "Shelgon",
+        "fileName":  "shelgon.png"
+    },
+    {
+        "pokeDexId":  373,
+        "appDexId":  290,
+        "nameJa":  "ボーマンダ",
+        "nameEn":  "Salamence",
+        "fileName":  "salamence.png"
+    },
+    {
+        "pokeDexId":  957,
+        "appDexId":  291,
+        "nameJa":  "カヌチャン",
+        "nameEn":  "Tinkatink",
+        "fileName":  "tinkatink.png"
+    },
+    {
+        "pokeDexId":  958,
+        "appDexId":  292,
+        "nameJa":  "ナカヌチャン",
+        "nameEn":  "Tinkatuff",
+        "fileName":  "tinkatuff.png"
+    },
+    {
+        "pokeDexId":  959,
+        "appDexId":  293,
+        "nameJa":  "デカヌチャン",
+        "nameEn":  "Tinkaton",
+        "fileName":  "tinkaton.png"
+    },
+    {
+        "pokeDexId":  856,
+        "appDexId":  294,
+        "nameJa":  "ミブリム",
+        "nameEn":  "Hatenna",
+        "fileName":  "hatenna.png"
+    },
+    {
+        "pokeDexId":  857,
+        "appDexId":  295,
+        "nameJa":  "テブリム",
+        "nameEn":  "Hattrem",
+        "fileName":  "hattrem.png"
+    },
+    {
+        "pokeDexId":  858,
+        "appDexId":  296,
+        "nameJa":  "ブリムオン",
+        "nameEn":  "Hatterene",
+        "fileName":  "hatterene.png"
+    },
+    {
+        "pokeDexId":  859,
+        "appDexId":  297,
+        "nameJa":  "ベロバー",
+        "nameEn":  "Impidimp",
+        "fileName":  "impidimp.png"
+    },
+    {
+        "pokeDexId":  860,
+        "appDexId":  298,
+        "nameJa":  "ギモー",
+        "nameEn":  "Morgrem",
+        "fileName":  "morgrem.png"
+    },
+    {
+        "pokeDexId":  861,
+        "appDexId":  299,
+        "nameJa":  "オーロンゲ",
+        "nameEn":  "Grimmsnarl",
+        "fileName":  "grimmsnarl.png"
+    },
+    {
+        "pokeDexId":  960,
+        "appDexId":  300,
+        "nameJa":  "ウミディグダ",
+        "nameEn":  "Wiglett",
+        "fileName":  "wiglett.png"
+    },
+    {
+        "pokeDexId":  961,
+        "appDexId":  301,
+        "nameJa":  "ウミトリオ",
+        "nameEn":  "Wugtrio",
+        "fileName":  "wugtrio.png"
+    },
+    {
+        "pokeDexId":  962,
+        "appDexId":  302,
+        "nameJa":  "オトシドリ",
+        "nameEn":  "Bombirdier",
+        "fileName":  "bombirdier.png"
+    },
+    {
+        "pokeDexId":  963,
+        "appDexId":  303,
+        "nameJa":  "ナミイルカ",
+        "nameEn":  "Finizen",
+        "fileName":  "finizen.png"
+    },
+    {
+        "pokeDexId":  964,
+        "appDexId":  304,
+        "nameJa":  "イルカマン(マイティ)",
+        "nameEn":  "Palafin(Hero)",
+        "fileName":  "palafin-hero.png"
+    },
+    {
+        "pokeDexId":  965,
+        "appDexId":  305,
+        "nameJa":  "ブロロン",
+        "nameEn":  "Varoom",
+        "fileName":  "varoom.png"
+    },
+    {
+        "pokeDexId":  966,
+        "appDexId":  306,
+        "nameJa":  "ブロロローム",
+        "nameEn":  "Revavroom",
+        "fileName":  "revavroom.png"
+    },
+    {
+        "pokeDexId":  967,
+        "appDexId":  307,
+        "nameJa":  "モトトカゲ",
+        "nameEn":  "Cyclizar",
+        "fileName":  "cyclizar.png"
+    },
+    {
+        "pokeDexId":  968,
+        "appDexId":  308,
+        "nameJa":  "ミミズズ",
+        "nameEn":  "Orthworm",
+        "fileName":  "orthworm.png"
+    },
+    {
+        "pokeDexId":  302,
+        "appDexId":  309,
+        "nameJa":  "ヤミラミ",
+        "nameEn":  "Sableye",
+        "fileName":  "sableye.png"
+    },
+    {
+        "pokeDexId":  353,
+        "appDexId":  310,
+        "nameJa":  "カゲボウズ",
+        "nameEn":  "Shuppet",
+        "fileName":  "shuppet.png"
+    },
+    {
+        "pokeDexId":  354,
+        "appDexId":  311,
+        "nameJa":  "ジュペッタ",
+        "nameEn":  "Banette",
+        "fileName":  "banette.png"
+    },
+    {
+        "pokeDexId":  870,
+        "appDexId":  312,
+        "nameJa":  "タイレーツ",
+        "nameEn":  "Falinks",
+        "fileName":  "falinks.png"
+    },
+    {
+        "pokeDexId":  701,
+        "appDexId":  313,
+        "nameJa":  "ルチャブル",
+        "nameEn":  "Hawlucha",
+        "fileName":  "hawlucha.png"
+    },
+    {
+        "pokeDexId":  442,
+        "appDexId":  314,
+        "nameJa":  "ミカルゲ",
+        "nameEn":  "Spiritomb",
+        "fileName":  "spiritomb.png"
+    },
+    {
+        "pokeDexId":  714,
+        "appDexId":  315,
+        "nameJa":  "オンバット",
+        "nameEn":  "Noibat",
+        "fileName":  "noibat.png"
+    },
+    {
+        "pokeDexId":  715,
+        "appDexId":  316,
+        "nameJa":  "オンバーン",
+        "nameEn":  "Noivern",
+        "fileName":  "noivern.png"
+    },
+    {
+        "pokeDexId":  885,
+        "appDexId":  317,
+        "nameJa":  "ドラメシヤ",
+        "nameEn":  "Dreepy",
+        "fileName":  "dreepy.png"
+    },
+    {
+        "pokeDexId":  886,
+        "appDexId":  318,
+        "nameJa":  "ドロンチ",
+        "nameEn":  "Drakloak",
+        "fileName":  "drakloak.png"
+    },
+    {
+        "pokeDexId":  887,
+        "appDexId":  319,
+        "nameJa":  "ドラパルト",
+        "nameEn":  "Dragapult",
+        "fileName":  "dragapult.png"
+    },
+    {
+        "pokeDexId":  969,
+        "appDexId":  320,
+        "nameJa":  "キラーメ",
+        "nameEn":  "Glimmet",
+        "fileName":  "glimmet.png"
+    },
+    {
+        "pokeDexId":  970,
+        "appDexId":  321,
+        "nameJa":  "キラフロル",
+        "nameEn":  "Glimmora",
+        "fileName":  "glimmora.png"
+    },
+    {
+        "pokeDexId":  479,
+        "appDexId":  322,
+        "nameJa":  "ロトム",
+        "nameEn":  "Rotom",
+        "fileName":  "rotom.png"
+    },
+    {
+        "pokeDexId":  479,
+        "appDexId":  323,
+        "nameJa":  "ヒートロトム",
+        "nameEn":  "Heat Rotom",
+        "fileName":  "heat-rotom.png"
+    },
+    {
+        "pokeDexId":  479,
+        "appDexId":  324,
+        "nameJa":  "ウォッシュロトム",
+        "nameEn":  "Wash Rotom",
+        "fileName":  "wash-rotom.png"
+    },
+    {
+        "pokeDexId":  479,
+        "appDexId":  325,
+        "nameJa":  "フロストロトム",
+        "nameEn":  "Frost Rotom",
+        "fileName":  "frost-rotom.png"
+    },
+    {
+        "pokeDexId":  479,
+        "appDexId":  326,
+        "nameJa":  "スピンロトム",
+        "nameEn":  "Fan Rotom",
+        "fileName":  "fan-rotom.png"
+    },
+    {
+        "pokeDexId":  479,
+        "appDexId":  327,
+        "nameJa":  "カットロトム",
+        "nameEn":  "Mow Rotom",
+        "fileName":  "mow-rotom.png"
+    },
+    {
+        "pokeDexId":  971,
+        "appDexId":  328,
+        "nameJa":  "ボチ",
+        "nameEn":  "Greavard",
+        "fileName":  "greavard.png"
+    },
+    {
+        "pokeDexId":  972,
+        "appDexId":  329,
+        "nameJa":  "ハカドッグ",
+        "nameEn":  "Houndstone",
+        "fileName":  "houndstone.png"
+    },
+    {
+        "pokeDexId":  765,
+        "appDexId":  330,
+        "nameJa":  "ヤレユータン",
+        "nameEn":  "Oranguru",
+        "fileName":  "oranguru.png"
+    },
+    {
+        "pokeDexId":  766,
+        "appDexId":  331,
+        "nameJa":  "ナゲツケサル",
+        "nameEn":  "Passimian",
+        "fileName":  "passimian.png"
+    },
+    {
+        "pokeDexId":  775,
+        "appDexId":  332,
+        "nameJa":  "ネッコアラ",
+        "nameEn":  "Komala",
+        "fileName":  "komala.png"
+    },
+    {
+        "pokeDexId":  246,
+        "appDexId":  333,
+        "nameJa":  "ヨーギラス",
+        "nameEn":  "Larvitar",
+        "fileName":  "larvitar.png"
+    },
+    {
+        "pokeDexId":  247,
+        "appDexId":  334,
+        "nameJa":  "サナギラス",
+        "nameEn":  "Pupitar",
+        "fileName":  "pupitar.png"
+    },
+    {
+        "pokeDexId":  248,
+        "appDexId":  335,
+        "nameJa":  "バンギラス",
+        "nameEn":  "Tyranitar",
+        "fileName":  "tyranitar.png"
+    },
+    {
+        "pokeDexId":  874,
+        "appDexId":  336,
+        "nameJa":  "イシヘンジン",
+        "nameEn":  "Stonjourner",
+        "fileName":  "stonjourner.png"
+    },
+    {
+        "pokeDexId":  875,
+        "appDexId":  337,
+        "nameJa":  "コオリッポ(アイス)",
+        "nameEn":  "Eiscue(Ice)",
+        "fileName":  "eiscue-ice.png"
+    },
+    {
+        "pokeDexId":  871,
+        "appDexId":  338,
+        "nameJa":  "バチンウニ",
+        "nameEn":  "Pincurchin",
+        "fileName":  "pincurchin.png"
+    },
+    {
+        "pokeDexId":  769,
+        "appDexId":  339,
+        "nameJa":  "スナバァ",
+        "nameEn":  "Sandygast",
+        "fileName":  "sandygast.png"
+    },
+    {
+        "pokeDexId":  770,
+        "appDexId":  340,
+        "nameJa":  "シロデスナ",
+        "nameEn":  "Palossand",
+        "fileName":  "palossand.png"
+    },
+    {
+        "pokeDexId":  79,
+        "appDexId":  341,
+        "nameJa":  "ヤドン",
+        "nameEn":  "Slowpoke",
+        "fileName":  "slowpoke.png"
+    },
+    {
+        "pokeDexId":  80,
+        "appDexId":  342,
+        "nameJa":  "ヤドラン",
+        "nameEn":  "Slowbro",
+        "fileName":  "slowbro.png"
+    },
+    {
+        "pokeDexId":  199,
+        "appDexId":  343,
+        "nameJa":  "ヤドキング",
+        "nameEn":  "Slowking",
+        "fileName":  "slowking.png"
+    },
+    {
+        "pokeDexId":  422,
+        "appDexId":  344,
+        "nameJa":  "カラナクシ(にし)",
+        "nameEn":  "Shellos(West)",
+        "fileName":  "shellos-west.png"
+    },
+    {
+        "pokeDexId":  423,
+        "appDexId":  345,
+        "nameJa":  "トリトドン(にし)",
+        "nameEn":  "Gastrodon(West)",
+        "fileName":  "gastrodon-west.png"
+    },
+    {
+        "pokeDexId":  90,
+        "appDexId":  346,
+        "nameJa":  "シェルダー",
+        "nameEn":  "Shellder",
+        "fileName":  "shellder.png"
+    },
+    {
+        "pokeDexId":  91,
+        "appDexId":  347,
+        "nameJa":  "パルシェン",
+        "nameEn":  "Cloyster",
+        "fileName":  "cloyster.png"
+    },
+    {
+        "pokeDexId":  211,
+        "appDexId":  348,
+        "nameJa":  "ハリーセン",
+        "nameEn":  "Qwilfish",
+        "fileName":  "qwilfish.png"
+    },
+    {
+        "pokeDexId":  370,
+        "appDexId":  349,
+        "nameJa":  "ラブカス",
+        "nameEn":  "Luvdisc",
+        "fileName":  "luvdisc.png"
+    },
+    {
+        "pokeDexId":  456,
+        "appDexId":  350,
+        "nameJa":  "ケイコウオ",
+        "nameEn":  "Finneon",
+        "fileName":  "finneon.png"
+    },
+    {
+        "pokeDexId":  457,
+        "appDexId":  351,
+        "nameJa":  "ネオラント",
+        "nameEn":  "Lumineon",
+        "fileName":  "lumineon.png"
+    },
+    {
+        "pokeDexId":  779,
+        "appDexId":  352,
+        "nameJa":  "ハギギシリ",
+        "nameEn":  "Bruxish",
+        "fileName":  "bruxish.png"
+    },
+    {
+        "pokeDexId":  594,
+        "appDexId":  353,
+        "nameJa":  "ママンボウ",
+        "nameEn":  "Alomomola",
+        "fileName":  "alomomola.png"
+    },
+    {
+        "pokeDexId":  690,
+        "appDexId":  354,
+        "nameJa":  "クズモー",
+        "nameEn":  "Skrelp",
+        "fileName":  "skrelp.png"
+    },
+    {
+        "pokeDexId":  691,
+        "appDexId":  355,
+        "nameJa":  "ドラミドロ",
+        "nameEn":  "Dragalge",
+        "fileName":  "dragalge.png"
+    },
+    {
+        "pokeDexId":  692,
+        "appDexId":  356,
+        "nameJa":  "ウデッポウ",
+        "nameEn":  "Clauncher",
+        "fileName":  "clauncher.png"
+    },
+    {
+        "pokeDexId":  693,
+        "appDexId":  357,
+        "nameJa":  "ブロスター",
+        "nameEn":  "Clawitzer",
+        "fileName":  "clawitzer.png"
+    },
+    {
+        "pokeDexId":  602,
+        "appDexId":  358,
+        "nameJa":  "シビシラス",
+        "nameEn":  "Tynamo",
+        "fileName":  "tynamo.png"
+    },
+    {
+        "pokeDexId":  603,
+        "appDexId":  359,
+        "nameJa":  "シビビール",
+        "nameEn":  "Eelektrik",
+        "fileName":  "eelektrik.png"
+    },
+    {
+        "pokeDexId":  604,
+        "appDexId":  360,
+        "nameJa":  "シビルドン",
+        "nameEn":  "Eelektross",
+        "fileName":  "eelektross.png"
+    },
+    {
+        "pokeDexId":  747,
+        "appDexId":  361,
+        "nameJa":  "ヒドイデ",
+        "nameEn":  "Mareanie",
+        "fileName":  "mareanie.png"
+    },
+    {
+        "pokeDexId":  748,
+        "appDexId":  362,
+        "nameJa":  "ドヒドイデ",
+        "nameEn":  "Toxapex",
+        "fileName":  "toxapex.png"
+    },
+    {
+        "pokeDexId":  973,
+        "appDexId":  363,
+        "nameJa":  "カラミンゴ",
+        "nameEn":  "Flamigo",
+        "fileName":  "flamigo.png"
+    },
+    {
+        "pokeDexId":  147,
+        "appDexId":  364,
+        "nameJa":  "ミニリュウ",
+        "nameEn":  "Dratini",
+        "fileName":  "dratini.png"
+    },
+    {
+        "pokeDexId":  148,
+        "appDexId":  365,
+        "nameJa":  "ハクリュー",
+        "nameEn":  "Dragonair",
+        "fileName":  "dragonair.png"
+    },
+    {
+        "pokeDexId":  149,
+        "appDexId":  366,
+        "nameJa":  "カイリュー",
+        "nameEn":  "Dragonite",
+        "fileName":  "dragonite.png"
+    },
+    {
+        "pokeDexId":  872,
+        "appDexId":  367,
+        "nameJa":  "ユキハミ",
+        "nameEn":  "Snom",
+        "fileName":  "snom.png"
+    },
+    {
+        "pokeDexId":  873,
+        "appDexId":  368,
+        "nameJa":  "モスノウ",
+        "nameEn":  "Frosmoth",
+        "fileName":  "frosmoth.png"
+    },
+    {
+        "pokeDexId":  459,
+        "appDexId":  369,
+        "nameJa":  "ユキカブリ",
+        "nameEn":  "Snover",
+        "fileName":  "snover.png"
+    },
+    {
+        "pokeDexId":  460,
+        "appDexId":  370,
+        "nameJa":  "ユキノオー",
+        "nameEn":  "Abomasnow",
+        "fileName":  "abomasnow.png"
+    },
+    {
+        "pokeDexId":  225,
+        "appDexId":  371,
+        "nameJa":  "デリバード",
+        "nameEn":  "Delibird",
+        "fileName":  "delibird.png"
+    },
+    {
+        "pokeDexId":  613,
+        "appDexId":  372,
+        "nameJa":  "クマシュン",
+        "nameEn":  "Cubchoo",
+        "fileName":  "cubchoo.png"
+    },
+    {
+        "pokeDexId":  614,
+        "appDexId":  373,
+        "nameJa":  "ツンベアー",
+        "nameEn":  "Beartic",
+        "fileName":  "beartic.png"
+    },
+    {
+        "pokeDexId":  361,
+        "appDexId":  374,
+        "nameJa":  "ユキワラシ",
+        "nameEn":  "Snorunt",
+        "fileName":  "snorunt.png"
+    },
+    {
+        "pokeDexId":  362,
+        "appDexId":  375,
+        "nameJa":  "オニゴーリ",
+        "nameEn":  "Glalie",
+        "fileName":  "glalie.png"
+    },
+    {
+        "pokeDexId":  478,
+        "appDexId":  376,
+        "nameJa":  "ユキメノコ",
+        "nameEn":  "Froslass",
+        "fileName":  "froslass.png"
+    },
+    {
+        "pokeDexId":  615,
+        "appDexId":  377,
+        "nameJa":  "フリージオ",
+        "nameEn":  "Cryogonal",
+        "fileName":  "cryogonal.png"
+    },
+    {
+        "pokeDexId":  974,
+        "appDexId":  378,
+        "nameJa":  "アルクジラ",
+        "nameEn":  "Cetoddle",
+        "fileName":  "cetoddle.png"
+    },
+    {
+        "pokeDexId":  975,
+        "appDexId":  379,
+        "nameJa":  "ハルクジラ",
+        "nameEn":  "Cetitan",
+        "fileName":  "cetitan.png"
+    },
+    {
+        "pokeDexId":  712,
+        "appDexId":  380,
+        "nameJa":  "カチコール",
+        "nameEn":  "Bergmite",
+        "fileName":  "bergmite.png"
+    },
+    {
+        "pokeDexId":  713,
+        "appDexId":  381,
+        "nameJa":  "クレベース",
+        "nameEn":  "Avalugg",
+        "fileName":  "avalugg.png"
+    },
+    {
+        "pokeDexId":  627,
+        "appDexId":  382,
+        "nameJa":  "ワシボン",
+        "nameEn":  "Rufflet",
+        "fileName":  "rufflet.png"
+    },
+    {
+        "pokeDexId":  628,
+        "appDexId":  383,
+        "nameJa":  "ウォーグル",
+        "nameEn":  "Braviary",
+        "fileName":  "braviary.png"
+    },
+    {
+        "pokeDexId":  624,
+        "appDexId":  384,
+        "nameJa":  "コマタナ",
+        "nameEn":  "Pawniard",
+        "fileName":  "pawniard.png"
+    },
+    {
+        "pokeDexId":  625,
+        "appDexId":  385,
+        "nameJa":  "キリキザン",
+        "nameEn":  "Bisharp",
+        "fileName":  "bisharp.png"
+    },
+    {
+        "pokeDexId":  983,
+        "appDexId":  386,
+        "nameJa":  "ドドゲザン",
+        "nameEn":  "Kingambit",
+        "fileName":  "kingambit.png"
+    },
+    {
+        "pokeDexId":  633,
+        "appDexId":  387,
+        "nameJa":  "モノズ",
+        "nameEn":  "Deino",
+        "fileName":  "deino.png"
+    },
+    {
+        "pokeDexId":  634,
+        "appDexId":  388,
+        "nameJa":  "ジヘッド",
+        "nameEn":  "Zweilous",
+        "fileName":  "zweilous.png"
+    },
+    {
+        "pokeDexId":  635,
+        "appDexId":  389,
+        "nameJa":  "サザンドラ",
+        "nameEn":  "Hydreigon",
+        "fileName":  "hydreigon.png"
+    },
+    {
+        "pokeDexId":  976,
+        "appDexId":  390,
+        "nameJa":  "ミガルーサ",
+        "nameEn":  "Veluza",
+        "fileName":  "veluza.png"
+    },
+    {
+        "pokeDexId":  977,
+        "appDexId":  391,
+        "nameJa":  "ヘイラッシャ",
+        "nameEn":  "Dondozo",
+        "fileName":  "dondozo.png"
+    },
+    {
+        "pokeDexId":  978,
+        "appDexId":  392,
+        "nameJa":  "シャリタツ(そった)",
+        "nameEn":  "Tatsugiri(Curly)",
+        "fileName":  "tatsugiri-curly.png"
+    },
+    {
+        "pokeDexId":  984,
+        "appDexId":  393,
+        "nameJa":  "イダイナキバ",
+        "nameEn":  "Great Tusk",
+        "fileName":  "great-tusk.png"
+    },
+    {
+        "pokeDexId":  985,
+        "appDexId":  394,
+        "nameJa":  "サケブシッポ",
+        "nameEn":  "Scream Tail",
+        "fileName":  "scream-tail.png"
+    },
+    {
+        "pokeDexId":  986,
+        "appDexId":  395,
+        "nameJa":  "アラブルタケ",
+        "nameEn":  "Brute Bonnet",
+        "fileName":  "brute-bonnet.png"
+    },
+    {
+        "pokeDexId":  987,
+        "appDexId":  396,
+        "nameJa":  "ハバタクカミ",
+        "nameEn":  "Flutter Mane",
+        "fileName":  "flutter-mane.png"
+    },
+    {
+        "pokeDexId":  988,
+        "appDexId":  397,
+        "nameJa":  "チヲハウハネ",
+        "nameEn":  "Slither Wing",
+        "fileName":  "slither-wing.png"
+    },
+    {
+        "pokeDexId":  989,
+        "appDexId":  398,
+        "nameJa":  "スナノケガワ",
+        "nameEn":  "Sandy Shocks",
+        "fileName":  "sandy-shocks.png"
+    },
+    {
+        "pokeDexId":  990,
+        "appDexId":  399,
+        "nameJa":  "テツノワダチ",
+        "nameEn":  "Iron Treads",
+        "fileName":  "iron-treads.png"
+    },
+    {
+        "pokeDexId":  991,
+        "appDexId":  400,
+        "nameJa":  "テツノツツミ",
+        "nameEn":  "Iron Bundle",
+        "fileName":  "iron-bundle.png"
+    },
+    {
+        "pokeDexId":  992,
+        "appDexId":  401,
+        "nameJa":  "テツノカイナ",
+        "nameEn":  "Iron Hands",
+        "fileName":  "iron-hands.png"
+    },
+    {
+        "pokeDexId":  993,
+        "appDexId":  402,
+        "nameJa":  "テツノコウベ",
+        "nameEn":  "Iron Jugulis",
+        "fileName":  "iron-jugulis.png"
+    },
+    {
+        "pokeDexId":  994,
+        "appDexId":  403,
+        "nameJa":  "テツノドクガ",
+        "nameEn":  "Iron Moth",
+        "fileName":  "iron-moth.png"
+    },
+    {
+        "pokeDexId":  995,
+        "appDexId":  404,
+        "nameJa":  "テツノイバラ",
+        "nameEn":  "Iron Thorns",
+        "fileName":  "iron-thorns.png"
+    },
+    {
+        "pokeDexId":  996,
+        "appDexId":  405,
+        "nameJa":  "セビエ",
+        "nameEn":  "Frigibax",
+        "fileName":  "frigibax.png"
+    },
+    {
+        "pokeDexId":  997,
+        "appDexId":  406,
+        "nameJa":  "セゴール",
+        "nameEn":  "Arctibax",
+        "fileName":  "arctibax.png"
+    },
+    {
+        "pokeDexId":  998,
+        "appDexId":  407,
+        "nameJa":  "セグレイブ",
+        "nameEn":  "Baxcalibur",
+        "fileName":  "baxcalibur.png"
+    },
+    {
+        "pokeDexId":  999,
+        "appDexId":  408,
+        "nameJa":  "コレクレー(はこ)",
+        "nameEn":  "Gimmighoul(Chest)",
+        "fileName":  "gimmighoul-chest.png"
+    },
+    {
+        "pokeDexId":  1000,
+        "appDexId":  409,
+        "nameJa":  "サーフゴー",
+        "nameEn":  "Gholdengo",
+        "fileName":  "gholdengo.png"
+    },
+    {
+        "pokeDexId":  1001,
+        "appDexId":  410,
+        "nameJa":  "チオンジェン",
+        "nameEn":  "Wo-Chien",
+        "fileName":  "wo-chien.png"
+    },
+    {
+        "pokeDexId":  1002,
+        "appDexId":  411,
+        "nameJa":  "パオジアン",
+        "nameEn":  "Chien-Pao",
+        "fileName":  "chien-pao.png"
+    },
+    {
+        "pokeDexId":  1003,
+        "appDexId":  412,
+        "nameJa":  "ディンルー",
+        "nameEn":  "Ting-Lu",
+        "fileName":  "ting-lu.png"
+    },
+    {
+        "pokeDexId":  1004,
+        "appDexId":  413,
+        "nameJa":  "イーユイ",
+        "nameEn":  "Chi-Yu",
+        "fileName":  "chi-yu.png"
+    },
+    {
+        "pokeDexId":  1005,
+        "appDexId":  414,
+        "nameJa":  "トドロクツキ",
+        "nameEn":  "Roaring Moon",
+        "fileName":  "roaring-moon.png"
+    },
+    {
+        "pokeDexId":  1006,
+        "appDexId":  415,
+        "nameJa":  "テツノブジン",
+        "nameEn":  "Iron Valiant",
+        "fileName":  "iron-valiant.png"
+    },
+    {
+        "pokeDexId":  1007,
+        "appDexId":  416,
+        "nameJa":  "コライドン",
+        "nameEn":  "Koraidon",
+        "fileName":  "koraidon.png"
+    },
+    {
+        "pokeDexId":  1008,
+        "appDexId":  417,
+        "nameJa":  "ミライドン",
+        "nameEn":  "Miraidon",
+        "fileName":  "miraidon.png"
+    },
+    {
+        "pokeDexId":  52,
+        "appDexId":  418,
+        "nameJa":  "ニャース(ガラル)",
+        "nameEn":  "Meowth(Galarian)",
+        "fileName":  "meowth-galarian.png"
+    },
+    {
+        "pokeDexId":  863,
+        "appDexId":  419,
+        "nameJa":  "ニャイキング",
+        "nameEn":  "Perrserker",
+        "fileName":  "perrserker.png"
+    },
+    {
+        "pokeDexId":  194,
+        "appDexId":  420,
+        "nameJa":  "ウパー",
+        "nameEn":  "Wooper",
+        "fileName":  "wooper.png"
+    },
+    {
+        "pokeDexId":  195,
+        "appDexId":  421,
+        "nameJa":  "ヌオー",
+        "nameEn":  "Quagsire",
+        "fileName":  "quagsire.png"
+    },
+    {
+        "pokeDexId":  4,
+        "appDexId":  422,
+        "nameJa":  "ヒトカゲ",
+        "nameEn":  "Charmander",
+        "fileName":  "charmander.png"
+    },
+    {
+        "pokeDexId":  5,
+        "appDexId":  423,
+        "nameJa":  "リザード",
+        "nameEn":  "Charmeleon",
+        "fileName":  "charmeleon.png"
+    },
+    {
+        "pokeDexId":  6,
+        "appDexId":  424,
+        "nameJa":  "リザードン",
+        "nameEn":  "Charizard",
+        "fileName":  "charizard.png"
+    },
+    {
+        "pokeDexId":  813,
+        "appDexId":  425,
+        "nameJa":  "ヒバニー",
+        "nameEn":  "Scorbunny",
+        "fileName":  "scorbunny.png"
+    },
+    {
+        "pokeDexId":  814,
+        "appDexId":  426,
+        "nameJa":  "ラビフット",
+        "nameEn":  "Raboot",
+        "fileName":  "raboot.png"
+    },
+    {
+        "pokeDexId":  815,
+        "appDexId":  427,
+        "nameJa":  "エースバーン",
+        "nameEn":  "Cinderace",
+        "fileName":  "cinderace.png"
+    },
+    {
+        "pokeDexId":  656,
+        "appDexId":  428,
+        "nameJa":  "ケロマツ",
+        "nameEn":  "Froakie",
+        "fileName":  "froakie.png"
+    },
+    {
+        "pokeDexId":  657,
+        "appDexId":  429,
+        "nameJa":  "ゲコガシラ",
+        "nameEn":  "Frogadier",
+        "fileName":  "frogadier.png"
+    },
+    {
+        "pokeDexId":  658,
+        "appDexId":  430,
+        "nameJa":  "ゲッコウガ",
+        "nameEn":  "Greninja",
+        "fileName":  "greninja.png"
+    },
+    {
+        "pokeDexId":  570,
+        "appDexId":  431,
+        "nameJa":  "ゾロア(ヒスイ)",
+        "nameEn":  "Hisuian Zoroa",
+        "fileName":  "hisuian-zoroa.png"
+    },
+    {
+        "pokeDexId":  571,
+        "appDexId":  432,
+        "nameJa":  "ゾロアーク(ヒスイ)",
+        "nameEn":  "Hisuian Zoroark",
+        "fileName":  "hisuian-zoroark.png"
+    },
+    {
+        "pokeDexId":  1009,
+        "appDexId":  433,
+        "nameJa":  "ウネルミナモ",
+        "nameEn":  "Walking Wake",
+        "fileName":  "walking-wake.png"
+    },
+    {
+        "pokeDexId":  1010,
+        "appDexId":  434,
+        "nameJa":  "テツノイサハ",
+        "nameEn":  "Iron Leaves",
+        "fileName":  "iron-leaves.png"
+    },
+    {
+        "pokeDexId":  722,
+        "appDexId":  435,
+        "nameJa":  "モクロー",
+        "nameEn":  "Rowlet",
+        "fileName":  "rowlet.png"
+    },
+    {
+        "pokeDexId":  723,
+        "appDexId":  436,
+        "nameJa":  "フクスロー",
+        "nameEn":  "Dartrix",
+        "fileName":  "dartrix.png"
+    },
+    {
+        "pokeDexId":  724,
+        "appDexId":  437,
+        "nameJa":  "ジュナイパー",
+        "nameEn":  "Decidueye",
+        "fileName":  "decidueye.png"
+    },
+    {
+        "pokeDexId":  501,
+        "appDexId":  438,
+        "nameJa":  "ミジュマル",
+        "nameEn":  "Oshawott",
+        "fileName":  "oshawott.png"
+    },
+    {
+        "pokeDexId":  502,
+        "appDexId":  439,
+        "nameJa":  "フタチマル",
+        "nameEn":  "Dewott",
+        "fileName":  "dewott.png"
+    },
+    {
+        "pokeDexId":  503,
+        "appDexId":  440,
+        "nameJa":  "ダイケンキ",
+        "nameEn":  "Samurott",
+        "fileName":  "samurott.png"
+    },
+    {
+        "pokeDexId":  155,
+        "appDexId":  441,
+        "nameJa":  "ヒノアラシ",
+        "nameEn":  "Cyndaquil",
+        "fileName":  "cyndaquil.png"
+    },
+    {
+        "pokeDexId":  156,
+        "appDexId":  442,
+        "nameJa":  "マグマラシ",
+        "nameEn":  "Quilava",
+        "fileName":  "quilava.png"
+    },
+    {
+        "pokeDexId":  157,
+        "appDexId":  443,
+        "nameJa":  "バクフーン",
+        "nameEn":  "Typhlosion",
+        "fileName":  "typhlosion.png"
+    },
+    {
+        "pokeDexId":  816,
+        "appDexId":  444,
+        "nameJa":  "メッソン",
+        "nameEn":  "Sobble",
+        "fileName":  "sobble.png"
+    },
+    {
+        "pokeDexId":  817,
+        "appDexId":  445,
+        "nameJa":  "ジメレオン",
+        "nameEn":  "Drizzile",
+        "fileName":  "drizzile.png"
+    },
+    {
+        "pokeDexId":  818,
+        "appDexId":  446,
+        "nameJa":  "インテレオン",
+        "nameEn":  "Inteleon",
+        "fileName":  "inteleon.png"
+    },
+    {
+        "pokeDexId":  650,
+        "appDexId":  447,
+        "nameJa":  "ハリマロン",
+        "nameEn":  "Chespin",
+        "fileName":  "chespin.png"
+    },
+    {
+        "pokeDexId":  651,
+        "appDexId":  448,
+        "nameJa":  "ハリボーグ",
+        "nameEn":  "Quilladin",
+        "fileName":  "quilladin.png"
+    },
+    {
+        "pokeDexId":  652,
+        "appDexId":  449,
+        "nameJa":  "ブリガロン",
+        "nameEn":  "Chesnaught",
+        "fileName":  "chesnaught.png"
+    },
+    {
+        "pokeDexId":  128,
+        "appDexId":  450,
+        "nameJa":  "ケンタロス",
+        "nameEn":  "Tauros",
+        "fileName":  "tauros.png"
+    },
+    {
+        "pokeDexId":  144,
+        "appDexId":  451,
+        "nameJa":  "フリーザー",
+        "nameEn":  "Articuno",
+        "fileName":  "articuno.png"
+    },
+    {
+        "pokeDexId":  145,
+        "appDexId":  452,
+        "nameJa":  "サンダー",
+        "nameEn":  "Zapdos",
+        "fileName":  "zapdos.png"
+    },
+    {
+        "pokeDexId":  146,
+        "appDexId":  453,
+        "nameJa":  "ファイヤー",
+        "nameEn":  "Moltres",
+        "fileName":  "moltres.png"
+    },
+    {
+        "pokeDexId":  150,
+        "appDexId":  454,
+        "nameJa":  "ミュウツー",
+        "nameEn":  "Mewtwo",
+        "fileName":  "mewtwo.png"
+    },
+    {
+        "pokeDexId":  151,
+        "appDexId":  455,
+        "nameJa":  "ミュウ",
+        "nameEn":  "Mew",
+        "fileName":  "mew.png"
+    },
+    {
+        "pokeDexId":  382,
+        "appDexId":  456,
+        "nameJa":  "カイオーガ",
+        "nameEn":  "Kyogre",
+        "fileName":  "kyogre.png"
+    },
+    {
+        "pokeDexId":  383,
+        "appDexId":  457,
+        "nameJa":  "グラードン",
+        "nameEn":  "Groudon",
+        "fileName":  "groudon.png"
+    },
+    {
+        "pokeDexId":  384,
+        "appDexId":  458,
+        "nameJa":  "レックウザ",
+        "nameEn":  "Rayquaza",
+        "fileName":  "rayquaza.png"
+    },
+    {
+        "pokeDexId":  480,
+        "appDexId":  459,
+        "nameJa":  "ユクシー",
+        "nameEn":  "Uxie",
+        "fileName":  "uxie.png"
+    },
+    {
+        "pokeDexId":  481,
+        "appDexId":  460,
+        "nameJa":  "エムリット",
+        "nameEn":  "Mesprit",
+        "fileName":  "mesprit.png"
+    },
+    {
+        "pokeDexId":  482,
+        "appDexId":  461,
+        "nameJa":  "アグノム",
+        "nameEn":  "Azelf",
+        "fileName":  "azelf.png"
+    },
+    {
+        "pokeDexId":  483,
+        "appDexId":  462,
+        "nameJa":  "ディアルガ",
+        "nameEn":  "Dialga",
+        "fileName":  "dialga.png"
+    },
+    {
+        "pokeDexId":  483,
+        "appDexId":  463,
+        "nameJa":  "ディアルガ(オリジン)",
+        "nameEn":  "Dialga(Origin)",
+        "fileName":  "dialga-origin.png"
+    },
+    {
+        "pokeDexId":  484,
+        "appDexId":  464,
+        "nameJa":  "パルキア",
+        "nameEn":  "Palkia",
+        "fileName":  "palkia.png"
+    },
+    {
+        "pokeDexId":  484,
+        "appDexId":  465,
+        "nameJa":  "パルキア(オリジン)",
+        "nameEn":  "Palkia(Origin)",
+        "fileName":  "palkia-origin.png"
+    },
+    {
+        "pokeDexId":  485,
+        "appDexId":  466,
+        "nameJa":  "ヒードラン",
+        "nameEn":  "Heatran",
+        "fileName":  "heatran.png"
+    },
+    {
+        "pokeDexId":  487,
+        "appDexId":  467,
+        "nameJa":  "ギラティナ(アナザー)",
+        "nameEn":  "Giratina(Altered)",
+        "fileName":  "giratina-altered.png"
+    },
+    {
+        "pokeDexId":  487,
+        "appDexId":  468,
+        "nameJa":  "ギラティナ(オリジン)",
+        "nameEn":  "Giratina(Origin)",
+        "fileName":  "giratina-origin.png"
+    },
+    {
+        "pokeDexId":  488,
+        "appDexId":  469,
+        "nameJa":  "クレセリア",
+        "nameEn":  "Cresselia",
+        "fileName":  "cresselia.png"
+    },
+    {
+        "pokeDexId":  493,
+        "appDexId":  470,
+        "nameJa":  "アルセウス",
+        "nameEn":  "Arceus",
+        "fileName":  "arceus.png"
+    },
+    {
+        "pokeDexId":  641,
+        "appDexId":  471,
+        "nameJa":  "トルネロス(けしん)",
+        "nameEn":  "Tornadus(Incarnate)",
+        "fileName":  "tornadus-incarnate.png"
+    },
+    {
+        "pokeDexId":  641,
+        "appDexId":  472,
+        "nameJa":  "トルネロス(れいじゅう)",
+        "nameEn":  "Tornadus(Therian)",
+        "fileName":  "tornadus-therian.png"
+    },
+    {
+        "pokeDexId":  642,
+        "appDexId":  473,
+        "nameJa":  "ボルトロス(けしん)",
+        "nameEn":  "Thundurus(Incarnate)",
+        "fileName":  "thundurus-incarnate.png"
+    },
+    {
+        "pokeDexId":  642,
+        "appDexId":  474,
+        "nameJa":  "ボルトロス(れいじゅう)",
+        "nameEn":  "Thundurus(Therian)",
+        "fileName":  "thundurus-therian.png"
+    },
+    {
+        "pokeDexId":  645,
+        "appDexId":  475,
+        "nameJa":  "ランドロス(けしん)",
+        "nameEn":  "Landorus(Incarnate)",
+        "fileName":  "landorus-incarnate.png"
+    },
+    {
+        "pokeDexId":  645,
+        "appDexId":  476,
+        "nameJa":  "ランドロス(れいじゅう)",
+        "nameEn":  "Landorus(Therian)",
+        "fileName":  "landorus-therian.png"
+    },
+    {
+        "pokeDexId":  648,
+        "appDexId":  477,
+        "nameJa":  "メロエッタ(ボイス)",
+        "nameEn":  "Meloetta(Aria)",
+        "fileName":  "meloetta-aria.png"
+    },
+    {
+        "pokeDexId":  648,
+        "appDexId":  478,
+        "nameJa":  "メロエッタ(ステップ)",
+        "nameEn":  "Meloetta(Pirouette)",
+        "fileName":  "meloetta-pirouette.png"
+    },
+    {
+        "pokeDexId":  653,
+        "appDexId":  479,
+        "nameJa":  "フォッコ",
+        "nameEn":  "Fennekin",
+        "fileName":  "fennekin.png"
+    },
+    {
+        "pokeDexId":  654,
+        "appDexId":  480,
+        "nameJa":  "テールナー",
+        "nameEn":  "Braixen",
+        "fileName":  "braixen.png"
+    },
+    {
+        "pokeDexId":  655,
+        "appDexId":  481,
+        "nameJa":  "マフォクシー",
+        "nameEn":  "Delphox",
+        "fileName":  "delphox.png"
+    },
+    {
+        "pokeDexId":  703,
+        "appDexId":  482,
+        "nameJa":  "メレシー",
+        "nameEn":  "Carbink",
+        "fileName":  "carbink.png"
+    },
+    {
+        "pokeDexId":  719,
+        "appDexId":  483,
+        "nameJa":  "ディアンシー",
+        "nameEn":  "Diancie",
+        "fileName":  "diancie.png"
+    },
+    {
+        "pokeDexId":  720,
+        "appDexId":  484,
+        "nameJa":  "フーパ(いましめられし)",
+        "nameEn":  "Hoopa(Confined)",
+        "fileName":  "hoopa-confined.png"
+    },
+    {
+        "pokeDexId":  720,
+        "appDexId":  485,
+        "nameJa":  "フーパ(ときはなたれし)",
+        "nameEn":  "Hoopa(Unbound)",
+        "fileName":  "hoopa-unbound.png"
+    },
+    {
+        "pokeDexId":  721,
+        "appDexId":  486,
+        "nameJa":  "ボルケニオン",
+        "nameEn":  "Volcanion",
+        "fileName":  "volcanion.png"
+    },
+    {
+        "pokeDexId":  26,
+        "appDexId":  487,
+        "nameJa":  "ライチュウ(アローラ)",
+        "nameEn":  "Raichu(Alolan)",
+        "fileName":  "raichu-alolan.png"
+    },
+    {
+        "pokeDexId":  50,
+        "appDexId":  488,
+        "nameJa":  "ディグダ(アローラ)",
+        "nameEn":  "Diglett(Alolan)",
+        "fileName":  "diglett-alolan.png"
+    },
+    {
+        "pokeDexId":  51,
+        "appDexId":  489,
+        "nameJa":  "ダグトリオ(アローラ)",
+        "nameEn":  "Dugtrio(Alolan)",
+        "fileName":  "dugtrio-alolan.png"
+    },
+    {
+        "pokeDexId":  52,
+        "appDexId":  490,
+        "nameJa":  "ニャース(アローラ)",
+        "nameEn":  "Meowth(Alolan)",
+        "fileName":  "meowth-alolan.png"
+    },
+    {
+        "pokeDexId":  53,
+        "appDexId":  491,
+        "nameJa":  "ペルシアン(アローラ)",
+        "nameEn":  "Persian(Alolan)",
+        "fileName":  "persian-alolan.png"
+    },
+    {
+        "pokeDexId":  88,
+        "appDexId":  492,
+        "nameJa":  "ベトベター(アローラ)",
+        "nameEn":  "Grimer(Alolan)",
+        "fileName":  "grimer-alolan.png"
+    },
+    {
+        "pokeDexId":  89,
+        "appDexId":  493,
+        "nameJa":  "ベトベトン(アローラ)",
+        "nameEn":  "Muk(Alolan)",
+        "fileName":  "muk-alolan.png"
+    },
+    {
+        "pokeDexId":  801,
+        "appDexId":  494,
+        "nameJa":  "マギアナ",
+        "nameEn":  "Magearna",
+        "fileName":  "magearna.png"
+    },
+    {
+        "pokeDexId":  79,
+        "appDexId":  495,
+        "nameJa":  "ヤドン(ガラル)",
+        "nameEn":  "Slowpoke(Galarian)",
+        "fileName":  "slowpoke-galarian.png"
+    },
+    {
+        "pokeDexId":  80,
+        "appDexId":  496,
+        "nameJa":  "ヤドラン(ガラル)",
+        "nameEn":  "Slowbro(Galarian)",
+        "fileName":  "slowbro-galarian.png"
+    },
+    {
+        "pokeDexId":  810,
+        "appDexId":  497,
+        "nameJa":  "サルノリ",
+        "nameEn":  "Grookey",
+        "fileName":  "grookey.png"
+    },
+    {
+        "pokeDexId":  811,
+        "appDexId":  498,
+        "nameJa":  "バチンキー",
+        "nameEn":  "Thwackey",
+        "fileName":  "thwackey.png"
+    },
+    {
+        "pokeDexId":  812,
+        "appDexId":  499,
+        "nameJa":  "ゴリランダー",
+        "nameEn":  "Rillaboom",
+        "fileName":  "rillaboom.png"
+    },
+    {
+        "pokeDexId":  888,
+        "appDexId":  500,
+        "nameJa":  "ザシアン(れきせん)",
+        "nameEn":  "Zacian(Hero)",
+        "fileName":  "zacian-hero.png"
+    },
+    {
+        "pokeDexId":  888,
+        "appDexId":  501,
+        "nameJa":  "ザシアン(けんのおう)",
+        "nameEn":  "Zacian(Crowned Sword)",
+        "fileName":  "zacian-crowned-sword.png"
+    },
+    {
+        "pokeDexId":  889,
+        "appDexId":  502,
+        "nameJa":  "ザマゼンタ(れきせん)",
+        "nameEn":  "Zamazenta(Hero)",
+        "fileName":  "zamazenta-hero.png"
+    },
+    {
+        "pokeDexId":  889,
+        "appDexId":  503,
+        "nameJa":  "ザマゼンタ(たてのおう)",
+        "nameEn":  "Zamazenta(Crowned Shield)",
+        "fileName":  "zamazenta-crowned-shield.png"
+    },
+    {
+        "pokeDexId":  890,
+        "appDexId":  504,
+        "nameJa":  "ムゲンダイナ",
+        "nameEn":  "Eternatus",
+        "fileName":  "eternatus.png"
+    },
+    {
+        "pokeDexId":  891,
+        "appDexId":  505,
+        "nameJa":  "ダクマ",
+        "nameEn":  "Kubfu",
+        "fileName":  "kubfu.png"
+    },
+    {
+        "pokeDexId":  892,
+        "appDexId":  506,
+        "nameJa":  "ウーラオス(いちげき)",
+        "nameEn":  "Urshifu(Single Strike)",
+        "fileName":  "urshifu-single-strike.png"
+    },
+    {
+        "pokeDexId":  892,
+        "appDexId":  507,
+        "nameJa":  "ウーラオス(れんげき)",
+        "nameEn":  "Urshifu(Rapid Strike)",
+        "fileName":  "urshifu-rapid-strike.png"
+    },
+    {
+        "pokeDexId":  893,
+        "appDexId":  508,
+        "nameJa":  "ザルード",
+        "nameEn":  "Zarude",
+        "fileName":  "zarude.png"
+    },
+    {
+        "pokeDexId":  894,
+        "appDexId":  509,
+        "nameJa":  "レジエレキ",
+        "nameEn":  "Regieleki",
+        "fileName":  "regieleki.png"
+    },
+    {
+        "pokeDexId":  895,
+        "appDexId":  510,
+        "nameJa":  "レジドラゴ",
+        "nameEn":  "Regidrago",
+        "fileName":  "regidrago.png"
+    },
+    {
+        "pokeDexId":  896,
+        "appDexId":  511,
+        "nameJa":  "ブリザポス",
+        "nameEn":  "Glastrier",
+        "fileName":  "glastrier.png"
+    },
+    {
+        "pokeDexId":  897,
+        "appDexId":  512,
+        "nameJa":  "レイスポス",
+        "nameEn":  "Spectrier",
+        "fileName":  "spectrier.png"
+    },
+    {
+        "pokeDexId":  898,
+        "appDexId":  513,
+        "nameJa":  "バドレックス",
+        "nameEn":  "Calyrex",
+        "fileName":  "calyrex.png"
+    },
+    {
+        "pokeDexId":  898,
+        "appDexId":  514,
+        "nameJa":  "バドレックス(はくばじょう)",
+        "nameEn":  "Calyrex(Ice Rider)",
+        "fileName":  "calyrex-ice-rider.png"
+    },
+    {
+        "pokeDexId":  898,
+        "appDexId":  515,
+        "nameJa":  "バドレックス(こくばじょう)",
+        "nameEn":  "Calyrex(Shadow Rider)",
+        "fileName":  "calyrex-shadow-rider.png"
+    },
+    {
+        "pokeDexId":  144,
+        "appDexId":  516,
+        "nameJa":  "フリーザー(ガラル)",
+        "nameEn":  "Articuno(Galarian)",
+        "fileName":  "articuno-galarian.png"
+    },
+    {
+        "pokeDexId":  145,
+        "appDexId":  517,
+        "nameJa":  "サンダー(ガラル)",
+        "nameEn":  "Zapdos(Galarian)",
+        "fileName":  "zapdos-galarian.png"
+    },
+    {
+        "pokeDexId":  146,
+        "appDexId":  518,
+        "nameJa":  "ファイヤー(ガラル)",
+        "nameEn":  "Moltres(Galarian)",
+        "fileName":  "moltres-galarian.png"
+    },
+    {
+        "pokeDexId":  199,
+        "appDexId":  519,
+        "nameJa":  "ヤドキング(ガラル)",
+        "nameEn":  "Slowking(Galarian)",
+        "fileName":  "slowking-galarian.png"
+    },
+    {
+        "pokeDexId":  58,
+        "appDexId":  520,
+        "nameJa":  "ガーディ(ヒスイ)",
+        "nameEn":  "Growlithe(Hisuian)",
+        "fileName":  "growlithe-hisuian.png"
+    },
+    {
+        "pokeDexId":  59,
+        "appDexId":  521,
+        "nameJa":  "ウインディ(ヒスイ)",
+        "nameEn":  "Arcanine(Hisuian)",
+        "fileName":  "arcanine-hisuian.png"
+    },
+    {
+        "pokeDexId":  100,
+        "appDexId":  522,
+        "nameJa":  "ビリリダマ(ヒスイ)",
+        "nameEn":  "Voltorb(Hisuian)",
+        "fileName":  "voltorb-hisuian.png"
+    },
+    {
+        "pokeDexId":  101,
+        "appDexId":  523,
+        "nameJa":  "マルマイン(ヒスイ)",
+        "nameEn":  "Electrode(Hisuian)",
+        "fileName":  "electrode-hisuian.png"
+    },
+    {
+        "pokeDexId":  157,
+        "appDexId":  524,
+        "nameJa":  "バクフーン(ヒスイ)",
+        "nameEn":  "Typhlosion(Hisuian)",
+        "fileName":  "typhlosion-hisuian.png"
+    },
+    {
+        "pokeDexId":  211,
+        "appDexId":  525,
+        "nameJa":  "ハリーセン(ヒスイ)",
+        "nameEn":  "Qwilfish(Hisuian)",
+        "fileName":  "qwilfish-hisuian.png"
+    },
+    {
+        "pokeDexId":  215,
+        "appDexId":  526,
+        "nameJa":  "ニューラ(ヒスイ)",
+        "nameEn":  "Sneasel(Hisuian)",
+        "fileName":  "sneasel-hisuian.png"
+    },
+    {
+        "pokeDexId":  503,
+        "appDexId":  527,
+        "nameJa":  "ダイケンキ(ヒスイ)",
+        "nameEn":  "Samurott(Hisuian)",
+        "fileName":  "samurott-hisuian.png"
+    },
+    {
+        "pokeDexId":  549,
+        "appDexId":  528,
+        "nameJa":  "ドレディア(ヒスイ)",
+        "nameEn":  "Lilligant(Hisuian)",
+        "fileName":  "lilligant-hisuian.png"
+    },
+    {
+        "pokeDexId":  550,
+        "appDexId":  529,
+        "nameJa":  "バスラオ(しろすじ)",
+        "nameEn":  "Basculin(White-Striped)",
+        "fileName":  "basculin-white-striped.png"
+    },
+    {
+        "pokeDexId":  628,
+        "appDexId":  530,
+        "nameJa":  "ウォーグル(ヒスイ)",
+        "nameEn":  "Braviary(Hisuian)",
+        "fileName":  "braviary-hisuian.png"
+    },
+    {
+        "pokeDexId":  705,
+        "appDexId":  531,
+        "nameJa":  "ヌメイル(ヒスイ)",
+        "nameEn":  "Sliggoo(Hisuian)",
+        "fileName":  "sliggoo-hisuian.png"
+    },
+    {
+        "pokeDexId":  706,
+        "appDexId":  532,
+        "nameJa":  "ヌメルゴン(ヒスイ)",
+        "nameEn":  "Goodra(Hisuian)",
+        "fileName":  "goodra-hisuian.png"
+    },
+    {
+        "pokeDexId":  713,
+        "appDexId":  533,
+        "nameJa":  "クレベース(ヒスイ)",
+        "nameEn":  "Avalugg(Hisuian)",
+        "fileName":  "avalugg-hisuian.png"
+    },
+    {
+        "pokeDexId":  724,
+        "appDexId":  534,
+        "nameJa":  "ジュナイパー(ヒスイ)",
+        "nameEn":  "Decidueye(Hisuian)",
+        "fileName":  "decidueye-hisuian.png"
+    },
+    {
+        "pokeDexId":  899,
+        "appDexId":  535,
+        "nameJa":  "アヤシシ",
+        "nameEn":  "Wyrdeer",
+        "fileName":  "wyrdeer.png"
+    },
+    {
+        "pokeDexId":  900,
+        "appDexId":  536,
+        "nameJa":  "バサギリ",
+        "nameEn":  "Kleavor",
+        "fileName":  "kleavor.png"
+    },
+    {
+        "pokeDexId":  901,
+        "appDexId":  537,
+        "nameJa":  "ガチグマ",
+        "nameEn":  "Ursaluna",
+        "fileName":  "ursaluna.png"
+    },
+    {
+        "pokeDexId":  902,
+        "appDexId":  538,
+        "nameJa":  "イダイトウ(オス)",
+        "nameEn":  "Basculegion(Male)",
+        "fileName":  "basculegion-male.png"
+    },
+    {
+        "pokeDexId":  902,
+        "appDexId":  539,
+        "nameJa":  "イダイトウ(メス)",
+        "nameEn":  "Basculegion(Female)",
+        "fileName":  "basculegion-female.png"
+    },
+    {
+        "pokeDexId":  903,
+        "appDexId":  540,
+        "nameJa":  "オオニューラ",
+        "nameEn":  "Sneasler",
+        "fileName":  "sneasler.png"
+    },
+    {
+        "pokeDexId":  904,
+        "appDexId":  541,
+        "nameJa":  "ハリーマン",
+        "nameEn":  "Overqwil",
+        "fileName":  "overqwil.png"
+    },
+    {
+        "pokeDexId":  905,
+        "appDexId":  542,
+        "nameJa":  "ラブトロス(けしん)",
+        "nameEn":  "Enamorus(Incarnate)",
+        "fileName":  "enamorus-incarnate.png"
+    },
+    {
+        "pokeDexId":  905,
+        "appDexId":  543,
+        "nameJa":  "ラブトロス(れいじゅう)",
+        "nameEn":  "Enamorus(Therian)",
+        "fileName":  "enamorus-therian.png"
+    },
+    {
+        "pokeDexId":  999,
+        "appDexId":  544,
+        "nameJa":  "コレクレー(とほ)",
+        "nameEn":  "Gimmighoul(Roaming)",
+        "fileName":  "gimmighoul-roaming.png"
+    },
+    {
+        "pokeDexId":  23,
+        "appDexId":  545,
+        "nameJa":  "アーボ",
+        "nameEn":  "Ekans",
+        "fileName":  "ekans.png"
+    },
+    {
+        "pokeDexId":  24,
+        "appDexId":  546,
+        "nameJa":  "アーボック",
+        "nameEn":  "Arbok",
+        "fileName":  "arbok.png"
+    },
+    {
+        "pokeDexId":  35,
+        "appDexId":  547,
+        "nameJa":  "ピッピ",
+        "nameEn":  "Clefairy",
+        "fileName":  "clefairy.png"
+    },
+    {
+        "pokeDexId":  36,
+        "appDexId":  548,
+        "nameJa":  "ピクシー",
+        "nameEn":  "Clefable",
+        "fileName":  "clefable.png"
+    },
+    {
+        "pokeDexId":  173,
+        "appDexId":  549,
+        "nameJa":  "ピィ",
+        "nameEn":  "Cleffa",
+        "fileName":  "cleffa.png"
+    },
+    {
+        "pokeDexId":  37,
+        "appDexId":  550,
+        "nameJa":  "ロコン",
+        "nameEn":  "Vulpix",
+        "fileName":  "vulpix.png"
+    },
+    {
+        "pokeDexId":  38,
+        "appDexId":  551,
+        "nameJa":  "キュウコン",
+        "nameEn":  "Ninetales",
+        "fileName":  "ninetales.png"
+    },
+    {
+        "pokeDexId":  60,
+        "appDexId":  554,
+        "nameJa":  "ニョロモ",
+        "nameEn":  "Poliwag",
+        "fileName":  "poliwag.png"
+    },
+    {
+        "pokeDexId":  61,
+        "appDexId":  555,
+        "nameJa":  "ニョロゾ",
+        "nameEn":  "Poliwhirl",
+        "fileName":  "poliwhirl.png"
+    },
+    {
+        "pokeDexId":  62,
+        "appDexId":  556,
+        "nameJa":  "ニョロボン",
+        "nameEn":  "Poliwrath",
+        "fileName":  "poliwrath.png"
+    },
+    {
+        "pokeDexId":  43,
+        "appDexId":  557,
+        "nameJa":  "ナゾノクサ",
+        "nameEn":  "Oddish",
+        "fileName":  "oddish.png"
+    },
+    {
+        "pokeDexId":  44,
+        "appDexId":  558,
+        "nameJa":  "クサイハナ",
+        "nameEn":  "Gloom",
+        "fileName":  "gloom.png"
+    },
+    {
+        "pokeDexId":  45,
+        "appDexId":  559,
+        "nameJa":  "ラフレシア",
+        "nameEn":  "Vileplume",
+        "fileName":  "vileplume.png"
+    },
+    {
+        "pokeDexId":  182,
+        "appDexId":  560,
+        "nameJa":  "キレイハナ",
+        "nameEn":  "Bellossom",
+        "fileName":  "bellossom.png"
+    },
+    {
+        "pokeDexId":  143,
+        "appDexId":  561,
+        "nameJa":  "カビゴン",
+        "nameEn":  "Snorlax",
+        "fileName":  "snorlax.png"
+    },
+    {
+        "pokeDexId":  446,
+        "appDexId":  562,
+        "nameJa":  "ゴンベ",
+        "nameEn":  "Munchlax",
+        "fileName":  "munchlax.png"
+    },
+    {
+        "pokeDexId":  161,
+        "appDexId":  563,
+        "nameJa":  "オタチ",
+        "nameEn":  "Sentret",
+        "fileName":  "sentret.png"
+    },
+    {
+        "pokeDexId":  162,
+        "appDexId":  564,
+        "nameJa":  "オオタチ",
+        "nameEn":  "Furret",
+        "fileName":  "furret.png"
+    },
+    {
+        "pokeDexId":  163,
+        "appDexId":  565,
+        "nameJa":  "ホーホー",
+        "nameEn":  "Hoothoot",
+        "fileName":  "hoothoot.png"
+    },
+    {
+        "pokeDexId":  164,
+        "appDexId":  566,
+        "nameJa":  "ヨルノズク",
+        "nameEn":  "Noctowl",
+        "fileName":  "noctowl.png"
+    },
+    {
+        "pokeDexId":  190,
+        "appDexId":  567,
+        "nameJa":  "エイパム",
+        "nameEn":  "Aipom",
+        "fileName":  "aipom.png"
+    },
+    {
+        "pokeDexId":  424,
+        "appDexId":  568,
+        "nameJa":  "エテボース",
+        "nameEn":  "Ambipom",
+        "fileName":  "ambipom.png"
+    },
+    {
+        "pokeDexId":  207,
+        "appDexId":  569,
+        "nameJa":  "グライガー",
+        "nameEn":  "Gligar",
+        "fileName":  "gligar.png"
+    },
+    {
+        "pokeDexId":  472,
+        "appDexId":  570,
+        "nameJa":  "グライオン",
+        "nameEn":  "Gliscor",
+        "fileName":  "gliscor.png"
+    },
+    {
+        "pokeDexId":  193,
+        "appDexId":  571,
+        "nameJa":  "ヤンヤンマ",
+        "nameEn":  "Yanma",
+        "fileName":  "yanma.png"
+    },
+    {
+        "pokeDexId":  469,
+        "appDexId":  572,
+        "nameJa":  "メガヤンマ",
+        "nameEn":  "Yanmega",
+        "fileName":  "yanmega.png"
+    },
+    {
+        "pokeDexId":  273,
+        "appDexId":  573,
+        "nameJa":  "タネボー",
+        "nameEn":  "Seedot",
+        "fileName":  "seedot.png"
+    },
+    {
+        "pokeDexId":  274,
+        "appDexId":  574,
+        "nameJa":  "コノハナ",
+        "nameEn":  "Nuzleaf",
+        "fileName":  "nuzleaf.png"
+    },
+    {
+        "pokeDexId":  275,
+        "appDexId":  575,
+        "nameJa":  "ダーテング",
+        "nameEn":  "Shiftry",
+        "fileName":  "shiftry.png"
+    },
+    {
+        "pokeDexId":  341,
+        "appDexId":  576,
+        "nameJa":  "ヘイガニ",
+        "nameEn":  "Corphish",
+        "fileName":  "corphish.png"
+    },
+    {
+        "pokeDexId":  342,
+        "appDexId":  577,
+        "nameJa":  "シザリガー",
+        "nameEn":  "Crawdaunt",
+        "fileName":  "crawdaunt.png"
+    },
+    {
+        "pokeDexId":  433,
+        "appDexId":  578,
+        "nameJa":  "リーシャン",
+        "nameEn":  "Chingling",
+        "fileName":  "chingling.png"
+    },
+    {
+        "pokeDexId":  358,
+        "appDexId":  579,
+        "nameJa":  "チリーン",
+        "nameEn":  "Chimecho",
+        "fileName":  "chimecho.png"
+    },
+    {
+        "pokeDexId":  349,
+        "appDexId":  580,
+        "nameJa":  "ヒンバス",
+        "nameEn":  "Feebas",
+        "fileName":  "feebas.png"
+    },
+    {
+        "pokeDexId":  350,
+        "appDexId":  581,
+        "nameJa":  "ミロカロス",
+        "nameEn":  "Milotic",
+        "fileName":  "milotic.png"
+    },
+    {
+        "pokeDexId":  629,
+        "appDexId":  582,
+        "nameJa":  "バルチャイ",
+        "nameEn":  "Vullaby",
+        "fileName":  "vullaby.png"
+    },
+    {
+        "pokeDexId":  630,
+        "appDexId":  583,
+        "nameJa":  "バルジーナ",
+        "nameEn":  "Mandibuzz",
+        "fileName":  "mandibuzz.png"
+    },
+    {
+        "pokeDexId":  708,
+        "appDexId":  584,
+        "nameJa":  "ボクレー",
+        "nameEn":  "Phantump",
+        "fileName":  "phantump.png"
+    },
+    {
+        "pokeDexId":  709,
+        "appDexId":  585,
+        "nameJa":  "オーロット",
+        "nameEn":  "Trevenant",
+        "fileName":  "trevenant.png"
+    },
+    {
+        "pokeDexId":  736,
+        "appDexId":  586,
+        "nameJa":  "アゴジムシ",
+        "nameEn":  "Grubbin",
+        "fileName":  "grubbin.png"
+    },
+    {
+        "pokeDexId":  737,
+        "appDexId":  587,
+        "nameJa":  "デンヂムシ",
+        "nameEn":  "Charjabug",
+        "fileName":  "charjabug.png"
+    },
+    {
+        "pokeDexId":  738,
+        "appDexId":  588,
+        "nameJa":  "クワガノン",
+        "nameEn":  "Vikavolt",
+        "fileName":  "vikavolt.png"
+    },
+    {
+        "pokeDexId":  845,
+        "appDexId":  589,
+        "nameJa":  "ウッウ",
+        "nameEn":  "Cramorant",
+        "fileName":  "cramorant.png"
+    },
+    {
+        "pokeDexId":  186,
+        "appDexId":  590,
+        "nameJa":  "ニョロトノ",
+        "nameEn":  "Politoed",
+        "fileName":  "politoed.png"
+    },
+    {
+        "pokeDexId":  884,
+        "appDexId":  591,
+        "nameJa":  "ジュラルドン",
+        "nameEn":  "Duraludon",
+        "fileName":  "duraludon.png"
+    },
+    {
+        "pokeDexId":  587,
+        "appDexId":  592,
+        "nameJa":  "エモンガ",
+        "nameEn":  "Emolga",
+        "fileName":  "emolga.png"
+    },
+    {
+        "pokeDexId":  220,
+        "appDexId":  593,
+        "nameJa":  "ウリムー",
+        "nameEn":  "Swinub",
+        "fileName":  "swinub.png"
+    },
+    {
+        "pokeDexId":  221,
+        "appDexId":  594,
+        "nameJa":  "イノムー",
+        "nameEn":  "Piloswine",
+        "fileName":  "piloswine.png"
+    },
+    {
+        "pokeDexId":  473,
+        "appDexId":  595,
+        "nameJa":  "マンムー",
+        "nameEn":  "Mamoswine",
+        "fileName":  "mamoswine.png"
+    },
+    {
+        "pokeDexId":  261,
+        "appDexId":  596,
+        "nameJa":  "ポチエナ",
+        "nameEn":  "Poochyena",
+        "fileName":  "poochyena.png"
+    },
+    {
+        "pokeDexId":  262,
+        "appDexId":  597,
+        "nameJa":  "グラエナ",
+        "nameEn":  "Mightyena",
+        "fileName":  "mightyena.png"
+    },
+    {
+        "pokeDexId":  37,
+        "appDexId":  598,
+        "nameJa":  "ロコン(アローラ)",
+        "nameEn":  "Vulpix(Alolan)",
+        "fileName":  "vulpix-alolan.png"
+    },
+    {
+        "pokeDexId":  38,
+        "appDexId":  599,
+        "nameJa":  "キュウコン(アローラ)",
+        "nameEn":  "Ninetales(Alolan)",
+        "fileName":  "ninetales-alolan.png"
+    },
+    {
+        "pokeDexId":  1014,
+        "appDexId":  600,
+        "nameJa":  "イイネイヌ",
+        "nameEn":  "Okidogi",
+        "fileName":  "okidogi.png"
+    },
+    {
+        "pokeDexId":  1015,
+        "appDexId":  601,
+        "nameJa":  "マシマシラ",
+        "nameEn":  "Munkidori",
+        "fileName":  "munkidori.png"
+    },
+    {
+        "pokeDexId":  1016,
+        "appDexId":  602,
+        "nameJa":  "キチキギス",
+        "nameEn":  "Fezandipiti",
+        "fileName":  "fezandipiti.png"
+    },
+    {
+        "pokeDexId":  1021,
+        "appDexId":  603,
+        "nameJa":  "タケルライコ",
+        "nameEn":  "RagingBolt",
+        "fileName":  "ragingbolt.png"
+    },
+    {
+        "pokeDexId":  1023,
+        "appDexId":  604,
+        "nameJa":  "テツノカシラ",
+        "nameEn":  "IronCrown",
+        "fileName":  "ironcrown.png"
+    },
+    {
+        "pokeDexId":  1011,
+        "appDexId":  605,
+        "nameJa":  "カミッチュ",
+        "nameEn":  "Dipplin",
+        "fileName":  "dipplin.png"
+    },
+    {
+        "pokeDexId":  1018,
+        "appDexId":  606,
+        "nameJa":  "ブリジュラス",
+        "nameEn":  "Archaludon",
+        "fileName":  "archaludon.png"
+    },
+    {
+        "pokeDexId":  1012,
+        "appDexId":  607,
+        "nameJa":  "チャデス",
+        "nameEn":  "Poltchageist",
+        "fileName":  "poltchageist.png"
+    },
+    {
+        "pokeDexId":  1017,
+        "appDexId":  608,
+        "nameJa":  "オーガポン(みどり)",
+        "nameEn":  "Ogerpon(Teal)",
+        "fileName":  "ogerpon-teal.png"
+    },
+    {
+        "pokeDexId":  1024,
+        "appDexId":  609,
+        "nameJa":  "テラパゴス(ノーマル)",
+        "nameEn":  "Terapagos(Normal)",
+        "fileName":  "terapagos-normal.png"
+    },
+    {
+        "pokeDexId":  1024,
+        "appDexId":  610,
+        "nameJa":  "テラパゴス(テラスタル)",
+        "nameEn":  "Terapagos(Terastal)",
+        "fileName":  "terapagos-terastal.png"
+    },
+    {
+        "pokeDexId":  240,
+        "appDexId":  611,
+        "nameJa":  "ブビィ",
+        "nameEn":  "Magby",
+        "fileName":  "magby.png"
+    },
+    {
+        "pokeDexId":  126,
+        "appDexId":  612,
+        "nameJa":  "ブーバー",
+        "nameEn":  "Magmar",
+        "fileName":  "magmar.png"
+    },
+    {
+        "pokeDexId":  467,
+        "appDexId":  613,
+        "nameJa":  "ブーバーン",
+        "nameEn":  "Magmortar",
+        "fileName":  "magmortar.png"
+    },
+    {
+        "pokeDexId":  111,
+        "appDexId":  614,
+        "nameJa":  "サイホーン",
+        "nameEn":  "Rhyhorn",
+        "fileName":  "rhyhorn.png"
+    },
+    {
+        "pokeDexId":  112,
+        "appDexId":  615,
+        "nameJa":  "サイドン",
+        "nameEn":  "Rhydon",
+        "fileName":  "rhydon.png"
+    },
+    {
+        "pokeDexId":  464,
+        "appDexId":  616,
+        "nameJa":  "ドサイドン",
+        "nameEn":  "Rhyperior",
+        "fileName":  "rhyperior.png"
+    },
+    {
+        "pokeDexId":  686,
+        "appDexId":  617,
+        "nameJa":  "マーイーカ",
+        "nameEn":  "Inkay",
+        "fileName":  "inkay.png"
+    },
+    {
+        "pokeDexId":  687,
+        "appDexId":  618,
+        "nameJa":  "カラマネロ",
+        "nameEn":  "Malamar",
+        "fileName":  "malamar.png"
+    },
+    {
+        "pokeDexId":  84,
+        "appDexId":  619,
+        "nameJa":  "ドードー",
+        "nameEn":  "Doduo",
+        "fileName":  "doduo.png"
+    },
+    {
+        "pokeDexId":  85,
+        "appDexId":  620,
+        "nameJa":  "ドードリオ",
+        "nameEn":  "Dodrio",
+        "fileName":  "dodrio.png"
+    },
+    {
+        "pokeDexId":  131,
+        "appDexId":  621,
+        "nameJa":  "ラプラス",
+        "nameEn":  "Lapras",
+        "fileName":  "lapras.png"
+    },
+    {
+        "pokeDexId":  27,
+        "appDexId":  622,
+        "nameJa":  "サンド",
+        "nameEn":  "Sandshrew",
+        "fileName":  "sandshrew.png"
+    },
+    {
+        "pokeDexId":  28,
+        "appDexId":  623,
+        "nameJa":  "サンドパン",
+        "nameEn":  "Sandslash",
+        "fileName":  "sandslash.png"
+    },
+    {
+        "pokeDexId":  27,
+        "appDexId":  624,
+        "nameJa":  "サンド(アローラ)",
+        "nameEn":  "Sandshrew(Alolan)",
+        "fileName":  "sandshrew-alolan.png"
+    },
+    {
+        "pokeDexId":  28,
+        "appDexId":  625,
+        "nameJa":  "サンドパン(アローラ)",
+        "nameEn":  "Sandslash(Alolan)",
+        "fileName":  "sandslash-alolan.png"
+    },
+    {
+        "pokeDexId":  227,
+        "appDexId":  626,
+        "nameJa":  "エアームド",
+        "nameEn":  "Skarmory",
+        "fileName":  "skarmory.png"
+    },
+    {
+        "pokeDexId":  410,
+        "appDexId":  627,
+        "nameJa":  "タテトプス",
+        "nameEn":  "Shieldon",
+        "fileName":  "shieldon.png"
+    },
+    {
+        "pokeDexId":  411,
+        "appDexId":  628,
+        "nameJa":  "トリデプス",
+        "nameEn":  "Bastiodon",
+        "fileName":  "bastiodon.png"
+    },
+    {
+        "pokeDexId":  408,
+        "appDexId":  629,
+        "nameJa":  "ズガイドス",
+        "nameEn":  "Cranidos",
+        "fileName":  "cranidos.png"
+    },
+    {
+        "pokeDexId":  409,
+        "appDexId":  630,
+        "nameJa":  "ラムパルド",
+        "nameEn":  "Rampardos",
+        "fileName":  "rampardos.png"
+    },
+    {
+        "pokeDexId":  355,
+        "appDexId":  631,
+        "nameJa":  "ヨマワル",
+        "nameEn":  "Duskull",
+        "fileName":  "duskull.png"
+    },
+    {
+        "pokeDexId":  356,
+        "appDexId":  632,
+        "nameJa":  "サマヨール",
+        "nameEn":  "Dusclops",
+        "fileName":  "dusclops.png"
+    },
+    {
+        "pokeDexId":  477,
+        "appDexId":  633,
+        "nameJa":  "ヨノワール",
+        "nameEn":  "Dusknoir",
+        "fileName":  "dusknoir.png"
+    },
+    {
+        "pokeDexId":  236,
+        "appDexId":  634,
+        "nameJa":  "バルキー",
+        "nameEn":  "Tyrogue",
+        "fileName":  "tyrogue.png"
+    },
+    {
+        "pokeDexId":  107,
+        "appDexId":  635,
+        "nameJa":  "エビワラー",
+        "nameEn":  "Hitmonchan",
+        "fileName":  "hitmonchan.png"
+    },
+    {
+        "pokeDexId":  106,
+        "appDexId":  636,
+        "nameJa":  "サワムラー",
+        "nameEn":  "Hitmonlee",
+        "fileName":  "hitmonlee.png"
+    },
+    {
+        "pokeDexId":  237,
+        "appDexId":  637,
+        "nameJa":  "カポエラー",
+        "nameEn":  "Hitmontop",
+        "fileName":  "hitmontop.png"
+    },
+    {
+        "pokeDexId":  607,
+        "appDexId":  638,
+        "nameJa":  "ヒトモシ",
+        "nameEn":  "Litwick",
+        "fileName":  "litwick.png"
+    },
+    {
+        "pokeDexId":  608,
+        "appDexId":  639,
+        "nameJa":  "ランプラー",
+        "nameEn":  "Lampent",
+        "fileName":  "lampent.png"
+    },
+    {
+        "pokeDexId":  609,
+        "appDexId":  640,
+        "nameJa":  "シャンデラ",
+        "nameEn":  "Chandelure",
+        "fileName":  "chandelure.png"
+    },
+    {
+        "pokeDexId":  782,
+        "appDexId":  641,
+        "nameJa":  "ジャラコ",
+        "nameEn":  "Jangmo-o",
+        "fileName":  "jangmo-o.png"
+    },
+    {
+        "pokeDexId":  783,
+        "appDexId":  642,
+        "nameJa":  "ジャランゴ",
+        "nameEn":  "Hakamo-o",
+        "fileName":  "hakamo-o.png"
+    },
+    {
+        "pokeDexId":  784,
+        "appDexId":  643,
+        "nameJa":  "ジャラランガ",
+        "nameEn":  "Kommo-o",
+        "fileName":  "kommo-o.png"
+    },
+    {
+        "pokeDexId":  532,
+        "appDexId":  644,
+        "nameJa":  "ドッコラー",
+        "nameEn":  "Timburr",
+        "fileName":  "timburr.png"
+    },
+    {
+        "pokeDexId":  533,
+        "appDexId":  645,
+        "nameJa":  "ドテッコツ",
+        "nameEn":  "Gurdurr",
+        "fileName":  "gurdurr.png"
+    },
+    {
+        "pokeDexId":  534,
+        "appDexId":  646,
+        "nameJa":  "ローブシン",
+        "nameEn":  "Conkeldurr",
+        "fileName":  "conkeldurr.png"
+    },
+    {
+        "pokeDexId":  731,
+        "appDexId":  647,
+        "nameJa":  "ツツケラ",
+        "nameEn":  "Pikipek",
+        "fileName":  "pikipek.png"
+    },
+    {
+        "pokeDexId":  732,
+        "appDexId":  648,
+        "nameJa":  "ケララッパ",
+        "nameEn":  "Trumbeak",
+        "fileName":  "trumbeak.png"
+    },
+    {
+        "pokeDexId":  733,
+        "appDexId":  649,
+        "nameJa":  "ドデカバシ",
+        "nameEn":  "Toucannon",
+        "fileName":  "toucannon.png"
+    },
+    {
+        "pokeDexId":  622,
+        "appDexId":  650,
+        "nameJa":  "ゴビット",
+        "nameEn":  "Golett",
+        "fileName":  "golett.png"
+    },
+    {
+        "pokeDexId":  623,
+        "appDexId":  651,
+        "nameJa":  "ゴルーグ",
+        "nameEn":  "Golurk",
+        "fileName":  "golurk.png"
+    },
+    {
+        "pokeDexId":  74,
+        "appDexId":  652,
+        "nameJa":  "イシツブテ",
+        "nameEn":  "Geodude",
+        "fileName":  "geodude.png"
+    },
+    {
+        "pokeDexId":  75,
+        "appDexId":  653,
+        "nameJa":  "ゴローン",
+        "nameEn":  "Graveler",
+        "fileName":  "graveler.png"
+    },
+    {
+        "pokeDexId":  76,
+        "appDexId":  654,
+        "nameJa":  "ゴローニャ",
+        "nameEn":  "Golem",
+        "fileName":  "golem.png"
+    },
+    {
+        "pokeDexId":  74,
+        "appDexId":  655,
+        "nameJa":  "イシツブテ(アローラ)",
+        "nameEn":  "Geodude(Alolan)",
+        "fileName":  "geodude-alolan.png"
+    },
+    {
+        "pokeDexId":  75,
+        "appDexId":  656,
+        "nameJa":  "ゴローン(アローラ)",
+        "nameEn":  "Graveler(Alolan)",
+        "fileName":  "graveler-alolan.png"
+    },
+    {
+        "pokeDexId":  76,
+        "appDexId":  657,
+        "nameJa":  "ゴローニャ(アローラ)",
+        "nameEn":  "Golem(Alolan)",
+        "fileName":  "golem-alolan.png"
+    },
+    {
+        "pokeDexId":  1,
+        "appDexId":  658,
+        "nameJa":  "フシギダネ",
+        "nameEn":  "Bulbasaur",
+        "fileName":  "bulbasaur.png"
+    },
+    {
+        "pokeDexId":  2,
+        "appDexId":  659,
+        "nameJa":  "フシギソウ",
+        "nameEn":  "Ivysaur",
+        "fileName":  "ivysaur.png"
+    },
+    {
+        "pokeDexId":  3,
+        "appDexId":  660,
+        "nameJa":  "フシギバナ",
+        "nameEn":  "Venusaur",
+        "fileName":  "venusaur.png"
+    },
+    {
+        "pokeDexId":  7,
+        "appDexId":  661,
+        "nameJa":  "ゼニガメ",
+        "nameEn":  "Squirtle",
+        "fileName":  "squirtle.png"
+    },
+    {
+        "pokeDexId":  8,
+        "appDexId":  662,
+        "nameJa":  "カメール",
+        "nameEn":  "Wartortle",
+        "fileName":  "wartortle.png"
+    },
+    {
+        "pokeDexId":  9,
+        "appDexId":  663,
+        "nameJa":  "カメックス",
+        "nameEn":  "Blastoise",
+        "fileName":  "blastoise.png"
+    },
+    {
+        "pokeDexId":  152,
+        "appDexId":  664,
+        "nameJa":  "チコリータ",
+        "nameEn":  "Chikorita",
+        "fileName":  "chikorita.png"
+    },
+    {
+        "pokeDexId":  153,
+        "appDexId":  665,
+        "nameJa":  "ベイリーフ",
+        "nameEn":  "Bayleef",
+        "fileName":  "bayleef.png"
+    },
+    {
+        "pokeDexId":  154,
+        "appDexId":  666,
+        "nameJa":  "メガニウム",
+        "nameEn":  "Meganium",
+        "fileName":  "meganium.png"
+    },
+    {
+        "pokeDexId":  158,
+        "appDexId":  667,
+        "nameJa":  "ワニノコ",
+        "nameEn":  "Totodile",
+        "fileName":  "totodile.png"
+    },
+    {
+        "pokeDexId":  159,
+        "appDexId":  668,
+        "nameJa":  "アリゲイツ",
+        "nameEn":  "Croconaw",
+        "fileName":  "croconaw.png"
+    },
+    {
+        "pokeDexId":  160,
+        "appDexId":  669,
+        "nameJa":  "オーダイル",
+        "nameEn":  "Feraligatr",
+        "fileName":  "feraligatr.png"
+    },
+    {
+        "pokeDexId":  252,
+        "appDexId":  670,
+        "nameJa":  "キモリ",
+        "nameEn":  "Treecko",
+        "fileName":  "treecko.png"
+    },
+    {
+        "pokeDexId":  253,
+        "appDexId":  671,
+        "nameJa":  "ジュプトル",
+        "nameEn":  "Grovyle",
+        "fileName":  "grovyle.png"
+    },
+    {
+        "pokeDexId":  254,
+        "appDexId":  672,
+        "nameJa":  "ジュカイン",
+        "nameEn":  "Sceptile",
+        "fileName":  "sceptile.png"
+    },
+    {
+        "pokeDexId":  255,
+        "appDexId":  673,
+        "nameJa":  "アチャモ",
+        "nameEn":  "Torchic",
+        "fileName":  "torchic.png"
+    },
+    {
+        "pokeDexId":  256,
+        "appDexId":  674,
+        "nameJa":  "ワカシャモ",
+        "nameEn":  "Combusken",
+        "fileName":  "combusken.png"
+    },
+    {
+        "pokeDexId":  257,
+        "appDexId":  675,
+        "nameJa":  "バシャーモ",
+        "nameEn":  "Blaziken",
+        "fileName":  "blaziken.png"
+    },
+    {
+        "pokeDexId":  258,
+        "appDexId":  676,
+        "nameJa":  "ミズゴロウ",
+        "nameEn":  "Mudkip",
+        "fileName":  "mudkip.png"
+    },
+    {
+        "pokeDexId":  259,
+        "appDexId":  677,
+        "nameJa":  "ヌマクロー",
+        "nameEn":  "Marshtomp",
+        "fileName":  "marshtomp.png"
+    },
+    {
+        "pokeDexId":  260,
+        "appDexId":  678,
+        "nameJa":  "ラグラージ",
+        "nameEn":  "Swampert",
+        "fileName":  "swampert.png"
+    },
+    {
+        "pokeDexId":  387,
+        "appDexId":  679,
+        "nameJa":  "ナエトル",
+        "nameEn":  "Turtwig",
+        "fileName":  "turtwig.png"
+    },
+    {
+        "pokeDexId":  388,
+        "appDexId":  680,
+        "nameJa":  "ハヤシガメ",
+        "nameEn":  "Grotle",
+        "fileName":  "grotle.png"
+    },
+    {
+        "pokeDexId":  389,
+        "appDexId":  681,
+        "nameJa":  "ドダイトス",
+        "nameEn":  "Torterra",
+        "fileName":  "torterra.png"
+    },
+    {
+        "pokeDexId":  390,
+        "appDexId":  682,
+        "nameJa":  "ヒコザル",
+        "nameEn":  "Chimchar",
+        "fileName":  "chimchar.png"
+    },
+    {
+        "pokeDexId":  391,
+        "appDexId":  683,
+        "nameJa":  "モウカザル",
+        "nameEn":  "Monferno",
+        "fileName":  "monferno.png"
+    },
+    {
+        "pokeDexId":  392,
+        "appDexId":  684,
+        "nameJa":  "ゴウカザル",
+        "nameEn":  "Infernape",
+        "fileName":  "infernape.png"
+    },
+    {
+        "pokeDexId":  393,
+        "appDexId":  685,
+        "nameJa":  "ポッチャマ",
+        "nameEn":  "Piplup",
+        "fileName":  "piplup.png"
+    },
+    {
+        "pokeDexId":  394,
+        "appDexId":  686,
+        "nameJa":  "ポッタイシ",
+        "nameEn":  "Prinplup",
+        "fileName":  "prinplup.png"
+    },
+    {
+        "pokeDexId":  395,
+        "appDexId":  687,
+        "nameJa":  "エンペルト",
+        "nameEn":  "Empoleon",
+        "fileName":  "empoleon.png"
+    },
+    {
+        "pokeDexId":  495,
+        "appDexId":  688,
+        "nameJa":  "ツタージャ",
+        "nameEn":  "Snivy",
+        "fileName":  "snivy.png"
+    },
+    {
+        "pokeDexId":  496,
+        "appDexId":  689,
+        "nameJa":  "ジャノビー",
+        "nameEn":  "Servine",
+        "fileName":  "servine.png"
+    },
+    {
+        "pokeDexId":  497,
+        "appDexId":  690,
+        "nameJa":  "ジャローダ",
+        "nameEn":  "Serperior",
+        "fileName":  "serperior.png"
+    },
+    {
+        "pokeDexId":  498,
+        "appDexId":  691,
+        "nameJa":  "ポカブ",
+        "nameEn":  "Tepig",
+        "fileName":  "tepig.png"
+    },
+    {
+        "pokeDexId":  499,
+        "appDexId":  692,
+        "nameJa":  "チャオブー",
+        "nameEn":  "Pignite",
+        "fileName":  "pignite.png"
+    },
+    {
+        "pokeDexId":  500,
+        "appDexId":  693,
+        "nameJa":  "エンブオー",
+        "nameEn":  "Emboar",
+        "fileName":  "emboar.png"
+    },
+    {
+        "pokeDexId":  725,
+        "appDexId":  694,
+        "nameJa":  "ニャビー",
+        "nameEn":  "Litten",
+        "fileName":  "litten.png"
+    },
+    {
+        "pokeDexId":  726,
+        "appDexId":  695,
+        "nameJa":  "ニャヒート",
+        "nameEn":  "Torracat",
+        "fileName":  "torracat.png"
+    },
+    {
+        "pokeDexId":  727,
+        "appDexId":  696,
+        "nameJa":  "ガオガエン",
+        "nameEn":  "Incineroar",
+        "fileName":  "incineroar.png"
+    },
+    {
+        "pokeDexId":  728,
+        "appDexId":  697,
+        "nameJa":  "アシマリ",
+        "nameEn":  "Popplio",
+        "fileName":  "popplio.png"
+    },
+    {
+        "pokeDexId":  729,
+        "appDexId":  698,
+        "nameJa":  "オシャマリ",
+        "nameEn":  "Brionne",
+        "fileName":  "brionne.png"
+    },
+    {
+        "pokeDexId":  730,
+        "appDexId":  699,
+        "nameJa":  "アシレーヌ",
+        "nameEn":  "Primarina",
+        "fileName":  "primarina.png"
+    },
+    {
+        "pokeDexId":  235,
+        "appDexId":  700,
+        "nameJa":  "ドーブル",
+        "nameEn":  "Smeargle",
+        "fileName":  "smeargle.png"
+    },
+    {
+        "pokeDexId":  492,
+        "appDexId":  701,
+        "nameJa":  "シェイミ(ランド)",
+        "nameEn":  "Shaymin(Land)",
+        "fileName":  "shaymin-land.png"
+    },
+    {
+        "pokeDexId":  492,
+        "appDexId":  702,
+        "nameJa":  "シェイミ(スカイ)",
+        "nameEn":  "Shaymin(Sky)",
+        "fileName":  "shaymin-sky.png"
+    },
+    {
+        "pokeDexId":  86,
+        "appDexId":  703,
+        "nameJa":  "パウワウ",
+        "nameEn":  "Seel",
+        "fileName":  "seel.png"
+    },
+    {
+        "pokeDexId":  87,
+        "appDexId":  704,
+        "nameJa":  "ジュゴン",
+        "nameEn":  "Dewgong",
+        "fileName":  "dewgong.png"
+    },
+    {
+        "pokeDexId":  102,
+        "appDexId":  705,
+        "nameJa":  "タマタマ",
+        "nameEn":  "Exeggcute",
+        "fileName":  "exeggcute.png"
+    },
+    {
+        "pokeDexId":  103,
+        "appDexId":  706,
+        "nameJa":  "ナッシー",
+        "nameEn":  "Exeggutor",
+        "fileName":  "exeggutor.png"
+    },
+    {
+        "pokeDexId":  328,
+        "appDexId":  707,
+        "nameJa":  "ナックラー",
+        "nameEn":  "Trapinch",
+        "fileName":  "trapinch.png"
+    },
+    {
+        "pokeDexId":  329,
+        "appDexId":  708,
+        "nameJa":  "ビブラーバ",
+        "nameEn":  "Vibrava",
+        "fileName":  "vibrava.png"
+    },
+    {
+        "pokeDexId":  330,
+        "appDexId":  709,
+        "nameJa":  "フライゴン",
+        "nameEn":  "Flygon",
+        "fileName":  "flygon.png"
+    },
+    {
+        "pokeDexId":  374,
+        "appDexId":  710,
+        "nameJa":  "ダンバル",
+        "nameEn":  "Beldum",
+        "fileName":  "beldum.png"
+    },
+    {
+        "pokeDexId":  375,
+        "appDexId":  711,
+        "nameJa":  "メタング",
+        "nameEn":  "Metang",
+        "fileName":  "metang.png"
+    },
+    {
+        "pokeDexId":  376,
+        "appDexId":  712,
+        "nameJa":  "メタグロス",
+        "nameEn":  "Metagross",
+        "fileName":  "metagross.png"
+    },
+    {
+        "pokeDexId":  522,
+        "appDexId":  713,
+        "nameJa":  "シママ",
+        "nameEn":  "Blitzle",
+        "fileName":  "blitzle.png"
+    },
+    {
+        "pokeDexId":  523,
+        "appDexId":  714,
+        "nameJa":  "ゼブライカ",
+        "nameEn":  "Zebstrika",
+        "fileName":  "zebstrika.png"
+    },
+    {
+        "pokeDexId":  546,
+        "appDexId":  715,
+        "nameJa":  "モンメン",
+        "nameEn":  "Cottonee",
+        "fileName":  "cottonee.png"
+    },
+    {
+        "pokeDexId":  547,
+        "appDexId":  716,
+        "nameJa":  "エルフーン",
+        "nameEn":  "Whimsicott",
+        "fileName":  "whimsicott.png"
+    },
+    {
+        "pokeDexId":  572,
+        "appDexId":  717,
+        "nameJa":  "チラーミィ",
+        "nameEn":  "Minccino",
+        "fileName":  "minccino.png"
+    },
+    {
+        "pokeDexId":  573,
+        "appDexId":  718,
+        "nameJa":  "チラチーノ",
+        "nameEn":  "Cinccino",
+        "fileName":  "cinccino.png"
+    },
+    {
+        "pokeDexId":  577,
+        "appDexId":  719,
+        "nameJa":  "ユニラン",
+        "nameEn":  "Solosis",
+        "fileName":  "solosis.png"
+    },
+    {
+        "pokeDexId":  578,
+        "appDexId":  720,
+        "nameJa":  "ダブラン",
+        "nameEn":  "Duosion",
+        "fileName":  "duosion.png"
+    },
+    {
+        "pokeDexId":  579,
+        "appDexId":  721,
+        "nameJa":  "ランクルス",
+        "nameEn":  "Reuniclus",
+        "fileName":  "reuniclus.png"
+    },
+    {
+        "pokeDexId":  677,
+        "appDexId":  722,
+        "nameJa":  "ニャスパー",
+        "nameEn":  "Espurr",
+        "fileName":  "espurr.png"
+    },
+    {
+        "pokeDexId":  678,
+        "appDexId":  723,
+        "nameJa":  "ニャオニクス(オス)",
+        "nameEn":  "Meowstic(Male)",
+        "fileName":  "meowstic-male.png"
+    },
+    {
+        "pokeDexId":  678,
+        "appDexId":  724,
+        "nameJa":  "ニャオニクス(メス)",
+        "nameEn":  "Meowstic(Female)",
+        "fileName":  "meowstic-female.png"
+    },
+    {
+        "pokeDexId":  868,
+        "appDexId":  725,
+        "nameJa":  "マホミル",
+        "nameEn":  "Milcery",
+        "fileName":  "milcery.png"
+    },
+    {
+        "pokeDexId":  869,
+        "appDexId":  726,
+        "nameJa":  "マホイップ",
+        "nameEn":  "Alcremie",
+        "fileName":  "alcremie.png"
+    },
+    {
+        "pokeDexId":  1017,
+        "appDexId":  727,
+        "nameJa":  "オーガポン(かまど)",
+        "nameEn":  "Ogerpon(Hearthflame)",
+        "fileName":  "ogerpon-hearthflame.png"
+    },
+    {
+        "pokeDexId":  1017,
+        "appDexId":  728,
+        "nameJa":  "オーガポン(いど)",
+        "nameEn":  "Ogerpon(Wellspring)",
+        "fileName":  "ogerpon-wellspring.png"
+    },
+    {
+        "pokeDexId":  1017,
+        "appDexId":  729,
+        "nameJa":  "オーガポン(いしずえ)",
+        "nameEn":  "Ogerpon(Cornerstone)",
+        "fileName":  "ogerpon-cornerstone.png"
+    },
+    {
+        "pokeDexId":  1013,
+        "appDexId":  730,
+        "nameJa":  "ヤバソチャ",
+        "nameEn":  "Sinistcha",
+        "fileName":  "sinistcha.png"
+    },
+    {
+        "pokeDexId":  901,
+        "appDexId":  731,
+        "nameJa":  "ガチグマ(アカツキ)",
+        "nameEn":  "Ursaluna(Bloodmoon)",
+        "fileName":  "ursaluna-bloodmoon.png"
+    },
+    {
+        "pokeDexId":  167,
+        "appDexId":  732,
+        "nameJa":  "イトマル",
+        "nameEn":  "Spinarak",
+        "fileName":  "spinarak.png"
+    },
+    {
+        "pokeDexId":  168,
+        "appDexId":  733,
+        "nameJa":  "アリアドス",
+        "nameEn":  "Ariados",
+        "fileName":  "ariados.png"
+    },
+    {
+        "pokeDexId":  270,
+        "appDexId":  734,
+        "nameJa":  "ハスボー",
+        "nameEn":  "Lotad",
+        "fileName":  "lotad.png"
+    },
+    {
+        "pokeDexId":  271,
+        "appDexId":  735,
+        "nameJa":  "ハスブレロ",
+        "nameEn":  "Lombre",
+        "fileName":  "lombre.png"
+    },
+    {
+        "pokeDexId":  272,
+        "appDexId":  736,
+        "nameJa":  "ルンパッパ",
+        "nameEn":  "Ludicolo",
+        "fileName":  "ludicolo.png"
+    },
+    {
+        "pokeDexId":  299,
+        "appDexId":  737,
+        "nameJa":  "ノズパス",
+        "nameEn":  "Nosepass",
+        "fileName":  "nosepass.png"
+    },
+    {
+        "pokeDexId":  476,
+        "appDexId":  738,
+        "nameJa":  "ダイノーズ",
+        "nameEn":  "Probopass",
+        "fileName":  "probopass.png"
+    },
+    {
+        "pokeDexId":  313,
+        "appDexId":  739,
+        "nameJa":  "バルビート",
+        "nameEn":  "Volbeat",
+        "fileName":  "volbeat.png"
+    },
+    {
+        "pokeDexId":  314,
+        "appDexId":  740,
+        "nameJa":  "イルミーゼ",
+        "nameEn":  "Illumise",
+        "fileName":  "illumise.png"
+    },
+    {
+        "pokeDexId":  540,
+        "appDexId":  741,
+        "nameJa":  "クルミル",
+        "nameEn":  "Sewaddle",
+        "fileName":  "sewaddle.png"
+    },
+    {
+        "pokeDexId":  541,
+        "appDexId":  742,
+        "nameJa":  "クルマユ",
+        "nameEn":  "Swadloon",
+        "fileName":  "swadloon.png"
+    },
+    {
+        "pokeDexId":  542,
+        "appDexId":  743,
+        "nameJa":  "ハハコモリ",
+        "nameEn":  "Leavanny",
+        "fileName":  "leavanny.png"
+    },
+    {
+        "pokeDexId":  742,
+        "appDexId":  744,
+        "nameJa":  "アブリー",
+        "nameEn":  "Cutiefly",
+        "fileName":  "cutiefly.png"
+    },
+    {
+        "pokeDexId":  743,
+        "appDexId":  745,
+        "nameJa":  "アブリボン",
+        "nameEn":  "Ribombee",
+        "fileName":  "ribombee.png"
+    },
+    {
+        "pokeDexId":  69,
+        "appDexId":  746,
+        "nameJa":  "マダツボミ",
+        "nameEn":  "Bellsprout",
+        "fileName":  "bellsprout.png"
+    },
+    {
+        "pokeDexId":  70,
+        "appDexId":  747,
+        "nameJa":  "ウツドン",
+        "nameEn":  "Weepinbell",
+        "fileName":  "weepinbell.png"
+    },
+    {
+        "pokeDexId":  71,
+        "appDexId":  748,
+        "nameJa":  "ウツボット",
+        "nameEn":  "Victreebel",
+        "fileName":  "victreebel.png"
+    },
+    {
+        "pokeDexId":  877,
+        "appDexId":  749,
+        "nameJa":  "モルペコ",
+        "nameEn":  "Morpeko",
+        "fileName":  "morpeko.png"
+    },
+    {
+        "pokeDexId":  218,
+        "appDexId":  750,
+        "nameJa":  "マグマッグ",
+        "nameEn":  "Slugma",
+        "fileName":  "slugma.png"
+    },
+    {
+        "pokeDexId":  219,
+        "appDexId":  751,
+        "nameJa":  "マグカルゴ",
+        "nameEn":  "Magcargo",
+        "fileName":  "magcargo.png"
+    },
+    {
+        "pokeDexId":  580,
+        "appDexId":  752,
+        "nameJa":  "コアルヒー",
+        "nameEn":  "Ducklett",
+        "fileName":  "ducklett.png"
+    },
+    {
+        "pokeDexId":  581,
+        "appDexId":  753,
+        "nameJa":  "スワンナ",
+        "nameEn":  "Swanna",
+        "fileName":  "swanna.png"
+    },
+    {
+        "pokeDexId":  109,
+        "appDexId":  754,
+        "nameJa":  "ドガース",
+        "nameEn":  "Koffing",
+        "fileName":  "koffing.png"
+    },
+    {
+        "pokeDexId":  110,
+        "appDexId":  755,
+        "nameJa":  "マタドガス",
+        "nameEn":  "Weezing",
+        "fileName":  "weezing.png"
+    },
+    {
+        "pokeDexId":  110,
+        "appDexId":  756,
+        "nameJa":  "マタドガス(ガラル)",
+        "nameEn":  "Weezing(Galarian)",
+        "fileName":  "weezing-galarian.png"
+    },
+    {
+        "pokeDexId":  619,
+        "appDexId":  757,
+        "nameJa":  "コジョフー",
+        "nameEn":  "Mienfoo",
+        "fileName":  "mienfoo.png"
+    },
+    {
+        "pokeDexId":  620,
+        "appDexId":  758,
+        "nameJa":  "コジョンド",
+        "nameEn":  "Mienshao",
+        "fileName":  "mienshao.png"
+    },
+    {
+        "pokeDexId":  489,
+        "appDexId":  759,
+        "nameJa":  "フィオネ",
+        "nameEn":  "Phione",
+        "fileName":  "phione.png"
+    },
+    {
+        "pokeDexId":  490,
+        "appDexId":  760,
+        "nameJa":  "マナフィ",
+        "nameEn":  "Manaphy",
+        "fileName":  "manaphy.png"
+    },
+    {
+        "pokeDexId":  491,
+        "appDexId":  761,
+        "nameJa":  "ダークライ",
+        "nameEn":  "Darkrai",
+        "fileName":  "darkrai.png"
+    },
+    {
+        "pokeDexId":  385,
+        "appDexId":  762,
+        "nameJa":  "ジラーチ",
+        "nameEn":  "Jirachi",
+        "fileName":  "jirachi.png"
+    },
+    {
+        "pokeDexId":  103,
+        "appDexId":  763,
+        "nameJa":  "ナッシー(アローラ)",
+        "nameEn":  "Exeggutor(Alolan)",
+        "fileName":  "exeggutor-alolan.png"
+    },
+    {
+        "pokeDexId":  239,
+        "appDexId":  764,
+        "nameJa":  "エレキッド",
+        "nameEn":  "Elekid",
+        "fileName":  "elekid.png"
+    },
+    {
+        "pokeDexId":  125,
+        "appDexId":  765,
+        "nameJa":  "エレブー",
+        "nameEn":  "Electabuzz",
+        "fileName":  "electabuzz.png"
+    },
+    {
+        "pokeDexId":  466,
+        "appDexId":  766,
+        "nameJa":  "エレキブル",
+        "nameEn":  "Electivire",
+        "fileName":  "electivire.png"
+    },
+    {
+        "pokeDexId":  72,
+        "appDexId":  767,
+        "nameJa":  "メノクラゲ",
+        "nameEn":  "Tentacool",
+        "fileName":  "tentacool.png"
+    },
+    {
+        "pokeDexId":  73,
+        "appDexId":  768,
+        "nameJa":  "ドククラゲ",
+        "nameEn":  "Tentacruel",
+        "fileName":  "tentacruel.png"
+    },
+    {
+        "pokeDexId":  116,
+        "appDexId":  769,
+        "nameJa":  "タッツー",
+        "nameEn":  "Horsea",
+        "fileName":  "horsea.png"
+    },
+    {
+        "pokeDexId":  117,
+        "appDexId":  770,
+        "nameJa":  "シードラ",
+        "nameEn":  "Seadra",
+        "fileName":  "seadra.png"
+    },
+    {
+        "pokeDexId":  230,
+        "appDexId":  771,
+        "nameJa":  "キングドラ",
+        "nameEn":  "Kingdra",
+        "fileName":  "kingdra.png"
+    },
+    {
+        "pokeDexId":  764,
+        "appDexId":  772,
+        "nameJa":  "キュワワー",
+        "nameEn":  "Comfey",
+        "fileName":  "comfey.png"
+    },
+    {
+        "pokeDexId":  170,
+        "appDexId":  773,
+        "nameJa":  "チョンチー",
+        "nameEn":  "Chinchou",
+        "fileName":  "chinchou.png"
+    },
+    {
+        "pokeDexId":  171,
+        "appDexId":  774,
+        "nameJa":  "ランターン",
+        "nameEn":  "Lanturn",
+        "fileName":  "lanturn.png"
+    },
+    {
+        "pokeDexId":  751,
+        "appDexId":  775,
+        "nameJa":  "シズクモ",
+        "nameEn":  "Dewpider",
+        "fileName":  "dewpider.png"
+    },
+    {
+        "pokeDexId":  752,
+        "appDexId":  776,
+        "nameJa":  "オニシズクモ",
+        "nameEn":  "Araquanid",
+        "fileName":  "araquanid.png"
+    },
+    {
+        "pokeDexId":  529,
+        "appDexId":  777,
+        "nameJa":  "モグリュー",
+        "nameEn":  "Drilbur",
+        "fileName":  "drilbur.png"
+    },
+    {
+        "pokeDexId":  530,
+        "appDexId":  778,
+        "nameJa":  "ドリュウズ",
+        "nameEn":  "Excadrill",
+        "fileName":  "excadrill.png"
+    },
+    {
+        "pokeDexId":  774,
+        "appDexId":  779,
+        "nameJa":  "メテノ(りゅうせい)",
+        "nameEn":  "Minior(Meteor)",
+        "fileName":  "minior-meteor.png"
+    },
+    {
+        "pokeDexId":  774,
+        "appDexId":  780,
+        "nameJa":  "メテノ(コア)",
+        "nameEn":  "MInior(Core)",
+        "fileName":  "minior-core.png"
+    },
+    {
+        "pokeDexId":  311,
+        "appDexId":  781,
+        "nameJa":  "プラスル",
+        "nameEn":  "Plusle",
+        "fileName":  "plusle.png"
+    },
+    {
+        "pokeDexId":  312,
+        "appDexId":  782,
+        "nameJa":  "マイナン",
+        "nameEn":  "MInun",
+        "fileName":  "minun.png"
+    },
+    {
+        "pokeDexId":  559,
+        "appDexId":  783,
+        "nameJa":  "ズルッグ",
+        "nameEn":  "Scraggy",
+        "fileName":  "scraggy.png"
+    },
+    {
+        "pokeDexId":  560,
+        "appDexId":  784,
+        "nameJa":  "ズルズキン",
+        "nameEn":  "Scrafty",
+        "fileName":  "scrafty.png"
+    },
+    {
+        "pokeDexId":  137,
+        "appDexId":  785,
+        "nameJa":  "ポリゴン",
+        "nameEn":  "Porygon",
+        "fileName":  "porygon.png"
+    },
+    {
+        "pokeDexId":  233,
+        "appDexId":  786,
+        "nameJa":  "ポリゴン2",
+        "nameEn":  "Porygon2",
+        "fileName":  "porygon2.png"
+    },
+    {
+        "pokeDexId":  474,
+        "appDexId":  787,
+        "nameJa":  "ポリゴンZ",
+        "nameEn":  "Porygon-Z",
+        "fileName":  "porygon-z.png"
+    },
+    {
+        "pokeDexId":  595,
+        "appDexId":  788,
+        "nameJa":  "バチュル",
+        "nameEn":  "Joltik",
+        "fileName":  "joltik.png"
+    },
+    {
+        "pokeDexId":  596,
+        "appDexId":  789,
+        "nameJa":  "デンチュラ",
+        "nameEn":  "Galvantula",
+        "fileName":  "galvantula.png"
+    },
+    {
+        "pokeDexId":  209,
+        "appDexId":  790,
+        "nameJa":  "ブルー",
+        "nameEn":  "Snubbull",
+        "fileName":  "snubbull.png"
+    },
+    {
+        "pokeDexId":  210,
+        "appDexId":  791,
+        "nameJa":  "グランブル",
+        "nameEn":  "Granbull",
+        "fileName":  "granbull.png"
+    },
+    {
+        "pokeDexId":  1019,
+        "appDexId":  792,
+        "nameJa":  "カミツオロチ",
+        "nameEn":  "Hydrapple",
+        "fileName":  "hydrapple.png"
+    },
+    {
+        "pokeDexId":  1020,
+        "appDexId":  793,
+        "nameJa":  "ウガツホムラ",
+        "nameEn":  "Gouging Fire",
+        "fileName":  "gouging-fire.png"
+    },
+    {
+        "pokeDexId":  1022,
+        "appDexId":  794,
+        "nameJa":  "テツノイワオ",
+        "nameEn":  "Iron Boulder",
+        "fileName":  "iron-boulder.png"
+    },
+    {
+        "pokeDexId":  1024,
+        "appDexId":  795,
+        "nameJa":  "テラパゴス(ステラ)",
+        "nameEn":  "Terapagos(Stellar)",
+        "fileName":  "terapagos-stellar.png"
+    },
+    {
+        "pokeDexId":  249,
+        "appDexId":  796,
+        "nameJa":  "ルギア",
+        "nameEn":  "Lugia",
+        "fileName":  "lugia.png"
+    },
+    {
+        "pokeDexId":  250,
+        "appDexId":  797,
+        "nameJa":  "ホウオウ",
+        "nameEn":  "Ho-Oh",
+        "fileName":  "ho-oh.png"
+    },
+    {
+        "pokeDexId":  243,
+        "appDexId":  798,
+        "nameJa":  "ライコウ",
+        "nameEn":  "Raikou",
+        "fileName":  "raikou.png"
+    },
+    {
+        "pokeDexId":  244,
+        "appDexId":  799,
+        "nameJa":  "エンテイ",
+        "nameEn":  "Entei",
+        "fileName":  "entei.png"
+    },
+    {
+        "pokeDexId":  245,
+        "appDexId":  800,
+        "nameJa":  "スイクン",
+        "nameEn":  "Suicune",
+        "fileName":  "suicune.png"
+    },
+    {
+        "pokeDexId":  380,
+        "appDexId":  801,
+        "nameJa":  "ラティアス",
+        "nameEn":  "Latias",
+        "fileName":  "latias.png"
+    },
+    {
+        "pokeDexId":  381,
+        "appDexId":  802,
+        "nameJa":  "ラティオス",
+        "nameEn":  "Latios",
+        "fileName":  "latios.png"
+    },
+    {
+        "pokeDexId":  646,
+        "appDexId":  803,
+        "nameJa":  "キュレム",
+        "nameEn":  "Kyurem",
+        "fileName":  "kyurem.png"
+    },
+    {
+        "pokeDexId":  646,
+        "appDexId":  804,
+        "nameJa":  "キュレム(ホワイト)",
+        "nameEn":  "Kyurem(White)",
+        "fileName":  "kyurem-white.png"
+    },
+    {
+        "pokeDexId":  646,
+        "appDexId":  805,
+        "nameJa":  "キュレム(ブラック)",
+        "nameEn":  "Kyurem(Black)",
+        "fileName":  "kyurem-black.png"
+    },
+    {
+        "pokeDexId":  643,
+        "appDexId":  806,
+        "nameJa":  "レシラム",
+        "nameEn":  "Reshiram",
+        "fileName":  "reshiram.png"
+    },
+    {
+        "pokeDexId":  644,
+        "appDexId":  807,
+        "nameJa":  "ゼクロム",
+        "nameEn":  "Zekrom",
+        "fileName":  "zekrom.png"
+    },
+    {
+        "pokeDexId":  638,
+        "appDexId":  808,
+        "nameJa":  "コバルオン",
+        "nameEn":  "Cobalion",
+        "fileName":  "cobalion.png"
+    },
+    {
+        "pokeDexId":  639,
+        "appDexId":  809,
+        "nameJa":  "テラキオン",
+        "nameEn":  "Terrakion",
+        "fileName":  "terrakion.png"
+    },
+    {
+        "pokeDexId":  640,
+        "appDexId":  810,
+        "nameJa":  "ビリジオン",
+        "nameEn":  "Virizion",
+        "fileName":  "virizion.png"
+    },
+    {
+        "pokeDexId":  800,
+        "appDexId":  811,
+        "nameJa":  "ネクロズマ",
+        "nameEn":  "Necrozma",
+        "fileName":  "necrozma.png"
+    },
+    {
+        "pokeDexId":  800,
+        "appDexId":  812,
+        "nameJa":  "ネクロズマ(日食)",
+        "nameEn":  "Necrozma(Dusk Mane)",
+        "fileName":  "necrozma-dusk-mane.png"
+    },
+    {
+        "pokeDexId":  800,
+        "appDexId":  813,
+        "nameJa":  "ネクロズマ(月食)",
+        "nameEn":  "Necrozma(Dawn Wings)",
+        "fileName":  "necrozma-dawn-wings.png"
+    },
+    {
+        "pokeDexId":  792,
+        "appDexId":  814,
+        "nameJa":  "ルナアーラ",
+        "nameEn":  "Lunala",
+        "fileName":  "lunala.png"
+    },
+    {
+        "pokeDexId":  791,
+        "appDexId":  815,
+        "nameJa":  "ソルガレオ",
+        "nameEn":  "Solgaleo",
+        "fileName":  "solgaleo.png"
+    },
+    {
+        "pokeDexId":  377,
+        "appDexId":  816,
+        "nameJa":  "レジロック",
+        "nameEn":  "Regirock",
+        "fileName":  "regirock.png"
+    },
+    {
+        "pokeDexId":  378,
+        "appDexId":  817,
+        "nameJa":  "レジアイス",
+        "nameEn":  "Regice",
+        "fileName":  "regice.png"
+    },
+    {
+        "pokeDexId":  379,
+        "appDexId":  818,
+        "nameJa":  "レジスチル",
+        "nameEn":  "Registeel",
+        "fileName":  "registeel.png"
+    },
+    {
+        "pokeDexId":  486,
+        "appDexId":  819,
+        "nameJa":  "レジギガス",
+        "nameEn":  "Regigigas",
+        "fileName":  "regigigas.png"
+    },
+    {
+        "pokeDexId":  386,
+        "appDexId":  820,
+        "nameJa":  "デオキシス(ノーマル)",
+        "nameEn":  "Deoxys(Normal)",
+        "fileName":  "deoxys-normal.png"
+    },
+    {
+        "pokeDexId":  386,
+        "appDexId":  821,
+        "nameJa":  "デオキシス(アタック)",
+        "nameEn":  "Deoxys(Attack)",
+        "fileName":  "deoxys-attack.png"
+    },
+    {
+        "pokeDexId":  386,
+        "appDexId":  822,
+        "nameJa":  "デオキシス(ディフェンス)",
+        "nameEn":  "Deoxys(Defense)",
+        "fileName":  "deoxys-defense.png"
+    },
+    {
+        "pokeDexId":  386,
+        "appDexId":  823,
+        "nameJa":  "デオキシス(スピード)",
+        "nameEn":  "Deoxys(Speed)",
+        "fileName":  "deoxys-speed.png"
+    },
+    {
+        "pokeDexId":  647,
+        "appDexId":  824,
+        "nameJa":  "ケルディオ(いつも)",
+        "nameEn":  "Keldeo(Ordinary)",
+        "fileName":  "keldeo-ordinary.png"
+    },
+    {
+        "pokeDexId":  647,
+        "appDexId":  825,
+        "nameJa":  "ケルディオ(かくご)",
+        "nameEn":  "Keldeo(Resolute)",
+        "fileName":  "keldeo-resolute.png"
+    },
+    {
+        "pokeDexId":  789,
+        "appDexId":  826,
+        "nameJa":  "コスモッグ",
+        "nameEn":  "Cosmog",
+        "fileName":  "cosmog.png"
+    },
+    {
+        "pokeDexId":  790,
+        "appDexId":  827,
+        "nameJa":  "コスモウム",
+        "nameEn":  "Cosmoem",
+        "fileName":  "cosmoem.png"
+    },
+    {
+        "pokeDexId":  1025,
+        "appDexId":  828,
+        "nameJa":  "モモワロウ",
+        "nameEn":  "Peacharunt",
+        "fileName":  "peacharunt.png"
+    },
+    {
+        "pokeDexId":  0,
+        "appDexId":  99999,
+        "nameJa":  "けつばん",
+        "nameEn":  "Default",
+        "fileName":  "default.png"
+    },
+    {
+        "pokeDexId":  925,
+        "appDexId":  9000073,
+        "nameJa":  "イッカネズミ(3匹)",
+        "nameEn":  "Maushold(Three)",
+        "fileName":  "maushold-three.png"
+    },
+    {
+        "pokeDexId":  931,
+        "appDexId":  9000119,
+        "nameJa":  "イキリンコ(ブルー)",
+        "nameEn":  "Squawkabilly(Blue)",
+        "fileName":  "squawkabilly-blue.png"
+    },
+    {
+        "pokeDexId":  931,
+        "appDexId":  9000120,
+        "nameJa":  "イキリンコ(ホワイト)",
+        "nameEn":  "Squawkabilly(White)",
+        "fileName":  "squawkabilly-white.png"
+    },
+    {
+        "pokeDexId":  670,
+        "appDexId":  9000154,
+        "nameJa":  "フラエッテ(えいえんのはな)",
+        "nameEn":  "Floette(Eternal)",
+        "fileName":  "floette-eternal.png"
+    },
+    {
+        "pokeDexId":  585,
+        "appDexId":  9000198,
+        "nameJa":  "シキジカ(なつ)",
+        "nameEn":  "Deerling(Summer)",
+        "fileName":  "deerling-summer.png"
+    },
+    {
+        "pokeDexId":  586,
+        "appDexId":  9000199,
+        "nameJa":  "メブキジカ(なつ)",
+        "nameEn":  "Sawsbuck(Summer)",
+        "fileName":  "sawsbuck-summer.png"
+    },
+    {
+        "pokeDexId":  668,
+        "appDexId":  9000236,
+        "nameJa":  "カエンジシ(メス)",
+        "nameEn":  "Pyroar(Female)",
+        "fileName":  "pyroar-female.png"
+    },
+    {
+        "pokeDexId":  854,
+        "appDexId":  9000248,
+        "nameJa":  "ヤバチャ(しんさく)",
+        "nameEn":  "Sinistea(Antique)",
+        "fileName":  "sinistea-antique.png"
+    },
+    {
+        "pokeDexId":  855,
+        "appDexId":  9000249,
+        "nameJa":  "ポットデス(しんさく)",
+        "nameEn":  "Polteageist(Antique)",
+        "fileName":  "polteageist-antique.png"
+    },
+    {
+        "pokeDexId":  450,
+        "appDexId":  9000278,
+        "nameJa":  "カバルドン(メス)",
+        "nameEn":  "Hippowdon(Female)",
+        "fileName":  "hippowdon-female.png"
+    },
+    {
+        "pokeDexId":  964,
+        "appDexId":  9000303,
+        "nameJa":  "イルカマン(ナイーブ)",
+        "nameEn":  "Palafin(Zero)",
+        "fileName":  "palafin-zero.png"
+    },
+    {
+        "pokeDexId":  875,
+        "appDexId":  9000337,
+        "nameJa":  "コオリッポ(ナイス)",
+        "nameEn":  "Eiscue(Noice)",
+        "fileName":  "eiscue-noice.png"
+    },
+    {
+        "pokeDexId":  422,
+        "appDexId":  9000344,
+        "nameJa":  "カラナクシ(ひがし)",
+        "nameEn":  "Shellos",
+        "fileName":  "shellos.png"
+    },
+    {
+        "pokeDexId":  423,
+        "appDexId":  9000345,
+        "nameJa":  "トリトドン(ひがし)",
+        "nameEn":  "Gastrodon",
+        "fileName":  "gastrodon.png"
+    },
+    {
+        "pokeDexId":  978,
+        "appDexId":  9000392,
+        "nameJa":  "シャリタツ(たれた)",
+        "nameEn":  "Tatsugiri(Droopy)",
+        "fileName":  "tatsugiri-droopy.png"
+    },
+    {
+        "pokeDexId":  892,
+        "appDexId":  9000506,
+        "nameJa":  "ウーラオス(不明)",
+        "nameEn":  "Urshifu(Unknown)",
+        "fileName":  "urshifu-unknown.png"
+    },
+    {
+        "pokeDexId":  585,
+        "appDexId":  9010198,
+        "nameJa":  "シキジカ(あき)",
+        "nameEn":  "Deerling(Autumn)",
+        "fileName":  "deerling-autumn.png"
+    },
+    {
+        "pokeDexId":  586,
+        "appDexId":  9010199,
+        "nameJa":  "メブキジカ(あき)",
+        "nameEn":  "Sawsbuck(Autumn)",
+        "fileName":  "sawsbuck-autumn.png"
+    },
+    {
+        "pokeDexId":  978,
+        "appDexId":  9010392,
+        "nameJa":  "シャリタツ(のびた)",
+        "nameEn":  "Tatsugiri(Stretchy)",
+        "fileName":  "tatsugiri-stretchy.png"
+    },
+    {
+        "pokeDexId":  585,
+        "appDexId":  9020198,
+        "nameJa":  "シキジカ(ふゆ)",
+        "nameEn":  "Deerling(Winter)",
+        "fileName":  "deerling-winter.png"
+    },
+    {
+        "pokeDexId":  586,
+        "appDexId":  9020199,
+        "nameJa":  "メブキジカ(ふゆ)",
+        "nameEn":  "Sawsbuck(Winter)",
+        "fileName":  "sawsbuck-winter.png"
+    }
+]

@@ -12,9 +12,7 @@
   <meta name="theme-color" content="#6c63ff">
   <link rel="manifest" href="manifest.json">
   <title>ポケモン対戦記録</title>
-  <!-- Google Identity Services (Google Drive API用) -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <!-- Firebase SDK (共通マスタデータ用) -->
+  <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
@@ -1831,6 +1829,106 @@
       padding: 0 4px;
       flex-shrink: 0;
     }
+
+    /* AI PARTY MODAL */
+    .ai-drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 24px 16px;
+      text-align: center;
+      background: var(--surface2);
+      cursor: pointer;
+      transition: all .2s;
+    }
+
+    .ai-drop-zone:hover,
+    .ai-drop-zone.drag-over {
+      border-color: var(--accent);
+      background: rgba(108, 99, 255, 0.12);
+    }
+
+    .ai-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .ai-preview-item {
+      position: relative;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: #000;
+      aspect-ratio: 16/9;
+    }
+
+    .ai-preview-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .ai-preview-del {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      background: rgba(0, 0, 0, 0.75);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .15s;
+    }
+
+    .ai-preview-del:hover {
+      background: #f87171;
+    }
+
+    .ai-preview-badge {
+      position: absolute;
+      bottom: 4px;
+      left: 4px;
+      background: rgba(0, 0, 0, 0.75);
+      color: #c4b5fd;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .ai-key-guide {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 14px;
+    }
+
+    .ai-loading-spinner {
+      display: inline-block;
+      width: 28px;
+      height: 28px;
+      border: 3px solid rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      border-top-color: var(--accent);
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
   </style>
 </head>
 
@@ -1857,19 +1955,22 @@
   <!-- ログインバナー -->
   <div id="login-banner"
     style="background:var(--surface);border-bottom:1px solid var(--border);padding:12px 20px;text-align:center;display:none">
-    <span style="color:var(--text-muted);font-size:14px">Googleアカウントで連携すると、ご自身のGoogle
-      Driveに安全に自動保存され、複数端末で同期できます。</span>
-    <button class="btn btn-primary btn-sm" onclick="toggleAuth()" style="margin-left:12px">Google Drive連携</button>
+    <span style="color:var(--text-muted);font-size:14px">Googleアカウントでログインするとデータがクラウドに保存され、どの端末からでもアクセスできます。</span>
+    <button class="btn btn-primary btn-sm" onclick="toggleAuth()" style="margin-left:12px">Googleでログイン</button>
   </div>
 
   <!-- PARTIES PAGE -->
   <div id="page-parties" class="page active">
-    <div class="flex justify-between items-center mb-4">
+    <div class="flex justify-between items-center mb-4" style="flex-wrap:wrap;gap:8px">
       <div>
         <h2 style="font-size:20px;font-weight:700">自分のパーティ</h2>
         <p class="text-muted mt-2">自由に登録できます</p>
       </div>
-      <button class="btn btn-primary" onclick="openPartyEdit(null)">＋ 新規登録</button>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-ghost" onclick="openAiPartyModal(null)"
+          style="border-color:var(--accent);color:#c4b5fd">📸 画像から自動作成</button>
+        <button class="btn btn-primary" onclick="openPartyEdit(null)">＋ 新規登録</button>
+      </div>
     </div>
     <div id="pe-copy-board"></div>
     <div id="party-grid" class="party-grid"></div>
@@ -2005,69 +2106,11 @@
   <div id="page-datamanage" class="page">
     <h2 style="font-size:20px;font-weight:700;margin-bottom:20px">データ管理</h2>
 
-    <!-- 個人データのバックアップ・復元 -->
-    <div class="card mb-4">
-      <div class="card-title">📦 個人データのバックアップ・復元</div>
-      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px">
-        パーティと対戦履歴の全データをJSONファイルとして手元に保存・復元できます。
-      </p>
-      <div style="display:flex;flex-wrap:wrap;gap:10px">
-        <button class="btn btn-primary btn-sm" onclick="exportDataToJSON()">
-          ⬇️ バックアップ書き出し (JSON)
-        </button>
-        <label class="btn btn-ghost btn-sm" style="cursor:pointer;margin:0">
-          ⬆️ データを復元 (JSON読込)
-          <input type="file" id="import-json-file" accept=".json" style="display:none"
-            onchange="importDataFromJSON(event)">
-        </label>
-      </div>
-    </div>
-
-    <!-- Google Drive 連携状況 -->
-    <div class="card mb-4">
-      <div class="card-title">☁️ Google Drive 個人クラウド保存</div>
-      <div style="font-size:13px;color:var(--text-muted);margin-bottom:12px">
-        ご自身のGoogle Drive上の安全なアプリ専用領域（<code>appDataFolder</code>）にデータを自動保存・同期します。
-      </div>
-      <div id="drive-status-box"
-        style="background:var(--surface2);padding:12px 16px;border-radius:8px;font-size:13px;margin-bottom:12px">
-        <div style="display:flex;align-items:center;justify-content:space-between">
-          <div>
-            <span>状態: </span>
-            <strong id="drive-status-text" style="color:var(--accent)">未接続</strong>
-          </div>
-          <button id="drive-sync-btn" class="btn btn-ghost btn-sm" style="display:none" onclick="manualSyncDrive()">🔄
-            今すぐ同期</button>
-        </div>
-        <div id="drive-account-detail" style="font-size:12px;color:var(--text-muted);margin-top:6px;display:none"></div>
-      </div>
-      <details style="font-size:12px;color:var(--text-muted);margin-top:8px">
-        <summary style="cursor:pointer;color:var(--accent)">⚙️ Google OAuth Client ID の設定</summary>
-        <div style="margin-top:10px;padding:10px;background:var(--surface2);border-radius:8px">
-          <label for="input-google-client-id" style="font-size:12px">OAuth 2.0 クライアント ID:</label>
-          <input type="text" id="input-google-client-id" placeholder="xxxx.apps.googleusercontent.com"
-            style="font-size:12px;margin-bottom:8px">
-          <div style="display:flex;justify-content:flex-end;gap:8px">
-            <button class="btn btn-ghost btn-sm" onclick="resetGoogleClientId()">リセット</button>
-            <button class="btn btn-primary btn-sm" onclick="saveGoogleClientId()">設定を保存</button>
-          </div>
-        </div>
-      </details>
-    </div>
-
-    <!-- 共通マスタデータ編集（管理者のみ） -->
-    <div class="section-label dm-admin-only" style="display:none">共通マスタデータ管理 (Firebase)</div>
-
     <!-- 非管理者向けメッセージ（管理者ログイン時は非表示） -->
     <div id="dm-no-permission" class="card mb-4"
-      style="display:none;border-color:var(--border);text-align:center;padding:24px 20px">
-      <div style="font-size:28px;margin-bottom:8px">🔒</div>
-      <div style="font-weight:600;font-size:14px">マスタデータ（ポケモン・技・道具）の編集権限はありません</div>
-      <div style="font-size:12px;color:var(--text-muted);margin-top:4px">※最新のマスタデータは自動で同期されています</div>
-      <div style="margin-top:12px">
-        <button class="btn btn-ghost btn-sm" onclick="loginFirebaseAdmin()"
-          style="font-size:11px">管理者としてFirebaseログイン</button>
-      </div>
+      style="display:none;border-color:var(--border);text-align:center;padding:32px 20px">
+      <div style="font-size:32px;margin-bottom:12px">🔒</div>
+      <div style="font-weight:600;font-size:15px">権限がないため、閲覧できません</div>
     </div>
 
     <div class="card mb-4 dm-admin-only" style="display:none">
@@ -2152,6 +2195,82 @@
     <div class="pe-body" id="pe-body"></div>
   </div>
 
+
+  <!-- AI PARTY MODAL -->
+  <div id="ai-party-modal" class="modal-overlay" onclick="if(event.target===this)closeAiPartyModal()">
+    <div class="modal" style="max-width:580px">
+      <div class="flex justify-between items-center mb-3">
+        <div class="modal-title" id="ai-party-modal-title" style="margin-bottom:0">📸 画像からパーティ自動作成</div>
+        <button class="btn btn-ghost btn-sm" onclick="closeAiPartyModal()">✕</button>
+      </div>
+
+      <!-- APIキー設定エリア -->
+      <div id="ai-key-section" style="margin-bottom:16px">
+        <div id="ai-key-status"
+          style="display:flex;align-items:center;justify-content:space-between;background:var(--surface2);padding:8px 12px;border-radius:8px;border:1px solid var(--border)">
+          <span id="ai-key-status-text" style="font-size:12px;color:var(--text-muted)">🔑 Gemini APIキー: <strong
+              id="ai-key-badge" style="color:var(--win)">設定済み</strong></span>
+          <button class="btn btn-ghost btn-sm" onclick="toggleAiApiKeyGuide()" style="padding:2px 8px;font-size:11px">変更
+            / 設定方法</button>
+        </div>
+
+        <div id="ai-key-guide-box" class="ai-key-guide" style="display:none;margin-top:10px">
+          <div style="font-weight:700;color:var(--accent);margin-bottom:6px">💡 Gemini APIキーの取得方法（無料・約1分）</div>
+          <ol style="padding-left:20px;margin-bottom:10px;font-size:12px;color:var(--text-muted)">
+            <li><a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer"
+                style="color:var(--accent);text-decoration:underline;font-weight:600">Google AI Studio (APIキー取得ページ)
+                ↗</a> にアクセス</li>
+            <li>Googleアカウントでログインし、<strong>「Create API key」</strong> をクリック</li>
+            <li>発行されたAPIキーをコピーして、下の入力欄に貼り付けて「保存」を押してください</li>
+          </ol>
+          <div style="font-size:11px;color:#94a3b8;margin-bottom:10px">※
+            クレジットカード登録不要の無料枠で1日1,500回まで利用できます。キーはお使いの端末のブラウザ内（localStorage）にのみ安全に保存されます。</div>
+          <div style="display:flex;gap:8px">
+            <input type="password" id="ai-api-key-input" placeholder="AIzaSy... から始まるAPIキーを入力"
+              style="font-size:13px;flex:1">
+            <button class="btn btn-primary btn-sm" onclick="saveGeminiApiKeyFromInput()">保存</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 画像アップロード / ドロップゾーン -->
+      <div id="ai-upload-section">
+        <div class="ai-drop-zone" id="ai-drop-zone" onclick="document.getElementById('ai-file-input').click()">
+          <div style="font-size:32px;margin-bottom:6px">📸</div>
+          <div style="font-weight:700;font-size:14px;margin-bottom:4px">タップして画像を選択 / ここに画像をドロップ</div>
+          <div style="font-size:12px;color:var(--text-muted)">または <kbd
+              style="background:var(--bg);padding:2px 6px;border-radius:4px;border:1px solid var(--border)">Ctrl +
+              V</kbd> でスクショを貼り付け</div>
+          <div style="font-size:11px;color:var(--accent);margin-top:6px">
+            ※「能力」画面と「ステータス」画面の2枚をアップロードすると、技・持ち物・努力値・性格が完全反映されます（1枚でも可）</div>
+        </div>
+        <input type="file" id="ai-file-input" accept="image/*" multiple style="display:none"
+          onchange="handleAiFileSelect(event)">
+
+        <!-- プレビュー表示 -->
+        <div id="ai-preview-container" class="ai-preview-grid" style="display:none"></div>
+      </div>
+
+      <!-- 解析ローディング表示 -->
+      <div id="ai-loading-box" style="display:none;text-align:center;padding:24px 10px">
+        <div class="ai-loading-spinner" style="margin-bottom:12px"></div>
+        <div style="font-weight:700;font-size:15px;color:var(--accent)">Gemini AIが画像を解析中...</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:6px">ポケモンの技、持ち物、特性、実数値・努力値を抽出しています</div>
+      </div>
+
+      <!-- エラーメッセージ -->
+      <div id="ai-error-msg"
+        style="display:none;background:#450a0a;color:#fca5a5;padding:10px;border-radius:8px;font-size:12px;margin-top:12px">
+      </div>
+
+      <!-- フッターボタン -->
+      <div class="modal-footer" style="margin-top:16px" id="ai-modal-footer">
+        <button class="btn btn-ghost" onclick="closeAiPartyModal()">キャンセル</button>
+        <button class="btn btn-primary" id="ai-submit-btn" onclick="executeAiPartyAnalysis()" disabled>🔍
+          解析してパーティ編集へ反映</button>
+      </div>
+    </div>
+  </div>
 
   <!-- MEMO MODAL -->
   <div id="memo-modal"
@@ -2546,328 +2665,102 @@
         return ai - bi;
       });
     }
-    // ---- GOOGLE DRIVE & CLOUD DATA SYNC ----
-    const DRIVE_FILE_NAME = 'pokemon_battle_log_data.json';
-    const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.appdata';
+    let currentUser = null;
+    let _fbReady = false;
 
-    function getGoogleClientId() {
-      return localStorage.getItem('pkm_google_client_id') || '';
-    }
-
-    let driveTokenClient = null;
-    let driveAccessToken = localStorage.getItem('pkm_drive_token') || null;
-    let driveTokenExpires = parseInt(localStorage.getItem('pkm_drive_token_expires') || '0', 10);
-    let driveUser = JSON.parse(localStorage.getItem('pkm_drive_user') || 'null');
-    let driveFileId = localStorage.getItem('pkm_drive_file_id') || null;
-
+    // 最後にこの端末が読み込んだ updatedAt（ミリ秒）
     let _lastLoadedAt = 0;
-    let _conflictCheckBusy = false;
-    let _conflictBannerDismissed = false;
-    let _conflictPollingStarted = false;
 
-    // UI更新
-    function updateDriveUI() {
-      const nameEl = document.getElementById('user-name');
-      const btnEl = document.getElementById('auth-btn');
-      const banner = document.getElementById('login-banner');
-      const statusText = document.getElementById('drive-status-text');
-      const syncBtn = document.getElementById('drive-sync-btn');
-      const accountDetail = document.getElementById('drive-account-detail');
-      const clientIdInput = document.getElementById('input-google-client-id');
-      if (clientIdInput) clientIdInput.value = getGoogleClientId();
-
-      const isConnected = !!(driveAccessToken && driveUser);
-      if (isConnected) {
-        if (nameEl) nameEl.textContent = driveUser.name || driveUser.email || 'Drive連携中';
-        if (btnEl) btnEl.textContent = 'ログアウト';
-        if (banner) banner.style.display = 'none';
-        if (statusText) { statusText.textContent = '連携中 (Google Drive)'; statusText.style.color = 'var(--win)'; }
-        if (syncBtn) syncBtn.style.display = 'inline-flex';
-        if (accountDetail) {
-          accountDetail.textContent = `アカウント: ${driveUser.email || driveUser.name || 'Googleユーザー'} | ファイル: ${DRIVE_FILE_NAME}`;
-          accountDetail.style.display = 'block';
-        }
-      } else {
-        if (nameEl) nameEl.textContent = '';
-        if (btnEl) btnEl.textContent = 'Google連携';
-        if (banner) banner.style.display = 'block';
-        if (statusText) { statusText.textContent = '未接続 (ブラウザローカル保存)'; statusText.style.color = 'var(--accent)'; }
-        if (syncBtn) syncBtn.style.display = 'none';
-        if (accountDetail) accountDetail.style.display = 'none';
-      }
-    }
-
-    // 認証トグル
-    async function toggleAuth() {
-      if (driveAccessToken && driveUser) {
-        if (confirm('Google Drive連携を解除してログアウトしますか？\n※端末内のデータは保持されます。')) {
-          signOutDrive();
-        }
-      } else {
-        signInDrive();
-      }
-    }
-
-    // サインイン
-    function signInDrive() {
-      let clientId = getGoogleClientId();
-      if (!clientId) {
-        const entered = prompt(
-          'Google Drive連携用の OAuth 2.0 クライアント ID を入力してください。\n' +
-          '（Google Cloud / Firebase Console で作成したWebクライアントID）\n\n' +
-          '※「データ管理」画面の「Google OAuth Client ID の設定」からも入力・保存可能です。'
-        );
-        if (!entered || !entered.trim()) return;
-        localStorage.setItem('pkm_google_client_id', entered.trim());
-        clientId = entered.trim();
-      }
-
-      if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
-        alert('Google Identity Services SDK を読み込み中です。数秒後に再度お試しください。');
-        return;
-      }
-
-      try {
-        driveTokenClient = google.accounts.oauth2.initTokenClient({
-          client_id: clientId,
-          scope: DRIVE_SCOPE,
-          callback: async (resp) => {
-            if (resp.error) {
-              console.error('Google Auth Error:', resp);
-              alert('Google認証に失敗しました: ' + (resp.error_description || resp.error));
-              return;
-            }
-            driveAccessToken = resp.access_token;
-            const expiresInSec = parseInt(resp.expires_in || '3600', 10);
-            driveTokenExpires = Date.now() + (expiresInSec - 60) * 1000;
-            localStorage.setItem('pkm_drive_token', driveAccessToken);
-            localStorage.setItem('pkm_drive_token_expires', driveTokenExpires.toString());
-
-            try {
-              const ures = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-                headers: { 'Authorization': `Bearer ${driveAccessToken}` }
-              });
-              if (ures.ok) {
-                driveUser = await ures.json();
-                localStorage.setItem('pkm_drive_user', JSON.stringify(driveUser));
-              } else {
-                driveUser = { name: 'Googleユーザー' };
-                localStorage.setItem('pkm_drive_user', JSON.stringify(driveUser));
-              }
-            } catch (ue) {
-              driveUser = { name: 'Googleユーザー' };
-              localStorage.setItem('pkm_drive_user', JSON.stringify(driveUser));
-            }
-
-            updateDriveUI();
-            await loadFromDrive();
-            renderParties();
-            renderHistory();
-          }
-        });
-        driveTokenClient.requestAccessToken({ prompt: 'consent' });
-      } catch (e) {
-        console.error('GIS Error:', e);
-        alert('Google認証の初期化に失敗しました。クライアントIDが正しいか確認してください。\n' + e.message);
-      }
-    }
-
-    // サインアウト
-    function signOutDrive() {
-      if (driveAccessToken && typeof google !== 'undefined' && google.accounts && google.accounts.oauth2) {
-        try { google.accounts.oauth2.revoke(driveAccessToken, () => { }); } catch (e) { }
-      }
-      driveAccessToken = null;
-      driveTokenExpires = 0;
-      driveUser = null;
-      driveFileId = null;
-      localStorage.removeItem('pkm_drive_token');
-      localStorage.removeItem('pkm_drive_token_expires');
-      localStorage.removeItem('pkm_drive_user');
-      localStorage.removeItem('pkm_drive_file_id');
-      updateDriveUI();
-    }
-
-    // Google Drive からファイル検索・読み込み
-    async function loadFromDrive() {
-      if (!driveAccessToken) return;
-      try {
-        const q = encodeURIComponent(`name = '${DRIVE_FILE_NAME}' and trashed = false`);
-        const listRes = await fetch(`https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=${q}&fields=files(id,name,modifiedTime)`, {
-          headers: { 'Authorization': `Bearer ${driveAccessToken}` }
-        });
-        if (!listRes.ok) {
-          if (listRes.status === 401) {
-            signOutDrive();
-            return;
-          }
-          throw new Error(`Drive list error: ${listRes.statusText}`);
-        }
-        const listData = await listRes.json();
-        if (listData.files && listData.files.length > 0) {
-          const file = listData.files[0];
-          driveFileId = file.id;
-          localStorage.setItem('pkm_drive_file_id', driveFileId);
-
-          const getRes = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`, {
-            headers: { 'Authorization': `Bearer ${driveAccessToken}` }
-          });
-          if (getRes.ok) {
-            const fileContent = await getRes.json();
-            parties = fileContent.parties || [];
-            records = fileContent.records || [];
-            localStorage.setItem('pkm_parties', JSON.stringify(parties));
-            localStorage.setItem('pkm_records', JSON.stringify(records));
-            _lastLoadedAt = fileContent.updatedAt || new Date(file.modifiedTime).getTime() || Date.now();
-          }
-        } else {
-          // ファイル未作成時（初回連携）: 既存のlocalStorageデータを自動引き継ぎアップロード
-          await createDriveFile();
-        }
-        updateDriveUI();
-        startConflictPolling();
-      } catch (e) {
-        console.error('Load from Drive error:', e);
-      }
-    }
-
-    // 新規ファイル作成（appDataFolder内）
-    async function createDriveFile() {
-      if (!driveAccessToken) return;
-      try {
-        const payload = {
-          parties,
-          records,
-          updatedAt: Date.now(),
-          version: '1.0'
-        };
-        const metadata = {
-          name: DRIVE_FILE_NAME,
-          parents: ['appDataFolder'],
-          mimeType: 'application/json'
-        };
-        const form = new FormData();
-        form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
-        form.append('file', new Blob([JSON.stringify(payload)], { type: 'application/json' }));
-
-        const res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${driveAccessToken}` },
-          body: form
-        });
-        if (res.ok) {
-          const created = await res.json();
-          driveFileId = created.id;
-          localStorage.setItem('pkm_drive_file_id', driveFileId);
-          _lastLoadedAt = payload.updatedAt;
-        }
-      } catch (e) {
-        console.error('Create Drive file error:', e);
-      }
-    }
-
-    // Google Drive へのデータ保存
-    async function saveToDrive() {
-      if (!driveAccessToken) return;
-      if (!driveFileId) {
-        await createDriveFile();
-        return;
-      }
-      try {
-        const payload = {
-          parties,
-          records,
-          updatedAt: Date.now(),
-          version: '1.0'
-        };
-        const res = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`, {
-          method: 'PATCH',
-          headers: {
-            'Authorization': `Bearer ${driveAccessToken}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(payload)
-        });
-        if (res.ok) {
-          _lastLoadedAt = payload.updatedAt;
-          _conflictBannerDismissed = false;
-          const b = document.getElementById('conflict-banner');
-          if (b) b.classList.remove('show');
-        } else if (res.status === 404) {
-          await createDriveFile();
-        }
-      } catch (e) {
-        console.error('Save to Drive error:', e);
-      }
-    }
-
-    // データ保存（localStorage 即時保存 + Google Drive 非同期保存）
+    // Firestore保存（ログイン中のみ、localStorageにも同時保存）
+    // 保存前に他端末の変更を検知して警告する
     async function saveData() {
       localStorage.setItem('pkm_parties', JSON.stringify(parties));
       localStorage.setItem('pkm_records', JSON.stringify(records));
-      if (driveAccessToken) {
-        await saveToDrive();
-      }
+      if (!currentUser || !_fbReady) return;
+      const { doc, setDoc } = window._firestoreOps;
+      const db = window._db;
+      const uid = currentUser.uid;
+      try {
+        const payload = {
+          parties,
+          records,
+          updatedAt: window._firestoreOps.serverTimestamp()
+        };
+        const apiKey = getGeminiApiKey();
+        if (apiKey) payload.geminiApiKey = apiKey;
+
+        await setDoc(doc(db, 'users', uid, 'data', 'main'), payload, { merge: true });
+        // サーバー時刻と合わせるため、保存直後に読み直して _lastLoadedAt を更新
+        try {
+          const saved = await window._firestoreOps.getDoc(doc(db, 'users', uid, 'data', 'main'));
+          if (saved.exists()) {
+            const ud = saved.data().updatedAt;
+            _lastLoadedAt = (ud && ud.toMillis) ? ud.toMillis() : Date.now();
+          } else {
+            _lastLoadedAt = Date.now();
+          }
+        } catch (e2) {
+          _lastLoadedAt = Date.now();
+        }
+        // 自分が保存したのでバナーを消す
+        _conflictBannerDismissed = false;
+        const b = document.getElementById('conflict-banner');
+        if (b) b.classList.remove('show');
+      } catch (e) { console.error('Firestore save error:', e); }
     }
 
-    // 手動同期
-    async function manualSyncDrive() {
-      if (!driveAccessToken) return;
-      const btn = document.getElementById('drive-sync-btn');
-      if (btn) btn.textContent = '🔄 同期中...';
-      await loadFromDrive();
-      renderParties();
-      renderHistory();
-      if (btn) btn.textContent = '🔄 今すぐ同期';
-      alert('Google Driveとデータを同期しました！');
-    }
+    // 他端末の変更を検知してリロードを促す（入力前チェック用）
+    // 変更あり→true、なし→false を返す
+    let _conflictCheckBusy = false;
+    let _conflictBannerDismissed = false;
 
-    // バナー表示・消去
+    // バナーを表示
     function showConflictBanner() {
       const b = document.getElementById('conflict-banner');
       if (b) b.classList.add('show');
     }
+    // バナーを閉じる（「✕」押下時。保存時に自動消去もする）
     function dismissConflictBanner() {
       _conflictBannerDismissed = true;
       const b = document.getElementById('conflict-banner');
       if (b) b.classList.remove('show');
     }
 
-    // バックグラウンド競合チェック
+    // バックグラウンドで競合チェックし、変更があればバナー表示
     async function bgConflictCheck() {
-      if (!driveAccessToken || !driveFileId || _lastLoadedAt === 0 || _conflictCheckBusy || _conflictBannerDismissed) return;
+      if (!currentUser || !_fbReady || _lastLoadedAt === 0 || _conflictCheckBusy) return;
+      if (_conflictBannerDismissed) return; // 一度閉じたら再表示しない
       _conflictCheckBusy = true;
       try {
-        const res = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?fields=modifiedTime`, {
-          headers: { 'Authorization': `Bearer ${driveAccessToken}` }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          const serverTime = new Date(data.modifiedTime).getTime();
-          if (serverTime > _lastLoadedAt + 3000) {
-            showConflictBanner();
-          }
+        const { doc, getDoc } = window._firestoreOps;
+        const snap = await getDoc(doc(window._db, 'users', currentUser.uid, 'data', 'main'));
+        if (!snap.exists()) return;
+        const ud = snap.data().updatedAt;
+        const serverTime = (ud && ud.toMillis) ? ud.toMillis() : 0;
+        if (serverTime > _lastLoadedAt) {
+          showConflictBanner();
         }
       } catch (e) {
+        // チェック失敗は無視
       } finally {
         _conflictCheckBusy = false;
       }
     }
 
-    // 操作前競合チェック
+    // 保存・操作前の確認（毎回Firestoreに問い合わせて即時判定）
     async function checkAndPromptReload() {
-      if (!driveAccessToken || !driveFileId || _lastLoadedAt === 0) return false;
+      if (!currentUser || !_fbReady || _lastLoadedAt === 0) return false;
       try {
-        const res = await fetch(`https://www.googleapis.com/drive/v3/files/${driveFileId}?fields=modifiedTime`, {
-          headers: { 'Authorization': `Bearer ${driveAccessToken}` }
-        });
-        if (!res.ok) return false;
-        const data = await res.json();
-        const serverTime = new Date(data.modifiedTime).getTime();
-        if (serverTime > _lastLoadedAt + 3000) {
+        const { doc, getDoc } = window._firestoreOps;
+        const snap = await getDoc(doc(window._db, 'users', currentUser.uid, 'data', 'main'));
+        if (!snap.exists()) return false;
+        const ud = snap.data().updatedAt;
+        const serverTime = (ud && ud.toMillis) ? ud.toMillis() : 0;
+        if (serverTime > _lastLoadedAt) {
+          // バナーも表示
           showConflictBanner();
           const ok = confirm(
-            '別の端末でGoogle Drive上のデータが更新されています。\n' +
+            '別の端末でデータが更新されています。\n' +
             'リロードして最新データを取得しますか？\n\n' +
             'OK → リロード\n' +
             'キャンセル → このまま続ける（この端末の内容で上書きされます）'
@@ -2876,141 +2769,114 @@
         }
         return false;
       } catch (e) {
-        return false;
+        return false; // 通信失敗時は無視して続行
       }
     }
 
+    // Firestoreからロード
+    async function loadFromFirestore() {
+      if (!currentUser || !_fbReady) return;
+      const { doc, getDoc, setDoc } = window._firestoreOps;
+      const db = window._db;
+      const uid = currentUser.uid;
+      try {
+        const snap = await getDoc(doc(db, 'users', uid, 'data', 'main'));
+        if (snap.exists()) {
+          const data = snap.data();
+          parties = data.parties || [];
+          records = data.records || [];
+          localStorage.setItem('pkm_parties', JSON.stringify(parties));
+          localStorage.setItem('pkm_records', JSON.stringify(records));
+
+          // Gemini APIキーの同期
+          if (data.geminiApiKey) {
+            localStorage.setItem('pkm_gemini_api_key', data.geminiApiKey);
+          } else if (getGeminiApiKey()) {
+            // クラウド側に未保存でローカルにある場合はクラウドにバックアップ保存
+            const localKey = getGeminiApiKey();
+            setDoc(doc(db, 'users', uid, 'data', 'main'), { geminiApiKey: localKey }, { merge: true }).catch(console.error);
+          }
+          updateAiApiKeyUI();
+
+          // 読み込み時刻を記録（競合検知用）
+          const ud2 = data.updatedAt; _lastLoadedAt = (ud2 && ud2.toMillis) ? ud2.toMillis() : Date.now();
+        } else {
+          // 新規ユーザーでローカルにAPIキーがある場合は保存
+          if (getGeminiApiKey()) {
+            setDoc(doc(db, 'users', uid, 'data', 'main'), { geminiApiKey: getGeminiApiKey() }, { merge: true }).catch(console.error);
+          }
+        }
+        await dmLoadMasterData();
+        // 読み込み完了後にバックグラウンドチェックを開始
+        startConflictPolling();
+      } catch (e) { console.error('Firestore load error:', e); }
+    }
+
+    // バックグラウンド競合チェックの開始
+    let _conflictPollingStarted = false;
     function startConflictPolling() {
       if (_conflictPollingStarted) return;
       _conflictPollingStarted = true;
+      // タブがフォアグラウンドに戻った時にチェック
       document.addEventListener('visibilitychange', function () {
         if (!document.hidden) bgConflictCheck();
       });
+      // 60秒ごとにバックグラウンドチェック
       setInterval(bgConflictCheck, 60000);
     }
 
-    // ---- JSON BACKUP & RESTORE / CLIENT ID SETTINGS ----
-    function exportDataToJSON() {
-      const exportData = {
-        appName: 'PokemonBattleLog',
-        version: '1.0',
-        exportedAt: new Date().toISOString(),
-        parties: parties,
-        records: records
-      };
-      const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-      a.href = url;
-      a.download = `pokemon_battle_log_backup_${dateStr}.json`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
-
-    function importDataFromJSON(event) {
-      const file = event.target.files && event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = async (e) => {
-        try {
-          const data = JSON.parse(e.target.result);
-          if (!data || (!Array.isArray(data.parties) && !Array.isArray(data.records))) {
-            alert('無効なバックアップファイルです。partiesまたはrecordsが見つかりません。');
-            return;
-          }
-          const pCount = (data.parties || []).length;
-          const rCount = (data.records || []).length;
-          if (!confirm(`バックアップファイルを読み込みますか？\n\nパーティ: ${pCount}件\n対戦履歴: ${rCount}件\n\n※現在の端末データおよびGoogle Driveデータは上書きされます。`)) {
-            return;
-          }
-          parties = data.parties || [];
-          records = data.records || [];
-          await saveData();
-          renderParties();
-          renderHistory();
-          alert('データの復元が完了しました！');
-        } catch (err) {
-          alert('JSONファイルの読み込みに失敗しました: ' + err.message);
-        } finally {
-          event.target.value = '';
-        }
-      };
-      reader.readAsText(file);
-    }
-
-    function saveGoogleClientId() {
-      const input = document.getElementById('input-google-client-id');
-      if (!input) return;
-      const val = input.value.trim();
-      if (!val) {
-        localStorage.removeItem('pkm_google_client_id');
-        alert('Client IDをクリアしました。');
+    // 認証トグル
+    async function toggleAuth() {
+      if (currentUser) {
+        await window._signOut(window._auth);
       } else {
-        localStorage.setItem('pkm_google_client_id', val);
-        alert('Google Client IDを保存しました！');
-      }
-      updateDriveUI();
-    }
-
-    function resetGoogleClientId() {
-      if (confirm('Google Client IDの設定をリセットしますか？')) {
-        localStorage.removeItem('pkm_google_client_id');
-        const input = document.getElementById('input-google-client-id');
-        if (input) input.value = '';
-        updateDriveUI();
-        alert('リセットしました。');
+        const provider = new window._GoogleAuthProvider();
+        try {
+          await window._signInWithPopup(window._auth, provider);
+        } catch (e) { console.error('Auth error:', e); }
       }
     }
 
-    // ---- FIREBASE MASTER DATA SYNC (共通マスタデータ) ----
-    let currentUser = null;
-    let _fbReady = false;
-
+    // Firebase初期化待ちでAuth監視を開始
     function initFirebase() {
       _fbReady = true;
-      // 起動時に全ユーザー共通マスタデータをFirestoreから自動読み込み
+      // 未ログインでも共通マスタデータは読み込む
       dmLoadMasterData();
-
-      // Firebase Auth (管理者UIDによるマスタデータ編集権限の判定)
-      window._onAuthStateChanged(window._auth, (user) => {
+      window._onAuthStateChanged(window._auth, async (user) => {
         currentUser = user;
+        const nameEl = document.getElementById('user-name');
+        const btnEl = document.getElementById('auth-btn');
+        const banner = document.getElementById('login-banner');
+        // 編集UIの表示制御（管理者のみ表示）
         const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
         const isAdmin = user && user.uid === ADMIN_UID;
         document.querySelectorAll('.dm-admin-only').forEach(el => {
           el.style.display = isAdmin ? '' : 'none';
         });
+        // 非管理者向け「権限なし」メッセージの表示制御
         const noPermEl = document.getElementById('dm-no-permission');
         if (noPermEl) noPermEl.style.display = isAdmin ? 'none' : 'block';
+        if (user) {
+          nameEl.textContent = user.displayName || user.email;
+          btnEl.textContent = 'ログアウト';
+          banner.style.display = 'none';
+          await loadFromFirestore();
+          renderParties();
+          renderHistory();
+        } else {
+          nameEl.textContent = '';
+          btnEl.textContent = 'ログイン';
+          banner.style.display = 'block';
+        }
       });
     }
 
-    async function loginFirebaseAdmin() {
-      if (!_fbReady) { alert('Firebase SDKを初期化中です。'); return; }
-      try {
-        const provider = new window._GoogleAuthProvider();
-        await window._signInWithPopup(window._auth, provider);
-      } catch (e) {
-        console.error('Firebase admin login error:', e);
-        alert('Firebaseログインに失敗しました: ' + e.message);
-      }
-    }
-
+    // Firebase準備完了イベント待ち
     if (window._firebaseReady) {
       initFirebase();
     } else {
       document.addEventListener('firebase-ready', initFirebase);
     }
-
-    // 初期化時にGoogle Drive状態をチェック
-    window.addEventListener('DOMContentLoaded', () => {
-      updateDriveUI();
-      if (driveAccessToken && Date.now() < driveTokenExpires) {
-        loadFromDrive();
-      }
-    });
 
     // ---- NAVIGATION ----
     function showPage(name, btn) {
@@ -3027,7 +2893,7 @@
       if (name === 'record') renderRecordPage();
       if (name === 'history') renderHistory();
       if (name === 'datamanage') {
-        checkAndPromptReload(); updateDriveUI(); dmType = null; dmAction = null;
+        checkAndPromptReload(); dmType = null; dmAction = null;
         ['dm-tab-pokemon', 'dm-tab-move', 'dm-tab-item', 'dm-btn-list', 'dm-btn-search'].forEach(id => { const el = document.getElementById(id); if (el) el.className = 'btn btn-ghost'; });
         document.getElementById('dm-action-area').style.display = 'none';
         document.getElementById('dm-form-card').style.display = 'none';
@@ -3302,6 +3168,7 @@
       <div class="flex justify-between items-center mb-3">
         <div class="party-name party-edit-trigger" data-party-id="${p.id}" style="cursor:pointer;flex:1">${p.name}</div>
         <button class="memo-icon-btn party-memo-btn ${p.memo ? 'has-memo' : ''}" data-party-id="${p.id}" title="${p.memo ? 'メモあり' : 'メモを追加'}">📝</button>
+        <button class="btn btn-ghost btn-sm party-ai-edit-btn" data-party-id="${p.id}" style="margin-right:4px">画像から編集</button>
         <button class="btn btn-ghost btn-sm party-copy-btn" data-party-id="${p.id}" style="margin-right:4px">コピー</button>
         <button class="btn btn-ghost btn-sm party-delete-btn" data-party-id="${p.id}">削除</button>
       </div>
@@ -3315,6 +3182,13 @@
         btn.addEventListener('click', e => {
           e.stopPropagation();
           openPartyMemo(btn.dataset.partyId);
+        });
+      });
+      // AI画像編集ボタン
+      grid.querySelectorAll('.party-ai-edit-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+          e.stopPropagation();
+          openAiPartyModal(btn.dataset.partyId);
         });
       });
       // コピーボタン
@@ -5588,6 +5462,586 @@
         ac.classList.remove('open');
       }
     });
+
+    // ======================================================
+    // ---- AI PARTY IMAGE PARSER (Gemini API / BYOK方式) ----
+    // ======================================================
+    let _aiTargetPartyId = null;
+    let _aiUploadedImages = []; // [{ id, name, mimeType, base64, dataUrl }]
+
+    function getGeminiApiKey() {
+      return localStorage.getItem('pkm_gemini_api_key') || '';
+    }
+
+    async function saveGeminiApiKey(key) {
+      const clean = (key || '').trim();
+      localStorage.setItem('pkm_gemini_api_key', clean);
+      updateAiApiKeyUI();
+      if (currentUser && _fbReady) {
+        try {
+          const { doc, setDoc } = window._firestoreOps;
+          const db = window._db;
+          const uid = currentUser.uid;
+          await setDoc(doc(db, 'users', uid, 'data', 'main'), {
+            geminiApiKey: clean,
+            updatedAt: window._firestoreOps.serverTimestamp()
+          }, { merge: true });
+        } catch (e) {
+          console.error('API key cloud save error:', e);
+        }
+      }
+    }
+
+    function saveGeminiApiKeyFromInput() {
+      const inp = document.getElementById('ai-api-key-input');
+      if (!inp) return;
+      const val = inp.value.trim();
+      if (!val) {
+        alert('APIキーを入力してください');
+        return;
+      }
+      saveGeminiApiKey(val);
+      alert('Gemini APIキーを保存しました！');
+      const guideBox = document.getElementById('ai-key-guide-box');
+      if (guideBox) guideBox.style.display = 'none';
+    }
+
+    function toggleAiApiKeyGuide() {
+      const box = document.getElementById('ai-key-guide-box');
+      if (!box) return;
+      const isHidden = box.style.display === 'none' || !box.style.display;
+      box.style.display = isHidden ? 'block' : 'none';
+      if (isHidden) {
+        const inp = document.getElementById('ai-api-key-input');
+        if (inp) {
+          inp.value = getGeminiApiKey();
+          setTimeout(() => inp.focus(), 50);
+        }
+      }
+    }
+
+    function updateAiApiKeyUI() {
+      const key = getGeminiApiKey();
+      const badge = document.getElementById('ai-key-badge');
+      const guideBox = document.getElementById('ai-key-guide-box');
+      const inp = document.getElementById('ai-api-key-input');
+
+      if (badge) {
+        if (key) {
+          badge.textContent = '設定済み';
+          badge.style.color = 'var(--win)';
+        } else {
+          badge.textContent = '未設定';
+          badge.style.color = 'var(--lose)';
+        }
+      }
+      if (inp && key) {
+        inp.value = key;
+      }
+      // 未設定の場合は自動的にガイドを表示
+      if (!key && guideBox) {
+        guideBox.style.display = 'block';
+      }
+    }
+
+    function openAiPartyModal(partyId = null) {
+      _aiTargetPartyId = partyId;
+      _aiUploadedImages = [];
+
+      const title = document.getElementById('ai-party-modal-title');
+      if (title) {
+        title.textContent = partyId ? '📸 画像からパーティ編集' : '📸 画像からパーティ自動作成';
+      }
+
+      // 初期化
+      const errEl = document.getElementById('ai-error-msg');
+      if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
+      const loadingBox = document.getElementById('ai-loading-box');
+      if (loadingBox) loadingBox.style.display = 'none';
+      const uploadSection = document.getElementById('ai-upload-section');
+      if (uploadSection) uploadSection.style.display = 'block';
+      const modalFooter = document.getElementById('ai-modal-footer');
+      if (modalFooter) modalFooter.style.display = 'flex';
+
+      updateAiApiKeyUI();
+      renderAiPreviews();
+
+      const modal = document.getElementById('ai-party-modal');
+      if (modal) modal.classList.add('open');
+    }
+
+    function closeAiPartyModal() {
+      const modal = document.getElementById('ai-party-modal');
+      if (modal) modal.classList.remove('open');
+      _aiUploadedImages = [];
+    }
+
+    // ファイル選択ハンドラ
+    function handleAiFileSelect(event) {
+      const files = event.target.files;
+      if (!files || !files.length) return;
+      addAiImageFiles(Array.from(files));
+      event.target.value = ''; // リセット
+    }
+
+    // 画像ファイルをCanvasで軽量リサイズ（長辺1600px、JPEG品質0.85）して追加
+    async function addAiImageFiles(files) {
+      const imgFiles = files.filter(f => f.type.startsWith('image/'));
+      if (!imgFiles.length) {
+        alert('画像ファイルを選択してください');
+        return;
+      }
+
+      const remaining = 2 - _aiUploadedImages.length;
+      if (remaining <= 0) {
+        alert('画像は最大2枚までアップロードできます（能力画面＋ステータス画面）');
+        return;
+      }
+
+      const toAdd = imgFiles.slice(0, remaining);
+
+      for (const file of toAdd) {
+        try {
+          const resized = await resizeImageFile(file, 1600, 0.85);
+          _aiUploadedImages.push({
+            id: Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+            name: file.name,
+            mimeType: 'image/jpeg',
+            base64: resized.base64,
+            dataUrl: resized.dataUrl
+          });
+        } catch (e) {
+          console.error('Image resize error:', e);
+        }
+      }
+      renderAiPreviews();
+    }
+
+    // 画像リサイズ・圧縮ヘルパー
+    function resizeImageFile(file, maxDimension = 1600, quality = 0.85) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          const img = new Image();
+          img.onload = () => {
+            let width = img.width;
+            let height = img.height;
+
+            if (width > maxDimension || height > maxDimension) {
+              if (width > height) {
+                height = Math.round((height * maxDimension) / width);
+                width = maxDimension;
+              } else {
+                width = Math.round((width * maxDimension) / height);
+                height = maxDimension;
+              }
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            const dataUrl = canvas.toDataURL('image/jpeg', quality);
+            const base64 = dataUrl.split(',')[1];
+            resolve({ dataUrl, base64, width, height });
+          };
+          img.onerror = reject;
+          img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function removeAiImage(id) {
+      _aiUploadedImages = _aiUploadedImages.filter(img => img.id !== id);
+      renderAiPreviews();
+    }
+
+    function renderAiPreviews() {
+      const container = document.getElementById('ai-preview-container');
+      const submitBtn = document.getElementById('ai-submit-btn');
+      if (!container || !submitBtn) return;
+
+      if (!_aiUploadedImages.length) {
+        container.style.display = 'none';
+        container.innerHTML = '';
+        submitBtn.disabled = true;
+        return;
+      }
+
+      container.style.display = 'grid';
+      container.innerHTML = _aiUploadedImages.map((img, idx) => {
+        const label = idx === 0 ? '画像 1' : '画像 2';
+        return `
+      <div class="ai-preview-item">
+        <img src="${img.dataUrl}" alt="プレビュー">
+        <button class="ai-preview-del" onclick="removeAiImage('${img.id}')" title="削除">✕</button>
+        <span class="ai-preview-badge">${label}</span>
+      </div>
+    `;
+      }).join('');
+
+      submitBtn.disabled = false;
+    }
+
+    // ドラッグ&ドロップ、ペーストのイベントリスナー設定
+    document.addEventListener('DOMContentLoaded', () => {
+      const dropZone = document.getElementById('ai-drop-zone');
+      if (dropZone) {
+        ['dragenter', 'dragover'].forEach(name => {
+          dropZone.addEventListener(name, e => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.add('drag-over');
+          });
+        });
+        ['dragleave', 'drop'].forEach(name => {
+          dropZone.addEventListener(name, e => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove('drag-over');
+          });
+        });
+        dropZone.addEventListener('drop', e => {
+          const dt = e.dataTransfer;
+          if (dt && dt.files && dt.files.length) {
+            addAiImageFiles(Array.from(dt.files));
+          }
+        });
+      }
+
+      // クリップボード貼り付け（Ctrl+V）
+      window.addEventListener('paste', e => {
+        const modal = document.getElementById('ai-party-modal');
+        if (!modal || !modal.classList.contains('open')) return;
+
+        const items = e.clipboardData?.items;
+        if (!items) return;
+        const files = [];
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].type.indexOf('image') !== -1) {
+            const file = items[i].getAsFile();
+            if (file) files.push(file);
+          }
+        }
+        if (files.length) {
+          e.preventDefault();
+          addAiImageFiles(files);
+        }
+      });
+    });
+
+    // ---- Gemini API 呼び出し & 解析 ----
+    async function executeAiPartyAnalysis() {
+      const apiKey = getGeminiApiKey();
+      if (!apiKey) {
+        alert('Gemini APIキーが設定されていません。上の設定欄にAPIキーを入力してください。');
+        toggleAiApiKeyGuide();
+        return;
+      }
+
+      if (!_aiUploadedImages.length) {
+        alert('解析する画像をアップロードまたは貼り付けてください');
+        return;
+      }
+
+      const errEl = document.getElementById('ai-error-msg');
+      const loadingBox = document.getElementById('ai-loading-box');
+      const uploadSection = document.getElementById('ai-upload-section');
+      const modalFooter = document.getElementById('ai-modal-footer');
+
+      if (errEl) errEl.style.display = 'none';
+      if (loadingBox) loadingBox.style.display = 'block';
+      if (uploadSection) uploadSection.style.display = 'none';
+      if (modalFooter) modalFooter.style.display = 'none';
+
+      try {
+        const promptText = `
+あなたはポケットモンスター（Pokemon HOMEおよびスカーレット・バイオレット）の対戦チーム画面抽出エキスパートです。
+添付された画像（「能力」画面や「ステータス」画面）を詳細に解析し、パーティ全体の情報を正確なJSON形式で抽出してください。
+
+【抽出ルール】
+1. teamName: チーム名（例: "Va" やスロット番号など、画面上部にあれば）
+2. teamId: チームID（例: "6KBAX0Y1Q9" など画面上部にあれば）
+3. pokemons: スロット1〜6のポケモン（最大6匹）の配列。各オブジェクトは以下を含めること：
+   - slot: 1〜6の番号
+   - name: ポケモン名（例: "フラエッテ", "エルフーン", "ドドゲザン", "ウインディ", "イダイトウ", "カイリュー" など）
+   - form: フォルム・姿（例: "ヒスイのすがた", "えいえんのはな", "アローラのすがた", "通常" など）
+   - gender: "♂" または "♀" または "なし"
+   - teraType: テラスタイプ（例: "フェアリー", "ほのお", "ひこう", "ゴースト", "ノーマル", "みず" など）
+   - ability: 特性名（例: "フラワーベール", "いたずらごころ", "まけんき", "いしあたま", "てきおうりょく", "せいしんりょく" など）
+   - item: 持ち物名（例: "フラエッテナイト", "きあいのタスキ", "くろいメガネ", "オボンのみ", "こだわりスカーフ", "りゅうのキバ" など）
+   - moves: 技名の配列（最大4つ、例: ["まもる", "マジカルシャイン", "ムーンフォース", "はめつのひかり"]）
+   - stats: 実数値オブジェクト { "hp": 数値, "atk": 数値, "def": 数値, "spa": 数値, "spd": 数値, "spe": 数値 }
+   - evs: ステータス画面の右側に表示されている努力値段階数値(0〜32) { "hp": 数値, "atk": 数値, "def": 数値, "spa": 数値, "spd": 数値, "spe": 数値 }（表示がない場合はすべて0）
+   - natureUp: 性格の上昇ステータス（赤色▲の項目: "atk", "def", "spa", "spd", "spe" または なし）
+   - natureDown: 性格の下降ステータス（青色▼の項目: "atk", "def", "spa", "spd", "spe" または なし）
+   - nature: 推測される性格名（例: "ひかえめ", "いじっぱり", "ようき", "おくびょう", "まじめ" など）
+
+【重要】
+・画像が2枚ある場合（能力画面＋ステータス画面）、同じスロットの情報を統合して1つのオブジェクトにまとめてください。
+・Nintendo Switch版またはスマートフォン版のどちらの比率・レイアウトであっても正確に抽出してください。
+・出力は純粋なJSONのみを返してください。
+`;
+
+        const parts = [{ text: promptText }];
+        _aiUploadedImages.forEach(img => {
+          parts.push({
+            inline_data: {
+              mime_type: img.mimeType,
+              data: img.base64
+            }
+          });
+        });
+
+        const candidateModels = ['gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'];
+        let response = null;
+        let lastError = null;
+
+        for (const model of candidateModels) {
+          try {
+            const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                contents: [{ parts: parts }],
+                generationConfig: {
+                  responseMimeType: "application/json"
+                }
+              })
+            });
+            if (res.ok) {
+              response = res;
+              break;
+            } else {
+              const errData = await res.json().catch(() => ({}));
+              console.warn(`Model ${model} failed:`, errData);
+              lastError = new Error(errData.error?.message || `HTTPエラー (${res.status})`);
+            }
+          } catch (e) {
+            lastError = e;
+          }
+        }
+
+        if (!response || !response.ok) {
+          throw lastError || new Error('AIモデルの呼び出しに失敗しました');
+        }
+
+        const resJson = await response.json();
+        const rawText = resJson.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        if (!rawText) throw new Error('AIから応答データが取得できませんでした。');
+
+        // JSONパース（マークダウンコードブロック対応）
+        let cleanJsonStr = rawText.trim();
+        if (cleanJsonStr.startsWith('```json')) cleanJsonStr = cleanJsonStr.slice(7);
+        if (cleanJsonStr.startsWith('```')) cleanJsonStr = cleanJsonStr.slice(3);
+        if (cleanJsonStr.endsWith('```')) cleanJsonStr = cleanJsonStr.slice(0, -3);
+
+        const parsedData = JSON.parse(cleanJsonStr.trim());
+
+        // アプリマスターデータと突合・クレンジングしてPEに反映
+        applyAnalyzedPartyToPE(parsedData, _aiTargetPartyId);
+
+      } catch (err) {
+        console.error('AI解析エラー:', err);
+        if (loadingBox) loadingBox.style.display = 'none';
+        if (uploadSection) uploadSection.style.display = 'block';
+        if (modalFooter) modalFooter.style.display = 'flex';
+        if (errEl) {
+          errEl.style.display = 'block';
+          errEl.textContent = `解析に失敗しました: ${err.message || err}`;
+        }
+      }
+    }
+
+    // ---- マスターデータ照合・正規化 & PE反映 ----
+    function applyAnalyzedPartyToPE(data, targetPartyId) {
+      editingPartyId = targetPartyId || null;
+      pePokemons = Array.from({ length: 6 }, () => peEmptyPoke());
+
+      // パーティ名
+      const nameInput = document.getElementById('pe-name-input');
+      if (targetPartyId) {
+        const existing = parties.find(p => p.id === targetPartyId);
+        if (existing && nameInput) nameInput.value = existing.name;
+      } else if (data.teamName && nameInput) {
+        nameInput.value = data.teamName;
+      } else if (nameInput) {
+        nameInput.value = '新規パーティ';
+      }
+
+      const allPokeSrc = localPokemon || POKEMON_LIST;
+      const allMovesSrc = localMoves || MOVES_LIST;
+      const allItemsSrc = localItems || ITEMS_LIST;
+
+      const rawList = Array.isArray(data.pokemons) ? data.pokemons : [];
+
+      rawList.forEach((rawPk, i) => {
+        if (i >= 6) return;
+        const pokeObj = peEmptyPoke();
+
+        // 1. ポケモン名の照合（display名）
+        const matchedDisplay = matchPokemonDisplay(rawPk.name, rawPk.form, rawPk.ability, allPokeSrc);
+        pokeObj.name = matchedDisplay || rawPk.name || '';
+
+        // 2. 特性の照合
+        pokeObj.ability = matchAbility(matchedDisplay, rawPk.ability, allPokeSrc);
+
+        // 3. 持ち物の照合
+        pokeObj.item = matchItem(rawPk.item, allItemsSrc);
+
+        // 4. 技の照合 (4つ)
+        const rawMoves = Array.isArray(rawPk.moves) ? rawPk.moves : [];
+        pokeObj.moves = [0, 1, 2, 3].map(mIdx => matchMove(rawMoves[mIdx] || '', allMovesSrc));
+
+        // 5. 性格の特定（上昇/下降から逆引き、または性格名照合）
+        pokeObj.nature = resolveNature(rawPk.natureUp, rawPk.natureDown, rawPk.nature);
+
+        // 6. 努力値（0〜32段階）
+        pokeObj.evs = resolveEvs(rawPk.evs);
+
+        pePokemons[i] = pokeObj;
+      });
+
+      closeAiPartyModal();
+      renderPartyEditBody();
+      document.getElementById('page-party-edit').classList.add('active');
+      document.getElementById('page-party-edit').scrollTop = 0;
+      syncCopyBoardToPE();
+    }
+
+    // ポケモン名（display）のあいまい照合
+    function matchPokemonDisplay(rawName, rawForm, rawAbility, pokeSrc) {
+      if (!rawName) return '';
+      const rNameKana = toKatakana(rawName.trim());
+      const rNameHira = toHiragana(rawName.trim());
+      const rForm = (rawForm || '').trim();
+
+      // 完全一致チェック
+      let exact = pokeSrc.find(p => p.display === rawName || p.name === rawName);
+
+      // フォルムが指定されている場合
+      if (rForm && rForm !== '通常') {
+        const withForm = pokeSrc.find(p => {
+          const h = toHiragana(p.display);
+          return (p.display.includes(rNameKana) || h.includes(rNameHira)) &&
+            (p.form.includes(rForm) || p.display.includes(rForm));
+        });
+        if (withForm) return withForm.display;
+      }
+
+      // 特性からフォルムを特定（例: いしあたまウインディ → ヒスイ）
+      if (rawAbility) {
+        const withAbil = pokeSrc.find(p => {
+          const h = toHiragana(p.display);
+          const isNameMatch = p.display.includes(rNameKana) || h.includes(rNameHira) || p.name.includes(rNameKana);
+          const isAbilMatch = p.ability1 === rawAbility || p.ability2 === rawAbility || p.ability_hidden === rawAbility;
+          return isNameMatch && isAbilMatch;
+        });
+        if (withAbil) return withAbil.display;
+      }
+
+      // 部分一致
+      const candidates = pokeSrc.filter(p => {
+        const dH = toHiragana(p.display);
+        return p.display.includes(rNameKana) || dH.includes(rNameHira) ||
+          p.name.includes(rNameKana) || toHiragana(p.name).includes(rNameHira);
+      });
+
+      if (candidates.length) {
+        // 通常フォームを優先
+        const normal = candidates.find(p => p.form === '通常' || p.display === p.name);
+        return normal ? normal.display : candidates[0].display;
+      }
+
+      return rawName;
+    }
+
+    // 特性の照合
+    function matchAbility(pokeDisplay, rawAbility, pokeSrc) {
+      if (!rawAbility) return '';
+      const pd = pokeSrc.find(p => p.display === pokeDisplay);
+      if (pd) {
+        const valid = [pd.ability1, pd.ability2, pd.ability_hidden].filter(Boolean);
+        const found = valid.find(a => a === rawAbility || toHiragana(a) === toHiragana(rawAbility));
+        if (found) return found;
+        if (valid.length === 1) return valid[0];
+      }
+      return rawAbility;
+    }
+
+    // 持ち物の照合
+    function matchItem(rawItem, itemsSrc) {
+      if (!rawItem) return '';
+      const rKana = toKatakana(rawItem.trim());
+      const rHira = toHiragana(rawItem.trim());
+
+      const itemNames = itemsSrc.map(it => typeof it === 'string' ? it : it.name);
+      const found = itemNames.find(n => n === rawItem || n === rKana || toHiragana(n) === rHira);
+      if (found) return found;
+
+      const partial = itemNames.find(n => n.includes(rKana) || toHiragana(n).includes(rHira));
+      return partial || rawItem;
+    }
+
+    // 技の照合
+    function matchMove(rawMove, movesSrc) {
+      if (!rawMove) return '';
+      const rKana = toKatakana(rawMove.trim());
+      const rHira = toHiragana(rawMove.trim());
+
+      const found = movesSrc.find(m => m.name === rawMove || m.name === rKana || toHiragana(m.name) === rHira);
+      if (found) return found.name;
+
+      const partial = movesSrc.find(m => m.name.includes(rKana) || toHiragana(m.name).includes(rHira));
+      return partial ? partial.name : rawMove;
+    }
+
+    // 性格の特定
+    function resolveNature(up, down, rawNature) {
+      if (up && down && up !== down) {
+        const found = NATURES_DATA.find(n => n.up === up && n.down === down);
+        if (found) return found.name;
+      }
+      if (rawNature) {
+        const found = NATURES_DATA.find(n => n.name === rawNature || toHiragana(n.name) === toHiragana(rawNature));
+        if (found) return found.name;
+      }
+      return 'まじめ';
+    }
+
+    // 努力値のクレンジング（0〜32段階）
+    function resolveEvs(rawEvs) {
+      const evs = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
+      if (!rawEvs || typeof rawEvs !== 'object') return evs;
+
+      const keys = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
+      let total = 0;
+
+      keys.forEach(k => {
+        let val = parseInt(rawEvs[k]) || 0;
+        if (val > 32) {
+          // 252などの実努力値が入ってきた場合は32段階に変換
+          val = Math.min(32, Math.round(val / 7.875));
+        }
+        val = Math.max(0, Math.min(32, val));
+        evs[k] = val;
+        total += val;
+      });
+
+      // 合計が66を超える場合は比率で調整
+      if (total > 66) {
+        const ratio = 66 / total;
+        keys.forEach(k => {
+          evs[k] = Math.floor(evs[k] * ratio);
+        });
+      }
+
+      return evs;
+    }
 
     // ---- INIT ----
     // localStorageから初期データを確実に読み込み
