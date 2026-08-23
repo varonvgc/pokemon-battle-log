@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 
 <head>
@@ -2392,6 +2392,10 @@
       });
     }
     let currentUser = null;
+    const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
+    function isAdmin(user = currentUser) {
+      return Boolean(user && user.uid === ADMIN_UID);
+    }
     let _fbReady = false;
 
     // 最後にこの端末が読み込んだ updatedAt（ミリ秒）
@@ -2574,14 +2578,13 @@
         const btnEl = document.getElementById('auth-btn');
         const banner = document.getElementById('login-banner');
         // 編集UIの表示制御（管理者のみ表示）
-        const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
-        const isAdmin = user && user.uid === ADMIN_UID;
+        const isAdm = isAdmin(user);
         document.querySelectorAll('.dm-admin-only').forEach(el => {
-          el.style.display = isAdmin ? '' : 'none';
+          el.style.display = isAdm ? '' : 'none';
         });
         // 非管理者向け「権限なし」メッセージの表示制御
         const noPermEl = document.getElementById('dm-no-permission');
-        if (noPermEl) noPermEl.style.display = isAdmin ? 'none' : 'block';
+        if (noPermEl) noPermEl.style.display = isAdm ? 'none' : 'block';
         if (user) {
           nameEl.textContent = user.displayName || user.email;
           btnEl.textContent = 'ログアウト';
@@ -3338,10 +3341,8 @@
     }
 
     function dmSelectAction(action) {
-      const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
-      const isAdmin = currentUser && currentUser.uid === ADMIN_UID;
       // 一覧(list)は全員OK、searchは管理者のみ（addは廃止）
-      if (!isAdmin && action !== 'list') return;
+      if (!isAdmin() && action !== 'list') return;
       dmAction = action;
       const btnList = document.getElementById('dm-btn-list');
       if (btnList) btnList.className = 'btn ' + (action === 'list' ? 'btn-primary' : 'btn-ghost');
@@ -3352,7 +3353,7 @@
         // 技・持ち物の一覧でも管理者に保存ボタン表示
         const saveBtn = document.querySelector('#dm-list-card .btn-primary');
         const cancelBtn = document.querySelector('#dm-list-card .btn-ghost');
-        if (isAdmin && (dmType === 'move' || dmType === 'item')) {
+        if (isAdmin() && (dmType === 'move' || dmType === 'item')) {
           if (saveBtn) saveBtn.style.display = 'inline-flex';
           if (cancelBtn) cancelBtn.style.display = 'inline-flex';
         } else {
@@ -3507,8 +3508,7 @@
     async function dmSaveEntry() {
       const reloading = await checkAndPromptReload();
       if (reloading) return;
-      const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
-      if (!currentUser || currentUser.uid !== ADMIN_UID) {
+      if (!isAdmin()) {
         alert('編集権限がありません');
         return;
       }
@@ -3558,8 +3558,7 @@
     }
 
     async function dmDeleteEntry() {
-      const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
-      if (!currentUser || currentUser.uid !== ADMIN_UID) {
+      if (!isAdmin()) {
         alert('編集権限がありません');
         return;
       }
@@ -3581,8 +3580,7 @@
 
     async function dmSaveMasterData() {
       // 編集権限チェック（自分のUIDのみ保存可能）
-      const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
-      if (!currentUser || currentUser.uid !== ADMIN_UID) {
+      if (!isAdmin()) {
         console.warn('Master data save blocked: no permission');
         return;
       }
@@ -3845,8 +3843,7 @@
 
       if (dmType === 'item') {
         // 持ち物一覧：内定チェックボックス付き
-        const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
-        const isAdminItem = currentUser && currentUser.uid === ADMIN_UID;
+        const isAdminItem = isAdmin();
         const confirmedItemCount = localItems.filter(it => it.confirmed).length;
         countEl.textContent = `全${localItems.length}件 / 内定${confirmedItemCount}件`;
         body.innerHTML = localItems.map((it, i) =>
@@ -3868,8 +3865,7 @@
 
       if (dmType === 'move') {
         // 技一覧：内定チェックボックス付き＋クリックで編集
-        const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
-        const isAdminMove = currentUser && currentUser.uid === ADMIN_UID;
+        const isAdminMove = isAdmin();
         const confirmedMoveCount = localMoves.filter(m => m.confirmed !== false).length;
         countEl.textContent = `全${localMoves.length}件 / 内定${confirmedMoveCount}件`;
         body.innerHTML = localMoves.map((m, i) => `
@@ -3906,10 +3902,9 @@
       <input type="checkbox" class="dm-list-check" data-idx="${i}" ${p.confirmed ? 'checked' : ''}>
     </div>`;
       }).join('');
-      const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
-      const isAdmin = currentUser && currentUser.uid === ADMIN_UID;
+      const isAdm = isAdmin();
       body.querySelectorAll('.dm-list-check').forEach(cb => {
-        if (!isAdmin) {
+        if (!isAdm) {
           cb.disabled = true;
           cb.style.opacity = '0.4';
           cb.style.cursor = 'not-allowed';
@@ -3925,8 +3920,7 @@
     async function dmSaveList() {
       const reloading = await checkAndPromptReload();
       if (reloading) return;
-      const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
-      if (!currentUser || currentUser.uid !== ADMIN_UID) {
+      if (!isAdmin()) {
         alert('編集権限がありません');
         return;
       }
@@ -3950,8 +3944,7 @@
 
     // 持ち物の検索結果を一覧カードに表示（編集なし）
     function dmShowItemResult(name) {
-      const ADMIN_UID = '9B0bfjR8TPNDAFvWQXkcssCDwbe2';
-      const isAdmin = currentUser && currentUser.uid === ADMIN_UID;
+      const isAdm = isAdmin();
       const body = document.getElementById('dm-list-body');
       const countEl = document.getElementById('dm-list-count');
       countEl.textContent = '検索結果: ' + name;
@@ -3959,9 +3952,9 @@
       const confirmed = item ? item.confirmed !== false : true;
       body.innerHTML = `<div class="dm-list-row">
     <div class="dm-list-name">${name}</div>
-    <input type="checkbox" class="dm-list-check" id="dm-item-result-check" ${confirmed ? 'checked' : ''} ${!isAdmin ? 'disabled style="opacity:0.4;cursor:not-allowed"' : ''}>
+    <input type="checkbox" class="dm-list-check" id="dm-item-result-check" ${confirmed ? 'checked' : ''} ${!isAdm ? 'disabled style="opacity:0.4;cursor:not-allowed"' : ''}>
   </div>`;
-      if (isAdmin && item) {
+      if (isAdm && item) {
         document.getElementById('dm-item-result-check').addEventListener('change', function () {
           item.confirmed = this.checked;
         });
@@ -3970,7 +3963,7 @@
       // 保存ボタン表示
       const saveBtn = document.querySelector('#dm-list-card .btn-primary');
       const cancelBtn = document.querySelector('#dm-list-card .btn-ghost');
-      if (isAdmin) { if (saveBtn) saveBtn.style.display = 'inline-flex'; if (cancelBtn) cancelBtn.style.display = 'inline-flex'; }
+      if (isAdm) { if (saveBtn) saveBtn.style.display = 'inline-flex'; if (cancelBtn) cancelBtn.style.display = 'inline-flex'; }
     }
 
 
