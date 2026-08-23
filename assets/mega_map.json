@@ -1,0 +1,674 @@
+﻿[
+    {
+        "appDexId":  829,
+        "pokeDexId":  154,
+        "nameEn":  "Mega Meganium",
+        "fileName":  "mega-meganium.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  830,
+        "pokeDexId":  500,
+        "nameEn":  "Mega Emboar",
+        "fileName":  "mega-emboar.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  831,
+        "pokeDexId":  160,
+        "nameEn":  "Mega Feraligatr",
+        "fileName":  "mega-feraligatr.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  837,
+        "pokeDexId":  15,
+        "nameEn":  "Mega Beedrill",
+        "fileName":  "mega-beedrill.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  841,
+        "pokeDexId":  18,
+        "nameEn":  "Mega Pidgeot",
+        "fileName":  "mega-pidgeot.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  842,
+        "pokeDexId":  181,
+        "nameEn":  "Mega Ampharos",
+        "fileName":  "mega-ampharos.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  848,
+        "pokeDexId":  130,
+        "nameEn":  "Mega Gyarados",
+        "fileName":  "mega-gyarados.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  851,
+        "pokeDexId":  689,
+        "nameEn":  "Mega Barbaracle",
+        "fileName":  "mega-barbaracle.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  854,
+        "pokeDexId":  121,
+        "nameEn":  "Mega Starmie",
+        "fileName":  "mega-starmie.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  855,
+        "pokeDexId":  670,
+        "nameEn":  "Mega Floette",
+        "fileName":  "mega-floette.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  856,
+        "pokeDexId":  678,
+        "nameEn":  "Mega Meowstic",
+        "fileName":  "mega-meowstic.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  857,
+        "pokeDexId":  678,
+        "nameEn":  "Mega Meowstic",
+        "fileName":  "mega-meowstic.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  858,
+        "pokeDexId":  668,
+        "nameEn":  "Mega Pyroar",
+        "fileName":  "mega-pyroar.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  863,
+        "pokeDexId":  26,
+        "nameEn":  "Mega Raichu X",
+        "fileName":  "mega-raichu-x.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  864,
+        "pokeDexId":  26,
+        "nameEn":  "Mega Raichu Y",
+        "fileName":  "mega-raichu-y.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  865,
+        "pokeDexId":  36,
+        "nameEn":  "Mega Clefable",
+        "fileName":  "mega-clefable.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  869,
+        "pokeDexId":  65,
+        "nameEn":  "Mega Alakazam",
+        "fileName":  "mega-alakazam.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  870,
+        "pokeDexId":  94,
+        "nameEn":  "Mega Gengar",
+        "fileName":  "mega-gengar.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  874,
+        "pokeDexId":  545,
+        "nameEn":  "Mega Scolipede",
+        "fileName":  "mega-scolipede.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  879,
+        "pokeDexId":  71,
+        "nameEn":  "Mega Victreebel",
+        "fileName":  "mega-victreebel.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  886,
+        "pokeDexId":  308,
+        "nameEn":  "Mega Medicham",
+        "fileName":  "mega-medicham.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  889,
+        "pokeDexId":  310,
+        "nameEn":  "Mega Manectric",
+        "fileName":  "mega-manectric.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  890,
+        "pokeDexId":  282,
+        "nameEn":  "Mega Gardevoir",
+        "fileName":  "mega-gardevoir.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  891,
+        "pokeDexId":  475,
+        "nameEn":  "Mega Gallade",
+        "fileName":  "mega-gallade.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  892,
+        "pokeDexId":  229,
+        "nameEn":  "Mega Houndoom",
+        "fileName":  "mega-houndoom.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  893,
+        "pokeDexId":  334,
+        "nameEn":  "Mega Altaria",
+        "fileName":  "mega-altaria.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  895,
+        "pokeDexId":  531,
+        "nameEn":  "Mega Audino",
+        "fileName":  "mega-audino.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  902,
+        "pokeDexId":  428,
+        "nameEn":  "Mega Lopunny",
+        "fileName":  "mega-lopunny.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  903,
+        "pokeDexId":  354,
+        "nameEn":  "Mega Banette",
+        "fileName":  "mega-banette.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  907,
+        "pokeDexId":  323,
+        "nameEn":  "Mega Camerupt",
+        "fileName":  "mega-camerupt.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  909,
+        "pokeDexId":  530,
+        "nameEn":  "Mega Excadrill",
+        "fileName":  "mega-excadrill.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  913,
+        "pokeDexId":  445,
+        "nameEn":  "Mega Garchomp",
+        "fileName":  "mega-garchomp.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  914,
+        "pokeDexId":  445,
+        "nameEn":  "Mega Garchomp Z",
+        "fileName":  "mega-garchomp-z.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  915,
+        "pokeDexId":  302,
+        "nameEn":  "Mega Sableye",
+        "fileName":  "mega-sableye.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  917,
+        "pokeDexId":  303,
+        "nameEn":  "Mega Mawile",
+        "fileName":  "mega-mawile.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  919,
+        "pokeDexId":  359,
+        "nameEn":  "Mega Absol",
+        "fileName":  "mega-absol.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  920,
+        "pokeDexId":  359,
+        "nameEn":  "Mega Absol Z",
+        "fileName":  "mega-absol-z.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  921,
+        "pokeDexId":  448,
+        "nameEn":  "Mega Lucario",
+        "fileName":  "mega-lucario.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  922,
+        "pokeDexId":  448,
+        "nameEn":  "Mega Lucario Z",
+        "fileName":  "mega-lucario-z.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  923,
+        "pokeDexId":  80,
+        "nameEn":  "Mega Slowbro",
+        "fileName":  "mega-slowbro.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  926,
+        "pokeDexId":  319,
+        "nameEn":  "Mega Sharpedo",
+        "fileName":  "mega-sharpedo.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  927,
+        "pokeDexId":  604,
+        "nameEn":  "Mega Eelektross",
+        "fileName":  "mega-eelektross.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  928,
+        "pokeDexId":  149,
+        "nameEn":  "Mega Dragonite",
+        "fileName":  "mega-dragonite.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  929,
+        "pokeDexId":  3,
+        "nameEn":  "Mega Venusaur",
+        "fileName":  "mega-venusaur.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  930,
+        "pokeDexId":  6,
+        "nameEn":  "Mega Charizard X",
+        "fileName":  "mega-charizard-x.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  931,
+        "pokeDexId":  6,
+        "nameEn":  "Mega Charizard Y",
+        "fileName":  "mega-charizard-y.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  932,
+        "pokeDexId":  9,
+        "nameEn":  "Mega Blastoise",
+        "fileName":  "mega-blastoise.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  936,
+        "pokeDexId":  687,
+        "nameEn":  "Mega Malamar",
+        "fileName":  "mega-malamar.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  937,
+        "pokeDexId":  691,
+        "nameEn":  "Mega Dragalge",
+        "fileName":  "mega-dragalge.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  938,
+        "pokeDexId":  362,
+        "nameEn":  "Mega Glalie",
+        "fileName":  "mega-glalie.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  939,
+        "pokeDexId":  478,
+        "nameEn":  "Mega Froslass",
+        "fileName":  "mega-froslass.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  940,
+        "pokeDexId":  460,
+        "nameEn":  "Mega Abomasnow",
+        "fileName":  "mega-abomasnow.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  941,
+        "pokeDexId":  212,
+        "nameEn":  "Mega Scizor",
+        "fileName":  "mega-scizor.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  943,
+        "pokeDexId":  127,
+        "nameEn":  "Mega Pinsir",
+        "fileName":  "mega-pinsir.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  944,
+        "pokeDexId":  214,
+        "nameEn":  "Mega Heracross",
+        "fileName":  "mega-heracross.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  945,
+        "pokeDexId":  701,
+        "nameEn":  "Mega Hawlucha",
+        "fileName":  "mega-hawlucha.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  946,
+        "pokeDexId":  560,
+        "nameEn":  "Mega Scrafty",
+        "fileName":  "mega-scrafty.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  947,
+        "pokeDexId":  609,
+        "nameEn":  "Mega Chandelure",
+        "fileName":  "mega-chandelure.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  949,
+        "pokeDexId":  142,
+        "nameEn":  "Mega Aerodactyl",
+        "fileName":  "mega-aerodactyl.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  956,
+        "pokeDexId":  208,
+        "nameEn":  "Mega Steelix",
+        "fileName":  "mega-steelix.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  960,
+        "pokeDexId":  306,
+        "nameEn":  "Mega Aggron",
+        "fileName":  "mega-aggron.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  965,
+        "pokeDexId":  248,
+        "nameEn":  "Mega Tyranitar",
+        "fileName":  "mega-tyranitar.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  966,
+        "pokeDexId":  658,
+        "nameEn":  "Mega Greninja",
+        "fileName":  "mega-greninja.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  967,
+        "pokeDexId":  870,
+        "nameEn":  "Mega Falinks",
+        "fileName":  "mega-falinks.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  968,
+        "pokeDexId":  652,
+        "nameEn":  "Mega Chesnaught",
+        "fileName":  "mega-chesnaught.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  969,
+        "pokeDexId":  227,
+        "nameEn":  "Mega Skarmory",
+        "fileName":  "mega-skarmory.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  970,
+        "pokeDexId":  655,
+        "nameEn":  "Mega Delphox",
+        "fileName":  "mega-delphox.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  971,
+        "pokeDexId":  373,
+        "nameEn":  "Mega Salamence",
+        "fileName":  "mega-salamence.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  973,
+        "pokeDexId":  115,
+        "nameEn":  "Mega Kangaskhan",
+        "fileName":  "mega-kangaskhan.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  975,
+        "pokeDexId":  780,
+        "nameEn":  "Mega Drampa",
+        "fileName":  "mega-drampa.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  976,
+        "pokeDexId":  376,
+        "nameEn":  "Mega Metagross",
+        "fileName":  "mega-metagross.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  982,
+        "pokeDexId":  718,
+        "nameEn":  "Mega Zygarde",
+        "fileName":  "mega-zygarde.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  983,
+        "pokeDexId":  719,
+        "nameEn":  "Mega Diancie",
+        "fileName":  "mega-diancie.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  984,
+        "pokeDexId":  150,
+        "nameEn":  "Mega Mewtwo X",
+        "fileName":  "mega-mewtwo-x.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  985,
+        "pokeDexId":  150,
+        "nameEn":  "Mega Mewtwo Y",
+        "fileName":  "mega-mewtwo-y.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  996,
+        "pokeDexId":  254,
+        "nameEn":  "Mega Sceptile",
+        "fileName":  "mega-sceptile.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  997,
+        "pokeDexId":  257,
+        "nameEn":  "Mega Blaziken",
+        "fileName":  "mega-blaziken.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  998,
+        "pokeDexId":  260,
+        "nameEn":  "Mega Swampert",
+        "fileName":  "mega-swampert.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  1000,
+        "pokeDexId":  358,
+        "nameEn":  "Mega Chimecho",
+        "fileName":  "mega-chimecho.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  1001,
+        "pokeDexId":  380,
+        "nameEn":  "Mega Latias",
+        "fileName":  "mega-latias.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  1002,
+        "pokeDexId":  381,
+        "nameEn":  "Mega Latios",
+        "fileName":  "mega-latios.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  1003,
+        "pokeDexId":  382,
+        "nameEn":  "Mega Kyogre",
+        "fileName":  "mega-kyogre.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  1004,
+        "pokeDexId":  383,
+        "nameEn":  "Mega Groudon",
+        "fileName":  "mega-groudon.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  1005,
+        "pokeDexId":  384,
+        "nameEn":  "Mega Rayquaza",
+        "fileName":  "mega-rayquaza.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  1006,
+        "pokeDexId":  398,
+        "nameEn":  "Mega Staraptor",
+        "fileName":  "mega-staraptor.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  1008,
+        "pokeDexId":  485,
+        "nameEn":  "Mega Heatran",
+        "fileName":  "mega-heatran.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  1009,
+        "pokeDexId":  491,
+        "nameEn":  "Mega Darkrai",
+        "fileName":  "mega-darkrai.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  1019,
+        "pokeDexId":  623,
+        "nameEn":  "Mega Golurk",
+        "fileName":  "mega-golurk.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  1021,
+        "pokeDexId":  740,
+        "nameEn":  "Mega Crabominable",
+        "fileName":  "mega-crabominable.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  1024,
+        "pokeDexId":  768,
+        "nameEn":  "Mega Golisopod",
+        "fileName":  "mega-golisopod.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  1025,
+        "pokeDexId":  801,
+        "nameEn":  "Mega Magearna",
+        "fileName":  "mega-magearna.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  1028,
+        "pokeDexId":  807,
+        "nameEn":  "Mega Zeraora",
+        "fileName":  "mega-zeraora.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  1038,
+        "pokeDexId":  952,
+        "nameEn":  "Mega Scovillain",
+        "fileName":  "mega-scovillain.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  1039,
+        "pokeDexId":  970,
+        "nameEn":  "Mega Glimmora",
+        "fileName":  "mega-glimmora.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  1040,
+        "pokeDexId":  978,
+        "nameEn":  "Mega Tatsugiri",
+        "fileName":  "mega-tatsugiri.png",
+        "isMega":  true
+    },
+    {
+        "appDexId":  1041,
+        "pokeDexId":  998,
+        "nameEn":  "Mega Baxcalibur",
+        "fileName":  "mega-baxcalibur.png",
+        "isMega":  true
+    }
+]
