@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+<!-- MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMqHHHMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMm8>?WHMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMHK{~~?WgMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMmK<~~:~?7HMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMHmmHHMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMHY<~~:~~~~XHMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMHHW9T=<<<jHMMMMMMMMMMMMMMMMMMMMMMMMMMMHWHMMMM
+MMMMMMMMMMMH8>~~~~~~:~~~XmMMMMMMMMMMMMMMMMMMMMMMMMHH9Y7<~~~~~~~~(WHMMMMMMMMMMMMMMMMMMMMgHW97<<~?HHMM
+MMMMMMMMMMH9<~~:~:~~~:~~~dmMMMMMMMMMMMMMMMMMMMMH9=<~~:~~:~~:~~:~(UgMMMMMMMMMMMMMMMHHH9=><~~~~~~:jHMM
+MMMMMMMMMq9<~~~~~~:~~~~~~(XmMMMMMMMMMMMMMMMHHY>~~~~~:~~~~:~~:~~~:XHMMMMMMMMMMMMMHBY<~~~~~~:~:~~~:dHM
+MMMMMMMMmr~~~:~~:~~:~:~~:~(XmMMMMMMMMMMMMmHY<~~:~~:~~~:~~~:~~~~:(XHMMMMMMMMMMHHY>~~~:~~:~~~:~~:~~jmM
+MMMMMMMgS<~~:~~:~~~~~~:~~~~~OHMMMMMMMMMmH>~~~~~~:~~:~~~:~~~:~~:~(XHMMMMMMMHHY<~~~:~~~:~~:~~~~:~~~(dm
+MMMMMMMHl~~~~~:~_(++_~~:~~~~(WHMMMMMMMH6~~~:~:~~~:~~:~~:~~:~~:~~(WMMMMMMmD<<~~:~~:~:~:~__~:~~~~:~(Wg
+MMMMMNmR<~~:~~~(dHWHk.~~:~:~~(WgMMMMm8>~~:~~~::~::::::~~:~~~~~~:dmMMMMH9=:~~~~:((JJQkWqHHHe_:~~~~(Wm
+MMMMMNmI~~:~:~~(WStZWHs_~~~:~~jHHMMmK>~~:~~::~::~~~~_:~~~:~:~~:(WgMMHH$<~~~~((+dH9SZOtrttXq$~~:~~(Wg
+MMMMMMHl~~~~~:_dH0tttXHe-~~~:~_?mgm9>~~~~:::~_~.~...~::~~~~~:~:dmmMmB=~~:~((dHUZtttttttttdqr~:~~:(HM
+MMMMMNHI~:~~~~(UHrtttrZHR-~~~~~~WmK<~~:~~::_.~.~.~~.~_::~:~~~:jH$Wm9<~~:~(dH9OtttOwwwwAAydm$~~~:(XgM
+MMMMMNmI~~::~~(WSttttttwWH+:~~~~JqI~~:~::~~.~~.~~.~~.~~::~~:_+q$~jHI~~:~(dWVttwdQWH9YYTWHWH>:~~~(XHM
+MMMMMNgR:~~(dkWHHkmAwOttZHH+:~:(WD<~~~:~:~~.~.~.~..~.~_:~~:(dH$<~(XR:~~(HKwwdWH$<<~~:~~jHHD~~:~(WHMM
+MMMMMMHHc~~zHn:~~<?THHQytwWR<~:jqI~~:~~::~.~.~.~.~~.~~~~:jQH9<~~~:dH<~(dHwXH9>~~~:~~~:(HHC~~~:(XgMMM
+MMMMMMNHm~~(dH:~~~~~:?THHkZHR<(dH>~~~:~:~.~~.~~.~.~.~.~:~~<<~~~~~(dS~(dHXH8>~~:~~~:~~(dHY<~:~(dmMMMM
+MMMMMMMNH+:~(qR-~:~~~~~:?WRdHc(XK<~~:~::~~.~~.~.~~.~.~_:~~~~~~:~:(WD~(WqH3~~~~~:~~~:(dH$~~~:(XHMMMMM
+MMMMMMMMNms__Zqn_~~:~~~~~(THH$(XK<~~~~~:~~..~.~~.~.~~._::~~~:~~:(dH>~(WH<~~:~:~~:~~(dH3~:~(+WMMMMMMM
+MMMMMMMMMNHm-~vHk_~:~:~~:~_ZHc(UH<~:~~::~~~.~~..~.~.~_:~~~:~~:~(jW>~~jHC~~:~~~:~~:(dmR_~(+mNMMMMMMMM
+MMMMMMMMMMNHm&gmmm-~~~:~~~~~XHc?mI_~~~:~:~.~.~.~~.~~~:~:~~~:~~(XBC~~(W0:~~~~:~~~_jHHmmhQWHNMMMMMMMMM
+MMMMMMMMMMMMmmHH9YT>:~~:~~:~?U3(vHs_~~~:~_~.~.~~.~~_:~~~:~~:(ik9>~~:~<<~~:~~~:~~:~~:<?7THHMMMMMMMMMM
+MMMMMMMMMMNmHC<~~~~~~:~~~:~~~~~~(?HS~:~~~~~~~~~~~_:~~~:~~((QW9<~~~:~~~~~:~~:~~:~~~~~~:((WHNMMMMMMMMM
+MMMMMMMMMMMNHHa++((+&a/~:~~:~~:~~~:~~~:~:~~~~~~~~~~:~~~:(V9Y<~~:~~~~:~~:~~:~(AWkmQma&WHHNMMMMMMMMMMM
+MMMMMMMMMMMMMNNHNHgKT7<~~~~~:~~:~~~:~~~~~:~:~~:~~~~~:~~~~~~~:~~~:~~:~~:~~~~~:?OHgNMNMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMMmI~~~:~:~~~:~~~:~~:~~:~~~:~~~:~:~~~:~~:~~:~~:~~:~~~:~~:~~:~~~?WHMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMmK<~~:~~~:~~~:~~~:~~:~~:~~~:~~~~~:~~~:~~:~~~:~~~~:~~~~~~:~~~~:~~?HMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMH9<~~:~~~:~~:~~:~~~~~~:~~:~~~:~:~~~:~~~:~~:~~~~:~~~:~:~~:~~:~~~:~:?HgMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMH9~~~~~~:~~:~_(-(_~:~:~~~~~:~~~:~~:~~(a&J-_~~:~~:~~:~~~:~~~~~:~~~~~~(HHMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMH3~~:~:~~~:~~(WW99<~~:~~:~:~~:~~~~:~~~(77T9>~~~:~~:~~~~~~:~:~~:~:~:~~:jmMMMMMMMMMMMMMM
+MMMMMMMMMMMMMH3~~:~~~:~~~:~~<~~:~~:~~~~:~~~~:~~:~~:~:_~_~~~:~~~~~:~:~:~~~~:~~~~:~~~~(HMMMMMMMMMMMMMM
+MMMMMMMMMMMMH3:~~~~:~~:~~~_((gQQQy:~~:~~~:~~:~~~~:~(WHHHmge-_~:~~~~~:~~~:~~:~~~~~:~~:jmMMMMMMMMMMMMM
+MMMMMMMMMMMH$~~:~~:~~~~:(dWBY=<<<<~~:~~:~~:~~:~:~~~~~~~~<?TWHZ:~:~~~_____~~~:~:~~:~~:zmMMMMMMMMMMMMM
+MMMMMMMMMMHR<~~~:~~~:~~:?T<~~~~~~~~_``  `   `   `_~:~~~~~~~~<~~~__``````` _~~:~~:~~~~(HHMMMMMMMMMMMM
+MMMMMMMMMNmS~~:~~:~~:~~~~~~~:~~~_`      .&J,        `_:~:~~:~~~_ ````` ````_~~~~~:~:~(WgMMMMMMMMMMMM
+MMMMMMMMMNgS~~~:~_ ` __~:~~:~~:_        _??`          `~~:~~~~`````` ``  `` ~:~:~~~~:(XMMMMMMMMMMMMM
+MMMMMMMMMNgR_~~~_`````` _:~~~:~` ...    ....    .Js     ~~:~~`` ` ` ` ``` ` _~~~:~~~~(HMMMMMMMMMMMMM
+MMMMMMMMMMHH+~:~ ` `` `` _~~:~_  (Hk..gXUYUWWHggKY`     ~~~:```` ````` ```  ~~:~~:~:~(WMMMMMMMMMMMMM
+MMMMMMMMMMNmI~~_`` ` ```` ~~~~_   .77=^`      .`       _~:~_` ``` ` `` ` ` -~~~~~~:~(dmMMMMMMMMMMMMM
+MMMMMMMMMMMNH2~_ ```` ` ` ~:~~_.                     ._~~~~_`` ` `` ` ``` .~~:~:~~~~(HHMMMMMMMMMMMMM
+MMMHMHgggMHMmHQQaJaJg++J+gg&&g&u+J.JJJJ..J.-....  ._~~:~:~~_ `` `` ```` .~~~:~~:~:~(dHMMMMMMMMMMMMMM
+Nm071<111?17171111171?zCzT77C77Y?CTTTTTT7TT6OTWHm_~:~~~:~~:~_-  .....__~~~~~~~~~~~(dHMMMMMMMMMMMMMMM
+NHI;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;vHn~~:~~~~:~~~~~~~~~~~~~~:~:~:~:~:(JmMMMMMMMMMMMMMMMM
+NHHc;;;;;;;;;;;;;;;;+gXWms<;;;;;;;;;;;;;;;;;;;;;vHx:~~:~~~~:~:~~~:~:~~:~~~~:~~_(dWNMMMMMMMMMMMMMMMMM
+MNgn;;;;;;;;;;;;;;;jXHIzOWke&e&+<;;;;;;;;;;;;;;;<dH2~:~~:~~~:~~:~~~~:~~:~~~~_(gHHNMMMMMMMMMMMMMMMMMM
+MMMH2;;;;;;;;;;;;;;;dqmy=dHK77TUHs<;;;;;;;;;;;;;;>dHc~~:~~:~~~:~~:~~~:~~:~:(dmNMMMMMMMMMMMMMMMMMMMMM
+MMMgHz;;;;;;;;;;;;;;+dHHkyWH_   (Ho&>;;;;;;;;;;;;;?WHo~~~:~~~::_~~:~~~~~~~~(dgMMMMMMMMMMMMMMMMMMMMMM
+MMMNHHz;;;;;;;;;;;>jWY! ?HHY` ...TYTWmQo<;;;;;;;;;;?WHc~~~::(&WH<~~:~:~:~~:_dmMMMMMMMMMMMMMMMMMMMMMM
+MMMMNHm+;;;;;;;;;;jq$ ..      ~::_   _?WHx;;;;;;;;;;+UH+:_+WHY<~~:~~:~~~:~~~jmMMMMMMMMMMMMMMMMMMMMMM
+MMMMMNgR<;;;;;;;;;+WH-_~  `    `  `.~_ .HR>;;;;;;;;;;+WHkW9C~~~~~~:~~~:~~:~~:dmMMMMMMMMMMMMMMMMMMMMM
+MMMMMMNmk<;;;;;;;;;<4H-   _:_       ~~ .WZ;;;;;;;;;;;+XHY<~~~~:~:~~:_JdH:~~~_dmMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMNmm<;;;;;;;;;dH\    _~          dK<;;;;;;;;;;;+WR<~~:~~~~::(JWBY<~~:~:dqMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMNms<;;;;;;;+W$  :~_      .__  +KI;;;;;;;;;;;;;jHR_~~:~_(+X9T<<~~~~~~~(qMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMNHI>;;;;;;<XH+.`_~`    `_~_ JHI;;;;;;;;;;;;;;;ZHn(JgkWqHHmWkmQe-:~~:(qMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMNmk;;;;;;;<OWHkmJ,.J......JH3;;;;;;;;;;;;;;;;;?WH9Y1<<;;<<?<zWR_~~~?HMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMNHx>;;;;;;;;<<<z7TTTYUWHB91;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;+XR~~::(mMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMHHo>;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;jW$~~~~(mMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMHHo>><;;>>;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;<dH>:~:(jmMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMNNHkWHHkWWWHkkkQkkmgQmgmgQeumgaggaAaAg&gaa&aagagA&uQaaggkqmHWkWHHMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMMMMMMMNNNMNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNMMMNMMMMMMMMMMMMMMMMMMMMMMMMMM -->
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=2.0, maximum-scale=2.0, user-scalable=no"
+    />
+    <meta
+      name="description"
+      content="ポケモン対戦なら「バトメモ」。最先端バトルサポートツール！初心者から上級者まで使いやすい！自動で戦績分析、ワンタップダメージ計算、72通りのよくばりダメージ計算、バトルメモ、バトルシナリオ。ブラウザ版"
+    />
+    <!-- OGP -->
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="「バトメモ」ポケモンを100倍、楽しむ無料ツール！"
+    />
+    <meta
+      property="og:description"
+      content="「バトメモ」ポケモンを100倍、楽しむ無料ツール！初心者から上級者まで使いやすい！自動で戦績分析、ワンタップダメージ計算、72通りのよくばりダメージ計算、バトルメモ、バトルシナリオ。"
+    />
+    <meta property="og:image" content="https://pamo3.com/ogp_0326.png" />
+    <meta property="og:url" content="https://pamo3.com" />
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@pamo3nanoda" />
+    <meta
+      name="twitter:title"
+      content="「バトメモ」ポケモンを100倍、楽しむ無料ツール！"
+    />
+    <meta
+      name="twitter:description"
+      content="「バトメモ」ポケモンを100倍、楽しむ無料ツール！初心者から上級者まで使いやすい！自動で戦績分析、ワンタップダメージ計算、72通りのよくばりダメージ計算、バトルメモ、バトルシナリオ。"
+    />
+    <meta
+      name="twitter:image"
+      content="https://pamo3.com/ogp_0326.png"
+    />
+
+    <!-- AdSense: トップレベルでは adsbygoogle.js を読まない（自動広告の注入を避ける）。
+         手動ユニットは web/adsense_rail.html 等の iframe 内で各自スクリプトを読み込む。 -->
+    <!-- adsense (global — 自動広告を再開するときは AdSense 管理画面の「自動広告」と合わせて復帰を検討) -->
+    <!-- <script
+      async
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3009802007786170"
+      crossorigin="anonymous"
+    ></script> -->
+    <base href="/" />
+    <!-- <meta name="google-adsense-account" content="ca-pub-3009802007786170" /> -->
+    <!-- dev -->
+    <!-- <meta
+      name="google-signin-client_id"
+      content="951003796210-s5ifbk1g9le2eso1j62r9os7760eq7pt.apps.googleusercontent.com"
+    /> -->
+    <!-- prd-->
+    <meta
+      name="google-signin-client_id"
+      content="462778491182-v1i4rbe713bpgm7772q4pvgfa04k5uq3.apps.googleusercontent.com"
+    />
+    <meta content="IE=Edge" http-equiv="X-UA-Compatible" />
+    <meta name="application-name" content="SV-Battle-Memories" />
+    <!-- iOS meta tags & icons -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta
+      name="apple-mobile-web-app-status-bar-style"
+      content="black-translucent"
+    />
+    <meta name="apple-mobile-web-app-title" content="sv_battle_memories" />
+    <!-- <link rel="apple-touch-icon" href="icons/Icon-192.png" /> -->
+    <link rel="apple-touch-icon" href="Icon-192.png" />
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png" />
+    <title>「バトメモ」ポケモンを100倍、楽しむ無料ツール！</title>
+    <meta name="theme-color" content="#0175C2" />
+    <link rel="manifest" href="manifest.json" />
+
+
+    <!-- <script src="tesseract_v5.min.js" type="text/javascript"></script> -->
+    <script src="poke_tesseract/tesseract.min.js" type="text/javascript"></script>
+
+    <script src="https://unpkg.com/pica/dist/pica.min.js"></script>
+  </head>
+  <body>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-analytics.js";
+      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+      //   [dev]
+      //   const firebaseConfig = {
+      //     apiKey: "AIzaSyDFIhITwprdrxZM3KIZHUWFNAda7yGab54",
+      //     authDomain: "battle-memories.firebaseapp.com",
+      //     projectId: "battle-memories",
+      //     storageBucket: "battle-memories.appspot.com",
+      //     messagingSenderId: "951003796210",
+      //     appId: "1:951003796210:web:21d074c36d95b6b449f66b",
+      //     measurementId: "G-TDL6FFN63T",
+      //   };
+      // [prd]
+      const firebaseConfig = {
+        apiKey: "AIzaSyD2PyiSNsGq4h_JLpLPRDxnWLoJQf7tvkc",
+        appId: "1:462778491182:web:bf231ba1f448edab3f9abf",
+        messagingSenderId: "462778491182",
+        projectId: "sv-battle-memories",
+        authDomain: "sv-battle-memories.firebaseapp.com",
+        storageBucket: "sv-battle-memories.appspot.com",
+        measurementId: "G-F4HDF47JPK",
+      };
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const analytics = getAnalytics(app);
+    </script>
+    <!-- デプロイ版が変わったら古い Service Worker / Cache Storage を自動解除してから Flutter を起動 -->
+    <script>
+      (function () {
+        var DEPLOY_VERSION = "2.5.1+783";
+
+        function loadFlutter() {
+          var s = document.createElement("script");
+          s.src =
+            "flutter_bootstrap.js?v=" + encodeURIComponent(DEPLOY_VERSION);
+          s.async = true;
+          document.body.appendChild(s);
+        }
+
+        var storageKey = "pbl_deploy_version";
+        var needsMigrate = true;
+        try {
+          needsMigrate = localStorage.getItem(storageKey) !== DEPLOY_VERSION;
+        } catch (e) {}
+
+        if (!needsMigrate) {
+          loadFlutter();
+          return;
+        }
+
+        var finished = false;
+        function finishMigration() {
+          if (finished) return;
+          finished = true;
+          try {
+            localStorage.setItem(storageKey, DEPLOY_VERSION);
+          } catch (e) {}
+          loadFlutter();
+        }
+
+        if (!("serviceWorker" in navigator)) {
+          finishMigration();
+          return;
+        }
+
+        Promise.all([
+          navigator.serviceWorker.getRegistrations().then(function (regs) {
+            return Promise.all(
+              regs.map(function (r) {
+                return r.unregister();
+              })
+            );
+          }),
+          "caches" in window
+            ? caches.keys().then(function (keys) {
+                return Promise.all(
+                  keys.map(function (k) {
+                    return caches.delete(k);
+                  })
+                );
+              })
+            : Promise.resolve(),
+        ])
+          .then(finishMigration)
+          .catch(finishMigration);
+
+        setTimeout(finishMigration, 4000);
+      })();
+    </script>
+
+    <script src="js/resize_image.js?v=1.99.5+740" type="text/javascript"></script>
+    <script src="js/pawmi_bridge.js?v=1.99.5+740" type="text/javascript"></script>
+    <script src="js/pawmo_bridge.js?v=1.99.5+740" type="text/javascript"></script>
+  </body>
+</html>
