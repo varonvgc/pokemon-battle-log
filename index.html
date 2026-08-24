@@ -3709,10 +3709,17 @@
     // iconNumの計算：姿違い・フォルムインデックスに対応したスプライトシート位置を取得
     function getPokeIconPos(pOrDisp, defaultNo = 0) {
       if (!pOrDisp) return '0px 0px';
-      const p = typeof pOrDisp === 'string'
-        ? ((localPokemon || POKEMON_LIST).find(pk => pk.display === pOrDisp || pk.name === pOrDisp))
-        : pOrDisp;
-      const idx = (p && p.iconIndex !== undefined) ? parseInt(p.iconIndex) : (parseInt(p?.no) || parseInt(defaultNo) || 0);
+      let idx = 0;
+      if (typeof pOrDisp === 'number') {
+        idx = pOrDisp;
+      } else if (typeof pOrDisp === 'string' && /^\d+$/.test(pOrDisp.trim())) {
+        idx = parseInt(pOrDisp.trim(), 10);
+      } else {
+        const p = typeof pOrDisp === 'string'
+          ? ((localPokemon || POKEMON_LIST).find(pk => pk.display === pOrDisp || pk.name === pOrDisp))
+          : pOrDisp;
+        idx = (p && p.iconIndex !== undefined) ? parseInt(p.iconIndex) : (parseInt(p?.no) || parseInt(defaultNo) || 0);
+      }
       const x = (idx % 12) * 40;
       const y = Math.floor(idx / 12) * 30;
       return `-${x}px -${y}px`;
@@ -3809,7 +3816,7 @@
       }
 
       grid.innerHTML = filtered.map(p => {
-        const style = getIconStyle(p.no);
+        const style = getIconStyle(p);
         const current = pickerTargetInput ? pickerTargetInput.value : '';
         const isSel = current === p.display;
         return `<button class="poke-icon-btn${isSel ? ' selected' : ''}" onclick="selectFromPicker('${p.display.replace(/'/g, "\\'")}')">
