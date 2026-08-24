@@ -4686,9 +4686,13 @@
       }
 
       buildMovePickerTypes();
-      document.getElementById('move-picker-search').value = '';
+      const searchInput = document.getElementById('move-picker-search');
+      if (searchInput) searchInput.value = '';
       filterMovePicker('');
       document.getElementById('move-picker-overlay').classList.add('open');
+      setTimeout(() => {
+        if (searchInput) searchInput.focus();
+      }, 50);
     }
 
     function toggleMovePickerLearnOnly() {
