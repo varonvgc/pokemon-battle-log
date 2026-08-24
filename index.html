@@ -2344,6 +2344,7 @@
     let MOVES_LIST = [];
     let ITEMS_LIST = [];
     let LEARNSETS_DATA = {};
+    let MEGA_STONE_MAP = {};
     let _masterDataPromise = null;
 
     async function loadStaticMasterData() {
@@ -2351,11 +2352,12 @@
       _masterDataPromise = (async () => {
         try {
           const v = Date.now();
-          const [pokeRes, moveRes, itemRes, lsRes] = await Promise.all([
+          const [pokeRes, moveRes, itemRes, lsRes, msRes] = await Promise.all([
             fetch('data/pokemon.json?v=' + v),
             fetch('data/moves.json?v=' + v),
             fetch('data/items.json?v=' + v),
-            fetch('data/learnsets.json?v=' + v).catch(() => null)
+            fetch('data/learnsets.json?v=' + v).catch(() => null),
+            fetch('data/mega_stones.json?v=' + v).catch(() => null)
           ]);
           POKEMON_LIST = await pokeRes.json();
           MOVES_LIST = await moveRes.json();
@@ -2366,6 +2368,14 @@
               console.log('LEARNSETS_DATA loaded successfully:', Object.keys(LEARNSETS_DATA).length, 'entries');
             } catch (e) {
               console.error('Failed to parse learnsets.json:', e);
+            }
+          }
+          if (msRes && msRes.ok) {
+            try {
+              MEGA_STONE_MAP = await msRes.json();
+              console.log('MEGA_STONE_MAP loaded successfully:', Object.keys(MEGA_STONE_MAP).length, 'entries');
+            } catch (e) {
+              console.error('Failed to parse mega_stones.json:', e);
             }
           }
 
@@ -4628,6 +4638,7 @@
           const name = item.textContent;
           input.value = name;
           pePokemons[idx].item = name;
+          checkAndApplyMegaOnItemChange(idx, name);
           recordRecentItem(name);
           listEl.classList.remove('open');
           setTimeout(() => { window._peAcMousedown = false; }, 200);
@@ -4635,9 +4646,38 @@
       });
       listEl.classList.add('open');
     }
+    function resolveMegaFormByItem(pokeNameOrDisplay, itemName) {
+      if (!itemName || !MEGA_STONE_MAP) return pokeNameOrDisplay;
+      const megaDisp = MEGA_STONE_MAP[itemName.trim()];
+      if (megaDisp) {
+        const baseName = (pokeNameOrDisplay || '').replace(/\(.*\)/, '').trim();
+        if (!baseName || megaDisp.startsWith(baseName)) {
+          return megaDisp;
+        }
+      }
+      return pokeNameOrDisplay;
+    }
+
+    function checkAndApplyMegaOnItemChange(idx, itemName) {
+      const currentName = pePokemons[idx].name || '';
+      if (currentName) {
+        const newName = resolveMegaFormByItem(currentName, itemName);
+        if (newName !== currentName) {
+          setPePokemon(idx, newName);
+          const card = document.querySelectorAll('.pe-pokemon-card')[idx];
+          if (card) {
+            const ta = card.querySelector('.pe-name-input');
+            if (ta) ta.value = newName;
+          }
+        }
+      }
+    }
+
     function onPeItemInput(input, idx) {
-      pePokemons[idx].item = input.value.trim();
-      showPeItemAc(input, idx, input.value.trim());
+      const val = input.value.trim();
+      pePokemons[idx].item = val;
+      checkAndApplyMegaOnItemChange(idx, val);
+      showPeItemAc(input, idx, val);
     }
     function onPeItemFocus(input, idx) {
       showPeItemAc(input, idx, input.value.trim());
@@ -5588,6 +5628,7 @@
 
 【重要】
 ・画像が2枚ある場合（能力画面＋ステータス画面）、同じスロットの情報を統合して1つのオブジェクトにまとめてください。
+・ポケモンがメガストーン（例: "リザードナイトY", "フシギバナイト"など）を持っている場合は、formおよびnameに対応するメガシンカ（例: "メガリザードンY", "メガフシギバナ"）を反映してください。
 ・Nintendo Switch版またはスマートフォン版のどちらの比率・レイアウトであっても正確に抽出してください。
 ・出力は純粋なJSONのみを返してください。
 `;
@@ -5688,15 +5729,19 @@
         if (i >= 6) return;
         const pokeObj = peEmptyPoke();
 
-        // 1. ポケモン名の照合（display名）
-        const matchedDisplay = matchPokemonDisplay(rawPk.name, rawPk.form, rawPk.ability, allPokeSrc);
+        // 3. 持ち物の照合
+        const matchedItem = matchItem(rawPk.item, allItemsSrc);
+        pokeObj.item = matchedItem;
+
+        // 1. ポケモン名の照合（display名）＋ メガストーン判定
+        let matchedDisplay = matchPokemonDisplay(rawPk.name, rawPk.form, rawPk.ability, allPokeSrc);
+        if (matchedItem) {
+          matchedDisplay = resolveMegaFormByItem(matchedDisplay, matchedItem);
+        }
         pokeObj.name = matchedDisplay || rawPk.name || '';
 
         // 2. 特性の照合
         pokeObj.ability = matchAbility(matchedDisplay, rawPk.ability, allPokeSrc);
-
-        // 3. 持ち物の照合
-        pokeObj.item = matchItem(rawPk.item, allItemsSrc);
 
         // 4. 技の照合 (4つ)
         const rawMoves = Array.isArray(rawPk.moves) ? rawPk.moves : [];

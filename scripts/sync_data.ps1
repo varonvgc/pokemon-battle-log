@@ -1,4 +1,4 @@
-# Pure ASCII Safe Comprehensive Showdown Sync Script
+# Pure ASCII Safe Comprehensive Showdown Sync Script (Data & Assets)
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
 
 $rootDir = Split-Path $PSScriptRoot -Parent
@@ -69,12 +69,14 @@ if ($iconIdxMatch.Success) {
 }
 Write-Host "Extracted forme icon indexes: $($iconIndexes.Count)" -ForegroundColor Green
 
-# 4. Read local pokemon and moves with strict UTF8
+# 4. Read local pokemon, moves, items with strict UTF8
 $localPokePath = Join-Path $dataDir "pokemon.json"
 $localMovesPath = Join-Path $dataDir "moves.json"
+$localItemsPath = Join-Path $dataDir "items.json"
 
 $localPokemon = [System.IO.File]::ReadAllText($localPokePath, [System.Text.Encoding]::UTF8) | ConvertFrom-Json
 $localMoves = [System.IO.File]::ReadAllText($localMovesPath, [System.Text.Encoding]::UTF8) | ConvertFrom-Json
+$localItems = [System.IO.File]::ReadAllText($localItemsPath, [System.Text.Encoding]::UTF8) | ConvertFrom-Json
 
 # 5. Build Move ID to Japanese Name
 $moveIdToName = [System.Collections.Generic.Dictionary[string, string]]::new()
@@ -208,24 +210,20 @@ foreach ($nKey in $localByNo.Keys) {
         $iconIdx = $nKey # default is national dex no
         
         if ($cIdx -eq 0) {
-            # Base form
             $resolvedId = $baseId
             if ($iconIndexes.ContainsKey($baseId)) {
                 $iconIdx = $iconIndexes[$baseId]
             }
         } elseif ($cIdx -lt $showdownSpecies.Count) {
-            # Corresponding forme by index
             $matchedS = $showdownSpecies[$cIdx]
             $resolvedId = $matchedS.id
             if ($iconIndexes.ContainsKey($matchedS.id)) {
                 $iconIdx = $iconIndexes[$matchedS.id]
             }
         } else {
-            # If extra forms beyond showdown list, use base
             $resolvedId = $baseId
         }
         
-        # Set iconIndex property
         $cand | Add-Member -NotePropertyName "iconIndex" -NotePropertyValue $iconIdx -Force
         
         # Get learnset
@@ -252,9 +250,81 @@ foreach ($kv in $rawLearnsets) {
     }
 }
 
-# 9. Save all data files with UTF-8
+# 9. Build and generate mega_stones.json
+Write-Host "Generating data/mega_stones.json mapping..." -ForegroundColor Cyan
+$strMega = [System.Text.Encoding]::UTF8.GetString(@(0xE3, 0x83, 0xA1, 0xE3, 0x82, 0xAC))
+$strKnight = [System.Text.Encoding]::UTF8.GetString(@(0xE3, 0x83, 0x8A, 0xE3, 0x82, 0xA4, 0xE3, 0x83, 0x88))
+
+$megaMap = [System.Collections.Generic.Dictionary[string, string]]::new()
+$megaPokes = [System.Collections.Generic.List[object]]::new()
+foreach ($p in $localPokemon) {
+    $f = [string]$p.form
+    $d = [string]$p.display
+    if ($f.IndexOf($strMega) -ge 0 -or $d.IndexOf($strMega) -ge 0) {
+        $megaPokes.Add($p)
+    }
+}
+
+$stoneItems = [System.Collections.Generic.List[string]]::new()
+foreach ($it in $localItems) {
+    $itStr = [string]$it
+    if ($itStr.IndexOf($strKnight) -ge 0) {
+        $stoneItems.Add($itStr)
+    }
+}
+
+foreach ($it in $stoneItems) {
+    $clean = $it.Substring(0, $it.IndexOf($strKnight))
+    $isX = $it.EndsWith("X") -or $it.EndsWith([System.Text.Encoding]::UTF8.GetString(@(0xEF, 0xBC, 0xB8)))
+    $isY = $it.EndsWith("Y") -or $it.EndsWith([System.Text.Encoding]::UTF8.GetString(@(0xEF, 0xBC, 0xB9)))
+    $isZ = $it.EndsWith("Z") -or $it.EndsWith([System.Text.Encoding]::UTF8.GetString(@(0xEF, 0xBC, 0xBA)))
+    
+    $bestMatch = $null
+    $bestScore = 0
+    
+    foreach ($mp in $megaPokes) {
+        $d = [string]$mp.display
+        $n = [string]$mp.name
+        
+        $hasX = $d.IndexOf("X") -ge 0 -or $d.IndexOf([System.Text.Encoding]::UTF8.GetString(@(0xEF, 0xBC, 0xB8))) -ge 0
+        $hasY = $d.IndexOf("Y") -ge 0 -or $d.IndexOf([System.Text.Encoding]::UTF8.GetString(@(0xEF, 0xBC, 0xB9))) -ge 0
+        $hasZ = $d.IndexOf("Z") -ge 0 -or $d.IndexOf([System.Text.Encoding]::UTF8.GetString(@(0xEF, 0xBC, 0xBA))) -ge 0
+        
+        if ($isX -and -not $hasX) { continue }
+        if ($isY -and -not $hasY) { continue }
+        if ($isZ -and -not $hasZ) { continue }
+        if (-not $isX -and -not $isY -and -not $isZ -and ($hasX -or $hasY -or $hasZ)) { continue }
+        
+        $matchLen = 0
+        $minLen = [Math]::Min($clean.Length, $n.Length)
+        for ($i = 0; $i -lt $minLen; $i++) {
+            if ($clean[$i] -eq $n[$i]) {
+                $matchLen++
+            } else {
+                break
+            }
+        }
+        
+        if ($matchLen -ge 2 -and $matchLen -gt $bestScore) {
+            $bestScore = $matchLen
+            $bestMatch = $d
+        }
+    }
+    
+    if ($clean -eq [System.Text.Encoding]::UTF8.GetString(@(0xE3,0x83,0xA1,0xE3,0x82,0xAC,0xE3,0x83,0x8B,0xE3,0x82,0xA6,0xE3,0x83,0xA0))) {
+        # メガニウム -> メガニウム(メガメガニウム)
+        $mCand = $megaPokes | Where-Object { $_.display.IndexOf([System.Text.Encoding]::UTF8.GetString(@(0xE3,0x83,0xA1,0xE3,0x82,0xAC,0xE3,0x83,0xA1,0xE3,0x82,0xAC,0xE3,0x83,0x8B,0xE3,0x82,0xA6,0xE3,0x83,0xA0))) -ge 0 } | Select-Object -First 1
+        if ($mCand) { $bestMatch = $mCand.display }
+    }
+    
+    if ($bestMatch) {
+        $megaMap[$it] = $bestMatch
+    }
+}
+
+# 10. Save all data files with UTF-8
 [System.IO.File]::WriteAllText($localPokePath, ($localPokemon | ConvertTo-Json -Depth 10), [System.Text.Encoding]::UTF8)
-Write-Host "Updated and saved data/pokemon.json with iconIndex" -ForegroundColor Green
+Write-Host "Saved data/pokemon.json" -ForegroundColor Green
 
 [System.IO.File]::WriteAllText((Join-Path $dataDir "learnsets.json"), ($finalLearnsets | ConvertTo-Json -Depth 10), [System.Text.Encoding]::UTF8)
 Write-Host "Saved data/learnsets.json" -ForegroundColor Green
@@ -263,5 +333,8 @@ $transObj = [System.Collections.Generic.Dictionary[string, object]]::new()
 $transObj["moves"] = $moveNameToId
 [System.IO.File]::WriteAllText((Join-Path $dataDir "translation_map.json"), ($transObj | ConvertTo-Json -Depth 10), [System.Text.Encoding]::UTF8)
 Write-Host "Saved data/translation_map.json" -ForegroundColor Green
+
+[System.IO.File]::WriteAllText((Join-Path $dataDir "mega_stones.json"), ($megaMap | ConvertTo-Json -Depth 10), [System.Text.Encoding]::UTF8)
+Write-Host "Saved data/mega_stones.json ($($megaMap.Count) mapped)" -ForegroundColor Green
 
 Write-Host "`n=== Comprehensive Sync Complete Successfully! ===" -ForegroundColor Cyan
