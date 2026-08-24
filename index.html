@@ -2294,8 +2294,11 @@
     <div class="move-picker-modal">
       <div class="move-picker-header">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-          <span style="font-size:14px;font-weight:700;color:var(--text-muted)">技を選択</span>
-          <button class="btn btn-ghost btn-sm" onclick="closeMovePickerPopup()">✕</button>
+          <span style="font-size:14px;font-weight:700;color:var(--text-muted)" id="move-picker-title">技を選択</span>
+          <div style="display:flex;align-items:center;gap:6px">
+            <button class="btn btn-ghost btn-sm" id="move-picker-learn-toggle" onclick="toggleMovePickerLearnOnly()" style="display:none;font-size:11px;padding:2px 8px">★ 覚える技のみ</button>
+            <button class="btn btn-ghost btn-sm" onclick="closeMovePickerPopup()">✕</button>
+          </div>
         </div>
         <input type="text" class="move-picker-search" id="move-picker-search" placeholder="技名で検索..." autocomplete="off"
           oninput="filterMovePicker(this.value)">
@@ -2340,20 +2343,25 @@
     let POKEMON_LIST = [];
     let MOVES_LIST = [];
     let ITEMS_LIST = [];
+    let LEARNSETS_DATA = {};
     let _masterDataPromise = null;
 
     async function loadStaticMasterData() {
       if (_masterDataPromise) return _masterDataPromise;
       _masterDataPromise = (async () => {
         try {
-          const [pokeRes, moveRes, itemRes] = await Promise.all([
+          const [pokeRes, moveRes, itemRes, lsRes] = await Promise.all([
             fetch('data/pokemon.json'),
             fetch('data/moves.json'),
-            fetch('data/items.json')
+            fetch('data/items.json'),
+            fetch('data/learnsets.json').catch(() => null)
           ]);
           POKEMON_LIST = await pokeRes.json();
           MOVES_LIST = await moveRes.json();
           ITEMS_LIST = await itemRes.json();
+          if (lsRes && lsRes.ok) {
+            try { LEARNSETS_DATA = await lsRes.json(); } catch (e) { }
+          }
 
           localPokemon = JSON.parse(JSON.stringify(POKEMON_LIST));
           localMoves = JSON.parse(JSON.stringify(MOVES_LIST)).map(m => ({ confirmed: true, ...m }));
@@ -4639,13 +4647,52 @@
 
     // ---- 技ピッカー ----
     let _movePkIdx = -1, _moveMvIdx = -1, _movePkActiveType = null;
+    let _moveLearnOnly = true;
+
     function openMovePickerPopup(pkIdx, mvIdx) {
       _movePkIdx = pkIdx; _moveMvIdx = mvIdx; _movePkActiveType = null;
+
+      const pk = pePokemons[pkIdx];
+      const hasPoke = Boolean(pk && pk.name);
+      const toggleBtn = document.getElementById('move-picker-learn-toggle');
+      const titleEl = document.getElementById('move-picker-title');
+
+      const pokeLearnedList = (hasPoke && LEARNSETS_DATA)
+        ? (LEARNSETS_DATA[pk.name] || LEARNSETS_DATA[pk.name.replace(/\(.*\)/, '')])
+        : null;
+
+      if (pokeLearnedList && pokeLearnedList.length > 0) {
+        _moveLearnOnly = true; // 覚える技に限定
+        if (toggleBtn) {
+          toggleBtn.style.display = 'inline-block';
+          toggleBtn.textContent = '全技を表示';
+          toggleBtn.classList.remove('btn-primary');
+          toggleBtn.classList.add('btn-ghost');
+        }
+        if (titleEl) titleEl.textContent = `${pk.name} の技`;
+      } else {
+        _moveLearnOnly = false;
+        if (toggleBtn) toggleBtn.style.display = 'none';
+        if (titleEl) titleEl.textContent = '技を選択';
+      }
+
       buildMovePickerTypes();
-      filterMovePicker('');
       document.getElementById('move-picker-search').value = '';
+      filterMovePicker('');
       document.getElementById('move-picker-overlay').classList.add('open');
     }
+
+    function toggleMovePickerLearnOnly() {
+      _moveLearnOnly = !_moveLearnOnly;
+      const toggleBtn = document.getElementById('move-picker-learn-toggle');
+      if (toggleBtn) {
+        toggleBtn.textContent = _moveLearnOnly ? '全技を表示' : '習得技のみ';
+        toggleBtn.classList.toggle('btn-primary', !_moveLearnOnly);
+        toggleBtn.classList.toggle('btn-ghost', _moveLearnOnly);
+      }
+      filterMovePicker(document.getElementById('move-picker-search').value);
+    }
+
     function closeMovePickerPopup() {
       document.getElementById('move-picker-overlay').classList.remove('open');
     }
@@ -4669,15 +4716,41 @@
     function filterMovePicker(val) {
       const body = document.getElementById('move-picker-body');
       const valKana = toKatakana(val.trim()), valHira = toHiragana(val.trim());
+
+      const pk = _movePkIdx >= 0 ? pePokemons[_movePkIdx] : null;
+      let learnedSet = null;
+      if (pk && pk.name && LEARNSETS_DATA) {
+        const rawList = LEARNSETS_DATA[pk.name] || LEARNSETS_DATA[pk.name.replace(/\(.*\)/, '')];
+        if (rawList && Array.isArray(rawList)) {
+          learnedSet = new Set(rawList);
+        }
+      }
+
       let list = (localMoves || MOVES_LIST).filter(m => m.confirmed !== false); // 内定のみ
       if (_movePkActiveType) list = list.filter(m => m.type === _movePkActiveType);
       if (val.trim()) list = list.filter(m => { const h = toHiragana(m.name); return m.name.includes(valKana) || h.includes(valHira); });
+
+      if (learnedSet && _moveLearnOnly) {
+        list = list.filter(m => learnedSet.has(m.name));
+      } else if (learnedSet) {
+        // 習得技を上位にソート
+        list = [...list].sort((a, b) => {
+          const aLearned = learnedSet.has(a.name) ? 1 : 0;
+          const bLearned = learnedSet.has(b.name) ? 1 : 0;
+          return bLearned - aLearned;
+        });
+      }
+
+      if (list.length === 0) {
+        body.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:13px">該当する技が見つかりません</div>';
+        return;
+      }
+
       body.innerHTML = list.map(m => {
-        const typeColor = document.querySelector(`.type-btn[data-type="${m.type}"]`)?.style.background
-          || (document.querySelector(`[data-type="${m.type}"]`) ? window.getComputedStyle(document.querySelector(`[data-type="${m.type}"]`)).backgroundColor : '#888');
-        return `<div class="move-picker-row" onclick="selectMoveFromPicker('${m.name.replace(/'/g, "\'")}')">
+        const isLearned = learnedSet ? learnedSet.has(m.name) : false;
+        return `<div class="move-picker-row" onclick="selectMoveFromPicker('${m.name.replace(/'/g, "\\'")}')">
       <span class="move-type-badge" style="background:${getTypeColor(m.type)}">${m.type}</span>
-      <span class="move-picker-name">${m.name}</span>
+      <span class="move-picker-name">${isLearned ? '<span style="color:#eab308;font-size:11px;margin-right:4px" title="習得可能技">★</span>' : ''}${m.name}</span>
       <span class="move-picker-cat" style="margin-left:auto">${m.category || ''}</span>
       <span class="move-picker-pwr">${m.power || '-'}</span>
     </div>`;
