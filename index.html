@@ -2350,17 +2350,23 @@
       if (_masterDataPromise) return _masterDataPromise;
       _masterDataPromise = (async () => {
         try {
+          const v = Date.now();
           const [pokeRes, moveRes, itemRes, lsRes] = await Promise.all([
-            fetch('data/pokemon.json'),
-            fetch('data/moves.json'),
-            fetch('data/items.json'),
-            fetch('data/learnsets.json').catch(() => null)
+            fetch('data/pokemon.json?v=' + v),
+            fetch('data/moves.json?v=' + v),
+            fetch('data/items.json?v=' + v),
+            fetch('data/learnsets.json?v=' + v).catch(() => null)
           ]);
           POKEMON_LIST = await pokeRes.json();
           MOVES_LIST = await moveRes.json();
           ITEMS_LIST = await itemRes.json();
           if (lsRes && lsRes.ok) {
-            try { LEARNSETS_DATA = await lsRes.json(); } catch (e) { }
+            try {
+              LEARNSETS_DATA = await lsRes.json();
+              console.log('LEARNSETS_DATA loaded successfully:', Object.keys(LEARNSETS_DATA).length, 'entries');
+            } catch (e) {
+              console.error('Failed to parse learnsets.json:', e);
+            }
           }
 
           localPokemon = JSON.parse(JSON.stringify(POKEMON_LIST));
@@ -4060,6 +4066,7 @@
     function closePartyModal() { closePartyEdit(); }
 
     async function openPartyEdit(id) {
+      await loadStaticMasterData();
       // バナーが出ている時だけ確認（毎回Firestore通信しない）
       const banner = document.getElementById('conflict-banner');
       if (banner && banner.classList.contains('show')) {
@@ -4649,16 +4656,18 @@
     let _movePkIdx = -1, _moveMvIdx = -1, _movePkActiveType = null;
     let _moveLearnOnly = true;
 
-    function openMovePickerPopup(pkIdx, mvIdx) {
+    async function openMovePickerPopup(pkIdx, mvIdx) {
+      await loadStaticMasterData();
       _movePkIdx = pkIdx; _moveMvIdx = mvIdx; _movePkActiveType = null;
 
       const pk = pePokemons[pkIdx];
-      const hasPoke = Boolean(pk && pk.name);
+      const pokeName = (pk && pk.name) ? pk.name : (document.querySelectorAll('.pe-name-input')[pkIdx]?.value || '');
+      const hasPoke = Boolean(pokeName);
       const toggleBtn = document.getElementById('move-picker-learn-toggle');
       const titleEl = document.getElementById('move-picker-title');
 
       const pokeLearnedList = (hasPoke && LEARNSETS_DATA)
-        ? (LEARNSETS_DATA[pk.name] || LEARNSETS_DATA[pk.name.replace(/\(.*\)/, '')])
+        ? (LEARNSETS_DATA[pokeName] || LEARNSETS_DATA[pokeName.replace(/\(.*\)/, '')])
         : null;
 
       if (pokeLearnedList && pokeLearnedList.length > 0) {
@@ -4669,7 +4678,7 @@
           toggleBtn.classList.remove('btn-primary');
           toggleBtn.classList.add('btn-ghost');
         }
-        if (titleEl) titleEl.textContent = `${pk.name} の技`;
+        if (titleEl) titleEl.textContent = `${pokeName} の技`;
       } else {
         _moveLearnOnly = false;
         if (toggleBtn) toggleBtn.style.display = 'none';
@@ -4718,9 +4727,10 @@
       const valKana = toKatakana(val.trim()), valHira = toHiragana(val.trim());
 
       const pk = _movePkIdx >= 0 ? pePokemons[_movePkIdx] : null;
+      const pokeName = (pk && pk.name) ? pk.name : (document.querySelectorAll('.pe-name-input')[_movePkIdx]?.value || '');
       let learnedSet = null;
-      if (pk && pk.name && LEARNSETS_DATA) {
-        const rawList = LEARNSETS_DATA[pk.name] || LEARNSETS_DATA[pk.name.replace(/\(.*\)/, '')];
+      if (pokeName && LEARNSETS_DATA) {
+        const rawList = LEARNSETS_DATA[pokeName] || LEARNSETS_DATA[pokeName.replace(/\(.*\)/, '')];
         if (rawList && Array.isArray(rawList)) {
           learnedSet = new Set(rawList);
         }
