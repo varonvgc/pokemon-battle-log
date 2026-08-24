@@ -4550,17 +4550,14 @@
     function buildAbilityOptions(sel, pokeName, current) {
       sel.innerHTML = '<option value="">（なし）</option>';
       if (pokeName) {
-        const pd = findPokemon(pokeName);
+        let pd = findPokemon(pokeName);
         if (pd) {
-          const abilities = new Set();
-          [pd.ability1, pd.ability2, pd.ability_hidden].filter(Boolean).forEach(a => abilities.add(a));
-          // メガフォームの場合、ベースポケモンの通常特性も追加
+          // メガシンカフォームの場合はベースポケモン（メガ前）の特性のみを使用
           if (pd.form && pd.form.includes('メガ')) {
             const base = (localPokemon || POKEMON_LIST).find(p => p.name === pd.name && (p.form === '通常' || !p.form));
-            if (base) {
-              [base.ability1, base.ability2, base.ability_hidden].filter(Boolean).forEach(a => abilities.add(a));
-            }
+            if (base) pd = base;
           }
+          const abilities = [pd.ability1, pd.ability2, pd.ability_hidden].filter(Boolean);
           abilities.forEach(ab => {
             const opt = document.createElement('option');
             opt.value = ab; opt.textContent = ab;
@@ -5865,8 +5862,13 @@
     // 特性の照合
     function matchAbility(pokeDisplay, rawAbility, pokeSrc) {
       if (!rawAbility) return '';
-      const pd = findPokemon(pokeDisplay);
+      let pd = findPokemon(pokeDisplay);
       if (pd) {
+        // メガシンカフォームの場合はベースポケモン（メガ前）の特性から照合
+        if (pd.form && pd.form.includes('メガ')) {
+          const base = (localPokemon || POKEMON_LIST).find(p => p.name === pd.name && (p.form === '通常' || !p.form));
+          if (base) pd = base;
+        }
         const valid = [pd.ability1, pd.ability2, pd.ability_hidden].filter(Boolean);
         const found = valid.find(a => a === rawAbility || toHiragana(a) === toHiragana(rawAbility));
         if (found) return found;
