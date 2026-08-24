@@ -4984,11 +4984,7 @@
 
     function getPokeSpriteHTML(display, no, form, pokemonName) {
       const pos = getPokeIconPos(display || { no, form, name: pokemonName });
-      const label = getFormLabel(form, pokemonName);
-      return `<div class="poke-tag-icon">
-    <span class="poke-tag-sprite" style="background-position:${pos}"></span>
-    ${label ? `<div class="poke-tag-label">${label}</div>` : ''}
-  </div>`;
+      return `<div class="poke-tag-icon"><span class="poke-tag-sprite" style="background-position:${pos}"></span></div>`;
     }
 
     // display名からポケモンデータを取得してスプライトHTMLを返す
