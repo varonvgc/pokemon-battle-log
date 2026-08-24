@@ -2389,6 +2389,36 @@
       return _masterDataPromise;
     }
 
+    // ポケモン名・表示名・メガ名の表記揺れを完全吸収してポケモンデータを取得するヘルパー
+    function findPokemon(query) {
+      if (!query) return null;
+      const list = localPokemon || POKEMON_LIST;
+      if (!list || !list.length) return null;
+      if (typeof query === 'object' && query.display) return query;
+
+      const q = String(query).trim();
+      // 1. 完全一致
+      let found = list.find(p => p.display === q || p.name === q);
+      if (found) return found;
+
+      // 2. 全角半角・記号正規化
+      const norm = s => s.replace(/[（）()]/g, '').replace(/[ＸX]/g, 'X').replace(/[ＹY]/g, 'Y').replace(/[ＺZ]/g, 'Z').toLowerCase();
+      const qNorm = norm(q);
+      found = list.find(p => norm(p.display) === qNorm || norm(p.name) === qNorm);
+      if (found) return found;
+
+      // 3. メガ/姿違いの相互解決（例: "メガリザードンY" <-> "リザードン(メガリザードンＹ)")
+      found = list.find(p => {
+        const dNorm = norm(p.display);
+        return dNorm === qNorm || dNorm.includes(qNorm) || qNorm.includes(dNorm);
+      });
+      if (found) return found;
+
+      // 4. ベース名フォールバック
+      const baseName = q.replace(/\(.*\)/, '').trim();
+      return list.find(p => p.name === baseName) || null;
+    }
+
     // ---- DATA ----
     let parties = JSON.parse(localStorage.getItem('pkm_parties') || '[]');
     let records = JSON.parse(localStorage.getItem('pkm_records') || '[]');
