@@ -1,33 +1,44 @@
-# Showdown Sync Script (UTF-8 Clean)
+# Pure ASCII Safe Comprehensive Showdown Sync Script
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
 
-$dataDir = Join-Path $PSScriptRoot "..\data"
+$rootDir = Split-Path $PSScriptRoot -Parent
+$dataDir = Join-Path $rootDir "data"
+$assetsDir = Join-Path $rootDir "assets"
+
 if (-not (Test-Path $dataDir)) { New-Item -ItemType Directory -Path $dataDir | Out-Null }
+if (-not (Test-Path $assetsDir)) { New-Item -ItemType Directory -Path $assetsDir | Out-Null }
 
-Write-Host "=== Pokemon Showdown Data Sync ===" -ForegroundColor Cyan
+Write-Host "=== Pokemon Showdown Comprehensive Sync (Data & Assets) ===" -ForegroundColor Cyan
 
-# 1. Read existing local data with strict UTF-8
-$localPokePath = Join-Path $dataDir "pokemon.json"
-$localMovesPath = Join-Path $dataDir "moves.json"
+# 1. Download Latest Sprite Sheets
+Write-Host "Downloading latest sprite sheets to assets/..." -ForegroundColor Cyan
+$spriteSheetUrl = "https://play.pokemonshowdown.com/sprites/pokemonicons-sheet.png"
+$pokeballSheetUrl = "https://play.pokemonshowdown.com/sprites/pokemonicons-pokeball-sheet.png"
 
-$localPokeJson = [System.IO.File]::ReadAllText($localPokePath, [System.Text.Encoding]::UTF8)
-$localMovesJson = [System.IO.File]::ReadAllText($localMovesPath, [System.Text.Encoding]::UTF8)
+$spritePath = Join-Path $assetsDir "pokemonicons-sheet.png"
+$pokeballPath = Join-Path $assetsDir "pokemonicons-pokeball-sheet.png"
 
-$localPokemon = $localPokeJson | ConvertFrom-Json
-$localMoves = $localMovesJson | ConvertFrom-Json
+try {
+    Invoke-WebRequest -Uri $spriteSheetUrl -OutFile $spritePath -UseBasicParsing
+    Write-Host "Saved assets/pokemonicons-sheet.png" -ForegroundColor Green
+    Invoke-WebRequest -Uri $pokeballSheetUrl -OutFile $pokeballPath -UseBasicParsing
+    Write-Host "Saved assets/pokemonicons-pokeball-sheet.png" -ForegroundColor Green
+} catch {
+    Write-Warning "Could not download sprite sheets: $($_.Exception.Message)"
+}
 
-Write-Host "Loaded local pokemon: $($localPokemon.Count), local moves: $($localMoves.Count)"
-
-# 2. Fetch Showdown data files
+# 2. Download Showdown Text & Data Files
+Write-Host "Downloading Showdown data..." -ForegroundColor Cyan
 $pokedexUrl = "https://raw.githubusercontent.com/smogon/pokemon-showdown/master/data/pokedex.ts"
 $movesUrl = "https://raw.githubusercontent.com/smogon/pokemon-showdown/master/data/moves.ts"
 $learnsetsUrl = "https://raw.githubusercontent.com/smogon/pokemon-showdown/master/data/learnsets.ts"
 $champLsUrl = "https://raw.githubusercontent.com/smogon/pokemon-showdown/master/data/mods/champions/learnsets.ts"
+$battleDexDataUrl = "https://play.pokemonshowdown.com/js/battle-dex-data.js"
 
-Write-Host "Downloading Showdown data..."
 $pokedexRaw = (Invoke-WebRequest -Uri $pokedexUrl -UseBasicParsing).Content
 $movesRaw = (Invoke-WebRequest -Uri $movesUrl -UseBasicParsing).Content
 $learnsetsRaw = (Invoke-WebRequest -Uri $learnsetsUrl -UseBasicParsing).Content
+$battleDexDataRaw = (Invoke-WebRequest -Uri $battleDexDataUrl -UseBasicParsing).Content
 
 $champLsRaw = ""
 try {
@@ -37,7 +48,35 @@ try {
     Write-Warning "Could not download Champions learnsets"
 }
 
-# 3. Build Move ID to Japanese Name
+# 3. Parse BattlePokemonIconIndexes from battle-dex-data.js
+Write-Host "Parsing BattlePokemonIconIndexes (forme icon offsets)..." -ForegroundColor Cyan
+$iconIndexes = [System.Collections.Generic.Dictionary[string, int]]::new()
+
+$iconIdxMatch = [regex]::Match($battleDexDataRaw, '(?s)BattlePokemonIconIndexes\s*=\s*\{([^}]+)\}')
+if ($iconIdxMatch.Success) {
+    $entries = $iconIdxMatch.Groups[1].Value -split ','
+    foreach ($entry in $entries) {
+        if ($entry -match '^\s*([a-z0-9]+)\s*:\s*(.+)$') {
+            $key = $matches[1].Trim()
+            $valExpr = $matches[2].Trim()
+            if ($valExpr -match '(\d+)\s*\+\s*(\d+)') {
+                $iconIndexes[$key] = [int]$matches[1] + [int]$matches[2]
+            } elseif ($valExpr -match '^\d+$') {
+                $iconIndexes[$key] = [int]$valExpr
+            }
+        }
+    }
+}
+Write-Host "Extracted forme icon indexes: $($iconIndexes.Count)" -ForegroundColor Green
+
+# 4. Read local pokemon and moves with strict UTF8
+$localPokePath = Join-Path $dataDir "pokemon.json"
+$localMovesPath = Join-Path $dataDir "moves.json"
+
+$localPokemon = [System.IO.File]::ReadAllText($localPokePath, [System.Text.Encoding]::UTF8) | ConvertFrom-Json
+$localMoves = [System.IO.File]::ReadAllText($localMovesPath, [System.Text.Encoding]::UTF8) | ConvertFrom-Json
+
+# 5. Build Move ID to Japanese Name
 $moveIdToName = [System.Collections.Generic.Dictionary[string, string]]::new()
 $moveNameToId = [System.Collections.Generic.Dictionary[string, string]]::new()
 
@@ -56,8 +95,8 @@ foreach ($m in $moveMatches) {
     }
 }
 
-# 4. Parse Base Learnsets
-Write-Host "Parsing base learnsets (with latest-gen fallback)..."
+# 6. Parse Learnsets (Champions Priority + Latest-Gen Fallback)
+Write-Host "Parsing learnsets..." -ForegroundColor Cyan
 $rawLearnsets = [System.Collections.Generic.Dictionary[string, System.Collections.Generic.List[string]]]::new()
 
 $lsSections = [regex]::Matches($learnsetsRaw, '(?m)^\s*([a-z0-9]+):\s*\{\s*learnset:\s*\{([^}]+)\}')
@@ -67,7 +106,6 @@ foreach ($sec in $lsSections) {
     
     $mEntries = [regex]::Matches($body, '([a-z0-9]+):\s*\[(.*?)\]')
     
-    # Find max generation
     $maxGen = 0
     foreach ($entry in $mEntries) {
         $sources = $entry.Groups[2].Value
@@ -95,7 +133,6 @@ foreach ($sec in $lsSections) {
     $rawLearnsets[$specKey] = $mList
 }
 
-# 5. Override / Merge with Champions Mod
 if ($champLsRaw) {
     $champSections = [regex]::Matches($champLsRaw, '(?m)^\s*([a-z0-9]+):\s*\{\s*learnset:\s*\{([^}]+)\}')
     foreach ($sec in $champSections) {
@@ -115,68 +152,116 @@ if ($champLsRaw) {
     }
 }
 
-# 6. Map Showdown species num to baseId
-$numToBaseId = [System.Collections.Generic.Dictionary[int, string]]::new()
-$pokeSections = [regex]::Matches($pokedexRaw, '(?m)^\s*([a-z0-9]+):\s*\{\s*num:\s*(-?\d+)')
-foreach ($ps in $pokeSections) {
-    $id = $ps.Groups[1].Value
-    $num = [int]$ps.Groups[2].Value
-    if (-not $numToBaseId.ContainsKey($num)) {
-        $numToBaseId[$num] = $id
+# 7. Map Pokedex Species: group species by num
+$pokedexSpeciesByNum = [System.Collections.Generic.Dictionary[int, System.Collections.Generic.List[object]]]::new()
+
+$pokeBlocks = [regex]::Matches($pokedexRaw, '(?m)^\s*([a-z0-9]+):\s*\{\s*num:\s*(-?\d+)(?:,\s*name:\s*"([^"]+)")?(?:[^{}]*?baseSpecies:\s*"([^"]+)")?(?:[^{}]*?forme:\s*"([^"]+)")?')
+foreach ($pb in $pokeBlocks) {
+    $sId = $pb.Groups[1].Value
+    $sNum = [int]$pb.Groups[2].Value
+    $sName = $pb.Groups[3].Value
+    $sBase = $pb.Groups[4].Value
+    $sForme = $pb.Groups[5].Value
+    
+    $obj = @{
+        id = $sId
+        num = $sNum
+        name = $sName
+        baseSpecies = $sBase
+        forme = $sForme
     }
+    
+    if (-not $pokedexSpeciesByNum.ContainsKey($sNum)) {
+        $pokedexSpeciesByNum[$sNum] = [System.Collections.Generic.List[object]]::new()
+    }
+    $pokedexSpeciesByNum[$sNum].Add($obj)
 }
 
-# 7. Map each localPokemon item to its learnset
-Write-Host "Mapping learnsets for all pokemon displays..."
+# 8. Assign iconIndex and build final learnsets
+Write-Host "Updating pokemon.json with iconIndex and generating learnsets.json..." -ForegroundColor Cyan
 $finalLearnsets = [System.Collections.Generic.Dictionary[string, object]]::new()
 
+# Group local pokemon by no
+$localByNo = [System.Collections.Generic.Dictionary[int, System.Collections.Generic.List[object]]]::new()
 foreach ($lp in $localPokemon) {
-    $disp = [string]$lp.display
-    $name = [string]$lp.name
-    $num = [int]$lp.no
-    $form = [string]$lp.form
+    $n = [int]$lp.no
+    if (-not $localByNo.ContainsKey($n)) {
+        $localByNo[$n] = [System.Collections.Generic.List[object]]::new()
+    }
+    $localByNo[$n].Add($lp)
+}
+
+foreach ($nKey in $localByNo.Keys) {
+    $cands = $localByNo[$nKey]
+    $showdownSpecies = if ($pokedexSpeciesByNum.ContainsKey($nKey)) { $pokedexSpeciesByNum[$nKey] } else { @() }
     
-    $movesFound = $null
+    $baseShowdown = $showdownSpecies | Where-Object { -not $_.baseSpecies -or $_.id -eq $_.baseSpecies.ToLower() } | Select-Object -First 1
+    if (-not $baseShowdown -and $showdownSpecies.Count -gt 0) { $baseShowdown = $showdownSpecies[0] }
+    $baseId = if ($baseShowdown) { $baseShowdown.id } else { "" }
     
-    if ($numToBaseId.ContainsKey($num)) {
-        $baseId = $numToBaseId[$num]
+    for ($cIdx = 0; $cIdx -lt $cands.Count; $cIdx++) {
+        $cand = $cands[$cIdx]
+        $disp = [string]$cand.display
+        $pName = [string]$cand.name
         
-        # Check form-specific id first
-        if ($form -and $form -ne '通常') {
-            $normForm = ($form -replace '[^a-zA-Z0-9]', '').ToLower()
-            $candId = $baseId + $normForm
-            if ($rawLearnsets.ContainsKey($candId) -and $rawLearnsets[$candId].Count -gt 0) {
-                $movesFound = $rawLearnsets[$candId]
+        $resolvedId = $baseId
+        $iconIdx = $nKey # default is national dex no
+        
+        if ($cIdx -eq 0) {
+            # Base form
+            $resolvedId = $baseId
+            if ($iconIndexes.ContainsKey($baseId)) {
+                $iconIdx = $iconIndexes[$baseId]
             }
+        } elseif ($cIdx -lt $showdownSpecies.Count) {
+            # Corresponding forme by index
+            $matchedS = $showdownSpecies[$cIdx]
+            $resolvedId = $matchedS.id
+            if ($iconIndexes.ContainsKey($matchedS.id)) {
+                $iconIdx = $iconIndexes[$matchedS.id]
+            }
+        } else {
+            # If extra forms beyond showdown list, use base
+            $resolvedId = $baseId
         }
         
-        # Fallback to baseId
-        if (-not $movesFound -and $rawLearnsets.ContainsKey($baseId) -and $rawLearnsets[$baseId].Count -gt 0) {
+        # Set iconIndex property
+        $cand | Add-Member -NotePropertyName "iconIndex" -NotePropertyValue $iconIdx -Force
+        
+        # Get learnset
+        $movesFound = $null
+        if ($resolvedId -and $rawLearnsets.ContainsKey($resolvedId) -and $rawLearnsets[$resolvedId].Count -gt 0) {
+            $movesFound = $rawLearnsets[$resolvedId]
+        } elseif ($baseId -and $rawLearnsets.ContainsKey($baseId) -and $rawLearnsets[$baseId].Count -gt 0) {
             $movesFound = $rawLearnsets[$baseId]
         }
-    }
-    
-    if ($movesFound) {
-        $finalLearnsets[$disp] = $movesFound.ToArray()
-        if ($name -and -not $finalLearnsets.ContainsKey($name)) {
-            $finalLearnsets[$name] = $movesFound.ToArray()
+        
+        if ($movesFound) {
+            $finalLearnsets[$disp] = $movesFound.ToArray()
+            if ($pName -and -not $finalLearnsets.ContainsKey($pName)) {
+                $finalLearnsets[$pName] = $movesFound.ToArray()
+            }
         }
     }
 }
 
-# Add raw english keys as well
+# Add english raw keys
 foreach ($kv in $rawLearnsets) {
     if (-not $finalLearnsets.ContainsKey($kv.Key) -and $kv.Value.Count -gt 0) {
         $finalLearnsets[$kv.Key] = $kv.Value.ToArray()
     }
 }
 
-Write-Host "Total entries in final learnset: $($finalLearnsets.Count)" -ForegroundColor Green
+# 9. Save all data files with UTF-8
+[System.IO.File]::WriteAllText($localPokePath, ($localPokemon | ConvertTo-Json -Depth 10), [System.Text.Encoding]::UTF8)
+Write-Host "Updated and saved data/pokemon.json with iconIndex" -ForegroundColor Green
 
-# 8. Save learnsets.json with UTF-8 encoding
-$learnsetsJson = $finalLearnsets | ConvertTo-Json -Depth 10
-$learnsetsFile = Join-Path $dataDir "learnsets.json"
-[System.IO.File]::WriteAllText($learnsetsFile, $learnsetsJson, [System.Text.Encoding]::UTF8)
-Write-Host "Saved data/learnsets.json successfully." -ForegroundColor Green
+[System.IO.File]::WriteAllText((Join-Path $dataDir "learnsets.json"), ($finalLearnsets | ConvertTo-Json -Depth 10), [System.Text.Encoding]::UTF8)
+Write-Host "Saved data/learnsets.json" -ForegroundColor Green
 
-Write-Host "`n=== Sync Complete Successfully! ===" -ForegroundColor Cyan
+$transObj = [System.Collections.Generic.Dictionary[string, object]]::new()
+$transObj["moves"] = $moveNameToId
+[System.IO.File]::WriteAllText((Join-Path $dataDir "translation_map.json"), ($transObj | ConvertTo-Json -Depth 10), [System.Text.Encoding]::UTF8)
+Write-Host "Saved data/translation_map.json" -ForegroundColor Green
+
+Write-Host "`n=== Comprehensive Sync Complete Successfully! ===" -ForegroundColor Cyan
