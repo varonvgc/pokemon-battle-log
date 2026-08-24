@@ -2397,26 +2397,46 @@
       if (typeof query === 'object' && query.display) return query;
 
       const q = String(query).trim();
-      // 1. 完全一致
+      // 1. display または name の完全一致
       let found = list.find(p => p.display === q || p.name === q);
       if (found) return found;
 
-      // 2. 全角半角・記号正規化
-      const norm = s => s.replace(/[（）()]/g, '').replace(/[ＸX]/g, 'X').replace(/[ＹY]/g, 'Y').replace(/[ＺZ]/g, 'Z').toLowerCase();
+      const norm = s => (s || '').replace(/[（）()]/g, '').replace(/[ＸX]/g, 'X').replace(/[ＹY]/g, 'Y').replace(/[ＺZ]/g, 'Z').toLowerCase();
       const qNorm = norm(q);
-      found = list.find(p => norm(p.display) === qNorm || norm(p.name) === qNorm);
+
+      // 2. display, name, form の正規化完全一致
+      found = list.find(p => norm(p.display) === qNorm || norm(p.name) === qNorm || norm(p.form) === qNorm);
       if (found) return found;
 
-      // 3. メガ/姿違いの相互解決（例: "メガリザードンY" <-> "リザードン(メガリザードンＹ)")
+      // 3. フォーム名（form）の完全一致（例: "メガリザードンY" -> p.form === "メガリザードンＹ"）
       found = list.find(p => {
-        const dNorm = norm(p.display);
-        return dNorm === qNorm || dNorm.includes(qNorm) || qNorm.includes(dNorm);
+        const fNorm = norm(p.form);
+        return fNorm && fNorm !== '通常' && fNorm === qNorm;
       });
       if (found) return found;
 
-      // 4. ベース名フォールバック
-      const baseName = q.replace(/\(.*\)/, '').trim();
-      return list.find(p => p.name === baseName) || null;
+      // 4. メガ・フォルム名を含む候補の中で、最も name が長い（最も具体的な）ものを探す
+      // （※ "メガリザードンY" で "リザード" に誤爆せず "リザードン(メガリザードンＹ)" を選択）
+      const matchedForms = list.filter(p => {
+        const dNorm = norm(p.display);
+        const fNorm = norm(p.form);
+        return (fNorm && fNorm !== '通常' && (dNorm.includes(qNorm) || qNorm.includes(fNorm)));
+      });
+      if (matchedForms.length) {
+        matchedForms.sort((a, b) => (b.name.length - a.name.length) || (b.display.length - a.display.length));
+        return matchedForms[0];
+      }
+
+      // 5. ベース名完全一致フォールバック（例: "リザードン(メガ...)" -> "リザードン"）
+      const baseName = q.replace(/\(.*\)/, '').replace(/^メガ/, '').trim();
+      const baseNorm = norm(baseName);
+      const baseCand = list.filter(p => norm(p.name) === baseNorm);
+      if (baseCand.length) {
+        const normal = baseCand.find(p => p.form === '通常' || p.display === p.name);
+        return normal || baseCand[0];
+      }
+
+      return null;
     }
 
     // ---- DATA ----
