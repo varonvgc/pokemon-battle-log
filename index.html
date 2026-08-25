@@ -2352,16 +2352,23 @@
       _masterDataPromise = (async () => {
         try {
           const v = Date.now();
-          const [pokeRes, moveRes, itemRes, lsRes, msRes] = await Promise.all([
+          const [pokeRes, moveRes, itemRes, lsRes, msRes, verRes] = await Promise.all([
             fetch('data/pokemon.json?v=' + v),
             fetch('data/moves.json?v=' + v),
             fetch('data/items.json?v=' + v),
             fetch('data/learnsets.json?v=' + v).catch(() => null),
-            fetch('data/mega_stones.json?v=' + v).catch(() => null)
+            fetch('data/mega_stones.json?v=' + v).catch(() => null),
+            fetch('data/version.json?v=' + v).catch(() => null)
           ]);
           POKEMON_LIST = await pokeRes.json();
           MOVES_LIST = await moveRes.json();
           ITEMS_LIST = await itemRes.json();
+          if (verRes && verRes.ok) {
+            try {
+              window.STATIC_VERSION_DATA = await verRes.json();
+              console.log('STATIC_VERSION_DATA loaded:', window.STATIC_VERSION_DATA);
+            } catch (e) { }
+          }
           if (lsRes && lsRes.ok) {
             try {
               LEARNSETS_DATA = await lsRes.json();
@@ -3672,6 +3679,8 @@
       const itemOverrides = {};
       localItems.forEach(it => { if (!it.confirmed) itemOverrides[it.name] = false; });
 
+      const staticVer = window.STATIC_VERSION_DATA?.version || Date.now();
+      localStorage.setItem('pkm_master_static_version', String(staticVer));
       localStorage.setItem('pkm_confirmed_overrides', JSON.stringify(overrides));
       localStorage.setItem('pkm_master_moves', JSON.stringify(localMoves));
       localStorage.setItem('pkm_item_overrides', JSON.stringify(itemOverrides));
@@ -3681,21 +3690,29 @@
         // 全アカウント共通の shared コレクションに保存
         await window._firestoreOps.setDoc(
           window._firestoreOps.doc(window._db, 'shared', 'master'),
-          { overrides, moves: localMoves, itemOverrides, updatedAt: window._firestoreOps.serverTimestamp() }
+          { masterVersion: staticVer, overrides, moves: localMoves, itemOverrides, updatedAt: window._firestoreOps.serverTimestamp() }
         );
       } catch (e) { console.error('Master save error:', e); }
     }
 
     async function dmLoadMasterData() {
       await loadStaticMasterData();
-      // 常にFirestoreから最新データを取得してlocalStorageキャッシュを上書きする
-      // （localStorageを先読みしない→リロードで必ず最新が反映される）
+      const staticVer = window.STATIC_VERSION_DATA?.version || 0;
+      const localAppliedVer = parseInt(localStorage.getItem('pkm_master_static_version') || '0', 10);
+      const isStaticRefreshed = staticVer > localAppliedVer;
+
       function applyOverrides(overrides) {
         try {
           localPokemon.forEach(p => {
             if (p.display in overrides) p.confirmed = overrides[p.display];
           });
         } catch (e) { }
+      }
+
+      if (isStaticRefreshed) {
+        console.log(`[MasterSync] Static master refreshed (v${staticVer} > v${localAppliedVer}). Auto-resetting legacy local overrides.`);
+        localStorage.removeItem('pkm_confirmed_overrides');
+        localStorage.setItem('pkm_master_static_version', String(staticVer));
       }
 
       if (!_fbReady) {
@@ -3717,20 +3734,40 @@
         );
         if (snap.exists()) {
           const d = snap.data();
-          if (d.overrides) {
-            localStorage.setItem('pkm_confirmed_overrides', JSON.stringify(d.overrides));
-            applyOverrides(d.overrides);
+          const fbMasterVer = d.masterVersion || 0;
+
+          // 静的データがFirebaseのバージョンより新しい場合、古いFirebaseのoverridesを破棄して最新静的データを正とする
+          if (staticVer > fbMasterVer) {
+            console.log(`[MasterSync] Static data is newer than Firebase (v${staticVer} > v${fbMasterVer}). Discarding outdated Firebase overrides.`);
+            localStorage.removeItem('pkm_confirmed_overrides');
+            localStorage.setItem('pkm_master_static_version', String(staticVer));
+            
+            // 管理者の場合はFirebase側も自動的にクリーン更新
+            if (isAdmin()) {
+              try {
+                await window._firestoreOps.setDoc(
+                  window._firestoreOps.doc(window._db, 'shared', 'master'),
+                  { masterVersion: staticVer, overrides: {}, moves: localMoves, itemOverrides: {}, updatedAt: window._firestoreOps.serverTimestamp() }
+                );
+                console.log('[MasterSync] Firebase shared/master cleaned and updated to version:', staticVer);
+              } catch (err) { }
+            }
+          } else {
+            // Firebase側が最新または同等バージョンの場合、ユーザーが手動で設定した差分を適用
+            if (d.overrides) {
+              localStorage.setItem('pkm_confirmed_overrides', JSON.stringify(d.overrides));
+              applyOverrides(d.overrides);
+            }
           }
-          if (d.moves) {
+
+          if (d.moves && staticVer <= fbMasterVer) {
             localMoves = d.moves.map(m => ({ confirmed: true, ...m }));
             localStorage.setItem('pkm_master_moves', JSON.stringify(localMoves));
           }
-          if (d.itemOverrides) {
+          if (d.itemOverrides && staticVer <= fbMasterVer) {
             localStorage.setItem('pkm_item_overrides', JSON.stringify(d.itemOverrides));
             localItems.forEach(it => { it.confirmed = !(it.name in d.itemOverrides && !d.itemOverrides[it.name]); });
           }
-        } else {
-          // shared/masterがまだ存在しない場合はデフォルト値を使用（何もしない）
         }
       } catch (e) {
         console.error('Master load error:', e);

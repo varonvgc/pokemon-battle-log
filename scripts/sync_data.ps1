@@ -41,6 +41,8 @@ $pokedexUrl = "https://raw.githubusercontent.com/smogon/pokemon-showdown/master/
 $movesUrl = "https://raw.githubusercontent.com/smogon/pokemon-showdown/master/data/moves.ts"
 $learnsetsUrl = "https://raw.githubusercontent.com/smogon/pokemon-showdown/master/data/learnsets.ts"
 $champLsUrl = "https://raw.githubusercontent.com/smogon/pokemon-showdown/master/data/mods/champions/learnsets.ts"
+$formatsDataUrl = "https://raw.githubusercontent.com/smogon/pokemon-showdown/master/data/formats-data.ts"
+$champFdUrl = "https://raw.githubusercontent.com/smogon/pokemon-showdown/master/data/mods/champions/formats-data.ts"
 $battleDexDataUrl = "https://play.pokemonshowdown.com/js/battle-dex-data.js"
 
 $speciesCsvUrl = "https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv"
@@ -50,6 +52,7 @@ $formNamesCsvUrl = "https://raw.githubusercontent.com/PokeAPI/pokeapi/master/dat
 $pokedexRaw = (Invoke-WebRequest -Uri $pokedexUrl -UseBasicParsing).Content
 $movesRaw = (Invoke-WebRequest -Uri $movesUrl -UseBasicParsing).Content
 $learnsetsRaw = (Invoke-WebRequest -Uri $learnsetsUrl -UseBasicParsing).Content
+$formatsDataRaw = (Invoke-WebRequest -Uri $formatsDataUrl -UseBasicParsing).Content
 $battleDexDataRaw = (Invoke-WebRequest -Uri $battleDexDataUrl -UseBasicParsing).Content
 
 $speciesCsvRaw = (Invoke-WebRequest -Uri $speciesCsvUrl -UseBasicParsing).Content | ConvertFrom-Csv
@@ -62,6 +65,14 @@ try {
     Write-Host "Downloaded Champions mod learnsets.ts" -ForegroundColor Green
 } catch {
     Write-Warning "Could not download Champions learnsets"
+}
+
+$champFdRaw = ""
+try {
+    $champFdRaw = (Invoke-WebRequest -Uri $champFdUrl -UseBasicParsing).Content
+    Write-Host "Downloaded Champions mod formats-data.ts" -ForegroundColor Green
+} catch {
+    Write-Warning "Could not download Champions formats-data"
 }
 
 # 3. Build Official Japanese Pokemon Name Map from PokeAPI
@@ -112,7 +123,57 @@ if ($iconIdxMatch.Success) {
 }
 Write-Host "Extracted forme icon indexes: $($iconIndexes.Count)" -ForegroundColor Green
 
-# 6. Read translations, local items, existing pokemon (to preserve confirmed flags)
+# 6. Parse Showdown Regulation & Tier Formats-Data (Champions Priority + SV Standard)
+function Parse-FormatsData($raw) {
+    $dict = @{}
+    $matches = [regex]::Matches($raw, '(?ms)^\t([a-z0-9]+):\s*\{(.*?)\n\t\},')
+    foreach ($m in $matches) {
+        $id = $m.Groups[1].Value
+        $body = $m.Groups[2].Value
+        
+        $tierMatch = [regex]::Match($body, 'tier:\s*"([^"]+)"')
+        $tier = if ($tierMatch.Success) { $tierMatch.Groups[1].Value } else { "" }
+        
+        $nonstdMatch = [regex]::Match($body, 'isNonstandard:\s*"([^"]+)"')
+        $nonstd = if ($nonstdMatch.Success) { $nonstdMatch.Groups[1].Value } else { "" }
+        
+        $dict[$id] = @{ tier = $tier; isNonstandard = $nonstd }
+    }
+    return $dict
+}
+
+$baseFd = Parse-FormatsData $formatsDataRaw
+$champFd = if ($champFdRaw) { Parse-FormatsData $champFdRaw } else { @{} }
+
+function Is-ConfirmedSpecies($id, $baseSpeciesId) {
+    # 1. Champions mod check
+    if ($champFd.ContainsKey($id)) {
+        $info = $champFd[$id]
+        if ($info.isNonstandard -or $info.tier -eq "Illegal") { return $false }
+        if ($info.tier) { return $true }
+    }
+    if ($baseSpeciesId -and $champFd.ContainsKey($baseSpeciesId)) {
+        $info = $champFd[$baseSpeciesId]
+        if ($info.isNonstandard -or $info.tier -eq "Illegal") { return $false }
+        if ($info.tier) { return $true }
+    }
+    
+    # 2. Base SV Standard check
+    if ($baseFd.ContainsKey($id)) {
+        $info = $baseFd[$id]
+        if ($info.isNonstandard -or $info.tier -eq "Illegal") { return $false }
+        if ($info.tier) { return $true }
+    }
+    if ($baseSpeciesId -and $baseFd.ContainsKey($baseSpeciesId)) {
+        $info = $baseFd[$baseSpeciesId]
+        if ($info.isNonstandard -or $info.tier -eq "Illegal") { return $false }
+        if ($info.tier) { return $true }
+    }
+    
+    return $false
+}
+
+# 7. Read translations, local items, existing pokemon
 $transPath = Join-Path $scriptsDir "translations.json"
 $typeMap = @{}
 $abilityMap = @{}
@@ -129,15 +190,7 @@ if (Test-Path $transPath) {
 $localPokePath = Join-Path $dataDir "pokemon.json"
 $localMovesPath = Join-Path $dataDir "moves.json"
 $localItemsPath = Join-Path $dataDir "items.json"
-
-$existingConfirmed = @{}
-if (Test-Path $localPokePath) {
-    $existingPokemon = [System.IO.File]::ReadAllText($localPokePath, [System.Text.Encoding]::UTF8) | ConvertFrom-Json
-    foreach ($p in $existingPokemon) {
-        $existingConfirmed[[string]$p.display] = [bool]$p.confirmed
-    }
-    Write-Host "Preserved existing confirmed flags: $($existingConfirmed.Count) entries." -ForegroundColor Green
-}
+$versionPath = Join-Path $dataDir "version.json"
 
 $localMoves = if (Test-Path $localMovesPath) { [System.IO.File]::ReadAllText($localMovesPath, [System.Text.Encoding]::UTF8) | ConvertFrom-Json } else { @() }
 $localItems = if (Test-Path $localItemsPath) { [System.IO.File]::ReadAllText($localItemsPath, [System.Text.Encoding]::UTF8) | ConvertFrom-Json } else { @() }
@@ -156,7 +209,7 @@ function Convert-AbilityJp([string]$engAbility) {
     return $engAbility
 }
 
-# 7. Build Move ID to Japanese Name
+# 8. Build Move ID to Japanese Name
 $moveIdToName = [System.Collections.Generic.Dictionary[string, string]]::new()
 $moveNameToId = [System.Collections.Generic.Dictionary[string, string]]::new()
 
@@ -174,7 +227,7 @@ foreach ($m in $moveMatches) {
     }
 }
 
-# 8. Parse Learnsets (Champions Priority + Latest-Gen Fallback)
+# 9. Parse Learnsets (Champions Priority + Latest-Gen Fallback)
 Write-Host "Parsing learnsets..." -ForegroundColor Cyan
 $rawLearnsets = [System.Collections.Generic.Dictionary[string, System.Collections.Generic.List[string]]]::new()
 
@@ -229,10 +282,9 @@ if ($champLsRaw) {
     }
 }
 
-# 9. Parse Showdown Pokedex and construct Master Pokemon List
+# 10. Parse Showdown Pokedex and construct Master Pokemon List
 Write-Host "Constructing Pokemon Master list from Showdown pokedex.ts..." -ForegroundColor Cyan
 
-# Forme dictionary (Pure Unicode unescaped)
 $uNormal = [System.Text.RegularExpressions.Regex]::Unescape("\u901a\u5e38")
 $uMega = [System.Text.RegularExpressions.Regex]::Unescape("\u30e1\u30ac")
 $uMeganium = [System.Text.RegularExpressions.Regex]::Unescape("\u30e1\u30ac\u30cb\u30a6\u30e0")
@@ -313,6 +365,8 @@ $pokeDetailedBlocks = [regex]::Matches($pokedexRaw, '(?ms)^\t([a-z0-9]+):\s*\{(.
 $finalPokemonList = [System.Collections.Generic.List[object]]::new()
 $finalLearnsets = [System.Collections.Generic.Dictionary[string, object]]::new()
 
+$confirmedCount = 0
+
 foreach ($pb in $pokeDetailedBlocks) {
     $sId = $pb.Groups[1].Value
     $body = $pb.Groups[2].Value
@@ -327,6 +381,7 @@ foreach ($pb in $pokeDetailedBlocks) {
     
     $baseMatch = [regex]::Match($body, 'baseSpecies:\s*"([^"]+)"')
     $sBase = if ($baseMatch.Success) { $baseMatch.Groups[1].Value } else { "" }
+    $baseSpecKey = if ($sBase) { ($sBase.ToLower() -replace '[^a-z0-9]', '') } else { "" }
     
     $formeMatch = [regex]::Match($body, 'forme:\s*"([^"]+)"')
     $sForme = if ($formeMatch.Success) { $formeMatch.Groups[1].Value } else { "" }
@@ -365,7 +420,6 @@ foreach ($pb in $pokeDetailedBlocks) {
     $jpForm = $uNormal
     $cleanFormeKey = $sForme.ToLower().Replace(" ", "").Replace("-", "")
     
-    # Check PokeAPI Form Map first (e.g. arceus-bug, silvally-poison, etc.)
     $pokeapiLookupKey = ($sName.ToLower() -replace '\s+', '-').Replace("%", "")
     $pokeapiMatch = $null
     if ($pokeapiFormMap.ContainsKey($pokeapiLookupKey)) {
@@ -392,7 +446,6 @@ foreach ($pb in $pokeDetailedBlocks) {
         $jpForm = $uMega + $jpBaseName + [System.Text.RegularExpressions.Regex]::Unescape("\uff3a") # 全角Ｚ
         $jpDisplay = "$jpBaseName($jpForm)"
     } elseif ($typeMap.ContainsKey($sForme)) {
-        # Arceus & Silvally (forme is type name: Bug, Poison, Ice, etc.)
         $jpForm = $typeMap[$sForme]
         $jpDisplay = "$jpBaseName($jpForm)"
     } elseif ($pokeapiMatch) {
@@ -433,13 +486,9 @@ foreach ($pb in $pokeDetailedBlocks) {
     }
     $abH = if ($sAbilities.ContainsKey('H')) { Convert-AbilityJp $sAbilities['H'] } else { "" }
     
-    # 6. Confirmed Flag (Preserve existing confirmed status)
-    $isConfirmed = $false
-    if ($existingConfirmed.ContainsKey($jpDisplay)) {
-        $isConfirmed = $existingConfirmed[$jpDisplay]
-    } elseif ($existingConfirmed.ContainsKey($jpBaseName)) {
-        $isConfirmed = $existingConfirmed[$jpBaseName]
-    }
+    # 6. Showdown Regulation-based Confirmed Flag
+    $isConfirmed = Is-ConfirmedSpecies $sId $baseSpecKey
+    if ($isConfirmed) { $confirmedCount++ }
     
     # 7. Icon Index
     $iconIdx = $sNum
@@ -492,9 +541,9 @@ foreach ($kv in $rawLearnsets) {
     }
 }
 
-Write-Host "Constructed $($finalPokemonList.Count) Master Pokemon entries." -ForegroundColor Green
+Write-Host "Constructed $($finalPokemonList.Count) Master Pokemon entries. ($confirmedCount confirmed based on Showdown rules)" -ForegroundColor Green
 
-# 10. Build and generate mega_stones.json
+# 11. Build and generate mega_stones.json
 Write-Host "Generating data/mega_stones.json mapping..." -ForegroundColor Cyan
 $strMega = [System.Text.Encoding]::UTF8.GetString(@(0xE3, 0x83, 0xA1, 0xE3, 0x82, 0xAC))
 $strKnight = [System.Text.Encoding]::UTF8.GetString(@(0xE3, 0x83, 0x8A, 0xE3, 0x82, 0xA4, 0xE3, 0x83, 0x88))
@@ -556,7 +605,6 @@ foreach ($it in $stoneItems) {
     }
     
     if ($clean -eq [System.Text.Encoding]::UTF8.GetString(@(0xE3,0x83,0xA1,0xE3,0x82,0xAC,0xE3,0x83,0x8B,0xE3,0x82,0xA6,0xE3,0x83,0xA0))) {
-        # メガニウム -> メガニウム(メガメガニウム)
         $mCand = $megaPokes | Where-Object { $_.display.IndexOf([System.Text.Encoding]::UTF8.GetString(@(0xE3,0x83,0xA1,0xE3,0x82,0xAC,0xE3,0x83,0xA1,0xE3,0x82,0xAC,0xE3,0x83,0x8B,0xE3,0x82,0xA6,0xE3,0x83,0xA0))) -ge 0 } | Select-Object -First 1
         if ($mCand) { $bestMatch = $mCand.display }
     }
@@ -566,7 +614,19 @@ foreach ($it in $stoneItems) {
     }
 }
 
-# 11. Save all data files with strict UTF-8
+# 12. Save version.json (Unique timestamp for auto-reset in frontend)
+$currentTimestamp = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
+$versionObj = [PSCustomObject]@{
+    version      = $currentTimestamp
+    updatedAt    = (Get-Date).ToString("yyyy-MM-ddTHH:mm:sszzz")
+    regulation   = "Champions (Reg M-B)"
+    totalPokemon = $finalPokemonList.Count
+    confirmed    = $confirmedCount
+}
+[System.IO.File]::WriteAllText($versionPath, ($versionObj | ConvertTo-Json -Depth 5), [System.Text.Encoding]::UTF8)
+Write-Host "Saved data/version.json (Version: $currentTimestamp)" -ForegroundColor Green
+
+# 13. Save all data files with strict UTF-8
 [System.IO.File]::WriteAllText($localPokePath, ($finalPokemonList | ConvertTo-Json -Depth 10), [System.Text.Encoding]::UTF8)
 Write-Host "Saved data/pokemon.json ($($finalPokemonList.Count) total entries)" -ForegroundColor Green
 
