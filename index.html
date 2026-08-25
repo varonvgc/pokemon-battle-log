@@ -5078,12 +5078,12 @@
     // display名からポケモンデータを取得してスプライトHTMLを返す
     function getPokeSpriteHTMLByDisplay(display) {
       if (!display) return '';
-      const p = (localPokemon || POKEMON_LIST).find(pk => pk.display === display);
+      const p = findPokemon(display) || (localPokemon || POKEMON_LIST).find(pk => pk.display === display);
       if (!p) {
         // データが見つからない場合はテキスト表示
         return `<span class="poke-tag">${display}</span>`;
       }
-      return getPokeSpriteHTML(display, p.no, p.form, p.name);
+      return getPokeSpriteHTML(p.display || display, p.no, p.form, p.name);
     }
 
 

@@ -35,20 +35,26 @@ try {
     Write-Warning "Could not download sprite sheets: $($_.Exception.Message)"
 }
 
-# 2. Download Showdown Text & Data Files
-Write-Host "Downloading Showdown data & PokeAPI official Japanese names..." -ForegroundColor Cyan
+# 2. Download Showdown Text & Data Files and PokeAPI Official Master Data
+Write-Host "Downloading Showdown data & PokeAPI official Japanese master files..." -ForegroundColor Cyan
 $pokedexUrl = "https://raw.githubusercontent.com/smogon/pokemon-showdown/master/data/pokedex.ts"
 $movesUrl = "https://raw.githubusercontent.com/smogon/pokemon-showdown/master/data/moves.ts"
 $learnsetsUrl = "https://raw.githubusercontent.com/smogon/pokemon-showdown/master/data/learnsets.ts"
 $champLsUrl = "https://raw.githubusercontent.com/smogon/pokemon-showdown/master/data/mods/champions/learnsets.ts"
 $battleDexDataUrl = "https://play.pokemonshowdown.com/js/battle-dex-data.js"
+
 $speciesCsvUrl = "https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv"
+$formsCsvUrl = "https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_forms.csv"
+$formNamesCsvUrl = "https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_form_names.csv"
 
 $pokedexRaw = (Invoke-WebRequest -Uri $pokedexUrl -UseBasicParsing).Content
 $movesRaw = (Invoke-WebRequest -Uri $movesUrl -UseBasicParsing).Content
 $learnsetsRaw = (Invoke-WebRequest -Uri $learnsetsUrl -UseBasicParsing).Content
 $battleDexDataRaw = (Invoke-WebRequest -Uri $battleDexDataUrl -UseBasicParsing).Content
+
 $speciesCsvRaw = (Invoke-WebRequest -Uri $speciesCsvUrl -UseBasicParsing).Content | ConvertFrom-Csv
+$formsCsvRaw = (Invoke-WebRequest -Uri $formsCsvUrl -UseBasicParsing).Content | ConvertFrom-Csv
+$formNamesCsvRaw = (Invoke-WebRequest -Uri $formNamesCsvUrl -UseBasicParsing).Content | ConvertFrom-Csv
 
 $champLsRaw = ""
 try {
@@ -70,7 +76,23 @@ foreach ($row in $speciesCsvRaw) {
 }
 Write-Host "Loaded official Japanese Pokemon species: $($speciesJpMap.Count)" -ForegroundColor Green
 
-# 4. Parse BattlePokemonIconIndexes from battle-dex-data.js
+# 4. Build Official Japanese Form Name Map from PokeAPI
+$pokeapiFormMap = @{}
+$formsDict = @{}
+foreach ($f in $formsCsvRaw) {
+    $formsDict[[int]$f.id] = $f.identifier.ToLower()
+}
+foreach ($fn in $formNamesCsvRaw) {
+    if ($fn.local_language_id -in @("1", "11") -and $fn.form_name) {
+        $fId = [int]$fn.pokemon_form_id
+        if ($formsDict.ContainsKey($fId)) {
+            $pokeapiFormMap[$formsDict[$fId]] = $fn.form_name
+        }
+    }
+}
+Write-Host "Loaded official Japanese PokeAPI forms: $($pokeapiFormMap.Count)" -ForegroundColor Green
+
+# 5. Parse BattlePokemonIconIndexes from battle-dex-data.js
 Write-Host "Parsing BattlePokemonIconIndexes (forme icon offsets)..." -ForegroundColor Cyan
 $iconIndexes = [System.Collections.Generic.Dictionary[string, int]]::new()
 $iconIdxMatch = [regex]::Match($battleDexDataRaw, '(?s)BattlePokemonIconIndexes\s*=\s*\{([^}]+)\}')
@@ -90,7 +112,7 @@ if ($iconIdxMatch.Success) {
 }
 Write-Host "Extracted forme icon indexes: $($iconIndexes.Count)" -ForegroundColor Green
 
-# 5. Read translations, local items, existing pokemon (to preserve confirmed flags)
+# 6. Read translations, local items, existing pokemon (to preserve confirmed flags)
 $transPath = Join-Path $scriptsDir "translations.json"
 $typeMap = @{}
 $abilityMap = @{}
@@ -134,7 +156,7 @@ function Convert-AbilityJp([string]$engAbility) {
     return $engAbility
 }
 
-# 6. Build Move ID to Japanese Name
+# 7. Build Move ID to Japanese Name
 $moveIdToName = [System.Collections.Generic.Dictionary[string, string]]::new()
 $moveNameToId = [System.Collections.Generic.Dictionary[string, string]]::new()
 
@@ -152,7 +174,7 @@ foreach ($m in $moveMatches) {
     }
 }
 
-# 7. Parse Learnsets (Champions Priority + Latest-Gen Fallback)
+# 8. Parse Learnsets (Champions Priority + Latest-Gen Fallback)
 Write-Host "Parsing learnsets..." -ForegroundColor Cyan
 $rawLearnsets = [System.Collections.Generic.Dictionary[string, System.Collections.Generic.List[string]]]::new()
 
@@ -207,7 +229,7 @@ if ($champLsRaw) {
     }
 }
 
-# 8. Parse Showdown Pokedex and construct Master Pokemon List
+# 9. Parse Showdown Pokedex and construct Master Pokemon List
 Write-Host "Constructing Pokemon Master list from Showdown pokedex.ts..." -ForegroundColor Cyan
 
 # Forme dictionary (Pure Unicode unescaped)
@@ -259,6 +281,32 @@ $formJpMap = @{
     "three-segment" = [System.Text.RegularExpressions.Regex]::Unescape("\u307f\u3064\u3075\u3057\u30d5\u30a9\u30eb\u30e0")
     "two-segment" = [System.Text.RegularExpressions.Regex]::Unescape("\u3075\u305f\u3075\u3057\u30d5\u30a9\u30eb\u30e0")
     "totem" = [System.Text.RegularExpressions.Regex]::Unescape("\u306c\u3057")
+    "m" = [System.Text.RegularExpressions.Regex]::Unescape("\u30aa\u30b9\u306e\u3059\u304c\u305f")
+    "f" = [System.Text.RegularExpressions.Regex]::Unescape("\u30e1\u30b9\u306e\u3059\u304c\u305f")
+    "shield" = [System.Text.RegularExpressions.Regex]::Unescape("\u30b7\u30fc\u30eb\u30c9\u30d5\u30a9\u30eb\u30e0")
+    "blade" = [System.Text.RegularExpressions.Regex]::Unescape("\u30d6\u30ec\u30fc\u30c9\u30d5\u30a9\u30eb\u30e0")
+    "eternal" = [System.Text.RegularExpressions.Regex]::Unescape("\u3048\u3044\u3048\u3093\u306e\u306f\u306a")
+    "hangry" = [System.Text.RegularExpressions.Regex]::Unescape("\u306f\u3089\u307a\u3053\u3082\u3088\u3046")
+    "fullbelly" = [System.Text.RegularExpressions.Regex]::Unescape("\u307e\u3093\u3077\u304f\u3082\u3088\u3046")
+    "iceface" = [System.Text.RegularExpressions.Regex]::Unescape("\u30a2\u30a4\u30b9\u30d5\u30a7\u30a4\u30b9")
+    "noiceface" = [System.Text.RegularExpressions.Regex]::Unescape("\u30ca\u30a4\u30b9\u30d5\u30a7\u30a4\u30b9")
+    "school" = [System.Text.RegularExpressions.Regex]::Unescape("\u3080\u308c\u306e\u3059\u304c\u305f")
+    "busted" = [System.Text.RegularExpressions.Regex]::Unescape("\u3070\u308c\u305f\u3059\u304c\u305f")
+    "gulping" = [System.Text.RegularExpressions.Regex]::Unescape("\u3046\u306e\u30df\u30b5\u30a4\u30eb\u306e\u3059\u304c\u305f")
+    "gorging" = [System.Text.RegularExpressions.Regex]::Unescape("\u30d4\u30ab\u30c1\u30e5\u30a6\u306e\u3059\u304c\u305f")
+    "dada" = [System.Text.RegularExpressions.Regex]::Unescape("\u3068\u3046\u3061\u3083\u3093")
+}
+
+$idDirectDisplayMap = @{
+    "basculegion" = [System.Text.RegularExpressions.Regex]::Unescape("\u30a4\u30c0\u30a4\u30c8\u30a6(\u30aa\u30b9\u306e\u3059\u304c\u305f)")
+    "basculegionf" = [System.Text.RegularExpressions.Regex]::Unescape("\u30a4\u30c0\u30a4\u30c8\u30a6(\u30e1\u30b9\u306e\u3059\u304c\u305f)")
+    "aegislash" = [System.Text.RegularExpressions.Regex]::Unescape("\u30ae\u30eb\u30ac\u30eb\u30c9(\u30b7\u30fc\u30eb\u30c9\u30d5\u30a9\u30eb\u30e0)")
+    "aegislashblade" = [System.Text.RegularExpressions.Regex]::Unescape("\u30ae\u30eb\u30ac\u30eb\u30c9(\u30d6\u30ec\u30fc\u30c9\u30d5\u30a9\u30eb\u30e0)")
+    "floetteeternal" = [System.Text.RegularExpressions.Regex]::Unescape("\u30d5\u30e9\u30a8\u30c3\u30c6(\u3048\u3044\u3048\u3093\u306e\u306f\u306a)")
+    "morpeko" = [System.Text.RegularExpressions.Regex]::Unescape("\u30e2\u30eb\u307a\u30b3(\u307e\u3093\u3077\u304f\u3082\u3088\u3046)")
+    "morpekohangry" = [System.Text.RegularExpressions.Regex]::Unescape("\u30e2\u30eb\u307a\u30b3(\u306f\u3089\u307a\u3053\u3082\u3088\u3046)")
+    "eiscue" = [System.Text.RegularExpressions.Regex]::Unescape("\u30b3\u30aa\u30ea\u30c3\u30dd(\u30a2\u30a4\u30b9\u30d5\u30a7\u30a4\u30b9)")
+    "eiscuenoice" = [System.Text.RegularExpressions.Regex]::Unescape("\u30b3\u30aa\u30ea\u30c3\u30dd(\u30ca\u30a4\u30b9\u30d5\u30a7\u30a4\u30b9)")
 }
 
 $pokeDetailedBlocks = [regex]::Matches($pokedexRaw, '(?ms)^\t([a-z0-9]+):\s*\{(.*?)\n\t\},')
@@ -317,23 +365,51 @@ foreach ($pb in $pokeDetailedBlocks) {
     $jpForm = $uNormal
     $cleanFormeKey = $sForme.ToLower().Replace(" ", "").Replace("-", "")
     
-    if ($sForme -eq "Mega") {
-        $jpForm = $uMega + $jpBaseName
-    } elseif ($sForme -eq "Mega-X") {
-        $jpForm = $uMega + $jpBaseName + [System.Text.RegularExpressions.Regex]::Unescape("\uff38") # 全角Ｘ
-    } elseif ($sForme -eq "Mega-Y") {
-        $jpForm = $uMega + $jpBaseName + [System.Text.RegularExpressions.Regex]::Unescape("\uff39") # 全角Ｙ
-    } elseif ($sForme -eq "Mega-Z") {
-        $jpForm = $uMega + $jpBaseName + [System.Text.RegularExpressions.Regex]::Unescape("\uff3a") # 全角Ｚ
-    } elseif ($sForme -and $formJpMap.ContainsKey($cleanFormeKey)) {
-        $jpForm = $formJpMap[$cleanFormeKey]
-    } elseif ($sBaseForme -and $formJpMap.ContainsKey($sBaseForme.ToLower())) {
-        $jpForm = $formJpMap[$sBaseForme.ToLower()]
-    } elseif ($sForme) {
-        $jpForm = $sForme
+    # Check PokeAPI Form Map first (e.g. arceus-bug, silvally-poison, etc.)
+    $pokeapiLookupKey = ($sName.ToLower() -replace '\s+', '-').Replace("%", "")
+    $pokeapiMatch = $null
+    if ($pokeapiFormMap.ContainsKey($pokeapiLookupKey)) {
+        $pokeapiMatch = $pokeapiFormMap[$pokeapiLookupKey]
+    } elseif ($pokeapiFormMap.ContainsKey($sId)) {
+        $pokeapiMatch = $pokeapiFormMap[$sId]
     }
     
-    $jpDisplay = if ($jpForm -eq $uNormal) { $jpBaseName } else { "$jpBaseName($jpForm)" }
+    if ($idDirectDisplayMap.ContainsKey($sId)) {
+        $jpDisplay = $idDirectDisplayMap[$sId]
+        if ($jpDisplay -match '\((.+)\)$') {
+            $jpForm = $matches[1]
+        }
+    } elseif ($sForme -eq "Mega") {
+        $jpForm = $uMega + $jpBaseName
+        $jpDisplay = "$jpBaseName($jpForm)"
+    } elseif ($sForme -eq "Mega-X") {
+        $jpForm = $uMega + $jpBaseName + [System.Text.RegularExpressions.Regex]::Unescape("\uff38") # 全角Ｘ
+        $jpDisplay = "$jpBaseName($jpForm)"
+    } elseif ($sForme -eq "Mega-Y") {
+        $jpForm = $uMega + $jpBaseName + [System.Text.RegularExpressions.Regex]::Unescape("\uff39") # 全角Ｙ
+        $jpDisplay = "$jpBaseName($jpForm)"
+    } elseif ($sForme -eq "Mega-Z") {
+        $jpForm = $uMega + $jpBaseName + [System.Text.RegularExpressions.Regex]::Unescape("\uff3a") # 全角Ｚ
+        $jpDisplay = "$jpBaseName($jpForm)"
+    } elseif ($typeMap.ContainsKey($sForme)) {
+        # Arceus & Silvally (forme is type name: Bug, Poison, Ice, etc.)
+        $jpForm = $typeMap[$sForme]
+        $jpDisplay = "$jpBaseName($jpForm)"
+    } elseif ($pokeapiMatch) {
+        $jpForm = $pokeapiMatch
+        $jpDisplay = "$jpBaseName($jpForm)"
+    } elseif ($sForme -and $formJpMap.ContainsKey($cleanFormeKey)) {
+        $jpForm = $formJpMap[$cleanFormeKey]
+        $jpDisplay = if ($jpForm -eq $uNormal) { $jpBaseName } else { "$jpBaseName($jpForm)" }
+    } elseif ($sBaseForme -and $formJpMap.ContainsKey($sBaseForme.ToLower())) {
+        $jpForm = $formJpMap[$sBaseForme.ToLower()]
+        $jpDisplay = if ($jpForm -eq $uNormal) { $jpBaseName } else { "$jpBaseName($jpForm)" }
+    } elseif ($sForme) {
+        $jpForm = $sForme
+        $jpDisplay = "$jpBaseName($jpForm)"
+    } else {
+        $jpDisplay = $jpBaseName
+    }
     
     # 3. Types
     $t1 = if ($sTypes.Count -gt 0) { Convert-TypeJp $sTypes[0] } else { "" }
@@ -418,7 +494,7 @@ foreach ($kv in $rawLearnsets) {
 
 Write-Host "Constructed $($finalPokemonList.Count) Master Pokemon entries." -ForegroundColor Green
 
-# 9. Build and generate mega_stones.json
+# 10. Build and generate mega_stones.json
 Write-Host "Generating data/mega_stones.json mapping..." -ForegroundColor Cyan
 $strMega = [System.Text.Encoding]::UTF8.GetString(@(0xE3, 0x83, 0xA1, 0xE3, 0x82, 0xAC))
 $strKnight = [System.Text.Encoding]::UTF8.GetString(@(0xE3, 0x83, 0x8A, 0xE3, 0x82, 0xA4, 0xE3, 0x83, 0x88))
@@ -490,7 +566,7 @@ foreach ($it in $stoneItems) {
     }
 }
 
-# 10. Save all data files with strict UTF-8
+# 11. Save all data files with strict UTF-8
 [System.IO.File]::WriteAllText($localPokePath, ($finalPokemonList | ConvertTo-Json -Depth 10), [System.Text.Encoding]::UTF8)
 Write-Host "Saved data/pokemon.json ($($finalPokemonList.Count) total entries)" -ForegroundColor Green
 
