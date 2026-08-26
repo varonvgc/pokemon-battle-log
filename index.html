@@ -2421,7 +2421,14 @@
     let POKEMON_ICON_BY_NAME = {};
     let POKEMON_BY_ICON_FILE = {};
     let POKEMON_FEATURES_DECODED = {};
+    let TYPE_FEATURES_DECODED = {};
     let _masterDataPromise = null;
+
+    const TYPE_NAME_JA_MAP = {
+      "normal": "ノーマル", "fire": "ほのお", "water": "みず", "grass": "くさ", "electric": "でんき", "ice": "こおり",
+      "fighting": "かくとう", "poison": "どく", "ground": "じめん", "flying": "ひこう", "psychic": "エスパー",
+      "bug": "むし", "rock": "いわ", "ghost": "ゴースト", "dragon": "ドラゴン", "dark": "あく", "steel": "はがね", "fairy": "フェアリー", "stellar": "ステラ"
+    };
 
     function initPokemonIconMap() {
       POKEMON_ICON_BY_NAME = {};
@@ -2494,7 +2501,7 @@
       _masterDataPromise = (async () => {
         try {
           const v = Date.now();
-          const [pokeRes, moveRes, itemRes, lsRes, msRes, mapRes, featRes, verRes] = await Promise.all([
+          const [pokeRes, moveRes, itemRes, lsRes, msRes, mapRes, featRes, typeFeatRes, verRes] = await Promise.all([
             fetch('data/pokemon.json?v=' + v),
             fetch('data/moves.json?v=' + v),
             fetch('data/items.json?v=' + v),
@@ -2502,6 +2509,7 @@
             fetch('data/mega_stones.json?v=' + v).catch(() => null),
             fetch('assets/pokemon_map.json?v=' + v).catch(() => null),
             fetch('assets/pokemon_features.json?v=' + v).catch(() => null),
+            fetch('assets/type_features.json?v=' + v).catch(() => null),
             fetch('data/version.json?v=' + v).catch(() => null)
           ]);
           POKEMON_LIST = await pokeRes.json();
@@ -2553,6 +2561,23 @@
               console.log('POKEMON_FEATURES_DECODED loaded:', Object.keys(POKEMON_FEATURES_DECODED).length, 'entries');
             } catch (e) {
               console.error('Failed to parse pokemon_features.json:', e);
+            }
+          }
+          if (typeFeatRes && typeFeatRes.ok) {
+            try {
+              const tJson = await typeFeatRes.json();
+              TYPE_FEATURES_DECODED = {};
+              for (const [tn, b64] of Object.entries(tJson)) {
+                const binStr = atob(b64);
+                const u8 = new Uint8Array(binStr.length);
+                for (let i = 0; i < binStr.length; i++) {
+                  u8[i] = binStr.charCodeAt(i);
+                }
+                TYPE_FEATURES_DECODED[tn] = u8;
+              }
+              console.log('TYPE_FEATURES_DECODED loaded:', Object.keys(TYPE_FEATURES_DECODED).length, 'entries');
+            } catch (e) {
+              console.error('Failed to parse type_features.json:', e);
             }
           }
 
@@ -6155,7 +6180,7 @@
     }
 
     // ======================================================
-    // ---- BATTLE SCREEN AUTO FILL (完全ローカル高速認識エンジン) ----
+    // ---- BATTLE SCREEN AUTO FILL (完全ローカル・マルチモーダル認識エンジン) ----
     // ======================================================
 
     function showRecordToast(message) {
@@ -6201,13 +6226,76 @@
       });
     }
 
-    // 16x16 クロップ画像データと 全848体 の特徴量を高速比較（約2〜5ms）
-    function matchCropToPokemonLocal(cropImgData) {
-      const data = cropImgData.data; // Uint8ClampedArray of 16x16x4 = 1024 bytes
-      let bestFile = '';
+    // タイプ照合ヘルパー
+    function recognizeTypeFromCanvas(mainCanvas, cropX, cropY, cropW, cropH) {
+      if (!TYPE_FEATURES_DECODED || !Object.keys(TYPE_FEATURES_DECODED).length) return 'none';
+
+      const tCanvas = document.createElement('canvas');
+      tCanvas.width = 20;
+      tCanvas.height = 20;
+      const tCtx = tCanvas.getContext('2d');
+      tCtx.imageSmoothingEnabled = true;
+      tCtx.imageSmoothingQuality = 'high';
+      tCtx.drawImage(mainCanvas, cropX, cropY, cropW, cropH, 0, 0, 20, 20);
+
+      const imgData = tCtx.getImageData(0, 0, 20, 20);
+      const data = imgData.data;
+
+      let bestType = 'none';
       let bestScore = Infinity;
 
-      for (const [fn, iconBytes] of Object.entries(POKEMON_FEATURES_DECODED)) {
+      for (const [tn, tBytes] of Object.entries(TYPE_FEATURES_DECODED)) {
+        let diff = 0;
+        for (let i = 0; i < 1600; i += 4) {
+          const dr = data[i] - tBytes[i];
+          const dg = data[i + 1] - tBytes[i + 1];
+          const db = data[i + 2] - tBytes[i + 2];
+          diff += (dr * dr + dg * dg + db * db);
+        }
+        if (diff < bestScore) {
+          bestScore = diff;
+          bestType = tn;
+        }
+      }
+
+      // スコア閾値（12000000以内ならタイプとして認定）
+      return (bestScore < 12000000) ? bestType : 'none';
+    }
+
+    // 性別判定ヘルパー
+    function recognizeGenderFromCanvas(mainCanvas, gx, gy) {
+      const gCanvas = document.createElement('canvas');
+      gCanvas.width = 14;
+      gCanvas.height = 14;
+      const gCtx = gCanvas.getContext('2d');
+      gCtx.drawImage(mainCanvas, gx, gy, 14, 14, 0, 0, 14, 14);
+      const data = gCtx.getImageData(0, 0, 14, 14).data;
+
+      let blueCount = 0;
+      let redCount = 0;
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i], g = data[i + 1], b = data[i + 2];
+        if (b > 130 && b > (r * 1.4) && g > 40) blueCount++;
+        if (r > 160 && r > (b * 2.0) && g < 60) redCount++;
+      }
+
+      if (blueCount > 8) return '♂';
+      if (redCount > 8) return '♀';
+      return 'none';
+    }
+
+    // アイコン画像と特定候補群の比較
+    function matchCropToCandidatePokemons(cropImgData, candidateFiles) {
+      const data = cropImgData.data;
+      let bestFile = (candidateFiles && candidateFiles[0]) || '';
+      let bestScore = Infinity;
+
+      const targetList = (candidateFiles && candidateFiles.length) ? candidateFiles : Object.keys(POKEMON_FEATURES_DECODED);
+
+      for (const fn of targetList) {
+        const iconBytes = POKEMON_FEATURES_DECODED[fn];
+        if (!iconBytes) continue;
+
         let diff = 0;
         let weightSum = 0;
         for (let k = 0; k < 1024; k += 4) {
@@ -6220,7 +6308,7 @@
             weightSum += a;
           }
         }
-        if (weightSum > 20) {
+        if (weightSum > 15) {
           const score = diff / weightSum;
           if (score < bestScore) {
             bestScore = score;
@@ -6228,6 +6316,7 @@
           }
         }
       }
+
       return { fileName: bestFile, score: bestScore };
     }
 
@@ -6290,22 +6379,29 @@
         const slotWhiteScores = [];
 
         for (let i = 0; i < 6; i++) {
-          const checkX = Math.round(origW * 0.24);
-          const checkY = Math.round(origH * (0.16 + i * 0.118));
-          const p = mainCtx.getImageData(checkX, checkY, 1, 1).data;
-          const isWhite = (p[0] > 180 && p[1] > 180 && p[2] > 180);
-          slotWhiteScores.push({ slot: i, isWhite, r: p[0], g: p[1], b: p[2] });
+          const checkX = Math.round(origW * 0.23);
+          const checkY = Math.round(origH * (0.13 + i * 0.118));
+          const sampleData = mainCtx.getImageData(checkX, checkY, 20, 20).data;
+          let sumLum = 0;
+          for (let k = 0; k < sampleData.length; k += 4) {
+            sumLum += (sampleData[k] * 0.299 + sampleData[k + 1] * 0.587 + sampleData[k + 2] * 0.114);
+          }
+          const avgLum = sumLum / 400;
+          const isWhite = (avgLum > 175);
+          slotWhiteScores.push({ slot: i, isWhite, avgLum });
           if (isWhite) whiteSlotCount++;
         }
 
         const mode = (whiteSlotCount >= 3) ? 'selected' : 'not_selected';
 
-        // 2. 相手6スロットの正確な切り出し＆マッチング
-        // パターン1（未選出）: X ≈ 77.5%
-        // パターン2（選出完了）: X ≈ 68.9%
+        // 2. 相手6スロットのマルチモーダル（タイプ＋性別＋アイコン）認識
         const oppXPct = (mode === 'selected') ? 0.689 : 0.775;
         const oppWPct = 0.057;
         const oppHPct = 0.110;
+
+        const type1XPct = (mode === 'selected') ? (768 / 1024) : (856 / 1024);
+        const type2XPct = (mode === 'selected') ? (790 / 1024) : (878 / 1024);
+        const genderXPct = (mode === 'selected') ? (772 / 1024) : (860 / 1024);
 
         const thumbCanvas = document.createElement('canvas');
         thumbCanvas.width = 16;
@@ -6315,6 +6411,7 @@
         thumbCtx.imageSmoothingQuality = 'high';
 
         const recognizedPokes = [];
+        const allPokeSrc = localPokemon || POKEMON_LIST;
 
         for (let i = 0; i < 6; i++) {
           const yPct = 0.118 + i * 0.118;
@@ -6323,11 +6420,55 @@
           const cropW = Math.round(origW * oppWPct);
           const cropH = Math.round(origH * oppHPct);
 
+          // タイプ1 & タイプ2
+          const t1X = Math.round(origW * type1XPct);
+          const t1Y = Math.round(origH * (yPct + 0.008));
+          const t2X = Math.round(origW * type2XPct);
+          const t2Y = t1Y;
+          const typeBoxDim = Math.round(origW * (20 / 1024));
+
+          const type1 = recognizeTypeFromCanvas(mainCanvas, t1X, t1Y, typeBoxDim, typeBoxDim);
+          const type2 = recognizeTypeFromCanvas(mainCanvas, t2X, t2Y, typeBoxDim, typeBoxDim);
+
+          // 性別
+          const gX = Math.round(origW * genderXPct);
+          const gY = Math.round(origH * (yPct + 0.063));
+          const gender = recognizeGenderFromCanvas(mainCanvas, gX, gY);
+
+          // タイプによる候補ポケモンの絞り込み
+          const candidateFiles = [];
+          const t1Ja = TYPE_NAME_JA_MAP[type1] || '';
+          const t2Ja = TYPE_NAME_JA_MAP[type2] || '';
+
+          if (t1Ja || t2Ja) {
+            allPokeSrc.forEach(p => {
+              const pt1 = p.type1 || '';
+              const pt2 = p.type2 || '';
+              let matchType = false;
+
+              if (t1Ja && t2Ja && t2Ja !== 'ステラ') {
+                if ((pt1 === t1Ja && pt2 === t2Ja) || (pt1 === t2Ja && pt2 === t1Ja)) matchType = true;
+              } else if (t1Ja && (!t2Ja || t2Ja === 'ステラ')) {
+                if (pt1 === t1Ja || pt2 === t1Ja) matchType = true;
+              } else if (t2Ja) {
+                if (pt1 === t2Ja || pt2 === t2Ja) matchType = true;
+              }
+
+              if (matchType) {
+                const fn = getPokemonIconFileName(p.display || p.name);
+                if (fn && fn !== 'default.png' && !candidateFiles.includes(fn)) {
+                  candidateFiles.push(fn);
+                }
+              }
+            });
+          }
+
+          // アイコン画像の切り出し＆照合
           thumbCtx.clearRect(0, 0, 16, 16);
           thumbCtx.drawImage(mainCanvas, cropX, cropY, cropW, cropH, 0, 0, 16, 16);
           const cropImgData = thumbCtx.getImageData(0, 0, 16, 16);
 
-          const match = matchCropToPokemonLocal(cropImgData);
+          const match = matchCropToCandidatePokemons(cropImgData, candidateFiles);
           const pObj = findPokemonByIconFile(match.fileName);
           const dispName = pObj ? pObj.display : (match.fileName || '');
           recognizedPokes.push(dispName);
@@ -6444,7 +6585,7 @@
         const recordPage = document.getElementById('page-record');
         const partyModal = document.getElementById('ai-party-modal');
         if (!recordPage || !recordPage.classList.contains('active')) return;
-        if (partyModal && partyModal.classList.contains('open')) return; // パーティ編集モーダルが開いている時は除外
+        if (partyModal && partyModal.classList.contains('open')) return;
 
         const items = e.clipboardData?.items;
         if (!items) return;
