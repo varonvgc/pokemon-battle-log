@@ -3037,6 +3037,9 @@
       const uid = currentUser.uid;
       try {
         await setDoc(doc(db, 'users', uid, 'records', rec.id), rec, { merge: true });
+        // 他端末に更新を伝えるため updatedAt も更新
+        await setDoc(doc(db, 'users', uid, 'data', 'main'), { updatedAt: window._firestoreOps.serverTimestamp() }, { merge: true });
+        _lastLoadedAt = Date.now();
       } catch (e) {
         console.error('Firestore record save error:', e);
       }
@@ -3045,11 +3048,14 @@
     // 単一対戦記録をFirestore（サブコレクション）からバックグラウンド削除
     async function deleteRecordFromFirestore(recId) {
       if (!currentUser || !_fbReady || !recId) return;
-      const { doc, deleteDoc } = window._firestoreOps;
+      const { doc, deleteDoc, setDoc } = window._firestoreOps;
       const db = window._db;
       const uid = currentUser.uid;
       try {
         await deleteDoc(doc(db, 'users', uid, 'records', recId));
+        // 他端末に更新を伝えるため updatedAt も更新
+        await setDoc(doc(db, 'users', uid, 'data', 'main'), { updatedAt: window._firestoreOps.serverTimestamp() }, { merge: true });
+        _lastLoadedAt = Date.now();
       } catch (e) {
         console.error('Firestore record delete error:', e);
       }
@@ -3958,6 +3964,8 @@
     }
 
     async function saveRecord() {
+      const reloading = await checkAndPromptReload();
+      if (reloading) return;
       if (!selectedPartyId) { alert('パーティを選択してください'); return; }
       if (!recordResult) { alert('勝敗を選択してください'); return; }
       const oppParty = getSlotValues('opp-party-slots', 6);
@@ -4130,6 +4138,8 @@
     }
 
     async function deleteRecord(id) {
+      const reloading = await checkAndPromptReload();
+      if (reloading) return;
       if (!confirm('この記録を削除しますか？')) return;
       records = records.filter(r => r.id !== id);
       localStorage.setItem('pkm_records', JSON.stringify(records));
