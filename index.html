@@ -19,7 +19,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc, serverTimestamp, query, orderBy }
+    import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc, serverTimestamp, query, orderBy, onSnapshot }
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -41,7 +41,7 @@
     window._signInWithPopup = signInWithPopup;
     window._signOut = signOut;
     window._onAuthStateChanged = onAuthStateChanged;
-    window._firestoreOps = { doc, getDoc, setDoc, collection, getDocs, deleteDoc, serverTimestamp, query, orderBy };
+    window._firestoreOps = { doc, getDoc, setDoc, collection, getDocs, deleteDoc, serverTimestamp, query, orderBy, onSnapshot };
     window._firebaseReady = true;
     document.dispatchEvent(new Event('firebase-ready'));
   </script>
@@ -3001,8 +3001,18 @@
     }
     let _fbReady = false;
 
+    // 各端末（ブラウザセッション）固有のクライアントID
+    const CLIENT_ID = 'cli_' + Math.random().toString(36).slice(2, 10) + '_' + Date.now();
+
     // 最後にこの端末が読み込んだ updatedAt（ミリ秒）
     let _lastLoadedAt = 0;
+
+    function isRemoteConflict(data) {
+      if (!data || !data.updatedBy) return false;
+      // 自分が書き込んだ更新なら絶対にリロード要求を出さない
+      if (data.updatedBy === CLIENT_ID) return false;
+      return true;
+    }
 
     // Firestoreへのパーティ保存（パーティ編集時など）
     async function saveData() {
@@ -3015,7 +3025,8 @@
       try {
         const payload = {
           parties,
-          updatedAt: window._firestoreOps.serverTimestamp()
+          updatedAt: window._firestoreOps.serverTimestamp(),
+          updatedBy: CLIENT_ID
         };
         const apiKey = getGeminiApiKey();
         if (apiKey) payload.geminiApiKey = apiKey;
@@ -3037,8 +3048,11 @@
       const uid = currentUser.uid;
       try {
         await setDoc(doc(db, 'users', uid, 'records', rec.id), rec, { merge: true });
-        // 他端末に更新を伝えるため updatedAt も更新
-        await setDoc(doc(db, 'users', uid, 'data', 'main'), { updatedAt: window._firestoreOps.serverTimestamp() }, { merge: true });
+        // 他端末に更新を伝えるため updatedAt と updatedBy も更新
+        await setDoc(doc(db, 'users', uid, 'data', 'main'), {
+          updatedAt: window._firestoreOps.serverTimestamp(),
+          updatedBy: CLIENT_ID
+        }, { merge: true });
         _lastLoadedAt = Date.now();
       } catch (e) {
         console.error('Firestore record save error:', e);
@@ -3053,8 +3067,11 @@
       const uid = currentUser.uid;
       try {
         await deleteDoc(doc(db, 'users', uid, 'records', recId));
-        // 他端末に更新を伝えるため updatedAt も更新
-        await setDoc(doc(db, 'users', uid, 'data', 'main'), { updatedAt: window._firestoreOps.serverTimestamp() }, { merge: true });
+        // 他端末に更新を伝えるため updatedAt と updatedBy も更新
+        await setDoc(doc(db, 'users', uid, 'data', 'main'), {
+          updatedAt: window._firestoreOps.serverTimestamp(),
+          updatedBy: CLIENT_ID
+        }, { merge: true });
         _lastLoadedAt = Date.now();
       } catch (e) {
         console.error('Firestore record delete error:', e);
@@ -3062,7 +3079,6 @@
     }
 
     // 他端末の変更を検知してリロードを促す（入力前チェック用）
-    // 変更あり→true、なし→false を返す
     let _conflictCheckBusy = false;
     let _conflictBannerDismissed = false;
 
@@ -3080,16 +3096,15 @@
 
     // バックグラウンドで競合チェックし、変更があればバナー表示
     async function bgConflictCheck() {
-      if (!currentUser || !_fbReady || _lastLoadedAt === 0 || _conflictCheckBusy) return;
+      if (!currentUser || !_fbReady || _conflictCheckBusy) return;
       if (_conflictBannerDismissed) return; // 一度閉じたら再表示しない
       _conflictCheckBusy = true;
       try {
         const { doc, getDoc } = window._firestoreOps;
         const snap = await getDoc(doc(window._db, 'users', currentUser.uid, 'data', 'main'));
         if (!snap.exists()) return;
-        const ud = snap.data().updatedAt;
-        const serverTime = (ud && ud.toMillis) ? ud.toMillis() : 0;
-        if (serverTime > _lastLoadedAt) {
+        const data = snap.data();
+        if (isRemoteConflict(data)) {
           showConflictBanner();
         }
       } catch (e) {
@@ -3099,16 +3114,15 @@
       }
     }
 
-    // 保存・操作前の確認（毎回Firestoreに問い合わせて即時判定）
+    // 保存・操作前の確認（他端末が更新しているか判定）
     async function checkAndPromptReload() {
-      if (!currentUser || !_fbReady || _lastLoadedAt === 0) return false;
+      if (!currentUser || !_fbReady) return false;
       try {
         const { doc, getDoc } = window._firestoreOps;
         const snap = await getDoc(doc(window._db, 'users', currentUser.uid, 'data', 'main'));
         if (!snap.exists()) return false;
-        const ud = snap.data().updatedAt;
-        const serverTime = (ud && ud.toMillis) ? ud.toMillis() : 0;
-        if (serverTime > _lastLoadedAt) {
+        const data = snap.data();
+        if (isRemoteConflict(data)) {
           // バナーも表示
           showConflictBanner();
           const ok = confirm(
@@ -3193,22 +3207,40 @@
         localStorage.setItem('pkm_records', JSON.stringify(records));
 
         await dmLoadMasterData();
-        // 読み込み完了後にバックグラウンドチェックを開始
+        // リアルタイム他端末変更リスナーを開始
         startConflictPolling();
       } catch (e) { console.error('Firestore load error:', e); }
     }
 
-    // バックグラウンド競合チェックの開始
-    let _conflictPollingStarted = false;
+    // リアルタイム他端末変更リスナーの開始
+    let _conflictUnsubscribe = null;
     function startConflictPolling() {
-      if (_conflictPollingStarted) return;
-      _conflictPollingStarted = true;
-      // タブがフォアグラウンドに戻った時にチェック
+      if (_conflictUnsubscribe) return;
+      if (!currentUser || !_fbReady) return;
+      const { doc, onSnapshot } = window._firestoreOps;
+      const db = window._db;
+      try {
+        _conflictUnsubscribe = onSnapshot(doc(db, 'users', currentUser.uid, 'data', 'main'), (snap) => {
+          if (!snap.exists()) return;
+          const data = snap.data();
+          if (isRemoteConflict(data)) {
+            if (!_conflictBannerDismissed) {
+              showConflictBanner();
+            }
+          } else {
+            // 自分の更新時はバナーを消す
+            const b = document.getElementById('conflict-banner');
+            if (b) b.classList.remove('show');
+          }
+        });
+      } catch (err) {
+        console.warn('onSnapshot error:', err);
+      }
+
+      // タブ復帰時にもチェック
       document.addEventListener('visibilitychange', function () {
         if (!document.hidden) bgConflictCheck();
       });
-      // 60秒ごとにバックグラウンドチェック
-      setInterval(bgConflictCheck, 60000);
     }
 
     // 認証トグル
