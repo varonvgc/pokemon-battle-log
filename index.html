@@ -3008,13 +3008,13 @@
     let _lastLoadedAt = 0;
 
     function isRemoteConflict(data) {
-      if (!data) return false;
+      if (!data || !data.updatedAt) return false;
       // 自分が書き込んだ更新なら絶対にリロード要求を出さない
       if (data.updatedBy && data.updatedBy === CLIENT_ID) return false;
 
       const serverTime = (data.updatedAt && data.updatedAt.toMillis) ? data.updatedAt.toMillis() : 0;
-      // この端末がロードした時刻より後に他端末が保存した場合のみ競合とみなす
-      if (_lastLoadedAt > 0 && serverTime > _lastLoadedAt) {
+      // この端末がロードした時刻より明確に新しい他端末の更新（+1000ms以上の余裕）のみ競合とみなす
+      if (_lastLoadedAt > 0 && serverTime > (_lastLoadedAt + 1000)) {
         return true;
       }
       return false;
@@ -3083,34 +3083,10 @@
       }
     }
 
-    // 保存・操作前の確認（他端末が更新しているか判定）
-    async function checkAndPromptReload() {
-      if (!currentUser || !_fbReady) return false;
-      try {
-        const { doc, getDoc } = window._firestoreOps;
-        const snap = await getDoc(doc(window._db, 'users', currentUser.uid, 'data', 'main'));
-        if (!snap.exists()) return false;
-        const data = snap.data();
-        if (isRemoteConflict(data)) {
-          showConflictBanner();
-          const ok = confirm(
-            '別の端末でデータが更新されています。\n' +
-            'リロードして最新データを取得しますか？\n\n' +
-            'OK → リロード\n' +
-            'キャンセル → このまま続ける（この端末の内容で上書きされます）'
-          );
-          if (ok) { location.reload(); return true; }
-        }
-        return false;
-      } catch (e) {
-        return false;
-      }
-    }
-
-    // Firestoreからロード（パーティ情報＋対戦履歴を読み込み）
+    // Firestoreからロード（純粋な読み取りのみ）
     async function loadFromFirestore() {
       if (!currentUser || !_fbReady) return;
-      const { doc, getDoc, setDoc, collection, getDocs } = window._firestoreOps;
+      const { doc, getDoc, collection, getDocs } = window._firestoreOps;
       const db = window._db;
       const uid = currentUser.uid;
       try {
@@ -3124,12 +3100,9 @@
           }
           localStorage.setItem('pkm_parties', JSON.stringify(parties));
 
-          // Gemini APIキーの同期
+          // Gemini APIキーの同期（読み取りのみ）
           if (data.geminiApiKey) {
             localStorage.setItem('pkm_gemini_api_key', data.geminiApiKey);
-          } else if (getGeminiApiKey()) {
-            const localKey = getGeminiApiKey();
-            setDoc(doc(db, 'users', uid, 'data', 'main'), { geminiApiKey: localKey }, { merge: true }).catch(console.error);
           }
           updateAiApiKeyUI();
 
@@ -3137,9 +3110,6 @@
           _lastLoadedAt = (ud2 && ud2.toMillis) ? ud2.toMillis() : Date.now();
         } else {
           _lastLoadedAt = Date.now();
-          if (getGeminiApiKey()) {
-            setDoc(doc(db, 'users', uid, 'data', 'main'), { geminiApiKey: getGeminiApiKey() }, { merge: true }).catch(console.error);
-          }
         }
 
         // サブコレクション（users/{uid}/records）に記録があれば読み込んでマージ（書き込みは絶対に行わない）
@@ -3265,13 +3235,11 @@
       else if (event && event.target) event.target.classList.add('active');
       // 記録・履歴・データ管理への遷移時はコピーボードを消去
       if (['record', 'history', 'datamanage'].includes(name)) clearCopyBoard();
-      if (name === 'parties') { renderParties(); showCopyBoard(); checkAndPromptReload(); }
-      if (name === 'record') checkAndPromptReload();
-      if (name === 'history') checkAndPromptReload();
+      if (name === 'parties') { renderParties(); showCopyBoard(); }
       if (name === 'record') renderRecordPage();
       if (name === 'history') renderHistory();
       if (name === 'datamanage') {
-        checkAndPromptReload(); dmType = null; dmAction = null;
+        dmType = null; dmAction = null;
         ['dm-tab-pokemon', 'dm-tab-move', 'dm-tab-item', 'dm-btn-list', 'dm-btn-search'].forEach(id => { const el = document.getElementById(id); if (el) el.className = 'btn btn-ghost'; });
         document.getElementById('dm-action-area').style.display = 'none';
         document.getElementById('dm-form-card').style.display = 'none';
@@ -3957,8 +3925,6 @@
     }
 
     async function saveRecord() {
-      const reloading = await checkAndPromptReload();
-      if (reloading) return;
       if (!selectedPartyId) { alert('パーティを選択してください'); return; }
       if (!recordResult) { alert('勝敗を選択してください'); return; }
       const oppParty = getSlotValues('opp-party-slots', 6);
@@ -4129,8 +4095,6 @@
     }
 
     async function deleteRecord(id) {
-      const reloading = await checkAndPromptReload();
-      if (reloading) return;
       if (!confirm('この記録を削除しますか？')) return;
       records = records.filter(r => r.id !== id);
       saveData();
@@ -4363,8 +4327,6 @@
     }
 
     async function dmSaveEntry() {
-      const reloading = await checkAndPromptReload();
-      if (reloading) return;
       if (!isAdmin()) {
         alert('編集権限がありません');
         return;
@@ -4890,8 +4852,6 @@
     }
 
     async function dmSaveList() {
-      const reloading = await checkAndPromptReload();
-      if (reloading) return;
       if (!isAdmin()) {
         alert('編集権限がありません');
         return;
