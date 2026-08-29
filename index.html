@@ -3004,8 +3004,7 @@
     // 最後にこの端末が読み込んだ updatedAt（ミリ秒）
     let _lastLoadedAt = 0;
 
-    // Firestore保存（ログイン中のみ、localStorageにも同時保存）
-    // 保存前に他端末の変更を検知して警告する
+    // Firestoreへのパーティ保存（パーティ編集時など）
     async function saveData() {
       localStorage.setItem('pkm_parties', JSON.stringify(parties));
       localStorage.setItem('pkm_records', JSON.stringify(records));
@@ -3016,30 +3015,44 @@
       try {
         const payload = {
           parties,
-          records,
           updatedAt: window._firestoreOps.serverTimestamp()
         };
         const apiKey = getGeminiApiKey();
         if (apiKey) payload.geminiApiKey = apiKey;
 
         await setDoc(doc(db, 'users', uid, 'data', 'main'), payload, { merge: true });
-        // サーバー時刻と合わせるため、保存直後に読み直して _lastLoadedAt を更新
-        try {
-          const saved = await window._firestoreOps.getDoc(doc(db, 'users', uid, 'data', 'main'));
-          if (saved.exists()) {
-            const ud = saved.data().updatedAt;
-            _lastLoadedAt = (ud && ud.toMillis) ? ud.toMillis() : Date.now();
-          } else {
-            _lastLoadedAt = Date.now();
-          }
-        } catch (e2) {
-          _lastLoadedAt = Date.now();
-        }
+        _lastLoadedAt = Date.now();
         // 自分が保存したのでバナーを消す
         _conflictBannerDismissed = false;
         const b = document.getElementById('conflict-banner');
         if (b) b.classList.remove('show');
       } catch (e) { console.error('Firestore save error:', e); }
+    }
+
+    // 単一対戦記録をFirestore（サブコレクション）にバックグラウンド保存
+    async function saveRecordToFirestore(rec) {
+      if (!currentUser || !_fbReady || !rec || !rec.id) return;
+      const { doc, setDoc } = window._firestoreOps;
+      const db = window._db;
+      const uid = currentUser.uid;
+      try {
+        await setDoc(doc(db, 'users', uid, 'records', rec.id), rec, { merge: true });
+      } catch (e) {
+        console.error('Firestore record save error:', e);
+      }
+    }
+
+    // 単一対戦記録をFirestore（サブコレクション）からバックグラウンド削除
+    async function deleteRecordFromFirestore(recId) {
+      if (!currentUser || !_fbReady || !recId) return;
+      const { doc, deleteDoc } = window._firestoreOps;
+      const db = window._db;
+      const uid = currentUser.uid;
+      try {
+        await deleteDoc(doc(db, 'users', uid, 'records', recId));
+      } catch (e) {
+        console.error('Firestore record delete error:', e);
+      }
     }
 
     // 他端末の変更を検知してリロードを促す（入力前チェック用）
@@ -3106,39 +3119,73 @@
       }
     }
 
-    // Firestoreからロード
+    // Firestoreからロード（パーティ情報＋サブコレクション対戦履歴＋レガシー履歴をマージ）
     async function loadFromFirestore() {
       if (!currentUser || !_fbReady) return;
-      const { doc, getDoc, setDoc } = window._firestoreOps;
+      const { doc, getDoc, setDoc, collection, getDocs } = window._firestoreOps;
       const db = window._db;
       const uid = currentUser.uid;
       try {
         const snap = await getDoc(doc(db, 'users', uid, 'data', 'main'));
+        let loadedRecords = [];
         if (snap.exists()) {
           const data = snap.data();
           parties = data.parties || [];
-          records = data.records || [];
+          if (data.records && Array.isArray(data.records)) {
+            loadedRecords = data.records;
+          }
           localStorage.setItem('pkm_parties', JSON.stringify(parties));
-          localStorage.setItem('pkm_records', JSON.stringify(records));
 
           // Gemini APIキーの同期
           if (data.geminiApiKey) {
             localStorage.setItem('pkm_gemini_api_key', data.geminiApiKey);
           } else if (getGeminiApiKey()) {
-            // クラウド側に未保存でローカルにある場合はクラウドにバックアップ保存
             const localKey = getGeminiApiKey();
             setDoc(doc(db, 'users', uid, 'data', 'main'), { geminiApiKey: localKey }, { merge: true }).catch(console.error);
           }
           updateAiApiKeyUI();
 
-          // 読み込み時刻を記録（競合検知用）
           const ud2 = data.updatedAt; _lastLoadedAt = (ud2 && ud2.toMillis) ? ud2.toMillis() : Date.now();
         } else {
-          // 新規ユーザーでローカルにAPIキーがある場合は保存
           if (getGeminiApiKey()) {
             setDoc(doc(db, 'users', uid, 'data', 'main'), { geminiApiKey: getGeminiApiKey() }, { merge: true }).catch(console.error);
           }
         }
+
+        // サブコレクション（users/{uid}/records）から個別対戦記録を取得
+        try {
+          const recSnap = await getDocs(collection(db, 'users', uid, 'records'));
+          const subRecords = [];
+          recSnap.forEach(docSnap => {
+            if (docSnap.exists()) {
+              subRecords.push(docSnap.data());
+            }
+          });
+
+          // レガシーデータとサブコレクションデータをマージ（重複はidで排除）
+          const recordMap = new Map();
+          // 古いレガシーを先に投入
+          loadedRecords.forEach(r => { if (r && r.id) recordMap.set(r.id, r); });
+          // サブコレクションの最新データを上書き投入
+          subRecords.forEach(r => { if (r && r.id) recordMap.set(r.id, r); });
+
+          records = Array.from(recordMap.values());
+          // 日時/ID順（新しい順）でソート
+          records.sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0));
+
+          // もしレガシーrecordsが残っていればバックグラウンドでサブコレクションへ移行保存
+          if (loadedRecords.length > 0) {
+            loadedRecords.forEach(r => {
+              if (r && r.id) saveRecordToFirestore(r);
+            });
+          }
+        } catch (recErr) {
+          console.warn('Subcollection records load fallback:', recErr);
+          records = loadedRecords;
+        }
+
+        localStorage.setItem('pkm_records', JSON.stringify(records));
+
         await dmLoadMasterData();
         // 読み込み完了後にバックグラウンドチェックを開始
         startConflictPolling();
@@ -3911,8 +3958,6 @@
     }
 
     async function saveRecord() {
-      const reloading = await checkAndPromptReload();
-      if (reloading) return;
       if (!selectedPartyId) { alert('パーティを選択してください'); return; }
       if (!recordResult) { alert('勝敗を選択してください'); return; }
       const oppParty = getSlotValues('opp-party-slots', 6);
@@ -3931,13 +3976,20 @@
         result: recordResult,
         memo: document.getElementById('rec-memo').value.trim()
       };
+
+      // 1. ローカルに即時保存
       records.unshift(rec);
-      saveData();
-      alert('記録を保存しました！');
+      localStorage.setItem('pkm_records', JSON.stringify(records));
+
+      // 2. クラウドに個別バックグラウンド保存（待ち時間ゼロ）
+      saveRecordToFirestore(rec);
+
+      // 3. UIの即時リセットとトースト通知（一瞬で完了）
       selectedPartyId = null;
       recordResult = null;
       document.getElementById('record-form-card').style.display = 'none';
       renderRecordPage();
+      showRecordToast('💾 対戦記録を保存しました！');
     }
 
     // ---- HISTORY ----
@@ -4078,13 +4130,13 @@
     }
 
     async function deleteRecord(id) {
-      const reloading = await checkAndPromptReload();
-      if (reloading) return;
       if (!confirm('この記録を削除しますか？')) return;
       records = records.filter(r => r.id !== id);
-      saveData();
+      localStorage.setItem('pkm_records', JSON.stringify(records));
+      deleteRecordFromFirestore(id);
       closeDetailModal();
       renderHistory();
+      showRecordToast('🗑️ 記録を削除しました');
     }
 
 
