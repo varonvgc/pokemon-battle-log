@@ -571,11 +571,78 @@ class PokemonRecognitionEngine {
     return resultSelection;
   }
 
+  async _extractTrainerName(sCtx, mode) {
+    try {
+      if (typeof Tesseract === 'undefined') {
+        console.warn('Tesseract.js is not loaded. Skipping trainer name OCR.');
+        return '';
+      }
+
+      // Crop coordinates (2532 x 1170 space)
+      const cropX = (mode === 'BEFORE') ? 1800 : 1650;
+      const cropY = (mode === 'BEFORE') ? 50 : 80;
+      const cropW = (mode === 'BEFORE') ? 550 : 450;
+      const cropH = (mode === 'BEFORE') ? 80 : 70;
+
+      // Extract and binarize
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = cropW;
+      tempCanvas.height = cropH;
+      const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
+      tempCtx.drawImage(sCtx.canvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+
+      const srcData = tempCtx.getImageData(0, 0, cropW, cropH).data;
+
+      // Scale 2x for optimal OCR
+      const ocrCanvas = document.createElement('canvas');
+      ocrCanvas.width = cropW * 2;
+      ocrCanvas.height = cropH * 2;
+      const ocrCtx = ocrCanvas.getContext('2d');
+      const outImgData = ocrCtx.createImageData(cropW * 2, cropH * 2);
+      const outData = outImgData.data;
+
+      for (let y = 0; y < cropH; y++) {
+        for (let x = 0; x < cropW; x++) {
+          const idx = (y * cropW + x) * 4;
+          const r = srcData[idx], g = srcData[idx + 1], b = srcData[idx + 2];
+          // Pure white text detection on pink background
+          const isText = (r > 205 && g > 205 && b > 205) || (g > 165 && b > 165 && r > 180);
+          const val = isText ? 0 : 255; // Text is black (0), Background is white (255)
+
+          for (let dy = 0; dy < 2; dy++) {
+            for (let dx = 0; dx < 2; dx++) {
+              const oIdx = ((y * 2 + dy) * (cropW * 2) + (x * 2 + dx)) * 4;
+              outData[oIdx] = val;
+              outData[oIdx + 1] = val;
+              outData[oIdx + 2] = val;
+              outData[oIdx + 3] = 255;
+            }
+          }
+        }
+      }
+      ocrCtx.putImageData(outImgData, 0, 0);
+
+      // Recognize multi-lingual text using Tesseract.js
+      // Languages supported: Japanese, English, Chinese (Sim/Tra), Korean, Spanish, French, German, Italian
+      const lang = 'jpn+eng+chi_sim+chi_tra+kor+spa+fra+deu+ita';
+      const ocrRes = await Tesseract.recognize(ocrCanvas, lang, {
+        logger: () => {}
+      });
+
+      let text = (ocrRes && ocrRes.data && ocrRes.data.text) ? ocrRes.data.text : '';
+      text = text.replace(/[\r\n\t]+/g, ' ').replace(/\s+/g, ' ').trim();
+      return text;
+    } catch (err) {
+      console.warn('Trainer name OCR error:', err);
+      return '';
+    }
+  }
+
   /**
    * Main Recognition Entrypoint for Image / Canvas
    * @param {HTMLImageElement | HTMLCanvasElement | ImageBitmap} imageSource
    * @param {Array<string>} [myTeam] Optional user registered 6-pokemon team for AFTER mode
-   * @returns {Promise<{mode: 'BEFORE'|'AFTER', opponent: Array<string>, mySelection?: Array<string>}>}
+   * @returns {Promise<{mode: 'BEFORE'|'AFTER', opponent: Array<string>, mySelection?: Array<string>, trainerName?: string}>}
    */
   async recognize(imageSource, myTeam = []) {
     await this.loadDictionaries();
@@ -596,6 +663,9 @@ class PokemonRecognitionEngine {
     const isBefore = (testBefore.score < testAfter.score) || (testBefore.score < 10000000);
     const detectedMode = isBefore ? 'BEFORE' : 'AFTER';
 
+    // OCR Trainer Name in parallel / background
+    const trainerNamePromise = this._extractTrainerName(sCtx, detectedMode);
+
     if (detectedMode === 'BEFORE') {
       const slot0Y = 137;
       const slotPitch = 137;
@@ -615,9 +685,12 @@ class PokemonRecognitionEngine {
         opponent.push(pName);
       }
 
+      const trainerName = await trainerNamePromise;
+
       return {
         mode: 'BEFORE',
-        opponent
+        opponent,
+        trainerName
       };
     } else {
       // AFTER Mode
@@ -646,10 +719,13 @@ class PokemonRecognitionEngine {
         mySelection = [selObj[1], selObj[2], selObj[3], selObj[4]];
       }
 
+      const trainerName = await trainerNamePromise;
+
       return {
         mode: 'AFTER',
         opponent,
-        mySelection
+        mySelection,
+        trainerName
       };
     }
   }

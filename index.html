@@ -12,7 +12,8 @@
   <meta name="theme-color" content="#6c63ff">
   <link rel="manifest" href="manifest.json">
   <title>ポケモン対戦記録</title>
-  <script src="scripts/recognition_engine.js?v=20260829_v18"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="scripts/recognition_engine.js?v=20260830_v19"></script>
   <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -2203,6 +2204,14 @@
         <img id="image-lightbox-img" class="image-lightbox-img" src="" alt="拡大スクリーンショット" onclick="event.stopPropagation()">
       </div>
 
+      <div style="margin-top:14px;margin-bottom:8px">
+        <label style="font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;margin-bottom:4px">
+          <span>相手のトレーナー名</span>
+          <span style="font-size:11px;font-weight:normal;color:var(--text-muted)">（任意・画像から自動入力）</span>
+        </label>
+        <input type="text" id="rec-opp-trainer" placeholder="例: サトシ / Red" autocomplete="off" style="max-width:320px;font-size:14px">
+      </div>
+
       <div class="section-label">相手のパーティ（6体）</div>
       <div class="slot-grid" id="opp-party-slots"></div>
 
@@ -3498,6 +3507,8 @@
       // 相手の選出プルダウン（初期は空）
       buildOppSelectionDropdowns([]);
 
+      const recOppTrainer = document.getElementById('rec-opp-trainer');
+      if (recOppTrainer) recOppTrainer.value = '';
       document.getElementById('rec-memo').value = '';
       form.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -3533,10 +3544,13 @@
       const oppParty = getSlotValues('opp-party-slots', 6);
       if (!oppParty.some(Boolean)) { alert('相手のパーティを1体以上入力してください'); return; }
 
+      const oppTrainer = (document.getElementById('rec-opp-trainer')?.value || '').trim();
+
       const rec = {
         id: Date.now().toString(),
         partyId: selectedPartyId,
         date: document.getElementById('rec-date').value,
+        oppTrainer,
         oppParty,
         mySelection: getSlotValues('my-selection-slots', 4),
         oppSelection: getSlotValues('opp-selection-slots', 4),
@@ -3617,9 +3631,12 @@
         return `<div class="record-item" onclick="openDetail('${r.id}')" style="border-left:3px solid ${isWin ? 'var(--win)' : 'var(--lose)'}">
       <div class="hist-card-body">
         <div class="hist-opp-party">
-          <div class="hist-row-label" style="display:flex;align-items:center;gap:6px">
-            <span class="${isWin ? 'badge-win' : 'badge-lose'}" style="font-size:10px;padding:2px 6px">${isWin ? '🏆勝' : '💀負'}</span>
-            <span class="record-date" style="font-size:11px">${dateStr}</span>
+          <div class="hist-row-label" style="display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:6px">
+              <span class="${isWin ? 'badge-win' : 'badge-lose'}" style="font-size:10px;padding:2px 6px">${isWin ? '🏆勝' : '💀負'}</span>
+              <span class="record-date" style="font-size:11px">${dateStr}</span>
+              ${r.oppTrainer ? `<span style="font-size:11px;font-weight:700;color:var(--text);background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px;border:1px solid rgba(255,255,255,0.1)">👤 ${r.oppTrainer}</span>` : ''}
+            </div>
           </div>
           <div style="display:flex;flex-wrap:wrap;gap:3px">${tagRow(oppPartyList, 'rgba(255,255,255,0.06)', oppSelFilter)}</div>
         </div>
@@ -3650,6 +3667,7 @@
       <span class="${r.result === 'win' ? 'badge-win' : 'badge-lose'}" style="font-size:16px;padding:4px 16px">${r.result === 'win' ? '🏆 勝ち' : '💀 負け'}</span>
       <span style="color:var(--text-muted);font-size:13px">${dateStr}</span>
     </div>
+    ${r.oppTrainer ? `<div style="margin-bottom:14px"><span style="font-size:12px;color:var(--text-muted)">相手トレーナー: </span><span style="font-weight:700;font-size:14px;color:var(--accent)">👤 ${r.oppTrainer}</span></div>` : ''}
     <div class="detail-section">
       <h4>自分のパーティ</h4>
       <div class="detail-pokemon">
@@ -6738,7 +6756,13 @@
         const result = await window.recognitionEngine.recognize(img, myTeamList);
         console.log('Recognition Result:', result);
 
-        // 1. 相手パーティスロットに反映
+        // 1. 相手トレーナー名の反映
+        if (result.trainerName) {
+          const tInput = document.getElementById('rec-opp-trainer');
+          if (tInput) tInput.value = result.trainerName;
+        }
+
+        // 2. 相手パーティスロットに反映
         const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
         let setOppCount = 0;
         if (result.opponent && result.opponent.length) {
@@ -6753,7 +6777,7 @@
         // 相手選出ドロップダウンの選択肢を再構築
         rebuildOppSelectionDropdowns();
 
-        // 2. 自分の選出（AFTERモード時の先発1/先発2/後発1/後発2）を反映
+        // 3. 自分の選出（AFTERモード時の先発1/先発2/後発1/後発2）を反映
         let isSelectionAutoFilled = false;
         if (result.mode === 'AFTER' && result.mySelection && result.mySelection.length === 4) {
           const mySelSelects = document.querySelectorAll('#my-selection-slots select');
@@ -6783,7 +6807,8 @@
 
         const elapsedMs = Math.round(performance.now() - startTime);
         const modeLabel = (result.mode === 'BEFORE') ? '選出画面' : '準備画面';
-        const toastMsg = `⚡ 【${modeLabel}】相手パーティ${setOppCount}体` + (isSelectionAutoFilled ? 'と自分の選出4体' : '') + `を自動入力しました！（${elapsedMs}ms）`;
+        const trainerLabel = result.trainerName ? `（トレーナー: ${result.trainerName}）` : '';
+        const toastMsg = `⚡ 【${modeLabel}】相手パーティ${setOppCount}体` + (isSelectionAutoFilled ? 'と自分の選出4体' : '') + `${trainerLabel}を自動入力しました！（${elapsedMs}ms）`;
         showRecordToast(toastMsg);
 
       } catch (err) {
