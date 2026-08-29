@@ -12,7 +12,7 @@
   <meta name="theme-color" content="#6c63ff">
   <link rel="manifest" href="manifest.json">
   <title>ポケモン対戦記録</title>
-  <script src="scripts/recognition_engine.js"></script>
+  <script src="scripts/recognition_engine.js?v=20260829_v16"></script>
   <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -6555,8 +6555,24 @@
           const mySelSelects = document.querySelectorAll('#my-selection-slots select');
           result.mySelection.forEach((name, i) => {
             if (name && mySelSelects[i]) {
-              mySelSelects[i].value = name;
-              isSelectionAutoFilled = true;
+              const norm = name.split('(')[0].split('（')[0].trim();
+              let matchedOpt = null;
+              for (const opt of mySelSelects[i].options) {
+                if (!opt.value) continue;
+                if (opt.value === name || opt.text === name) {
+                  matchedOpt = opt.value;
+                  break;
+                }
+                const optNorm = opt.value.split('(')[0].split('（')[0].trim();
+                if (optNorm === norm && optNorm.length > 0) {
+                  matchedOpt = opt.value;
+                  break;
+                }
+              }
+              if (matchedOpt) {
+                mySelSelects[i].value = matchedOpt;
+                isSelectionAutoFilled = true;
+              }
             }
           });
         }

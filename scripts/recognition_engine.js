@@ -1,6 +1,7 @@
 // ============================================================================
 // Pokemon Battle Log - Universal Client-Side Image Recognition Engine
 // Powered by Otsu Thresholding, 680-dim Spatial Pyramid PHOG & Geometric Solidity
+// Standard Coordinate Space: 2532 x 1170
 // ============================================================================
 
 class PokemonRecognitionEngine {
@@ -541,23 +542,16 @@ class PokemonRecognitionEngine {
   async recognize(imageSource, myTeam = []) {
     await this.loadDictionaries();
 
-    // Standardize to Canvas (1920x1080 or native Switch aspect 16:9, resized to standard Switch coordinate 2340x1080 or 1920x1080)
-    const canvas = document.createElement('canvas');
-    canvas.width = imageSource.naturalWidth || imageSource.width || 1920;
-    canvas.height = imageSource.naturalHeight || imageSource.height || 1080;
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    ctx.drawImage(imageSource, 0, 0);
-
-    // If resolution differs from switch standard (e.g. 1920x1080 scaled), handle appropriately
-    // The model uses Switch screen coordinates mapped to 2340 width or scaled
+    // Standardize to Canvas (Exact 2532 x 1170 Coordinate Space)
     const standardCanvas = document.createElement('canvas');
-    standardCanvas.width = 2340;
-    standardCanvas.height = 1080;
+    standardCanvas.width = 2532;
+    standardCanvas.height = 1170;
     const sCtx = standardCanvas.getContext('2d', { willReadFrequently: true });
-    sCtx.drawImage(canvas, 0, 0, 2340, 1080);
+    sCtx.imageSmoothingEnabled = true;
+    sCtx.imageSmoothingQuality = 'high';
+    sCtx.drawImage(imageSource, 0, 0, 2532, 1170);
 
     // 1. Detect Mode: BEFORE (Selection screen) vs AFTER (Battle preparation screen)
-    // Check type match score at BEFORE coordinate vs AFTER coordinate
     const testBefore = this._matchTypeTemplate(sCtx, 2117, 137 + 12, 45, 45, this.typeFeaturesBefore);
     const testAfter = this._matchTypeTemplate(sCtx, 1912, 160 + 12, 45, 45, this.typeFeaturesAfter);
 
