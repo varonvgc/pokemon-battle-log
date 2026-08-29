@@ -671,6 +671,88 @@
       flex-shrink: 0;
     }
 
+    .picker-top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .picker-slots-nav {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+      flex: 1;
+    }
+
+    .picker-slot-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 42px;
+      background: var(--surface2);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      padding: 0;
+      position: relative;
+      transition: all 0.15s ease;
+    }
+
+    .picker-slot-item:hover {
+      border-color: var(--accent);
+      background: rgba(108, 99, 255, 0.12);
+    }
+
+    .picker-slot-item.active {
+      border-color: var(--accent);
+      background: rgba(108, 99, 255, 0.22);
+      box-shadow: 0 0 0 2px var(--accent), 0 2px 8px rgba(108, 99, 255, 0.35);
+    }
+
+    .picker-slot-item img.ball-img {
+      width: 26px;
+      height: 26px;
+      object-fit: contain;
+      mix-blend-mode: lighten;
+      pointer-events: none;
+    }
+
+    .picker-slot-item .poke-sprite {
+      display: block;
+      width: 40px;
+      height: 30px;
+      background-image: url('assets/pokemonicons-sheet.png');
+      background-repeat: no-repeat;
+      image-rendering: pixelated;
+      pointer-events: none;
+      transform: scale(0.85);
+    }
+
+    .picker-close-btn {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    .picker-close-btn:hover {
+      color: #fff;
+      border-color: var(--lose);
+      background: rgba(248, 113, 113, 0.2);
+    }
+
     .picker-title {
       font-size: 14px;
       font-weight: 700;
@@ -2386,7 +2468,11 @@
   <div class="picker-overlay" id="pokemon-picker">
     <div class="picker-modal">
       <div class="picker-header">
-        <div class="picker-title" id="picker-title">ポケモンを選択</div>
+        <div class="picker-top-bar" id="picker-top-bar">
+          <div class="picker-slots-nav" id="picker-slots-nav"></div>
+          <div class="picker-fallback-title" id="picker-fallback-title" style="display:none;font-weight:700;font-size:15px;color:var(--text)">ポケモンを選択</div>
+          <button type="button" class="picker-close-btn" id="picker-close-btn" onclick="closePokemonPicker()" title="閉じる">✕</button>
+        </div>
         <input type="text" class="picker-search" id="picker-search" placeholder="名前で検索（ひらがな可）" autocomplete="off"
           oninput="pickerOnSearch(this.value)">
         <div class="picker-types" id="picker-types"></div>
@@ -4196,6 +4282,47 @@
       renderPickerGrid(document.getElementById('picker-search').value);
     }
 
+    let pickerOppSlotIndex = -1;
+
+    function renderPickerOppSlots() {
+      const nav = document.getElementById('picker-slots-nav');
+      if (!nav) return;
+      const inputs = document.querySelectorAll('#opp-party-slots input[type=text]');
+      let html = '';
+      for (let i = 0; i < 6; i++) {
+        const val = inputs[i] ? inputs[i].value.trim() : '';
+        const isActive = (i === pickerOppSlotIndex);
+        let inner = '';
+        if (val) {
+          const poke = (localPokemon || POKEMON_LIST).find(p => p.display === val);
+          if (poke) {
+            const pos = getPokeIconPos(poke);
+            inner = `<span class="poke-sprite" style="background-position:${pos}"></span>`;
+          } else {
+            inner = `<img src="data:image/jpeg;base64,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" alt="${i + 1}体目" class="ball-img">`;
+          }
+        } else {
+          inner = `<img src="data:image/jpeg;base64,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" alt="${i + 1}体目" class="ball-img">`;
+        }
+        html += `<button type="button" class="picker-slot-item${isActive ? ' active' : ''}" onclick="setPickerOppSlot(${i})" title="${i + 1}体目">${inner}</button>`;
+      }
+      nav.innerHTML = html;
+    }
+
+    function setPickerOppSlot(idx) {
+      pickerOppSlotIndex = idx;
+      const inputs = document.querySelectorAll('#opp-party-slots input[type=text]');
+      if (inputs[idx]) {
+        pickerTargetInput = inputs[idx];
+      }
+      const searchEl = document.getElementById('picker-search');
+      if (searchEl) searchEl.value = '';
+      pickerActiveType = null;
+      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+      renderPickerOppSlots();
+      renderPickerGrid('');
+    }
+
     function openPokemonPicker(btn) {
       const wrap = btn.closest('.pokemon-slot');
       pickerTargetInput = wrap ? wrap.querySelector('input[type=text]') : btn.closest('.slot-input-wrap').querySelector('input[type=text]');
@@ -4206,6 +4333,21 @@
       pickerActiveType = null;
       document.getElementById('picker-search').value = '';
       document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+
+      const slotsNav = document.getElementById('picker-slots-nav');
+      const fallbackTitle = document.getElementById('picker-fallback-title');
+
+      if (containerId === 'opp-party-slots') {
+        pickerOppSlotIndex = parseInt(pickerTargetInput.dataset.index, 10) || 0;
+        if (slotsNav) slotsNav.style.display = 'grid';
+        if (fallbackTitle) fallbackTitle.style.display = 'none';
+        renderPickerOppSlots();
+      } else {
+        pickerOppSlotIndex = -1;
+        if (slotsNav) slotsNav.style.display = 'none';
+        if (fallbackTitle) fallbackTitle.style.display = 'block';
+      }
+
       renderPickerGrid('');
       document.getElementById('pokemon-picker').classList.add('open');
     }
@@ -4213,6 +4355,8 @@
     function closePokemonPicker() {
       document.getElementById('pokemon-picker').classList.remove('open');
       pickerTargetInput = null;
+      pickerOppSlotIndex = -1;
+      _pePickerTargetIdx = -1;
     }
 
     function pickerOnSearch(val) {
@@ -4281,6 +4425,25 @@
         closePokemonPicker();
         return;
       }
+
+      if (pickerOppSlotIndex >= 0 && pickerTargetInput && pickerTargetInput.dataset.container === 'opp-party-slots') {
+        // 相手パーティ選択時
+        pickerTargetInput.value = displayName;
+        recordRecentPick(displayName);
+        updateSlotIcon(pickerTargetInput, displayName);
+        rebuildOppSelectionDropdowns();
+
+        const nextIdx = pickerOppSlotIndex + 1;
+        if (nextIdx < 6) {
+          // 次のスロットへ移動
+          setPickerOppSlot(nextIdx);
+        } else {
+          // 6番目の選択完了 -> ピッカーを閉じる
+          closePokemonPicker();
+        }
+        return;
+      }
+
       if (pickerTargetInput) {
         pickerTargetInput.value = displayName;
         recordRecentPick(displayName);
@@ -5031,6 +5194,14 @@
     let _pePickerTargetIdx = -1;
     function openPokemonPickerForPe(idx) {
       _pePickerTargetIdx = idx;
+      pickerOppSlotIndex = -1;
+      pickerTargetInput = null;
+      pickerActiveType = null;
+      document.querySelectorAll('.type-btn').forEach(b => b.classList.remove('active'));
+      const slotsNav = document.getElementById('picker-slots-nav');
+      const fallbackTitle = document.getElementById('picker-fallback-title');
+      if (slotsNav) slotsNav.style.display = 'none';
+      if (fallbackTitle) fallbackTitle.style.display = 'block';
       pickerOnSearch('');
       const overlay = document.getElementById('pokemon-picker');
       overlay.classList.add('open');
