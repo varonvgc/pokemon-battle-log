@@ -2277,9 +2277,9 @@
 
 <body>
   <div id="conflict-banner">
-    <span>⚠️ 別の端末でデータが更新されています</span>
+    <span>⚠️ 別の端末でデータが更新されました</span>
     <div style="display:flex;align-items:center;gap:8px">
-      <button id="conflict-banner-reload" onclick="location.reload()">リロード</button>
+      <button id="conflict-banner-reload" onclick="applyRemoteData()">最新データを反映</button>
       <button id="conflict-banner-dismiss" onclick="dismissConflictBanner()" title="閉じる">✕</button>
     </div>
   </div>
@@ -3050,6 +3050,7 @@
     // 他端末の変更を検知してリロードを促す（入力前チェック用）
     let _conflictCheckBusy = false;
     let _conflictBannerDismissed = false;
+    let _latestRemoteData = null;
 
     // バナーを表示
     function showConflictBanner() {
@@ -3061,6 +3062,32 @@
       _conflictBannerDismissed = true;
       const b = document.getElementById('conflict-banner');
       if (b) b.classList.remove('show');
+    }
+
+    // 最新データ（他端末の更新）を白画面リロードなしで即座に画面へ反映
+    async function applyRemoteData() {
+      if (_latestRemoteData) {
+        if (_latestRemoteData.parties && Array.isArray(_latestRemoteData.parties)) {
+          parties = _latestRemoteData.parties;
+          localStorage.setItem('pkm_parties', JSON.stringify(parties));
+        }
+        if (_latestRemoteData.records && Array.isArray(_latestRemoteData.records)) {
+          records = _latestRemoteData.records;
+          localStorage.setItem('pkm_records', JSON.stringify(records));
+        }
+        if (_latestRemoteData.updatedAt && _latestRemoteData.updatedAt.toMillis) {
+          _lastLoadedAt = _latestRemoteData.updatedAt.toMillis();
+        } else {
+          _lastLoadedAt = Date.now();
+        }
+      } else {
+        await loadFromFirestore();
+      }
+      renderParties();
+      renderHistory();
+      renderRecordPage();
+      dismissConflictBanner();
+      showRecordToast('✨ 最新データを画面に反映しました！');
     }
 
     // バックグラウンドで競合チェックし、変更があればバナー表示
@@ -3155,6 +3182,7 @@
           if (!snap.exists()) return;
           const data = snap.data();
           if (isRemoteConflict(data)) {
+            _latestRemoteData = data;
             showConflictBanner();
           } else {
             // 自分の更新時はバナーを消す
