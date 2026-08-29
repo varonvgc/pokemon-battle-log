@@ -3020,7 +3020,7 @@
       return false;
     }
 
-    // Firestoreへのパーティ保存（パーティ編集時など）
+    // Firestoreへのデータ保存
     async function saveData() {
       localStorage.setItem('pkm_parties', JSON.stringify(parties));
       localStorage.setItem('pkm_records', JSON.stringify(records));
@@ -3031,6 +3031,7 @@
       try {
         const payload = {
           parties,
+          records,
           updatedAt: window._firestoreOps.serverTimestamp(),
           updatedBy: CLIENT_ID
         };
@@ -3044,44 +3045,6 @@
         const b = document.getElementById('conflict-banner');
         if (b) b.classList.remove('show');
       } catch (e) { console.error('Firestore save error:', e); }
-    }
-
-    // 単一対戦記録をFirestore（サブコレクション）にバックグラウンド保存
-    async function saveRecordToFirestore(rec) {
-      if (!currentUser || !_fbReady || !rec || !rec.id) return;
-      const { doc, setDoc } = window._firestoreOps;
-      const db = window._db;
-      const uid = currentUser.uid;
-      try {
-        await setDoc(doc(db, 'users', uid, 'records', rec.id), rec, { merge: true });
-        // 他端末に更新を伝えるため updatedAt と updatedBy も更新
-        await setDoc(doc(db, 'users', uid, 'data', 'main'), {
-          updatedAt: window._firestoreOps.serverTimestamp(),
-          updatedBy: CLIENT_ID
-        }, { merge: true });
-        _lastLoadedAt = Date.now();
-      } catch (e) {
-        console.error('Firestore record save error:', e);
-      }
-    }
-
-    // 単一対戦記録をFirestore（サブコレクション）からバックグラウンド削除
-    async function deleteRecordFromFirestore(recId) {
-      if (!currentUser || !_fbReady || !recId) return;
-      const { doc, deleteDoc, setDoc } = window._firestoreOps;
-      const db = window._db;
-      const uid = currentUser.uid;
-      try {
-        await deleteDoc(doc(db, 'users', uid, 'records', recId));
-        // 他端末に更新を伝えるため updatedAt と updatedBy も更新
-        await setDoc(doc(db, 'users', uid, 'data', 'main'), {
-          updatedAt: window._firestoreOps.serverTimestamp(),
-          updatedBy: CLIENT_ID
-        }, { merge: true });
-        _lastLoadedAt = Date.now();
-      } catch (e) {
-        console.error('Firestore record delete error:', e);
-      }
     }
 
     // 他端末の変更を検知してリロードを促す（入力前チェック用）
@@ -3144,7 +3107,7 @@
       }
     }
 
-    // Firestoreからロード（パーティ情報＋サブコレクション対戦履歴＋レガシー履歴をマージ）
+    // Firestoreからロード（パーティ情報＋対戦履歴を読み込み）
     async function loadFromFirestore() {
       if (!currentUser || !_fbReady) return;
       const { doc, getDoc, setDoc, collection, getDocs } = window._firestoreOps;
@@ -3179,7 +3142,7 @@
           }
         }
 
-        // サブコレクション（users/{uid}/records）から個別対戦記録を取得
+        // サブコレクション（users/{uid}/records）に記録があれば読み込んでマージ（書き込みは絶対に行わない）
         try {
           const recSnap = await getDocs(collection(db, 'users', uid, 'records'));
           const subRecords = [];
@@ -3189,25 +3152,16 @@
             }
           });
 
-          // レガシーデータとサブコレクションデータをマージ（重複はidで排除）
-          const recordMap = new Map();
-          // 古いレガシーを先に投入
-          loadedRecords.forEach(r => { if (r && r.id) recordMap.set(r.id, r); });
-          // サブコレクションの最新データを上書き投入
-          subRecords.forEach(r => { if (r && r.id) recordMap.set(r.id, r); });
-
-          records = Array.from(recordMap.values());
-          // 日時/ID順（新しい順）でソート
-          records.sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0));
-
-          // もしレガシーrecordsが残っていればバックグラウンドでサブコレクションへ移行保存
-          if (loadedRecords.length > 0) {
-            loadedRecords.forEach(r => {
-              if (r && r.id) saveRecordToFirestore(r);
-            });
+          if (subRecords.length > 0) {
+            const recordMap = new Map();
+            loadedRecords.forEach(r => { if (r && r.id) recordMap.set(r.id, r); });
+            subRecords.forEach(r => { if (r && r.id) recordMap.set(r.id, r); });
+            records = Array.from(recordMap.values());
+            records.sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0));
+          } else {
+            records = loadedRecords;
           }
         } catch (recErr) {
-          console.warn('Subcollection records load fallback:', recErr);
           records = loadedRecords;
         }
 
@@ -4026,12 +3980,10 @@
 
       // 1. ローカルに即時保存
       records.unshift(rec);
-      localStorage.setItem('pkm_records', JSON.stringify(records));
+      // 2. クラウドにバックグラウンド保存
+      saveData();
 
-      // 2. クラウドに個別バックグラウンド保存（待ち時間ゼロ）
-      saveRecordToFirestore(rec);
-
-      // 3. UIの即時リセットとトースト通知（一瞬で完了）
+      // 3. UIの即時リセットとトースト通知
       selectedPartyId = null;
       recordResult = null;
       document.getElementById('record-form-card').style.display = 'none';
@@ -4181,8 +4133,7 @@
       if (reloading) return;
       if (!confirm('この記録を削除しますか？')) return;
       records = records.filter(r => r.id !== id);
-      localStorage.setItem('pkm_records', JSON.stringify(records));
-      deleteRecordFromFirestore(id);
+      saveData();
       closeDetailModal();
       renderHistory();
       showRecordToast('🗑️ 記録を削除しました');
