@@ -398,7 +398,7 @@ class PokemonRecognitionEngine {
     return c;
   }
 
-  _getSlotNumber(ctx, slotY) {
+  _getSlotBadgeScores(ctx, slotY) {
     const cropCanvas = document.createElement('canvas');
     cropCanvas.width = 20;
     cropCanvas.height = 20;
@@ -421,10 +421,7 @@ class PokemonRecognitionEngine {
       }
     }
 
-    if (whiteCount < 150) return 0;
-
-    let bestNum = 0;
-    let bestDiff = 999999999;
+    const scores = { 1: 999999, 2: 999999, 3: 999999, 4: 999999 };
     for (const numStr of ['1', '2', '3', '4']) {
       const ref = this.badgeFeatures[numStr];
       if (!ref) continue;
@@ -432,12 +429,14 @@ class PokemonRecognitionEngine {
       for (let k = 0; k < 400; k++) {
         diff += Math.abs(b[k] - ref[k]);
       }
-      if (diff < bestDiff) {
-        bestDiff = diff;
-        bestNum = parseInt(numStr, 10);
-      }
+      scores[parseInt(numStr, 10)] = diff;
     }
-    return bestNum;
+
+    return {
+      isSelected: (whiteCount >= 150),
+      whiteCount,
+      scores
+    };
   }
 
   _resolveMySelection(ctx, myTeamList) {
@@ -454,15 +453,54 @@ class PokemonRecognitionEngine {
       };
     });
 
-    const selectedSlotIndices = {};
+    // 1. 各スロットのバッジ認識（1〜4の差分スコア取得）
+    const slotBadges = [];
     for (let i = 0; i < 6; i++) {
       const sy = slot0Y + i * slotPitch;
-      const num = this._getSlotNumber(ctx, sy);
-      if (num >= 1 && num <= 4) {
-        selectedSlotIndices[num] = i;
+      const badgeInfo = this._getSlotBadgeScores(ctx, sy);
+      slotBadges.push({ slot: i, ...badgeInfo });
+    }
+
+    // 選出されたスロットを抽出（通常4つ、もし足りない場合は白画素数の多い順に補完）
+    let selectedSlots = slotBadges.filter(s => s.isSelected);
+    if (selectedSlots.length < 4) {
+      const sortedByWhite = [...slotBadges].sort((a, b) => b.whiteCount - a.whiteCount);
+      selectedSlots = sortedByWhite.slice(0, 4);
+    } else if (selectedSlots.length > 4) {
+      selectedSlots = selectedSlots.sort((a, b) => b.whiteCount - a.whiteCount).slice(0, 4);
+    }
+
+    // 2. 4つの選出スロットに対して [1, 2, 3, 4] の1対1最適割当（24通りの全順列コスト最小化）
+    const permutations = [
+      [1,2,3,4], [1,2,4,3], [1,3,2,4], [1,3,4,2], [1,4,2,3], [1,4,3,2],
+      [2,1,3,4], [2,1,4,3], [2,3,1,4], [2,3,4,1], [2,4,1,3], [2,4,3,1],
+      [3,1,2,4], [3,1,4,2], [3,2,1,4], [3,2,4,1], [3,4,1,2], [3,4,2,1],
+      [4,1,2,3], [4,1,3,2], [4,2,1,3], [4,2,3,1], [4,3,1,2], [4,3,2,1]
+    ];
+
+    let bestTotalCost = Infinity;
+    let bestPerm = [1, 2, 3, 4];
+
+    for (const perm of permutations) {
+      let cost = 0;
+      for (let k = 0; k < 4; k++) {
+        const num = perm[k];
+        cost += selectedSlots[k].scores[num];
+      }
+      if (cost < bestTotalCost) {
+        bestTotalCost = cost;
+        bestPerm = perm;
       }
     }
 
+    const selectedSlotIndices = {};
+    for (let k = 0; k < 4; k++) {
+      const sIdx = selectedSlots[k].slot;
+      const num = bestPerm[k];
+      selectedSlotIndices[num] = sIdx;
+    }
+
+    // 3. タイプ判定とチームメンバーの1対1最小コスト割当
     const slotTypes = [];
     for (let i = 0; i < 6; i++) {
       const sy = slot0Y + i * slotPitch;
