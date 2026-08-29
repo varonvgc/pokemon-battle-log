@@ -3008,10 +3008,16 @@
     let _lastLoadedAt = 0;
 
     function isRemoteConflict(data) {
-      if (!data || !data.updatedBy) return false;
+      if (!data) return false;
       // 自分が書き込んだ更新なら絶対にリロード要求を出さない
-      if (data.updatedBy === CLIENT_ID) return false;
-      return true;
+      if (data.updatedBy && data.updatedBy === CLIENT_ID) return false;
+
+      const serverTime = (data.updatedAt && data.updatedAt.toMillis) ? data.updatedAt.toMillis() : 0;
+      // この端末がロードした時刻より後に他端末が保存した場合のみ競合とみなす
+      if (_lastLoadedAt > 0 && serverTime > _lastLoadedAt) {
+        return true;
+      }
+      return false;
     }
 
     // Firestoreへのパーティ保存（パーティ編集時など）
@@ -3097,7 +3103,7 @@
     // バックグラウンドで競合チェックし、変更があればバナー表示
     async function bgConflictCheck() {
       if (!currentUser || !_fbReady || _conflictCheckBusy) return;
-      if (_conflictBannerDismissed) return; // 一度閉じたら再表示しない
+      if (_conflictBannerDismissed) return;
       _conflictCheckBusy = true;
       try {
         const { doc, getDoc } = window._firestoreOps;
@@ -3123,7 +3129,6 @@
         if (!snap.exists()) return false;
         const data = snap.data();
         if (isRemoteConflict(data)) {
-          // バナーも表示
           showConflictBanner();
           const ok = confirm(
             '別の端末でデータが更新されています。\n' +
@@ -3135,7 +3140,7 @@
         }
         return false;
       } catch (e) {
-        return false; // 通信失敗時は無視して続行
+        return false;
       }
     }
 
@@ -3165,8 +3170,10 @@
           }
           updateAiApiKeyUI();
 
-          const ud2 = data.updatedAt; _lastLoadedAt = (ud2 && ud2.toMillis) ? ud2.toMillis() : Date.now();
+          const ud2 = data.updatedAt;
+          _lastLoadedAt = (ud2 && ud2.toMillis) ? ud2.toMillis() : Date.now();
         } else {
+          _lastLoadedAt = Date.now();
           if (getGeminiApiKey()) {
             setDoc(doc(db, 'users', uid, 'data', 'main'), { geminiApiKey: getGeminiApiKey() }, { merge: true }).catch(console.error);
           }
@@ -3224,13 +3231,13 @@
           if (!snap.exists()) return;
           const data = snap.data();
           if (isRemoteConflict(data)) {
-            if (!_conflictBannerDismissed) {
-              showConflictBanner();
-            }
+            showConflictBanner();
           } else {
             // 自分の更新時はバナーを消す
-            const b = document.getElementById('conflict-banner');
-            if (b) b.classList.remove('show');
+            if (data.updatedBy === CLIENT_ID) {
+              const b = document.getElementById('conflict-banner');
+              if (b) b.classList.remove('show');
+            }
           }
         });
       } catch (err) {
