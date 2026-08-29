@@ -641,4 +641,19 @@ Write-Host "Saved data/translation_map.json" -ForegroundColor Green
 [System.IO.File]::WriteAllText((Join-Path $dataDir "mega_stones.json"), ($megaMap | ConvertTo-Json -Depth 10), [System.Text.Encoding]::UTF8)
 Write-Host "Saved data/mega_stones.json ($($megaMap.Count) mapped)" -ForegroundColor Green
 
-Write-Host "`n=== Comprehensive Master Sync Complete Successfully! ===" -ForegroundColor Cyan
+# 14. Automatic Clean Roster & Image Recognition Feature Dictionaries Update
+Write-Host "`n--- Updating Image Recognition Feature Dictionaries ---" -ForegroundColor Cyan
+try {
+    $rosterScript = Join-Path $scriptsDir "build_clean_roster.ps1"
+    if (Test-Path $rosterScript) {
+        & $rosterScript
+    }
+    $phogScript = Join-Path $scriptsDir "gen_geo_phog_features.ps1"
+    if (Test-Path $phogScript) {
+        & $phogScript
+    }
+} catch {
+    Write-Warning "Could not update recognition features: $($_.Exception.Message)"
+}
+
+Write-Host "`n=== Comprehensive Master Sync & AI Recognition Engine Ready! ===" -ForegroundColor Cyan

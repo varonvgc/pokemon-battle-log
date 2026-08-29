@@ -12,6 +12,7 @@
   <meta name="theme-color" content="#6c63ff">
   <link rel="manifest" href="manifest.json">
   <title>ポケモン対戦記録</title>
+  <script src="scripts/recognition_engine.js"></script>
   <!-- Firebase SDK -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -2046,10 +2047,15 @@
 
       <!-- AUTO記録（選出スクショ解析）エリア -->
       <div class="rec-ai-box" id="rec-ai-box" style="margin-top:16px;margin-bottom:8px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px">
           <div style="font-size:13px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:6px">
             <span>⚡ 選出画面スクショから高速自動入力</span>
-            <span style="font-size:10px;background:rgba(16,185,129,0.2);color:#34d399;padding:2px 6px;border-radius:4px;border:1px solid rgba(52,211,153,0.3)">ローカル0.1秒認識・API不要</span>
+            <span style="font-size:10px;background:rgba(16,185,129,0.2);color:#34d399;padding:2px 6px;border-radius:4px;border:1px solid rgba(52,211,153,0.3)">0.05秒・完全ローカル</span>
+          </div>
+          <div class="rec-mode-tabs" style="display:inline-flex;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:2px;gap:2px">
+            <button type="button" class="rec-mode-btn active" id="rec-mode-auto" onclick="setRecordScanMode('auto')" style="padding:4px 8px;font-size:11px;border-radius:4px;border:none;background:var(--accent);color:#fff;cursor:pointer;font-weight:600">🪄 自動判別</button>
+            <button type="button" class="rec-mode-btn" id="rec-mode-unselected" onclick="setRecordScanMode('not_selected')" style="padding:4px 8px;font-size:11px;border-radius:4px;border:none;background:transparent;color:var(--text-muted);cursor:pointer;font-weight:500">1️⃣ 選出前(相手6体)</button>
+            <button type="button" class="rec-mode-btn" id="rec-mode-selected" onclick="setRecordScanMode('selected')" style="padding:4px 8px;font-size:11px;border-radius:4px;border:none;background:transparent;color:var(--text-muted);cursor:pointer;font-weight:500">2️⃣ 選出後(選出も自動入力)</button>
           </div>
         </div>
         <div class="rec-ai-drop-zone" id="rec-ai-drop-zone" onclick="document.getElementById('rec-ai-file-input').click()">
@@ -6183,6 +6189,29 @@
     // ---- BATTLE SCREEN AUTO FILL (完全ローカル・マルチモーダル認識エンジン) ----
     // ======================================================
 
+    let recordScanMode = 'auto'; // 'auto' | 'not_selected' | 'selected'
+
+    function setRecordScanMode(mode) {
+      recordScanMode = mode;
+      const btnAuto = document.getElementById('rec-mode-auto');
+      const btnUnsel = document.getElementById('rec-mode-unselected');
+      const btnSel = document.getElementById('rec-mode-selected');
+
+      [btnAuto, btnUnsel, btnSel].forEach(b => {
+        if (!b) return;
+        b.style.background = 'transparent';
+        b.style.color = 'var(--text-muted)';
+        b.style.fontWeight = '500';
+      });
+
+      const activeBtn = (mode === 'not_selected') ? btnUnsel : (mode === 'selected' ? btnSel : btnAuto);
+      if (activeBtn) {
+        activeBtn.style.background = 'var(--accent)';
+        activeBtn.style.color = '#fff';
+        activeBtn.style.fontWeight = '600';
+      }
+    }
+
     function showRecordToast(message) {
       let toast = document.getElementById('rec-toast');
       if (!toast) {
@@ -6226,6 +6255,32 @@
       });
     }
 
+    // カード開始Y座標の自動アライメント（どんな解像度・黒帯でもジャストフィット）
+    function findCardStartY(mainCanvas, scanX) {
+      const ctx = mainCanvas.getContext('2d');
+      const h = mainCanvas.height;
+      const scanData = ctx.getImageData(scanX, 0, 1, Math.round(h * 0.45)).data;
+
+      for (let y = 15; y < Math.round(h * 0.45) - 6; y++) {
+        const idx = y * 4;
+        const r = scanData[idx], g = scanData[idx + 1], b = scanData[idx + 2];
+        // 赤紫色カード背景 (#78103c) の検出
+        if (r > 85 && r < 170 && g < 50 && b > 20 && b < 105) {
+          let match = true;
+          for (let k = 1; k <= 5; k++) {
+            const kidx = (y + k) * 4;
+            const kr = scanData[kidx], kg = scanData[kidx + 1], kb = scanData[kidx + 2];
+            if (!(kr > 85 && kr < 170 && kg < 50 && kb > 20 && kb < 105)) {
+              match = false;
+              break;
+            }
+          }
+          if (match) return y;
+        }
+      }
+      return Math.round(h * 0.12); // フォールバック
+    }
+
     // タイプ照合ヘルパー
     function recognizeTypeFromCanvas(mainCanvas, cropX, cropY, cropW, cropH) {
       if (!TYPE_FEATURES_DECODED || !Object.keys(TYPE_FEATURES_DECODED).length) return 'none';
@@ -6258,8 +6313,7 @@
         }
       }
 
-      // スコア閾値（12000000以内ならタイプとして認定）
-      return (bestScore < 12000000) ? bestType : 'none';
+      return (bestScore < 14000000) ? bestType : 'none';
     }
 
     // 性別判定ヘルパー
@@ -6284,13 +6338,43 @@
       return 'none';
     }
 
-    // アイコン画像と特定候補群の比較
+    function rgbToHsv(r, g, b) {
+      const r_ = r / 255, g_ = g / 255, b_ = b / 255;
+      const max = Math.max(r_, g_, b_), min = Math.min(r_, g_, b_);
+      const delta = max - min;
+      const v = max;
+      const s = max === 0 ? 0 : delta / max;
+      let h = 0;
+      if (delta > 0) {
+        if (max === r_) h = 60 * (((g_ - b_) / delta) % 6);
+        else if (max === g_) h = 60 * (((b_ - r_) / delta) + 2);
+        else h = 60 * (((r_ - g_) / delta) + 4);
+        if (h < 0) h += 360;
+      }
+      return [h, s, v];
+    }
+
+    // アイコン画像と特定候補群の比較（色相・彩度・占有面積・シルエットを統合した高精度版）
     function matchCropToCandidatePokemons(cropImgData, candidateFiles) {
       const data = cropImgData.data;
-      let bestFile = (candidateFiles && candidateFiles[0]) || '';
-      let bestScore = Infinity;
+
+      let cropFgCount = 0;
+      let cropHueSum = 0, cropSatSum = 0;
+      for (let k = 0; k < 1024; k += 4) {
+        const r = data[k], g = data[k + 1], b = data[k + 2];
+        const isBg = (r > 85 && r < 170 && g < 50 && b > 20 && b < 105);
+        if (!isBg) {
+          cropFgCount++;
+          const [h, s] = rgbToHsv(r, g, b);
+          cropHueSum += h;
+          cropSatSum += s;
+        }
+      }
+      const cropAvgHue = cropFgCount > 0 ? (cropHueSum / cropFgCount) : 0;
+      const cropAvgSat = cropFgCount > 0 ? (cropSatSum / cropFgCount) : 0;
 
       const targetList = (candidateFiles && candidateFiles.length) ? candidateFiles : Object.keys(POKEMON_FEATURES_DECODED);
+      const scoredList = [];
 
       for (const fn of targetList) {
         const iconBytes = POKEMON_FEATURES_DECODED[fn];
@@ -6298,29 +6382,60 @@
 
         let diff = 0;
         let weightSum = 0;
+        let iconFgCount = 0;
+        let iconHueSum = 0, iconSatSum = 0;
+
         for (let k = 0; k < 1024; k += 4) {
           const a = iconBytes[k + 3] / 255;
+          const cr = data[k], cg = data[k + 1], cb = data[k + 2];
+          const isBg = (cr > 85 && cr < 170 && cg < 50 && cb > 20 && cb < 105);
+
           if (a > 0.25) {
-            const dr = data[k] - iconBytes[k];
-            const dg = data[k + 1] - iconBytes[k + 1];
-            const db = data[k + 2] - iconBytes[k + 2];
+            iconFgCount++;
+            const dr = cr - iconBytes[k];
+            const dg = cg - iconBytes[k + 1];
+            const db = cb - iconBytes[k + 2];
             diff += (dr * dr + dg * dg + db * db) * a;
             weightSum += a;
+
+            const [ih, is] = rgbToHsv(iconBytes[k], iconBytes[k + 1], iconBytes[k + 2]);
+            iconHueSum += ih;
+            iconSatSum += is;
           }
         }
+
         if (weightSum > 15) {
-          const score = diff / weightSum;
-          if (score < bestScore) {
-            bestScore = score;
-            bestFile = fn;
-          }
+          let score = diff / weightSum;
+
+          // 1. 占有面積（シルエットの広がり）一致判定（ドヒドイデの殻など）
+          const areaRatioDiff = Math.abs(cropFgCount - iconFgCount) / Math.max(1, cropFgCount + iconFgCount);
+          score += areaRatioDiff * 3000;
+
+          // 2. 色相（Hue）一致判定
+          const iconAvgHue = iconFgCount > 0 ? (iconHueSum / iconFgCount) : 0;
+          let hueDiff = Math.abs(cropAvgHue - iconAvgHue);
+          if (hueDiff > 180) hueDiff = 360 - hueDiff;
+          score += hueDiff * 100;
+
+          // 3. 彩度（Saturation）一致判定（鮮やかな黄色/オレンジのカイリュー vs 暗いオンバーン等）
+          const iconAvgSat = iconFgCount > 0 ? (iconSatSum / iconFgCount) : 0;
+          const satDiff = Math.abs(cropAvgSat - iconAvgSat);
+          score += satDiff * 1500;
+
+          scoredList.push({ fileName: fn, score });
         }
       }
 
-      return { fileName: bestFile, score: bestScore };
+      scoredList.sort((a, b) => a.score - b.score);
+      const best = scoredList[0] || { fileName: targetList[0] || '', score: 999999 };
+      return {
+        fileName: best.fileName,
+        score: best.score,
+        topCandidates: scoredList.slice(0, 3).map(s => s.fileName)
+      };
     }
 
-    // 選出番号（1, 2, 3, 4）のピクセルパターン判定ヘルパー
+    // 選出番号（1, 2, 3, 4）のピクセルパターン判定
     function detectOrderNumberFromImageData(imgData) {
       const { data, width, height } = imgData;
       let topCount = 0, midCount = 0, bottomCount = 0, leftCount = 0, rightCount = 0;
@@ -6331,7 +6446,8 @@
         for (let x = 0; x < width; x++) {
           const idx = (y * width + x) * 4;
           const r = data[idx], g = data[idx + 1], b = data[idx + 2];
-          const isDark = (r < 120 && g < 120 && b < 160) || (b > 150 && r < 100);
+          // 白地上の濃紺の数字ピクセル
+          const isDark = (r < 110 && g < 110 && b < 160) || (b > 130 && r < 90 && g < 90);
           if (isDark) {
             totalNonBg++;
             if (y < height * 0.35) topCount++;
@@ -6344,14 +6460,55 @@
         }
       }
 
-      if (totalNonBg < 15) return 0;
+      if (totalNonBg < 10) return 0;
 
-      if (leftCount > rightCount * 1.3 && midCount > topCount) return 4;
-      if (rightCount > leftCount * 1.4) return 3;
-      if (bottomCount > topCount * 1.3) return 2;
-      if (totalNonBg > 0 && Math.abs(leftCount - rightCount) < totalNonBg * 0.25) return 1;
+      // 4: 左側と中央の比率が高い
+      if (leftCount > rightCount * 1.25 && midCount > topCount) return 4;
+      // 3: 右側が張り出している
+      if (rightCount > leftCount * 1.35) return 3;
+      // 2: 下部の横棒が重い
+      if (bottomCount > topCount * 1.25) return 2;
+      // 1: 縦棒が中央に立つ
+      if (totalNonBg > 0 && Math.abs(leftCount - rightCount) < totalNonBg * 0.3) return 1;
 
       return 1;
+    }
+
+    // クイックサジェストチップの描画
+    function renderOppSuggestChips(slotIdx, candidates, currentName) {
+      const slotEl = document.querySelectorAll('#opp-party-slots .pokemon-slot')[slotIdx];
+      if (!slotEl) return;
+
+      let chipContainer = slotEl.querySelector('.rec-suggest-chips');
+      if (!chipContainer) {
+        chipContainer = document.createElement('div');
+        chipContainer.className = 'rec-suggest-chips';
+        chipContainer.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;font-size:10px';
+        slotEl.appendChild(chipContainer);
+      }
+      chipContainer.innerHTML = '';
+
+      if (!candidates || candidates.length <= 1) return;
+
+      candidates.forEach(fn => {
+        const pObj = findPokemonByIconFile(fn);
+        const name = pObj ? pObj.display : fn;
+        if (name === currentName) return;
+
+        const chip = document.createElement('span');
+        chip.textContent = name;
+        chip.style.cssText = 'background:var(--surface);border:1px solid var(--border);padding:1px 6px;border-radius:4px;cursor:pointer;color:var(--accent);font-weight:600';
+        chip.onclick = () => {
+          const input = slotEl.querySelector('input[type=text]');
+          if (input) {
+            input.value = name;
+            updateSlotIcon(input, name);
+            rebuildOppSelectionDropdowns();
+            renderOppSuggestChips(slotIdx, candidates, name);
+          }
+        };
+        chipContainer.appendChild(chip);
+      });
     }
 
     async function handleRecordAiFile(file) {
@@ -6360,190 +6517,53 @@
         return;
       }
 
-      setRecordAiLoading(true, '画像を高速解析中...');
+      setRecordAiLoading(true, 'AI高精度解析中（PHOG幾何エンジン）...');
       const startTime = performance.now();
 
       try {
         const img = await loadImageFromFile(file);
-        const origW = img.naturalWidth || img.width;
-        const origH = img.naturalHeight || img.height;
 
-        const mainCanvas = document.createElement('canvas');
-        mainCanvas.width = origW;
-        mainCanvas.height = origH;
-        const mainCtx = mainCanvas.getContext('2d');
-        mainCtx.drawImage(img, 0, 0);
-
-        // 1. 画面タイプ判定（未選出 not_selected vs 選出完了 selected）
-        let whiteSlotCount = 0;
-        const slotWhiteScores = [];
-
-        for (let i = 0; i < 6; i++) {
-          const checkX = Math.round(origW * 0.23);
-          const checkY = Math.round(origH * (0.13 + i * 0.118));
-          const sampleData = mainCtx.getImageData(checkX, checkY, 20, 20).data;
-          let sumLum = 0;
-          for (let k = 0; k < sampleData.length; k += 4) {
-            sumLum += (sampleData[k] * 0.299 + sampleData[k + 1] * 0.587 + sampleData[k + 2] * 0.114);
-          }
-          const avgLum = sumLum / 400;
-          const isWhite = (avgLum > 175);
-          slotWhiteScores.push({ slot: i, isWhite, avgLum });
-          if (isWhite) whiteSlotCount++;
+        // 現在選択されている自分のパーティのポケモン一覧を取得
+        let myTeamList = [];
+        const myParty = parties.find(p => p.id === selectedPartyId);
+        if (myParty && myParty.pokemon && myParty.pokemon.length) {
+          myTeamList = myParty.pokemon.map(pk => (typeof pk === 'string' ? pk : (pk && pk.name || '')));
         }
 
-        const mode = (whiteSlotCount >= 3) ? 'selected' : 'not_selected';
+        // 高精度認識エンジン（大津2値化＋680次元PHOG＋幾何Solidity記述子＋タイプ認識）の実行
+        const result = await window.recognitionEngine.recognize(img, myTeamList);
+        console.log('Recognition Result:', result);
 
-        // 2. 相手6スロットのマルチモーダル（タイプ＋性別＋アイコン）認識
-        const oppXPct = (mode === 'selected') ? 0.689 : 0.775;
-        const oppWPct = 0.057;
-        const oppHPct = 0.110;
-
-        const type1XPct = (mode === 'selected') ? (768 / 1024) : (856 / 1024);
-        const type2XPct = (mode === 'selected') ? (790 / 1024) : (878 / 1024);
-        const genderXPct = (mode === 'selected') ? (772 / 1024) : (860 / 1024);
-
-        const thumbCanvas = document.createElement('canvas');
-        thumbCanvas.width = 16;
-        thumbCanvas.height = 16;
-        const thumbCtx = thumbCanvas.getContext('2d');
-        thumbCtx.imageSmoothingEnabled = true;
-        thumbCtx.imageSmoothingQuality = 'high';
-
-        const recognizedPokes = [];
-        const allPokeSrc = localPokemon || POKEMON_LIST;
-
-        for (let i = 0; i < 6; i++) {
-          const yPct = 0.118 + i * 0.118;
-          const cropX = Math.round(origW * oppXPct);
-          const cropY = Math.round(origH * yPct);
-          const cropW = Math.round(origW * oppWPct);
-          const cropH = Math.round(origH * oppHPct);
-
-          // タイプ1 & タイプ2
-          const t1X = Math.round(origW * type1XPct);
-          const t1Y = Math.round(origH * (yPct + 0.008));
-          const t2X = Math.round(origW * type2XPct);
-          const t2Y = t1Y;
-          const typeBoxDim = Math.round(origW * (20 / 1024));
-
-          const type1 = recognizeTypeFromCanvas(mainCanvas, t1X, t1Y, typeBoxDim, typeBoxDim);
-          const type2 = recognizeTypeFromCanvas(mainCanvas, t2X, t2Y, typeBoxDim, typeBoxDim);
-
-          // 性別
-          const gX = Math.round(origW * genderXPct);
-          const gY = Math.round(origH * (yPct + 0.063));
-          const gender = recognizeGenderFromCanvas(mainCanvas, gX, gY);
-
-          // タイプによる候補ポケモンの絞り込み
-          const candidateFiles = [];
-          const t1Ja = TYPE_NAME_JA_MAP[type1] || '';
-          const t2Ja = TYPE_NAME_JA_MAP[type2] || '';
-
-          if (t1Ja || t2Ja) {
-            allPokeSrc.forEach(p => {
-              const pt1 = p.type1 || '';
-              const pt2 = p.type2 || '';
-              let matchType = false;
-
-              if (t1Ja && t2Ja && t2Ja !== 'ステラ') {
-                if ((pt1 === t1Ja && pt2 === t2Ja) || (pt1 === t2Ja && pt2 === t1Ja)) matchType = true;
-              } else if (t1Ja && (!t2Ja || t2Ja === 'ステラ')) {
-                if (pt1 === t1Ja || pt2 === t1Ja) matchType = true;
-              } else if (t2Ja) {
-                if (pt1 === t2Ja || pt2 === t2Ja) matchType = true;
-              }
-
-              if (matchType) {
-                const fn = getPokemonIconFileName(p.display || p.name);
-                if (fn && fn !== 'default.png' && !candidateFiles.includes(fn)) {
-                  candidateFiles.push(fn);
-                }
-              }
-            });
-          }
-
-          // アイコン画像の切り出し＆照合
-          thumbCtx.clearRect(0, 0, 16, 16);
-          thumbCtx.drawImage(mainCanvas, cropX, cropY, cropW, cropH, 0, 0, 16, 16);
-          const cropImgData = thumbCtx.getImageData(0, 0, 16, 16);
-
-          const match = matchCropToCandidatePokemons(cropImgData, candidateFiles);
-          const pObj = findPokemonByIconFile(match.fileName);
-          const dispName = pObj ? pObj.display : (match.fileName || '');
-          recognizedPokes.push(dispName);
-        }
-
-        // 3. 相手パーティスロットに反映
+        // 1. 相手パーティスロットに反映
         const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
         let setOppCount = 0;
-        recognizedPokes.forEach((pName, idx) => {
-          if (idx >= 6 || !oppInputs[idx]) return;
-          oppInputs[idx].value = pName;
-          updateSlotIcon(oppInputs[idx], pName);
-          if (pName) setOppCount++;
-        });
+        if (result.opponent && result.opponent.length) {
+          result.opponent.forEach((pName, idx) => {
+            if (idx >= 6 || !oppInputs[idx]) return;
+            oppInputs[idx].value = pName;
+            updateSlotIcon(oppInputs[idx], pName);
+            if (pName && pName !== '???') setOppCount++;
+          });
+        }
 
         // 相手選出ドロップダウンの選択肢を再構築
         rebuildOppSelectionDropdowns();
 
-        // 4. 自分の選出順（パターン2：選出完了状態）の反映
+        // 2. 自分の選出（AFTERモード時の先発1/先発2/後発1/後発2）を反映
         let isSelectionAutoFilled = false;
-        if (mode === 'selected') {
-          const selectedSlots = slotWhiteScores.filter(s => s.isWhite).map(s => s.slot);
-          const mySelectionMap = {};
-
-          for (const slotIdx of selectedSlots) {
-            const numX = Math.round(origW * 0.195);
-            const numY = Math.round(origH * (0.13 + slotIdx * 0.118));
-            const numW = Math.max(12, Math.round(origW * 0.035));
-            const numH = Math.max(16, Math.round(origH * 0.075));
-
-            const numImgData = mainCtx.getImageData(numX, numY, numW, numH);
-            const detectedOrder = detectOrderNumberFromImageData(numImgData);
-            if (detectedOrder >= 1 && detectedOrder <= 4) {
-              mySelectionMap[slotIdx] = detectedOrder;
-            }
-          }
-
-          const usedOrders = new Set(Object.values(mySelectionMap));
-          selectedSlots.forEach((sIdx) => {
-            if (!mySelectionMap[sIdx] || mySelectionMap[sIdx] < 1 || mySelectionMap[sIdx] > 4) {
-              for (let ord = 1; ord <= 4; ord++) {
-                if (!usedOrders.has(ord)) {
-                  mySelectionMap[sIdx] = ord;
-                  usedOrders.add(ord);
-                  break;
-                }
-              }
+        if (result.mode === 'AFTER' && result.mySelection && result.mySelection.length === 4) {
+          const mySelSelects = document.querySelectorAll('#my-selection-slots select');
+          result.mySelection.forEach((name, i) => {
+            if (name && mySelSelects[i]) {
+              mySelSelects[i].value = name;
+              isSelectionAutoFilled = true;
             }
           });
-
-          const myParty = parties.find(p => p.id === selectedPartyId);
-          if (myParty && myParty.pokemon && myParty.pokemon.length) {
-            const selArray = [null, null, null, null];
-            for (const [slotIdxStr, orderNum] of Object.entries(mySelectionMap)) {
-              const sIdx = parseInt(slotIdxStr);
-              const oIdx = orderNum - 1;
-              if (sIdx >= 0 && sIdx < myParty.pokemon.length && oIdx >= 0 && oIdx < 4) {
-                const pk = myParty.pokemon[sIdx];
-                const name = typeof pk === 'string' ? pk : (pk && pk.name || '');
-                if (name) selArray[oIdx] = name;
-              }
-            }
-
-            const mySelSelects = document.querySelectorAll('#my-selection-slots select');
-            selArray.forEach((name, i) => {
-              if (name && mySelSelects[i]) {
-                mySelSelects[i].value = name;
-                isSelectionAutoFilled = true;
-              }
-            });
-          }
         }
 
         const elapsedMs = Math.round(performance.now() - startTime);
-        const toastMsg = `⚡ 相手パーティ${setOppCount}体` + (isSelectionAutoFilled ? 'と自分の選出4体' : '') + `を自動入力しました！（${elapsedMs}ms）`;
+        const modeLabel = (result.mode === 'BEFORE') ? '選出画面' : '準備画面';
+        const toastMsg = `⚡ 【${modeLabel}】相手パーティ${setOppCount}体` + (isSelectionAutoFilled ? 'と自分の選出4体' : '') + `を自動入力しました！（${elapsedMs}ms）`;
         showRecordToast(toastMsg);
 
       } catch (err) {
