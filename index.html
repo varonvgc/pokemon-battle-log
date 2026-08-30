@@ -4504,7 +4504,15 @@
     // ===== Pokemon Showdown リプレイ解析エンジン =====
     function normalizeShowdownSpeciesName(raw) {
       if (!raw) return '';
-      return raw.split(',')[0].trim();
+      let s = raw.split(',')[0].trim();
+      // Floette-Mega は Floette-Eternal に正規化
+      if (/^floette-mega/i.test(s)) return 'Floette-Eternal';
+      // メガシンカ・キョダイマックス・ゲンシカイキ・テラスタルの接尾辞を除去
+      s = s.replace(/-Mega(-[XYZxyz])?/i, '');
+      s = s.replace(/-Gmax/i, '');
+      s = s.replace(/-Primal/i, '');
+      s = s.replace(/-(Terastal|Stellar)/i, '');
+      return s;
     }
 
     function matchShowdownPokemonName(rawName) {
@@ -4513,6 +4521,7 @@
 
       const specialMap = {
         'floetteeternal': 'フラエッテ(えいえんのはな)',
+        'floettemega': 'フラエッテ(えいえんのはな)',
         'arcaninehisui': 'ウインディ(ヒスイのすがた)',
         'growlithehisui': 'ガーディ(ヒスイのすがた)',
         'zoruahisui': 'ゾロア(ヒスイのすがた)',
