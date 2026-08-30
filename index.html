@@ -4502,98 +4502,50 @@
     }
 
     // ===== Pokemon Showdown リプレイ解析エンジン =====
-    function normalizeShowdownSpeciesName(raw) {
-      if (!raw) return '';
-      let s = raw.split(',')[0].trim();
-      // Floette-Mega は Floette-Eternal に正規化
-      if (/^floette-mega/i.test(s)) return 'Floette-Eternal';
-      // メガシンカ・キョダイマックス・ゲンシカイキ・テラスタルの接尾辞を除去
-      s = s.replace(/-Mega(-[XYZxyz])?/i, '');
-      s = s.replace(/-Gmax/i, '');
-      s = s.replace(/-Primal/i, '');
-      s = s.replace(/-(Terastal|Stellar)/i, '');
-      return s;
-    }
-
     function matchShowdownPokemonName(rawName) {
       if (!rawName) return '';
-      const clean = normalizeShowdownSpeciesName(rawName);
+      const parts = rawName.split(',');
+      let species = parts[0].trim();
+      let gender = parts.length > 2 ? parts[2].trim() : (parts.length > 1 && (parts[1].trim() === 'M' || parts[1].trim() === 'F') ? parts[1].trim() : '');
 
-      const specialMap = {
-        'floetteeternal': 'フラエッテ(えいえんのはな)',
-        'floettemega': 'フラエッテ(えいえんのはな)',
-        'arcaninehisui': 'ウインディ(ヒスイのすがた)',
-        'growlithehisui': 'ガーディ(ヒスイのすがた)',
-        'zoruahisui': 'ゾロア(ヒスイのすがた)',
-        'zoroarkhisui': 'ゾロアーク(ヒスイのすがた)',
-        'braviaryhisui': 'ウォーグル(ヒスイのすがた)',
-        'sliggoohisui': 'ヌメイル(ヒスイのすがた)',
-        'goodrahisui': 'ヌメルゴン(ヒスイのすがた)',
-        'avalugghisui': 'クレベース(ヒスイのすがた)',
-        'decidueyehisui': 'ジュナイパー(ヒスイのすがた)',
-        'samurotthisui': 'ダイケンキ(ヒスイのすがた)',
-        'typhlosionhisui': 'バクフーン(ヒスイのすがた)',
-        'qwilfishhisui': 'ハリーセン(ヒスイのすがた)',
-        'lilliganthisui': 'ドレディア(ヒスイのすがた)',
-        'voltorbhisui': 'ビリリダマ(ヒスイのすがた)',
-        'electrodehisui': 'マルマイン(ヒスイのすがた)',
-        'basculinwhitestriped': 'バスラオ(しろかすじのすがた)',
-        'basculegion': 'イダイトウ(オス)',
-        'basculegionm': 'イダイトウ(オス)',
-        'basculegionf': 'イダイトウ(メス)',
-        'taurospaldeacombat': 'パルデアケンタロス(かくとう)',
-        'taurospaldeablaze': 'パルデアケンタロス(ほのお)',
-        'taurospaldeaaqua': 'パルデアケンタロス(みず)',
-        'taurospaldea': 'パルデアケンタロス(かくとう)',
-        'urshifurapidstrike': 'ウーラオス(れんげきのかた)',
-        'urshifusinglestrike': 'ウーラオス(いちげきのかた)',
-        'urshifu': 'ウーラオス(いちげきのかた)',
-        'ogerponhearthflame': 'オーガポン(かまどのめん)',
-        'ogerponwellspring': 'オーガポン(いどのめん)',
-        'ogerponcornerstone': 'オーガポン(いしずえのめん)',
-        'ogerpon': 'オーガポン(みどりのめん)',
-        'ogerponteal': 'オーガポン(みどりのめん)',
-        'ogerponhearthflamemask': 'オーガポン(かまどのめん)',
-        'ogerponwellspringmask': 'オーガポン(いどのめん)',
-        'ogerponcornerstonemask': 'オーガポン(いしずえのめん)',
-        'terapagos': 'テラパゴス',
-        'terapagosterastal': 'テラパゴス',
-        'terapagosstellar': 'テラパゴス',
-        'rotomheat': 'ロトム(ヒート)',
-        'rotomwash': 'ロトム(ウォッシュ)',
-        'rotomfrost': 'ロトム(フロスト)',
-        'rotomfan': 'ロトム(スピン)',
-        'rotommow': 'ロトム(カット)',
-        'indeedee': 'イエッサン(オスのすがた)',
-        'indeedeef': 'イエッサン(メスのすがた)',
-        'meowstic': 'ニャオニクス(オスのすがた)',
-        'meowsticf': 'ニャオニクス(メスのすがた)',
-        'porygon2': 'ポリゴン２',
-        'porygonz': 'ポリゴンＺ'
-      };
+      // Floette-Mega は Floette-Eternal に正規化
+      if (/^floette-mega/i.test(species)) species = 'Floette-Eternal';
+      // メガシンカ・キョダイマックス・ゲンシカイキ・テラスタルの接尾辞を除去
+      species = species.replace(/-Mega(-[XYZxyz])?/i, '');
+      species = species.replace(/-Gmax/i, '');
+      species = species.replace(/-Primal/i, '');
+      species = species.replace(/-(Terastal|Stellar)/i, '');
 
-      const id = toTransId(clean);
-      if (specialMap[id]) return specialMap[id];
+      // 性別によるすがた違い（Showdownで種族名に -F が付かず性別欄に F が入る場合の補正）
+      if (gender === 'F') {
+        const idLower = species.toLowerCase();
+        if (idLower === 'basculegion' || idLower === 'indeedee' || idLower === 'meowstic' || idLower === 'oinkologne') {
+          species = species + '-F';
+        }
+      }
 
+      // 1. translation_map.json (translatePokemonToJa) を直接使用
       if (typeof translatePokemonToJa === 'function') {
-        const ja = translatePokemonToJa(clean);
-        if (ja && ja !== clean) return ja;
+        const ja = translatePokemonToJa(species);
+        if (ja && ja !== species) return ja;
 
-        // メガシンカ除去等で再試行 (例: Charizard-Mega-Y -> Charizard -> リザードン)
-        const baseName = clean.split('-')[0];
+        // ハイフン前（ベース名）で再試行
+        const baseName = species.split('-')[0];
         const baseJa = translatePokemonToJa(baseName);
         if (baseJa && baseJa !== baseName) return baseJa;
       }
 
+      // 2. POKEMON_MAP_LIST によるフォールバック
+      const id = toTransId(species);
       if (POKEMON_MAP_LIST && POKEMON_MAP_LIST.length) {
         const match = POKEMON_MAP_LIST.find(p => toTransId(p.nameEn) === id);
         if (match && match.nameJa) return match.nameJa;
-        const baseId = toTransId(clean.split('-')[0]);
+        const baseId = toTransId(species.split('-')[0]);
         const matchBase = POKEMON_MAP_LIST.find(p => toTransId(p.nameEn) === baseId);
         if (matchBase && matchBase.nameJa) return matchBase.nameJa;
       }
 
-      return clean;
+      return species;
     }
 
     function parseShowdownReplayJson(replayData, myUsername) {
