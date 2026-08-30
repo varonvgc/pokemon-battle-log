@@ -4598,18 +4598,23 @@
       }
 
       const lines = replayData.log.split('\n');
-      let p1Name = '', p2Name = '';
+      let p1Name = (replayData.players && replayData.players[0]) || '';
+      let p2Name = (replayData.players && replayData.players[1]) || '';
       let p1Rating = null, p2Rating = null;
 
       for (const line of lines) {
         if (line.startsWith('|player|p1|')) {
           const parts = line.split('|');
-          p1Name = parts[3] || '';
-          if (parts[5] && !isNaN(Number(parts[5]))) p1Rating = parts[5].trim();
+          if (parts[3] && parts[3].trim()) {
+            p1Name = parts[3].trim();
+            if (parts[5] && !isNaN(Number(parts[5]))) p1Rating = parts[5].trim();
+          }
         } else if (line.startsWith('|player|p2|')) {
           const parts = line.split('|');
-          p2Name = parts[3] || '';
-          if (parts[5] && !isNaN(Number(parts[5]))) p2Rating = parts[5].trim();
+          if (parts[3] && parts[3].trim()) {
+            p2Name = parts[3].trim();
+            if (parts[5] && !isNaN(Number(parts[5]))) p2Rating = parts[5].trim();
+          }
         }
       }
 
@@ -4711,6 +4716,21 @@
       };
     }
 
+    // 勝敗を明示的にセットする関数（自動入力用・トグルしない）
+    function applyBo1Result(r) {
+      recordResult = r;
+      document.getElementById('btn-win')?.classList.toggle('active', r === 'win');
+      document.getElementById('btn-lose')?.classList.toggle('active', r === 'lose');
+      document.getElementById('btn-draw')?.classList.toggle('active', r === 'draw');
+    }
+
+    function applyBo3Result(gameIdx, r) {
+      if (bo3Games[gameIdx]) {
+        bo3Games[gameIdx].result = r;
+      }
+      updateBo3Score();
+    }
+
     async function fetchShowdownReplayJson(rawUrl) {
       let url = (rawUrl || '').trim();
       if (!url) throw new Error('URLを入力してください');
@@ -4778,7 +4798,7 @@
         }
         // 5. 勝敗
         if (parsed.result) {
-          setResult(parsed.result);
+          applyBo1Result(parsed.result);
         }
 
         showRecordToast('✨ Showdown対戦ログを自動反映しました！');
@@ -4814,7 +4834,7 @@
         // 相手トレーナー名
         if (parsed.oppTrainer) {
           const tInput = document.getElementById('rec-opp-trainer');
-          if (tInput && !tInput.value) tInput.value = parsed.oppTrainer;
+          if (tInput) tInput.value = parsed.oppTrainer;
         }
         // 相手レート
         if (parsed.oppRating) {
@@ -4844,7 +4864,7 @@
           setSelectionFromNames('opp', parsed.oppSelection, gameIdx);
         }
         if (parsed.result) {
-          setBo3Result(gameIdx, parsed.result);
+          applyBo3Result(gameIdx, parsed.result);
         }
 
         showRecordToast(`✨ ${gameIdx + 1}戦目の対戦ログを自動反映しました！`);
