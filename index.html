@@ -1892,7 +1892,35 @@
       color: #fbbf24;
     }
 
-    /* メモあり = 黄色 */
+    /* パーティカード用アイコンアクションボタン */
+    .party-action-icon-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      line-height: 1;
+      padding: 4px 6px;
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all .15s;
+      flex-shrink: 0;
+    }
+    .party-action-icon-btn:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+    .party-action-icon-btn.party-delete-btn:hover {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+    }
+    .party-action-icon-btn.has-memo {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: rgba(245, 158, 11, 0.4);
+    }
 
     /* ===== コピーボード ===== */
     .pe-copy-board-box {
@@ -3680,12 +3708,14 @@
       const pokeNames = p.pokemon.map(pk => typeof pk === 'string' ? pk : (pk && pk.name || ''));
       return `
     <div class="party-card" data-party-id="${p.id}">
-      <div class="flex justify-between items-center mb-3">
-        <div class="party-name party-edit-trigger" data-party-id="${p.id}" style="cursor:pointer;flex:1">${p.name}</div>
-        <button class="memo-icon-btn party-memo-btn ${p.memo ? 'has-memo' : ''}" data-party-id="${p.id}" title="${p.memo ? 'メモあり' : 'メモを追加'}">📝</button>
-        <button class="btn btn-ghost btn-sm party-ai-edit-btn" data-party-id="${p.id}" style="margin-right:4px">画像から編集</button>
-        <button class="btn btn-ghost btn-sm party-copy-btn" data-party-id="${p.id}" style="margin-right:4px">コピー</button>
-        <button class="btn btn-ghost btn-sm party-delete-btn" data-party-id="${p.id}">削除</button>
+      <div class="flex justify-between items-center mb-3" style="gap:6px">
+        <div class="party-name party-edit-trigger" data-party-id="${p.id}" style="cursor:pointer;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0" title="${p.name}">${p.name}</div>
+        <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+          <button class="party-action-icon-btn party-memo-btn ${p.memo ? 'has-memo' : ''}" data-party-id="${p.id}" title="${p.memo ? 'メモあり (編集)' : 'メモを追加'}">📝</button>
+          <button class="party-action-icon-btn party-ai-edit-btn" data-party-id="${p.id}" title="画像から編集">📸</button>
+          <button class="party-action-icon-btn party-copy-btn" data-party-id="${p.id}" title="パーティをコピー">📋</button>
+          <button class="party-action-icon-btn party-delete-btn" data-party-id="${p.id}" title="パーティを削除">🗑️</button>
+        </div>
       </div>
       <div class="party-pokemon party-edit-trigger" data-party-id="${p.id}" style="cursor:pointer">
         ${pokeNames.filter(Boolean).map(pk => getPokeSpriteHTMLByDisplay(pk)).join('')}
