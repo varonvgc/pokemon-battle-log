@@ -2630,7 +2630,10 @@
 
   <!-- RECORD PAGE -->
   <div id="page-record" class="page">
-    <h2 style="font-size:20px;font-weight:700;margin-bottom:20px">対戦を記録する</h2>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px">
+      <h2 style="font-size:20px;font-weight:700" id="record-page-title">対戦を記録する</h2>
+      <button type="button" id="record-cancel-edit-btn" class="btn btn-ghost btn-sm" onclick="cancelRecordEdit()" style="display:none;color:#ef4444;border-color:#ef4444">✕ 編集をキャンセル</button>
+    </div>
 
     <!-- BO1 / BO3 切り替え -->
     <div class="format-toggle-group">
@@ -2808,8 +2811,9 @@
         <textarea id="rec-memo" rows="3" placeholder="特記事項など..."></textarea>
       </div>
 
-      <div style="margin-top:20px;text-align:right">
-        <button class="btn btn-primary" onclick="saveRecord()">💾 記録を保存</button>
+      <div style="margin-top:20px;display:flex;justify-content:flex-end;align-items:center;gap:10px">
+        <button type="button" id="record-cancel-edit-btn-bottom" class="btn btn-ghost" onclick="cancelRecordEdit()" style="display:none;color:#ef4444;border-color:#ef4444">✕ 編集をキャンセル</button>
+        <button type="button" class="btn btn-primary" id="record-save-btn" onclick="saveRecord()">💾 記録を保存</button>
       </div>
     </div>
   </div>
@@ -3154,6 +3158,7 @@
       <div class="modal-title">対戦詳細</div>
       <div id="detail-content"></div>
       <div class="modal-footer">
+        <button class="btn btn-primary btn-sm" id="detail-edit-btn">✏️ 編集</button>
         <button class="btn btn-danger btn-sm" id="detail-delete-btn">削除</button>
         <button class="btn btn-ghost" onclick="closeDetailModal()">閉じる</button>
       </div>
@@ -4247,6 +4252,7 @@
 
     // ---- RECORD PAGE ----
     let currentRecordFormat = 'bo1'; // 'bo1' | 'bo3'
+    let editingRecordId = null;
     let mySelectionOrder = [];
     let oppSelectionOrder = [];
 
@@ -4321,10 +4327,12 @@
       const form = document.getElementById('record-form-card');
       form.style.display = 'block';
 
-      // Set datetime
-      const now = new Date();
-      const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
-      document.getElementById('rec-date').value = local.toISOString().slice(0, 16);
+      // Set datetime (新規登録時のみ現在日時を設定)
+      if (!editingRecordId) {
+        const now = new Date();
+        const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+        document.getElementById('rec-date').value = local.toISOString().slice(0, 16);
+      }
 
       // 自分のパーティ
       const myParty = parties.find(p => p.id === selectedPartyId);
@@ -4888,12 +4896,26 @@
         };
       }
 
-      // 1. ローカルに即時保存
-      records.unshift(rec);
-      // 2. クラウドにバックグラウンド保存
-      saveData();
+      // 1. ローカルに即時保存 (編集中は上書き更新、新規は先頭に追加)
+      if (editingRecordId) {
+        rec.id = editingRecordId;
+        const targetIdx = records.findIndex(x => x.id === editingRecordId);
+        if (targetIdx !== -1) {
+          records[targetIdx] = rec;
+        } else {
+          records.unshift(rec);
+        }
+        editingRecordId = null;
+        updateRecordFormEditModeUI();
+        saveData();
+        showRecordToast('💾 対戦記録を更新しました！');
+      } else {
+        records.unshift(rec);
+        saveData();
+        showRecordToast('💾 対戦記録を保存しました！');
+      }
 
-      // 3. UIのリセット（前回選択したパーティは維持し、フォームを展開状態にする）
+      // 2. UIのリセット（前回選択したパーティは維持し、フォームを展開状態にする）
       recordResult = null;
       document.getElementById('btn-win').classList.remove('active');
       document.getElementById('btn-lose').classList.remove('active');
@@ -4905,7 +4927,6 @@
       ];
       renderRecordPage();
       showRecordForm();
-      showRecordToast('💾 対戦記録を保存しました！');
     }
 
     // ---- HISTORY (無限スクロール / ページネーション対応) ----
@@ -5193,6 +5214,8 @@
     ${r.memo ? `<div class="detail-section"><h4>メモ</h4><p style="font-size:13px">${r.memo}</p></div>` : ''}
   `;
 
+      const editBtn = document.getElementById('detail-edit-btn');
+      if (editBtn) editBtn.onclick = () => editRecord(id);
       document.getElementById('detail-delete-btn').onclick = () => deleteRecord(id);
       document.getElementById('detail-modal').classList.add('open');
     }
@@ -5201,8 +5224,124 @@
       document.getElementById('detail-modal').classList.remove('open');
     }
 
+    function editRecord(id) {
+      const r = records.find(x => x.id === id);
+      if (!r) return;
+
+      editingRecordId = id;
+      closeDetailModal();
+
+      // ナビゲーションバーの「記録する」ボタンをアクティブにしてタブ遷移
+      const navBtns = document.querySelectorAll('nav button');
+      const recordNavBtn = Array.from(navBtns).find(b => b.textContent.includes('記録する'));
+      showPage('record', recordNavBtn);
+
+      // フォーマット設定
+      const fmt = r.format || 'bo1';
+      setRecordFormat(fmt);
+
+      // パーティ選択
+      selectedPartyId = r.partyId || null;
+      renderRecordPage();
+
+      if (selectedPartyId) {
+        showRecordForm();
+
+        // 日時を復元
+        if (r.date) {
+          document.getElementById('rec-date').value = r.date;
+        }
+
+        // 相手トレーナー名・レート・メモ
+        const recOppTrainer = document.getElementById('rec-opp-trainer');
+        if (recOppTrainer) recOppTrainer.value = r.oppTrainer || '';
+        const recOppRating = document.getElementById('rec-opp-rating');
+        if (recOppRating) recOppRating.value = r.oppRating || '';
+        document.getElementById('rec-memo').value = r.memo || '';
+
+        // 相手パーティ（6体）
+        if (r.oppParty && Array.isArray(r.oppParty)) {
+          setSlotValues('opp-party-slots', r.oppParty);
+        }
+        rebuildOppSelectionDropdowns();
+
+        // 選出 & 勝敗
+        if (fmt === 'bo1') {
+          setSelectionFromNames('my', r.mySelection);
+          setSelectionFromNames('opp', r.oppSelection);
+          setResult(r.result);
+        } else {
+          // BO3
+          bo3Games = [
+            { mySelectionOrder: [], oppSelectionOrder: [], result: null },
+            { mySelectionOrder: [], oppSelectionOrder: [], result: null },
+            { mySelectionOrder: [], oppSelectionOrder: [], result: null }
+          ];
+          if (r.games && Array.isArray(r.games)) {
+            r.games.forEach((g, idx) => {
+              if (idx < 3) {
+                setSelectionFromNames('my', g.mySelection, idx);
+                setSelectionFromNames('opp', g.oppSelection, idx);
+                setBo3Result(idx, g.result);
+              }
+            });
+          } else if (r.result) {
+            setSelectionFromNames('my', r.mySelection, 0);
+            setSelectionFromNames('opp', r.oppSelection, 0);
+            setBo3Result(0, r.result);
+          }
+          updateBo3Score();
+        }
+      }
+
+      updateRecordFormEditModeUI();
+
+      const pageEl = document.getElementById('page-record');
+      if (pageEl) pageEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function cancelRecordEdit() {
+      editingRecordId = null;
+      updateRecordFormEditModeUI();
+      recordResult = null;
+      document.getElementById('btn-win').classList.remove('active');
+      document.getElementById('btn-lose').classList.remove('active');
+      document.getElementById('btn-draw')?.classList.remove('active');
+      bo3Games = [
+        { mySelectionOrder: [], oppSelectionOrder: [], result: null },
+        { mySelectionOrder: [], oppSelectionOrder: [], result: null },
+        { mySelectionOrder: [], oppSelectionOrder: [], result: null }
+      ];
+      renderRecordPage();
+      showRecordForm();
+      showRecordToast('編集をキャンセルしました');
+    }
+
+    function updateRecordFormEditModeUI() {
+      const titleEl = document.getElementById('record-page-title');
+      const saveBtn = document.getElementById('record-save-btn');
+      const cancelBtnTop = document.getElementById('record-cancel-edit-btn');
+      const cancelBtnBottom = document.getElementById('record-cancel-edit-btn-bottom');
+
+      if (editingRecordId) {
+        if (titleEl) titleEl.innerHTML = '✏️ 対戦記録の編集';
+        if (saveBtn) saveBtn.innerHTML = '💾 変更を保存';
+        if (cancelBtnTop) cancelBtnTop.style.display = 'inline-flex';
+        if (cancelBtnBottom) cancelBtnBottom.style.display = 'inline-flex';
+      } else {
+        if (titleEl) titleEl.innerHTML = '対戦を記録する';
+        if (saveBtn) saveBtn.innerHTML = '💾 記録を保存';
+        if (cancelBtnTop) cancelBtnTop.style.display = 'none';
+        if (cancelBtnBottom) cancelBtnBottom.style.display = 'none';
+      }
+    }
+
     async function deleteRecord(id) {
       if (!confirm('この記録を削除しますか？')) return;
+      if (editingRecordId === id) {
+        editingRecordId = null;
+        updateRecordFormEditModeUI();
+      }
       records = records.filter(r => r.id !== id);
       saveData();
       closeDetailModal();
