@@ -121,6 +121,12 @@
       margin: 0 auto;
     }
 
+    @media (max-width: 600px) {
+      .page {
+        padding: 16px 12px;
+      }
+    }
+
     .page.active {
       display: block;
     }
@@ -132,6 +138,12 @@
       border-radius: var(--radius);
       padding: 20px;
       margin-bottom: 16px;
+    }
+
+    @media (max-width: 600px) {
+      .card {
+        padding: 14px 10px;
+      }
     }
 
     .card-title {
@@ -239,7 +251,7 @@
 
     @media (max-width: 600px) {
       .selection-party-grid {
-        gap: 4px;
+        gap: 3px;
       }
     }
 
@@ -259,6 +271,32 @@
       min-height: 60px;
       box-sizing: border-box;
       width: 100%;
+      min-width: 0;
+    }
+
+    @media (max-width: 600px) {
+      .selection-poke-card {
+        padding: 4px 1px 3px;
+        min-height: 52px;
+        border-radius: 6px;
+      }
+
+      .selection-poke-card .poke-sprite {
+        transform: scale(0.9);
+        transform-origin: center;
+      }
+
+      .selection-poke-card img.ball-img {
+        width: 26px !important;
+        height: 26px !important;
+      }
+
+      .selection-order-badge {
+        width: 18px;
+        height: 18px;
+        font-size: 10px;
+        margin-top: 2px;
+      }
     }
 
     .selection-poke-card:hover {
@@ -529,6 +567,16 @@
       padding: 12px;
       margin-top: 14px;
       margin-bottom: 14px;
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    @media (max-width: 600px) {
+      .bo3-game-card {
+        padding: 10px 6px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
     }
 
     .bo3-game-title {
