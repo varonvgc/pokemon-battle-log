@@ -663,6 +663,12 @@
       color: var(--lose);
     }
 
+    .result-btn.draw.active {
+      border-color: #eab308;
+      background: #713f12;
+      color: #fde047;
+    }
+
     /* DETAIL VIEW */
     .detail-section {
       margin-bottom: 16px;
@@ -2672,6 +2678,7 @@
         <div class="result-toggle">
           <button type="button" class="result-btn win" id="btn-win" onclick="setResult('win')">🏆 勝ち</button>
           <button type="button" class="result-btn lose" id="btn-lose" onclick="setResult('lose')">💀 負け</button>
+          <button type="button" class="result-btn draw" id="btn-draw" onclick="setResult('draw')">🤝 引き分け</button>
         </div>
       </div>
 
@@ -2693,6 +2700,7 @@
           <div class="result-toggle">
             <button type="button" class="result-btn win" id="btn-win-bo3-0" onclick="setBo3Result(0, 'win')">🏆 勝ち</button>
             <button type="button" class="result-btn lose" id="btn-lose-bo3-0" onclick="setBo3Result(0, 'lose')">💀 負け</button>
+            <button type="button" class="result-btn draw" id="btn-draw-bo3-0" onclick="setBo3Result(0, 'draw')">🤝 引き分け</button>
           </div>
         </div>
 
@@ -2712,6 +2720,7 @@
           <div class="result-toggle">
             <button type="button" class="result-btn win" id="btn-win-bo3-1" onclick="setBo3Result(1, 'win')">🏆 勝ち</button>
             <button type="button" class="result-btn lose" id="btn-lose-bo3-1" onclick="setBo3Result(1, 'lose')">💀 負け</button>
+            <button type="button" class="result-btn draw" id="btn-draw-bo3-1" onclick="setBo3Result(1, 'draw')">🤝 引き分け</button>
           </div>
         </div>
 
@@ -2731,6 +2740,7 @@
           <div class="result-toggle">
             <button type="button" class="result-btn win" id="btn-win-bo3-2" onclick="setBo3Result(2, 'win')">🏆 勝ち</button>
             <button type="button" class="result-btn lose" id="btn-lose-bo3-2" onclick="setBo3Result(2, 'lose')">💀 負け</button>
+            <button type="button" class="result-btn draw" id="btn-draw-bo3-2" onclick="setBo3Result(2, 'draw')">🤝 引き分け</button>
           </div>
         </div>
 
@@ -4238,6 +4248,7 @@
       recordResult = null;
       document.getElementById('btn-win').classList.remove('active');
       document.getElementById('btn-lose').classList.remove('active');
+      document.getElementById('btn-draw')?.classList.remove('active');
       bo3Games = [
         { mySelectionOrder: [], oppSelectionOrder: [], result: null },
         { mySelectionOrder: [], oppSelectionOrder: [], result: null },
@@ -4642,9 +4653,14 @@
     }
 
     function setResult(r) {
-      recordResult = r;
-      document.getElementById('btn-win').classList.toggle('active', r === 'win');
-      document.getElementById('btn-lose').classList.toggle('active', r === 'lose');
+      if (recordResult === r) {
+        recordResult = null;
+      } else {
+        recordResult = r;
+      }
+      document.getElementById('btn-win').classList.toggle('active', recordResult === 'win');
+      document.getElementById('btn-lose').classList.toggle('active', recordResult === 'lose');
+      document.getElementById('btn-draw')?.classList.toggle('active', recordResult === 'draw');
     }
 
     function setBo3Result(gameIdx, r) {
@@ -4663,8 +4679,10 @@
         const g = bo3Games[i];
         const btnWin = document.getElementById(`btn-win-bo3-${i}`);
         const btnLose = document.getElementById(`btn-lose-bo3-${i}`);
+        const btnDraw = document.getElementById(`btn-draw-bo3-${i}`);
         if (btnWin) btnWin.classList.toggle('active', g.result === 'win');
         if (btnLose) btnLose.classList.toggle('active', g.result === 'lose');
+        if (btnDraw) btnDraw.classList.toggle('active', g.result === 'draw');
 
         const badge = document.getElementById(`bo3-badge-${i}`);
         if (badge) {
@@ -4672,11 +4690,14 @@
             badge.innerHTML = '<span class="badge-win" style="font-size:10px;padding:2px 6px">🏆 勝ち</span>';
           } else if (g.result === 'lose') {
             badge.innerHTML = '<span class="badge-lose" style="font-size:10px;padding:2px 6px">💀 負け</span>';
+          } else if (g.result === 'draw') {
+            badge.innerHTML = '<span class="badge-draw" style="font-size:10px;padding:2px 6px">🤝 引き分け</span>';
           } else {
             badge.innerHTML = '';
           }
         }
 
+        // 引き分けの場合は総合勝敗数には追加されない
         if (g.result === 'win') wins++;
         if (g.result === 'lose') losses++;
       }
@@ -4688,7 +4709,7 @@
       if (loseEl) loseEl.textContent = losses;
 
       // 3試合目の表示判定:
-      // 1戦目と2戦目の勝敗が 2-0 または 0-2 以外（例: 1-1, 1-0, 0-1, 未入力など）の場合に3戦目入力欄を表示
+      // 1戦目と2戦目の勝敗が 2-0 または 0-2 で決着がついている場合のみ3戦目を非表示（引き分け等がある場合は3戦目を表示）
       const g0 = bo3Games[0].result;
       const g1 = bo3Games[1].result;
       const card3 = document.getElementById('bo3-game-card-2');
@@ -4699,8 +4720,10 @@
           bo3Games[2].result = null; // 2-0 または 0-2 のときは3戦目リセット
           const btnWin3 = document.getElementById('btn-win-bo3-2');
           const btnLose3 = document.getElementById('btn-lose-bo3-2');
+          const btnDraw3 = document.getElementById('btn-draw-bo3-2');
           if (btnWin3) btnWin3.classList.remove('active');
           if (btnLose3) btnLose3.classList.remove('active');
+          if (btnDraw3) btnDraw3.classList.remove('active');
           const badge3 = document.getElementById('bo3-badge-2');
           if (badge3) badge3.innerHTML = '';
           // スコア再集計
@@ -4760,7 +4783,7 @@
         };
       } else {
         // BO3
-        // 一つでも勝敗欄が入力されているか確認
+        // 一つでも勝敗欄が入力されているか確認（引き分けを含む）
         const hasAnyResult = bo3Games.some(g => g.result !== null);
         if (!hasAnyResult) { alert('少なくとも1試合の勝敗を入力してください'); return; }
 
@@ -4815,6 +4838,7 @@
       recordResult = null;
       document.getElementById('btn-win').classList.remove('active');
       document.getElementById('btn-lose').classList.remove('active');
+      document.getElementById('btn-draw')?.classList.remove('active');
       bo3Games = [
         { mySelectionOrder: [], oppSelectionOrder: [], result: null },
         { mySelectionOrder: [], oppSelectionOrder: [], result: null },
@@ -4855,13 +4879,13 @@
         resultBadgeHtml = r.games.map(g => {
           if (g.result === 'win') return `<span class="badge-win" style="font-size:10px;padding:2px 6px">🏆勝</span>`;
           if (g.result === 'lose') return `<span class="badge-lose" style="font-size:10px;padding:2px 6px">💀負</span>`;
-          return `<span class="badge-draw" style="font-size:10px;padding:2px 6px">-</span>`;
+          return `<span class="badge-draw" style="font-size:10px;padding:2px 6px">🤝分</span>`;
         }).join(' ');
       } else {
         const isWin = r.result === 'win';
         const isDraw = r.result === 'draw';
         const badgeCls = isWin ? 'badge-win' : (isDraw ? 'badge-draw' : 'badge-lose');
-        const badgeTxt = isWin ? '🏆勝' : (isDraw ? '⚖️分' : '💀負');
+        const badgeTxt = isWin ? '🏆勝' : (isDraw ? '🤝分' : '💀負');
         resultBadgeHtml = `<span class="${badgeCls}" style="font-size:10px;padding:2px 6px">${badgeTxt}</span>`;
       }
 
@@ -5035,13 +5059,13 @@
         headerResultHtml = r.games.map((g, idx) => {
           if (g.result === 'win') return `<span class="badge-win" style="font-size:15px;padding:4px 12px">🏆 ${idx + 1}戦目: 勝ち</span>`;
           if (g.result === 'lose') return `<span class="badge-lose" style="font-size:15px;padding:4px 12px">💀 ${idx + 1}戦目: 負け</span>`;
-          return `<span class="badge-draw" style="font-size:15px;padding:4px 12px">⚖️ ${idx + 1}戦目: 引き分け</span>`;
+          return `<span class="badge-draw" style="font-size:15px;padding:4px 12px">🤝 ${idx + 1}戦目: 引き分け</span>`;
         }).join(' ');
       } else {
         const isWin = r.result === 'win';
         const isDraw = r.result === 'draw';
         const badgeCls = isWin ? 'badge-win' : (isDraw ? 'badge-draw' : 'badge-lose');
-        const badgeTxt = isWin ? '🏆 勝ち' : (isDraw ? '⚖️ 引き分け' : '💀 負け');
+        const badgeTxt = isWin ? '🏆 勝ち' : (isDraw ? '🤝 引き分け' : '💀 負け');
         headerResultHtml = `<span class="${badgeCls}" style="font-size:16px;padding:4px 16px">${badgeTxt}</span>`;
       }
 
