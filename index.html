@@ -2916,6 +2916,7 @@
           localPokemon = JSON.parse(JSON.stringify(POKEMON_LIST));
           localMoves = JSON.parse(JSON.stringify(MOVES_LIST)).map(m => ({ confirmed: true, ...m }));
           localItems = ITEMS_LIST.map(name => ({ name, confirmed: true }));
+          rebuildPokemonMap();
         } catch (e) {
           console.error('Failed to load static master data:', e);
         }
@@ -2923,34 +2924,58 @@
       return _masterDataPromise;
     }
 
-    // ポケモン名・表示名・メガ名の表記揺れを完全吸収してポケモンデータを取得するヘルパー
+    // ポケモン高速引き出し用ハッシュマップ＆スプライトキャッシュ
+    const _pokemonMap = new Map();
+    const _spriteCache = new Map();
+
+    function rebuildPokemonMap() {
+      _pokemonMap.clear();
+      _spriteCache.clear();
+      const list = localPokemon || POKEMON_LIST;
+      if (!list || !list.length) return;
+      list.forEach(p => {
+        if (!p) return;
+        if (p.display && !_pokemonMap.has(p.display)) _pokemonMap.set(p.display, p);
+        if (p.name && !_pokemonMap.has(p.name)) _pokemonMap.set(p.name, p);
+      });
+    }
+
+    // ポケモン名・表示名・メガ名の表記揺れを完全吸収してポケモンデータを取得するヘルパー（O(1)高速キャッシュ対応）
     function findPokemon(query) {
       if (!query) return null;
+      if (typeof query === 'object' && query.display) return query;
+      const q = String(query).trim();
+      if (!q) return null;
+
+      // 1. ハッシュマップからのO(1)高速引き出し
+      if (_pokemonMap.has(q)) {
+        return _pokemonMap.get(q);
+      }
+
       const list = localPokemon || POKEMON_LIST;
       if (!list || !list.length) return null;
-      if (typeof query === 'object' && query.display) return query;
-
-      const q = String(query).trim();
-      // 1. display または name の完全一致
-      let found = list.find(p => p.display === q || p.name === q);
-      if (found) return found;
 
       const norm = s => (s || '').replace(/[（）()]/g, '').replace(/[ＸX]/g, 'X').replace(/[ＹY]/g, 'Y').replace(/[ＺZ]/g, 'Z').toLowerCase();
       const qNorm = norm(q);
 
       // 2. display, name, form の正規化完全一致
-      found = list.find(p => norm(p.display) === qNorm || norm(p.name) === qNorm || norm(p.form) === qNorm);
-      if (found) return found;
+      let found = list.find(p => norm(p.display) === qNorm || norm(p.name) === qNorm || norm(p.form) === qNorm);
+      if (found) {
+        _pokemonMap.set(q, found);
+        return found;
+      }
 
       // 3. フォーム名（form）の完全一致（例: "メガリザードンY" -> p.form === "メガリザードンＹ"）
       found = list.find(p => {
         const fNorm = norm(p.form);
         return fNorm && fNorm !== '通常' && fNorm === qNorm;
       });
-      if (found) return found;
+      if (found) {
+        _pokemonMap.set(q, found);
+        return found;
+      }
 
       // 4. メガ・フォルム名を含む候補の中で、最も name が長い（最も具体的な）ものを探す
-      // （※ "メガリザードンY" で "リザード" に誤爆せず "リザードン(メガリザードンＹ)" を選択）
       const matchedForms = list.filter(p => {
         const dNorm = norm(p.display);
         const fNorm = norm(p.form);
@@ -2958,6 +2983,7 @@
       });
       if (matchedForms.length) {
         matchedForms.sort((a, b) => (b.name.length - a.name.length) || (b.display.length - a.display.length));
+        _pokemonMap.set(q, matchedForms[0]);
         return matchedForms[0];
       }
 
@@ -2967,7 +2993,9 @@
       const baseCand = list.filter(p => norm(p.name) === baseNorm);
       if (baseCand.length) {
         const normal = baseCand.find(p => p.form === '通常' || p.display === p.name);
-        return normal || baseCand[0];
+        const res = normal || baseCand[0];
+        _pokemonMap.set(q, res);
+        return res;
       }
 
       return null;
@@ -3574,8 +3602,57 @@
     }
 
     // ---- PARTIES ----
+    let _partyGridBound = false;
+
+    function initPartyGridDelegation() {
+      if (_partyGridBound) return;
+      const grid = document.getElementById('party-grid');
+      if (!grid) return;
+      _partyGridBound = true;
+
+      // クリックイベントの集約（イベント移譲: 1つのリスナーですべてのボタンとカード操作を判別）
+      grid.addEventListener('click', (e) => {
+        const memoBtn = e.target.closest('.party-memo-btn');
+        if (memoBtn) {
+          e.stopPropagation();
+          openPartyMemo(memoBtn.dataset.partyId);
+          return;
+        }
+
+        const aiBtn = e.target.closest('.party-ai-edit-btn');
+        if (aiBtn) {
+          e.stopPropagation();
+          openAiPartyModal(aiBtn.dataset.partyId);
+          return;
+        }
+
+        const copyBtn = e.target.closest('.party-copy-btn');
+        if (copyBtn) {
+          e.stopPropagation();
+          copyParty(copyBtn.dataset.partyId);
+          return;
+        }
+
+        const deleteBtn = e.target.closest('.party-delete-btn');
+        if (deleteBtn) {
+          e.stopPropagation();
+          deleteParty(deleteBtn.dataset.partyId);
+          return;
+        }
+
+        // カード本体タップ時（ボタン以外）に編集モーダルを開く
+        const card = e.target.closest('.party-card');
+        if (card && !e.target.closest('button')) {
+          editParty(card.dataset.partyId);
+        }
+      });
+    }
+
     function renderParties() {
       const grid = document.getElementById('party-grid');
+      if (!grid) return;
+      initPartyGridDelegation();
+
       if (!parties.length) {
         grid.innerHTML = '<div class="empty"><div class="empty-icon">🎮</div><p>パーティがまだありません</p><p>右上のボタンから登録してください</p></div>';
         return;
@@ -3597,51 +3674,11 @@
       </div>
     </div>`;
       }).join('');
-      // メモボタン
-      grid.querySelectorAll('.party-memo-btn').forEach(btn => {
-        btn.addEventListener('click', e => {
-          e.stopPropagation();
-          openPartyMemo(btn.dataset.partyId);
-        });
-      });
-      // AI画像編集ボタン
-      grid.querySelectorAll('.party-ai-edit-btn').forEach(btn => {
-        btn.addEventListener('click', e => {
-          e.stopPropagation();
-          openAiPartyModal(btn.dataset.partyId);
-        });
-      });
-      // コピーボタン
-      grid.querySelectorAll('.party-copy-btn').forEach(btn => {
-        btn.addEventListener('click', e => {
-          e.stopPropagation();
-          copyParty(btn.dataset.partyId);
-        });
-      });
-      // 削除ボタン
-      grid.querySelectorAll('.party-delete-btn').forEach(btn => {
-        btn.addEventListener('click', e => {
-          e.stopPropagation();
-          deleteParty(btn.dataset.partyId);
-        });
-      });
-      // カード全体クリックで編集（ドラッグとの区別: pointerdownからpointerupまでの移動距離で判定）
-      grid.querySelectorAll('.party-card').forEach(card => {
-        let startX = 0, startY = 0, moved = false;
-        card.addEventListener('pointerdown', e => {
-          startX = e.clientX; startY = e.clientY; moved = false;
-        });
-        card.addEventListener('pointermove', e => {
-          if (Math.abs(e.clientX - startX) > 5 || Math.abs(e.clientY - startY) > 5) moved = true;
-        });
-        card.addEventListener('pointerup', e => {
-          // ボタン上のクリックは除外
-          if (e.target.closest('button')) return;
-          if (!moved) editParty(card.dataset.partyId);
-        });
-      });
-      // ドラッグ&ドロップ並び替え初期化
-      initPartyDragSort(grid);
+
+      // PC環境のみドラッグ&ドロップ並び替えを初期化
+      if (!('ontouchstart' in window)) {
+        initPartyDragSort(grid);
+      }
       // コピーボードを先頭に表示
       showCopyBoard();
     }
@@ -4634,6 +4671,7 @@
           localItems.forEach(it => { it.confirmed = !(it.name in cachedItemOv2 && !cachedItemOv2[it.name]); });
         } catch (e2) { }
       }
+      rebuildPokemonMap();
     }
 
     // ---- ピンチズーム無効化（iOS対応）----
@@ -6048,15 +6086,21 @@
       return `<div class="poke-tag-icon"><span class="poke-tag-sprite" style="background-position:${pos}"></span></div>`;
     }
 
-    // display名からポケモンデータを取得してスプライトHTMLを返す
+    // display名からポケモンデータを取得してスプライトHTMLを返す（O(1)キャッシュ対応）
     function getPokeSpriteHTMLByDisplay(display) {
       if (!display) return '';
-      const p = findPokemon(display) || (localPokemon || POKEMON_LIST).find(pk => pk.display === display);
-      if (!p) {
-        // データが見つからない場合はテキスト表示
-        return `<span class="poke-tag">${display}</span>`;
+      if (_spriteCache.has(display)) {
+        return _spriteCache.get(display);
       }
-      return getPokeSpriteHTML(p.display || display, p.no, p.form, p.name);
+      const p = findPokemon(display);
+      if (!p) {
+        const fallback = `<span class="poke-tag">${display}</span>`;
+        _spriteCache.set(display, fallback);
+        return fallback;
+      }
+      const html = getPokeSpriteHTML(p.display || display, p.no, p.form, p.name);
+      _spriteCache.set(display, html);
+      return html;
     }
 
 
