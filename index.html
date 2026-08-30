@@ -6981,30 +6981,43 @@
       return String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
     }
 
+    function normalizeJaAlphaNum(s) {
+      if (!s) return '';
+      return String(s).replace(/[Ａ-Ｚａ-ｚ０-９]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0));
+    }
+
     function translatePokemonToEn(jaDisplay) {
       if (!jaDisplay) return '';
       if (!_transMapData || !_transMapData.pokemon_ja_to_en) return jaDisplay;
-      return _transMapData.pokemon_ja_to_en[jaDisplay] || jaDisplay;
+      if (_transMapData.pokemon_ja_to_en[jaDisplay]) return _transMapData.pokemon_ja_to_en[jaDisplay];
+      const norm = normalizeJaAlphaNum(jaDisplay);
+      if (_transMapData.pokemon_ja_to_en[norm]) return _transMapData.pokemon_ja_to_en[norm];
+      return jaDisplay;
     }
 
     function translatePokemonToJa(enName) {
       if (!enName) return '';
       if (!_transMapData || !_transMapData.pokemon_en_to_ja) return enName;
       const id = toTransId(enName);
-      return _transMapData.pokemon_en_to_ja[id] || enName;
+      if (_transMapData.pokemon_en_to_ja[id]) return _transMapData.pokemon_en_to_ja[id];
+      return enName;
     }
 
     function translateItemToEn(jaItem) {
       if (!jaItem) return '';
       if (!_transMapData || !_transMapData.items_ja_to_en) return jaItem;
-      return _transMapData.items_ja_to_en[jaItem] || jaItem;
+      if (_transMapData.items_ja_to_en[jaItem]) return _transMapData.items_ja_to_en[jaItem];
+      const norm = normalizeJaAlphaNum(jaItem);
+      if (_transMapData.items_ja_to_en[norm]) return _transMapData.items_ja_to_en[norm];
+      return jaItem;
     }
 
     function translateItemToJa(enItem) {
       if (!enItem) return '';
       if (!_transMapData || !_transMapData.items_en_to_ja) return enItem;
       const id = toTransId(enItem);
-      return _transMapData.items_en_to_ja[id] || enItem;
+      if (_transMapData.items_en_to_ja[id]) return _transMapData.items_en_to_ja[id];
+      return enItem;
     }
 
     function translateMoveToEn(jaMove) {
