@@ -670,6 +670,63 @@
       margin-top: 20px;
     }
 
+    /* POKEPASTE MODAL */
+    .pokepaste-modal-dialog {
+      display: flex;
+      flex-direction: column;
+      max-height: 88vh;
+      padding: 12px 14px;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    .pokepaste-header {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .pokepaste-btn-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: nowrap;
+    }
+
+    .pokepaste-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+
+    .pokepaste-textarea {
+      width: 100%;
+      flex: 1;
+      min-height: 360px;
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      font-family: Consolas, Monaco, 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.45;
+      resize: none;
+      outline: none;
+      box-sizing: border-box;
+      overflow-y: auto;
+    }
+
+    .pokepaste-textarea:focus {
+      border-color: var(--accent);
+    }
+
     /* SECTION DIVIDER */
     .section-label {
       font-size: 13px;
@@ -3006,6 +3063,33 @@
     <div id="pe-copy-board-pe"
       style="display:none;margin:4px 6px 6px;max-width:900px;margin-left:auto;margin-right:auto;"></div>
     <div class="pe-body" id="pe-body"></div>
+    <div class="pe-footer-actions" style="margin:16px 8px 48px;max-width:900px;margin-left:auto;margin-right:auto;display:flex;flex-direction:column;align-items:center;gap:8px;">
+      <button type="button" class="btn btn-secondary" onclick="openPokepasteModal()" style="font-size:13px;padding:9px 20px;border-radius:8px;width:100%;max-width:320px;justify-content:center;">
+        Pokepasteから読み込み
+      </button>
+      <div style="display:flex;gap:8px;width:100%;max-width:320px;">
+        <button type="button" class="btn btn-ghost btn-sm" onclick="exportAndOpenInPokePaste(false)" style="flex:1;border:1px solid var(--border);border-radius:6px;font-size:12px;padding:7px 0;background:var(--surface2);" title="通常版を別タブで開く">Pokepaste</button>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="exportAndOpenInPokePaste(true)" style="flex:1;border:1px solid var(--border);border-radius:6px;font-size:12px;padding:7px 0;background:var(--surface2);" title="OTS版を別タブで開く">OTS</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POKEPASTE MODAL -->
+  <div id="pokepaste-modal" class="modal-overlay" onclick="if(event.target===this)closePokepasteModal()">
+    <div class="modal pokepaste-modal-dialog">
+      <!-- 固定ヘッダー / ボタンバー -->
+      <div class="pokepaste-header">
+        <div style="font-size:14px;font-weight:700;color:var(--text);">Pokepasteから読み込み</div>
+        <div class="pokepaste-btn-group">
+          <button type="button" class="btn btn-primary btn-sm" onclick="importPokepasteFromModal()">読み込み</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="closePokepasteModal()" style="padding:4px 8px;font-size:14px;">✕</button>
+        </div>
+      </div>
+      <!-- テキスト入力エリア（スクロール可能） -->
+      <div class="pokepaste-body">
+        <textarea id="pokepaste-textarea" class="pokepaste-textarea" placeholder="Pokemon Showdown形式のテキストを入力..." spellcheck="false" autocomplete="off"></textarea>
+      </div>
+    </div>
   </div>
 
 
@@ -6870,6 +6954,378 @@
       if (cardPE2) { const ta = cardPE2.querySelector('.pe-name-input'); if (ta) ta.value = name; }
       // ステータスボタン更新
       updateStatsBtnText(idx);
+    }
+
+    // ===== Pokepaste (Showdown形式) 連携機能 =====
+    let _transMapData = null;
+    let _transMapPromise = null;
+    async function loadTranslationMap() {
+      if (_transMapData) return _transMapData;
+      if (_transMapPromise) return _transMapPromise;
+      _transMapPromise = (async () => {
+        try {
+          const res = await fetch('data/translation_map.json');
+          if (res.ok) {
+            _transMapData = await res.json();
+          }
+        } catch (e) {
+          console.error('Failed to load translation map:', e);
+        }
+        return _transMapData || {};
+      })();
+      return _transMapPromise;
+    }
+
+    function toTransId(s) {
+      if (!s) return '';
+      return String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    function translatePokemonToEn(jaDisplay) {
+      if (!jaDisplay) return '';
+      if (!_transMapData || !_transMapData.pokemon_ja_to_en) return jaDisplay;
+      return _transMapData.pokemon_ja_to_en[jaDisplay] || jaDisplay;
+    }
+
+    function translatePokemonToJa(enName) {
+      if (!enName) return '';
+      if (!_transMapData || !_transMapData.pokemon_en_to_ja) return enName;
+      const id = toTransId(enName);
+      return _transMapData.pokemon_en_to_ja[id] || enName;
+    }
+
+    function translateItemToEn(jaItem) {
+      if (!jaItem) return '';
+      if (!_transMapData || !_transMapData.items_ja_to_en) return jaItem;
+      return _transMapData.items_ja_to_en[jaItem] || jaItem;
+    }
+
+    function translateItemToJa(enItem) {
+      if (!enItem) return '';
+      if (!_transMapData || !_transMapData.items_en_to_ja) return enItem;
+      const id = toTransId(enItem);
+      return _transMapData.items_en_to_ja[id] || enItem;
+    }
+
+    function translateMoveToEn(jaMove) {
+      if (!jaMove) return '';
+      if (!_transMapData || !_transMapData.moves_ja_to_en) return jaMove;
+      return _transMapData.moves_ja_to_en[jaMove] || jaMove;
+    }
+
+    function translateMoveToJa(enMove) {
+      if (!enMove) return '';
+      if (!_transMapData || !_transMapData.moves_en_to_ja) return enMove;
+      const id = toTransId(enMove);
+      return _transMapData.moves_en_to_ja[id] || enMove;
+    }
+
+    function translateAbilityToEn(jaAbil) {
+      if (!jaAbil) return '';
+      if (!_transMapData || !_transMapData.abilities_ja_to_en) return jaAbil;
+      return _transMapData.abilities_ja_to_en[jaAbil] || jaAbil;
+    }
+
+    function translateAbilityToJa(enAbil) {
+      if (!enAbil) return '';
+      if (!_transMapData || !_transMapData.abilities_en_to_ja) return enAbil;
+      const id = toTransId(enAbil);
+      return _transMapData.abilities_en_to_ja[id] || enAbil;
+    }
+
+    function translateNatureToEn(jaNature) {
+      if (!jaNature) return 'Serious';
+      if (!_transMapData || !_transMapData.natures_ja_to_en) return jaNature;
+      return _transMapData.natures_ja_to_en[jaNature] || 'Serious';
+    }
+
+    function translateNatureToJa(enNature) {
+      if (!enNature) return 'まじめ';
+      if (!_transMapData || !_transMapData.natures_en_to_ja) return enNature;
+      const id = toTransId(enNature);
+      return _transMapData.natures_en_to_ja[id] || 'まじめ';
+    }
+
+    // アプリ内パーティ -> Pokepasteテキスト生成
+    function exportToPokepasteText(pokemonList, isOts = false) {
+      const blocks = [];
+      (pokemonList || []).forEach(pk => {
+        if (!pk || !pk.name) return;
+        const lines = [];
+
+        // 1. ポケモン名 & 持ち物
+        let pokeEn = translatePokemonToEn(pk.name);
+        const itemEn = pk.item ? translateItemToEn(pk.item) : '';
+        if (itemEn) {
+          lines.push(`${pokeEn} @ ${itemEn}`);
+        } else {
+          lines.push(`${pokeEn}`);
+        }
+
+        // 2. 特性
+        if (pk.ability) {
+          const abilEn = translateAbilityToEn(pk.ability);
+          lines.push(`Ability: ${abilEn}`);
+        }
+
+        // 3. レベル
+        lines.push(`Level: 50`);
+
+        // OTS以外の場合: EVs & 性格
+        if (!isOts) {
+          const evs = pk.evs || {};
+          const STAT_ORDER = [
+            { k: 'hp', label: 'HP' },
+            { k: 'atk', label: 'Atk' },
+            { k: 'def', label: 'Def' },
+            { k: 'spa', label: 'SpA' },
+            { k: 'spd', label: 'SpD' },
+            { k: 'spe', label: 'Spe' }
+          ];
+          const evParts = [];
+          STAT_ORDER.forEach(st => {
+            const v = parseInt(evs[st.k], 10) || 0;
+            if (v > 0) {
+              evParts.push(`${v} ${st.label}`);
+            }
+          });
+          if (evParts.length > 0) {
+            lines.push(`EVs: ${evParts.join(' / ')}`);
+          }
+
+          const natureEn = translateNatureToEn(pk.nature || 'まじめ');
+          if (natureEn) {
+            lines.push(`${natureEn} Nature`);
+          }
+        }
+
+        // 4. 技4つ
+        (pk.moves || []).forEach(mv => {
+          if (mv && mv.trim()) {
+            const mvEn = translateMoveToEn(mv.trim());
+            lines.push(`- ${mvEn}`);
+          }
+        });
+
+        blocks.push(lines.join('\n'));
+      });
+      return blocks.join('\n\n');
+    }
+
+    // Pokepasteテキスト -> アプリ内ポケモンデータ解析
+    function parsePokepasteText(text) {
+      if (!text || !text.trim()) return [];
+      const rawLines = text.split(/\r?\n/);
+      const pokeBlocks = [];
+      let currentLines = [];
+
+      rawLines.forEach(l => {
+        const trimmed = l.trim();
+        if (!trimmed) {
+          if (currentLines.length) {
+            pokeBlocks.push(currentLines);
+            currentLines = [];
+          }
+        } else {
+          currentLines.push(trimmed);
+        }
+      });
+      if (currentLines.length) pokeBlocks.push(currentLines);
+
+      const parsedList = [];
+      pokeBlocks.forEach(blk => {
+        if (!blk.length) return;
+        const pk = {
+          name: '',
+          item: '',
+          ability: '',
+          moves: ['', '', '', ''],
+          nature: 'まじめ',
+          evs: { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 },
+          memo: ''
+        };
+
+        // 1行目の解析: "Species (Gender) @ Item" または "Nickname (Species) (Gender) @ Item"
+        const firstLine = blk[0];
+        let itemPart = '';
+        let pokePart = firstLine;
+
+        if (firstLine.includes('@')) {
+          const atIdx = firstLine.indexOf('@');
+          pokePart = firstLine.substring(0, atIdx).trim();
+          itemPart = firstLine.substring(atIdx + 1).trim();
+        }
+
+        // 性別表記 (M), (F) を除去
+        pokePart = pokePart.replace(/\s*\([MF]\)\s*$/i, '').trim();
+
+        // ニックネーム表記 "Nickname (Species)" -> "Species"
+        const nickMatch = pokePart.match(/\(([^)]+)\)$/);
+        if (nickMatch) {
+          pokePart = nickMatch[1].trim();
+        }
+
+        // ポケモン名・アイテム名の日本語変換
+        let jaName = translatePokemonToJa(pokePart);
+        let jaItem = itemPart ? translateItemToJa(itemPart) : '';
+
+        // メガストーンを持っている場合はメガシンカフォルムに自動マッピング
+        if (jaItem) {
+          const stoneMap = window.MEGA_STONE_MAP || (window.MEGA_STONES_DATA || {});
+          if (stoneMap && stoneMap[jaItem]) {
+            jaName = stoneMap[jaItem];
+          }
+        }
+
+        pk.name = jaName;
+        pk.item = jaItem;
+
+        let moveIndex = 0;
+        for (let i = 1; i < blk.length; i++) {
+          const line = blk[i];
+          if (/^Ability:\s*(.+)$/i.test(line)) {
+            const rawAbil = line.replace(/^Ability:\s*/i, '').trim();
+            pk.ability = translateAbilityToJa(rawAbil);
+          } else if (/^EVs:\s*(.+)$/i.test(line)) {
+            const rawEvs = line.replace(/^EVs:\s*/i, '').trim();
+            const parts = rawEvs.split('/');
+            parts.forEach(p => {
+              const m = p.trim().match(/^(\d+)\s*(HP|Atk|Def|SpA|SpD|Spe)$/i);
+              if (m) {
+                const val = parseInt(m[1], 10) || 0;
+                const stat = m[2].toLowerCase();
+                const statKey = stat === 'spa' ? 'spa' : (stat === 'spd' ? 'spd' : (stat === 'spe' ? 'spe' : stat));
+                // 32より大きい（通常の252振りなど）場合は 0〜32 に丸め
+                pk.evs[statKey] = val > 32 ? Math.min(32, Math.round(val / 8)) : val;
+              }
+            });
+          } else if (/^(\w+)\s+Nature$/i.test(line)) {
+            const m = line.match(/^(\w+)\s+Nature$/i);
+            if (m) {
+              pk.nature = translateNatureToJa(m[1]);
+            }
+          } else if (/^-\s*(.+)$/.test(line)) {
+            if (moveIndex < 4) {
+              const rawMove = line.replace(/^-\s*/, '').trim();
+              pk.moves[moveIndex] = translateMoveToJa(rawMove);
+              moveIndex++;
+            }
+          }
+        }
+
+        // メガシンカポケモンの場合、特性がメガ前のものに適合しているか確認
+        if (pk.name) {
+          let pd = findPokemon(pk.name);
+          if (pd && pd.form && pd.form.includes('メガ')) {
+            const base = (localPokemon || POKEMON_LIST).find(p => p.name === pd.name && (p.form === '通常' || !p.form));
+            if (base) {
+              const abilities = [base.ability1, base.ability2, base.ability_hidden].filter(Boolean);
+              if (abilities.length && (!pk.ability || !abilities.includes(pk.ability))) {
+                pk.ability = abilities[0];
+              }
+            }
+          }
+        }
+
+        parsedList.push(pk);
+      });
+
+      return parsedList;
+    }
+
+    async function openPokepasteModal() {
+      await loadStaticMasterData();
+      await loadTranslationMap();
+      syncPeInputsToState();
+
+      const modal = document.getElementById('pokepaste-modal');
+      const textarea = document.getElementById('pokepaste-textarea');
+      if (!modal || !textarea) return;
+
+      const currentExportText = exportToPokepasteText(pePokemons, false);
+      textarea.value = currentExportText;
+      modal.classList.add('open');
+    }
+
+    function closePokepasteModal() {
+      const modal = document.getElementById('pokepaste-modal');
+      if (modal) modal.classList.remove('open');
+    }
+
+    function importPokepasteFromModal() {
+      const textarea = document.getElementById('pokepaste-textarea');
+      if (!textarea) return;
+      const text = textarea.value.trim();
+      if (!text) {
+        alert('Pokepasteテキストを入力してください');
+        return;
+      }
+
+      const pokes = parsePokepasteText(text);
+      if (!pokes.length) {
+        alert('有効なポケモンデータを読み取れませんでした');
+        return;
+      }
+
+      for (let i = 0; i < 6; i++) {
+        if (i < pokes.length) {
+          pePokemons[i] = pokes[i];
+        } else {
+          pePokemons[i] = peEmptyPoke();
+        }
+      }
+
+      renderPartyEditBody();
+      closePokepasteModal();
+    }
+
+    async function exportAndOpenInPokePaste(isOts = false) {
+      await loadStaticMasterData();
+      await loadTranslationMap();
+      syncPeInputsToState();
+
+      const text = exportToPokepasteText(pePokemons, isOts);
+      if (!text) {
+        alert('出力するポケモンデータがありません');
+        return;
+      }
+
+      const titleInput = document.getElementById('pe-name-input');
+      const title = (titleInput && titleInput.value.trim()) ? titleInput.value.trim() + (isOts ? ' (OTS)' : '') : (isOts ? 'Team (OTS)' : 'Team');
+
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = 'https://pokepast.es/create';
+      form.target = '_blank';
+      form.style.display = 'none';
+
+      const pasteField = document.createElement('input');
+      pasteField.type = 'hidden';
+      pasteField.name = 'paste';
+      pasteField.value = text;
+      form.appendChild(pasteField);
+
+      const titleField = document.createElement('input');
+      titleField.type = 'hidden';
+      titleField.name = 'title';
+      titleField.value = title;
+      form.appendChild(titleField);
+
+      const authorField = document.createElement('input');
+      authorField.type = 'hidden';
+      authorField.name = 'author';
+      authorField.value = '';
+      form.appendChild(authorField);
+
+      const notesField = document.createElement('input');
+      notesField.type = 'hidden';
+      notesField.name = 'notes';
+      notesField.value = '';
+      form.appendChild(notesField);
+
+      document.body.appendChild(form);
+      form.submit();
+      setTimeout(() => { form.remove(); }, 500);
     }
 
     // ピッカーからポケモン選択

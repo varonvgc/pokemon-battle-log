@@ -1,1 +1,2909 @@
-﻿[{"form":"通常","file":"venusaur.png","no":"3","id":"3_フシギバナ","t1":"grass","name":"フシギバナ","t2":"poison","display":"フシギバナ"},{"form":"通常","file":"charizard.png","no":"6","id":"6_リザードン","t1":"fire","name":"リザードン","t2":"flying","display":"リザードン"},{"form":"通常","file":"blastoise.png","no":"9","id":"9_カメックス","t1":"water","name":"カメックス","t2":"none","display":"カメックス"},{"form":"通常","file":"beedrill.png","no":"15","id":"15_スピアー","t1":"bug","name":"スピアー","t2":"poison","display":"スピアー"},{"form":"通常","file":"pidgeot.png","no":"18","id":"18_ピジョット","t1":"normal","name":"ピジョット","t2":"flying","display":"ピジョット"},{"form":"通常","file":"arbok.png","no":"24","id":"24_アーボック","t1":"poison","name":"アーボック","t2":"none","display":"アーボック"},{"form":"通常","file":"pikachu.png","no":"25","id":"25_ピカチュウ","t1":"electric","name":"ピカチュウ","t2":"none","display":"ピカチュウ"},{"form":"通常","file":"raichu.png","no":"26","id":"26_ライチュウ","t1":"electric","name":"ライチュウ","t2":"none","display":"ライチュウ"},{"form":"アローラのすがた","file":"raichu.png","no":"26","id":"26_ライチュウ(アローラのすがた)","t1":"electric","name":"ライチュウ","t2":"psychic","display":"ライチュウ(アローラのすがた)"},{"form":"通常","file":"clefable.png","no":"36","id":"36_ピクシー","t1":"fairy","name":"ピクシー","t2":"none","display":"ピクシー"},{"form":"通常","file":"ninetales.png","no":"38","id":"38_キュウコン","t1":"fire","name":"キュウコン","t2":"none","display":"キュウコン"},{"form":"アローラのすがた","file":"ninetales.png","no":"38","id":"38_キュウコン(アローラのすがた)","t1":"ice","name":"キュウコン","t2":"fairy","display":"キュウコン(アローラのすがた)"},{"form":"通常","file":"vileplume.png","no":"45","id":"45_ラフレシア","t1":"grass","name":"ラフレシア","t2":"poison","display":"ラフレシア"},{"form":"通常","file":"arcanine.png","no":"59","id":"59_ウインディ","t1":"fire","name":"ウインディ","t2":"none","display":"ウインディ"},{"form":"ヒスイのすがた","file":"arcanine.png","no":"59","id":"59_ウインディ(ヒスイのすがた)","t1":"fire","name":"ウインディ","t2":"rock","display":"ウインディ(ヒスイのすがた)"},{"form":"通常","file":"alakazam.png","no":"65","id":"65_フーディン","t1":"psychic","name":"フーディン","t2":"none","display":"フーディン"},{"form":"通常","file":"machamp.png","no":"68","id":"68_カイリキー","t1":"fighting","name":"カイリキー","t2":"none","display":"カイリキー"},{"form":"通常","file":"victreebel.png","no":"71","id":"71_ウツボット","t1":"grass","name":"ウツボット","t2":"poison","display":"ウツボット"},{"form":"通常","file":"slowbro.png","no":"80","id":"80_ヤドラン","t1":"water","name":"ヤドラン","t2":"psychic","display":"ヤドラン"},{"form":"ガラルのすがた","file":"slowbro.png","no":"80","id":"80_ヤドラン(ガラルのすがた)","t1":"poison","name":"ヤドラン","t2":"psychic","display":"ヤドラン(ガラルのすがた)"},{"form":"通常","file":"gengar.png","no":"94","id":"94_ゲンガー","t1":"ghost","name":"ゲンガー","t2":"poison","display":"ゲンガー"},{"form":"通常","file":"kangaskhan.png","no":"115","id":"115_ガルーラ","t1":"normal","name":"ガルーラ","t2":"none","display":"ガルーラ"},{"form":"通常","file":"starmie.png","no":"121","id":"121_スターミー","t1":"water","name":"スターミー","t2":"psychic","display":"スターミー"},{"form":"通常","file":"pinsir.png","no":"127","id":"127_カイロス","t1":"bug","name":"カイロス","t2":"none","display":"カイロス"},{"form":"通常","file":"tauros.png","no":"128","id":"128_ケンタロス","t1":"normal","name":"ケンタロス","t2":"none","display":"ケンタロス"},{"form":"コンバット種","file":"tauros.png","no":"128","id":"128_ケンタロス(コンバット種)","t1":"fighting","name":"ケンタロス","t2":"none","display":"ケンタロス(コンバット種)"},{"form":"ブレイズ種","file":"tauros.png","no":"128","id":"128_ケンタロス(ブレイズ種)","t1":"fighting","name":"ケンタロス","t2":"fire","display":"ケンタロス(ブレイズ種)"},{"form":"ウォーター種","file":"tauros.png","no":"128","id":"128_ケンタロス(ウォーター種)","t1":"fighting","name":"ケンタロス","t2":"water","display":"ケンタロス(ウォーター種)"},{"form":"通常","file":"gyarados.png","no":"130","id":"130_ギャラドス","t1":"water","name":"ギャラドス","t2":"flying","display":"ギャラドス"},{"form":"通常","file":"ditto.png","no":"132","id":"132_メタモン","t1":"normal","name":"メタモン","t2":"none","display":"メタモン"},{"form":"通常","file":"vaporeon.png","no":"134","id":"134_シャワーズ","t1":"water","name":"シャワーズ","t2":"none","display":"シャワーズ"},{"form":"通常","file":"jolteon.png","no":"135","id":"135_サンダース","t1":"electric","name":"サンダース","t2":"none","display":"サンダース"},{"form":"通常","file":"flareon.png","no":"136","id":"136_ブースター","t1":"fire","name":"ブースター","t2":"none","display":"ブースター"},{"form":"通常","file":"aerodactyl.png","no":"142","id":"142_プテラ","t1":"rock","name":"プテラ","t2":"flying","display":"プテラ"},{"form":"通常","file":"snorlax.png","no":"143","id":"143_カビゴン","t1":"normal","name":"カビゴン","t2":"none","display":"カビゴン"},{"form":"通常","file":"dragonite.png","no":"149","id":"149_カイリュー","t1":"dragon","name":"カイリュー","t2":"flying","display":"カイリュー"},{"form":"通常","file":"meganium.png","no":"154","id":"154_メガニウム","t1":"grass","name":"メガニウム","t2":"none","display":"メガニウム"},{"form":"通常","file":"typhlosion.png","no":"157","id":"157_バクフーン","t1":"fire","name":"バクフーン","t2":"none","display":"バクフーン"},{"form":"ヒスイのすがた","file":"typhlosion.png","no":"157","id":"157_バクフーン(ヒスイのすがた)","t1":"fire","name":"バクフーン","t2":"ghost","display":"バクフーン(ヒスイのすがた)"},{"form":"通常","file":"feraligatr.png","no":"160","id":"160_オーダイル","t1":"water","name":"オーダイル","t2":"none","display":"オーダイル"},{"form":"通常","file":"ariados.png","no":"168","id":"168_アリアドス","t1":"bug","name":"アリアドス","t2":"poison","display":"アリアドス"},{"form":"通常","file":"ampharos.png","no":"181","id":"181_デンリュウ","t1":"electric","name":"デンリュウ","t2":"none","display":"デンリュウ"},{"form":"通常","file":"azumarill.png","no":"184","id":"184_マリルリ","t1":"water","name":"マリルリ","t2":"fairy","display":"マリルリ"},{"form":"通常","file":"politoed.png","no":"186","id":"186_ニョロトノ","t1":"water","name":"ニョロトノ","t2":"none","display":"ニョロトノ"},{"form":"通常","file":"espeon.png","no":"196","id":"196_エーフィ","t1":"psychic","name":"エーフィ","t2":"none","display":"エーフィ"},{"form":"通常","file":"umbreon.png","no":"197","id":"197_ブラッキー","t1":"dark","name":"ブラッキー","t2":"none","display":"ブラッキー"},{"form":"通常","file":"slowking.png","no":"199","id":"199_ヤドキング","t1":"water","name":"ヤドキング","t2":"psychic","display":"ヤドキング"},{"form":"ガラルのすがた","file":"slowking.png","no":"199","id":"199_ヤドキング(ガラルのすがた)","t1":"poison","name":"ヤドキング","t2":"psychic","display":"ヤドキング(ガラルのすがた)"},{"form":"通常","file":"forretress.png","no":"205","id":"205_フォレトス","t1":"bug","name":"フォレトス","t2":"steel","display":"フォレトス"},{"form":"通常","file":"steelix.png","no":"208","id":"208_ハガネール","t1":"steel","name":"ハガネール","t2":"ground","display":"ハガネール"},{"form":"通常","file":"qwilfish.png","no":"211","id":"211_ハリーセン","t1":"water","name":"ハリーセン","t2":"poison","display":"ハリーセン"},{"form":"通常","file":"scizor.png","no":"212","id":"212_ハッサム","t1":"bug","name":"ハッサム","t2":"steel","display":"ハッサム"},{"form":"通常","file":"heracross.png","no":"214","id":"214_ヘラクロス","t1":"bug","name":"ヘラクロス","t2":"fighting","display":"ヘラクロス"},{"form":"通常","file":"skarmory.png","no":"227","id":"227_エアームド","t1":"steel","name":"エアームド","t2":"flying","display":"エアームド"},{"form":"通常","file":"houndoom.png","no":"229","id":"229_ヘルガー","t1":"dark","name":"ヘルガー","t2":"fire","display":"ヘルガー"},{"form":"通常","file":"tyranitar.png","no":"248","id":"248_バンギラス","t1":"rock","name":"バンギラス","t2":"dark","display":"バンギラス"},{"form":"通常","file":"sceptile.png","no":"254","id":"254_ジュカイン","t1":"grass","name":"ジュカイン","t2":"none","display":"ジュカイン"},{"form":"通常","file":"blaziken.png","no":"257","id":"257_バシャーモ","t1":"fire","name":"バシャーモ","t2":"fighting","display":"バシャーモ"},{"form":"通常","file":"swampert.png","no":"260","id":"260_ラグラージ","t1":"water","name":"ラグラージ","t2":"ground","display":"ラグラージ"},{"form":"通常","file":"pelipper.png","no":"279","id":"279_ペリッパー","t1":"water","name":"ペリッパー","t2":"flying","display":"ペリッパー"},{"form":"通常","file":"gardevoir.png","no":"282","id":"282_サーナイト","t1":"psychic","name":"サーナイト","t2":"fairy","display":"サーナイト"},{"form":"通常","file":"sableye.png","no":"302","id":"302_ヤミラミ","t1":"dark","name":"ヤミラミ","t2":"ghost","display":"ヤミラミ"},{"form":"通常","file":"mawile.png","no":"303","id":"303_クチート","t1":"steel","name":"クチート","t2":"fairy","display":"クチート"},{"form":"通常","file":"aggron.png","no":"306","id":"306_ボスゴドラ","t1":"steel","name":"ボスゴドラ","t2":"rock","display":"ボスゴドラ"},{"form":"通常","file":"medicham.png","no":"308","id":"308_チャーレム","t1":"fighting","name":"チャーレム","t2":"psychic","display":"チャーレム"},{"form":"通常","file":"manectric.png","no":"310","id":"310_ライボルト","t1":"electric","name":"ライボルト","t2":"none","display":"ライボルト"},{"form":"通常","file":"sharpedo.png","no":"319","id":"319_サメハダー","t1":"water","name":"サメハダー","t2":"dark","display":"サメハダー"},{"form":"通常","file":"camerupt.png","no":"323","id":"323_バクーダ","t1":"fire","name":"バクーダ","t2":"ground","display":"バクーダ"},{"form":"通常","file":"torkoal.png","no":"324","id":"324_コータス","t1":"fire","name":"コータス","t2":"none","display":"コータス"},{"form":"通常","file":"altaria.png","no":"334","id":"334_チルタリス","t1":"dragon","name":"チルタリス","t2":"flying","display":"チルタリス"},{"form":"通常","file":"milotic.png","no":"350","id":"350_ミロカロス","t1":"water","name":"ミロカロス","t2":"none","display":"ミロカロス"},{"form":"ポワルンのすがた","file":"castform.png","no":"351","id":"351_ポワルン(ポワルンのすがた)","t1":"normal","name":"ポワルン","t2":"none","display":"ポワルン(ポワルンのすがた)"},{"form":"たいようのすがた","file":"castform.png","no":"351","id":"351_ポワルン(たいようのすがた)","t1":"fire","name":"ポワルン","t2":"none","display":"ポワルン(たいようのすがた)"},{"form":"あまみずのすがた","file":"castform.png","no":"351","id":"351_ポワルン(あまみずのすがた)","t1":"water","name":"ポワルン","t2":"none","display":"ポワルン(あまみずのすがた)"},{"form":"ゆきぐものすがた","file":"castform.png","no":"351","id":"351_ポワルン(ゆきぐものすがた)","t1":"ice","name":"ポワルン","t2":"none","display":"ポワルン(ゆきぐものすがた)"},{"form":"通常","file":"banette.png","no":"354","id":"354_ジュペッタ","t1":"ghost","name":"ジュペッタ","t2":"none","display":"ジュペッタ"},{"form":"通常","file":"chimecho.png","no":"358","id":"358_チリーン","t1":"psychic","name":"チリーン","t2":"none","display":"チリーン"},{"form":"通常","file":"absol.png","no":"359","id":"359_アブソル","t1":"dark","name":"アブソル","t2":"none","display":"アブソル"},{"form":"通常","file":"glalie.png","no":"362","id":"362_オニゴーリ","t1":"ice","name":"オニゴーリ","t2":"none","display":"オニゴーリ"},{"form":"通常","file":"metagross.png","no":"376","id":"376_メタグロス","t1":"steel","name":"メタグロス","t2":"psychic","display":"メタグロス"},{"form":"通常","file":"torterra.png","no":"389","id":"389_ドダイトス","t1":"grass","name":"ドダイトス","t2":"ground","display":"ドダイトス"},{"form":"通常","file":"infernape.png","no":"392","id":"392_ゴウカザル","t1":"fire","name":"ゴウカザル","t2":"fighting","display":"ゴウカザル"},{"form":"通常","file":"empoleon.png","no":"395","id":"395_エンペルト","t1":"water","name":"エンペルト","t2":"steel","display":"エンペルト"},{"form":"通常","file":"staraptor.png","no":"398","id":"398_ムクホーク","t1":"normal","name":"ムクホーク","t2":"flying","display":"ムクホーク"},{"form":"通常","file":"luxray.png","no":"405","id":"405_レントラー","t1":"electric","name":"レントラー","t2":"none","display":"レントラー"},{"form":"通常","file":"roserade.png","no":"407","id":"407_ロズレイド","t1":"grass","name":"ロズレイド","t2":"poison","display":"ロズレイド"},{"form":"通常","file":"rampardos.png","no":"409","id":"409_ラムパルド","t1":"rock","name":"ラムパルド","t2":"none","display":"ラムパルド"},{"form":"通常","file":"bastiodon.png","no":"411","id":"411_トリデプス","t1":"rock","name":"トリデプス","t2":"steel","display":"トリデプス"},{"form":"通常","file":"lopunny.png","no":"428","id":"428_ミミロップ","t1":"normal","name":"ミミロップ","t2":"none","display":"ミミロップ"},{"form":"通常","file":"spiritomb.png","no":"442","id":"442_ミカルゲ","t1":"ghost","name":"ミカルゲ","t2":"dark","display":"ミカルゲ"},{"form":"通常","file":"garchomp.png","no":"445","id":"445_ガブリアス","t1":"dragon","name":"ガブリアス","t2":"ground","display":"ガブリアス"},{"form":"通常","file":"lucario.png","no":"448","id":"448_ルカリオ","t1":"fighting","name":"ルカリオ","t2":"steel","display":"ルカリオ"},{"form":"通常","file":"hippowdon.png","no":"450","id":"450_カバルドン","t1":"ground","name":"カバルドン","t2":"none","display":"カバルドン"},{"form":"通常","file":"toxicroak.png","no":"454","id":"454_ドクロッグ","t1":"poison","name":"ドクロッグ","t2":"fighting","display":"ドクロッグ"},{"form":"通常","file":"abomasnow.png","no":"460","id":"460_ユキノオー","t1":"grass","name":"ユキノオー","t2":"ice","display":"ユキノオー"},{"form":"通常","file":"weavile.png","no":"461","id":"461_マニューラ","t1":"dark","name":"マニューラ","t2":"ice","display":"マニューラ"},{"form":"通常","file":"rhyperior.png","no":"464","id":"464_ドサイドン","t1":"ground","name":"ドサイドン","t2":"rock","display":"ドサイドン"},{"form":"通常","file":"leafeon.png","no":"470","id":"470_リーフィア","t1":"grass","name":"リーフィア","t2":"none","display":"リーフィア"},{"form":"通常","file":"glaceon.png","no":"471","id":"471_グレイシア","t1":"ice","name":"グレイシア","t2":"none","display":"グレイシア"},{"form":"通常","file":"gliscor.png","no":"472","id":"472_グライオン","t1":"ground","name":"グライオン","t2":"flying","display":"グライオン"},{"form":"通常","file":"mamoswine.png","no":"473","id":"473_マンムー","t1":"ice","name":"マンムー","t2":"ground","display":"マンムー"},{"form":"通常","file":"gallade.png","no":"475","id":"475_エルレイド","t1":"psychic","name":"エルレイド","t2":"fighting","display":"エルレイド"},{"form":"通常","file":"froslass.png","no":"478","id":"478_ユキメノコ","t1":"ice","name":"ユキメノコ","t2":"ghost","display":"ユキメノコ"},{"form":"ロトムのすがた","file":"rotom.png","no":"479","id":"479_ロトム(ロトムのすがた)","t1":"electric","name":"ロトム","t2":"ghost","display":"ロトム(ロトムのすがた)"},{"form":"ヒートロトム","file":"rotom.png","no":"479","id":"479_ロトム(ヒートロトム)","t1":"electric","name":"ロトム","t2":"fire","display":"ロトム(ヒートロトム)"},{"form":"ウォッシュロトム","file":"rotom.png","no":"479","id":"479_ロトム(ウォッシュロトム)","t1":"electric","name":"ロトム","t2":"water","display":"ロトム(ウォッシュロトム)"},{"form":"フロストロトム","file":"rotom.png","no":"479","id":"479_ロトム(フロストロトム)","t1":"electric","name":"ロトム","t2":"ice","display":"ロトム(フロストロトム)"},{"form":"スピンロトム","file":"rotom.png","no":"479","id":"479_ロトム(スピンロトム)","t1":"electric","name":"ロトム","t2":"flying","display":"ロトム(スピンロトム)"},{"form":"カットロトム","file":"rotom.png","no":"479","id":"479_ロトム(カットロトム)","t1":"electric","name":"ロトム","t2":"grass","display":"ロトム(カットロトム)"},{"form":"通常","file":"serperior.png","no":"497","id":"497_ジャローダ","t1":"grass","name":"ジャローダ","t2":"none","display":"ジャローダ"},{"form":"通常","file":"emboar.png","no":"500","id":"500_エンブオー","t1":"fire","name":"エンブオー","t2":"fighting","display":"エンブオー"},{"form":"通常","file":"samurott.png","no":"503","id":"503_ダイケンキ","t1":"water","name":"ダイケンキ","t2":"none","display":"ダイケンキ"},{"form":"ヒスイのすがた","file":"samurott.png","no":"503","id":"503_ダイケンキ(ヒスイのすがた)","t1":"water","name":"ダイケンキ","t2":"dark","display":"ダイケンキ(ヒスイのすがた)"},{"form":"通常","file":"watchog.png","no":"505","id":"505_ミルホッグ","t1":"normal","name":"ミルホッグ","t2":"none","display":"ミルホッグ"},{"form":"通常","file":"liepard.png","no":"510","id":"510_レパルダス","t1":"dark","name":"レパルダス","t2":"none","display":"レパルダス"},{"form":"通常","file":"simisage.png","no":"512","id":"512_ヤナッキー","t1":"grass","name":"ヤナッキー","t2":"none","display":"ヤナッキー"},{"form":"通常","file":"simisear.png","no":"514","id":"514_バオッキー","t1":"fire","name":"バオッキー","t2":"none","display":"バオッキー"},{"form":"通常","file":"simipour.png","no":"516","id":"516_ヒヤッキー","t1":"water","name":"ヒヤッキー","t2":"none","display":"ヒヤッキー"},{"form":"通常","file":"musharna.png","no":"518","id":"518_ムシャーナ","t1":"psychic","name":"ムシャーナ","t2":"none","display":"ムシャーナ"},{"form":"通常","file":"excadrill.png","no":"530","id":"530_ドリュウズ","t1":"ground","name":"ドリュウズ","t2":"steel","display":"ドリュウズ"},{"form":"通常","file":"audino.png","no":"531","id":"531_タブンネ","t1":"normal","name":"タブンネ","t2":"none","display":"タブンネ"},{"form":"通常","file":"conkeldurr.png","no":"534","id":"534_ローブシン","t1":"fighting","name":"ローブシン","t2":"none","display":"ローブシン"},{"form":"通常","file":"scolipede.png","no":"545","id":"545_ペンドラー","t1":"bug","name":"ペンドラー","t2":"poison","display":"ペンドラー"},{"form":"通常","file":"whimsicott.png","no":"547","id":"547_エルフーン","t1":"grass","name":"エルフーン","t2":"fairy","display":"エルフーン"},{"form":"通常","file":"krookodile.png","no":"553","id":"553_ワルビアル","t1":"ground","name":"ワルビアル","t2":"dark","display":"ワルビアル"},{"form":"通常","file":"scrafty.png","no":"560","id":"560_ズルズキン","t1":"dark","name":"ズルズキン","t2":"fighting","display":"ズルズキン"},{"form":"通常","file":"cofagrigus.png","no":"563","id":"563_デスカーン","t1":"ghost","name":"デスカーン","t2":"none","display":"デスカーン"},{"form":"通常","file":"garbodor.png","no":"569","id":"569_ダストダス","t1":"poison","name":"ダストダス","t2":"none","display":"ダストダス"},{"form":"通常","file":"zoroark.png","no":"571","id":"571_ゾロアーク","t1":"dark","name":"ゾロアーク","t2":"none","display":"ゾロアーク"},{"form":"ヒスイのすがた","file":"zoroark.png","no":"571","id":"571_ゾロアーク(ヒスイのすがた)","t1":"normal","name":"ゾロアーク","t2":"ghost","display":"ゾロアーク(ヒスイのすがた)"},{"form":"通常","file":"reuniclus.png","no":"579","id":"579_ランクルス","t1":"psychic","name":"ランクルス","t2":"none","display":"ランクルス"},{"form":"通常","file":"vanilluxe.png","no":"584","id":"584_バイバニラ","t1":"ice","name":"バイバニラ","t2":"none","display":"バイバニラ"},{"form":"通常","file":"emolga.png","no":"587","id":"587_エモンガ","t1":"electric","name":"エモンガ","t2":"flying","display":"エモンガ"},{"form":"通常","file":"eelektross.png","no":"604","id":"604_シビルドン","t1":"electric","name":"シビルドン","t2":"none","display":"シビルドン"},{"form":"通常","file":"chandelure.png","no":"609","id":"609_シャンデラ","t1":"ghost","name":"シャンデラ","t2":"fire","display":"シャンデラ"},{"form":"通常","file":"beartic.png","no":"614","id":"614_ツンベアー","t1":"ice","name":"ツンベアー","t2":"none","display":"ツンベアー"},{"form":"通常","file":"stunfisk.png","no":"618","id":"618_マッギョ","t1":"ground","name":"マッギョ","t2":"electric","display":"マッギョ"},{"form":"ガラルのすがた","file":"stunfisk.png","no":"618","id":"618_マッギョ(ガラルのすがた)","t1":"ground","name":"マッギョ","t2":"steel","display":"マッギョ(ガラルのすがた)"},{"form":"通常","file":"golurk.png","no":"623","id":"623_ゴルーグ","t1":"ground","name":"ゴルーグ","t2":"ghost","display":"ゴルーグ"},{"form":"通常","file":"hydreigon.png","no":"635","id":"635_サザンドラ","t1":"dark","name":"サザンドラ","t2":"dragon","display":"サザンドラ"},{"form":"通常","file":"volcarona.png","no":"637","id":"637_ウルガモス","t1":"bug","name":"ウルガモス","t2":"fire","display":"ウルガモス"},{"form":"通常","file":"chesnaught.png","no":"652","id":"652_ブリガロン","t1":"grass","name":"ブリガロン","t2":"fighting","display":"ブリガロン"},{"form":"通常","file":"delphox.png","no":"655","id":"655_マフォクシー","t1":"fire","name":"マフォクシー","t2":"psychic","display":"マフォクシー"},{"form":"通常","file":"greninja.png","no":"658","id":"658_ゲッコウガ","t1":"water","name":"ゲッコウガ","t2":"dark","display":"ゲッコウガ"},{"form":"通常","file":"diggersby.png","no":"660","id":"660_ホルード","t1":"normal","name":"ホルード","t2":"ground","display":"ホルード"},{"form":"通常","file":"talonflame.png","no":"663","id":"663_ファイアロー","t1":"fire","name":"ファイアロー","t2":"flying","display":"ファイアロー"},{"form":"通常","file":"vivillon.png","no":"666","id":"666_ビビヨン","t1":"bug","name":"ビビヨン","t2":"flying","display":"ビビヨン"},{"form":"ファンシーなもよう","file":"vivillon.png","no":"666","id":"666_ビビヨン(ファンシーなもよう)","t1":"bug","name":"ビビヨン","t2":"flying","display":"ビビヨン(ファンシーなもよう)"},{"form":"Pokeball","file":"vivillon.png","no":"666","id":"666_ビビヨン(Pokeball)","t1":"bug","name":"ビビヨン","t2":"flying","display":"ビビヨン(Pokeball)"},{"form":"通常","file":"pyroar.png","no":"668","id":"668_カエンジシ","t1":"fire","name":"カエンジシ","t2":"normal","display":"カエンジシ"},{"form":"えいえんのはな","file":"floette-eternal.png","no":"670","id":"670_フラエッテ(えいえんのはな)","t1":"fairy","name":"フラエッテ","t2":"none","display":"フラエッテ(えいえんのはな)"},{"form":"通常","file":"florges.png","no":"671","id":"671_フラージェス","t1":"fairy","name":"フラージェス","t2":"none","display":"フラージェス"},{"form":"通常","file":"pangoro.png","no":"675","id":"675_ゴロンダ","t1":"fighting","name":"ゴロンダ","t2":"dark","display":"ゴロンダ"},{"form":"通常","file":"furfrou.png","no":"676","id":"676_トリミアン","t1":"normal","name":"トリミアン","t2":"none","display":"トリミアン"},{"form":"オスのすがた","file":"meowstic.png","no":"678","id":"678_ニャオニクス(オスのすがた)","t1":"psychic","name":"ニャオニクス","t2":"none","display":"ニャオニクス(オスのすがた)"},{"form":"メスのすがた","file":"meowstic.png","no":"678","id":"678_ニャオニクス(メスのすがた)","t1":"psychic","name":"ニャオニクス","t2":"none","display":"ニャオニクス(メスのすがた)"},{"form":"シールドフォルム","file":"aegislash.png","no":"681","id":"681_ギルガルド(シールドフォルム)","t1":"steel","name":"ギルガルド","t2":"ghost","display":"ギルガルド(シールドフォルム)"},{"form":"ブレードフォルム","file":"aegislash.png","no":"681","id":"681_ギルガルド(ブレードフォルム)","t1":"steel","name":"ギルガルド","t2":"ghost","display":"ギルガルド(ブレードフォルム)"},{"form":"通常","file":"aromatisse.png","no":"683","id":"683_フレフワン","t1":"fairy","name":"フレフワン","t2":"none","display":"フレフワン"},{"form":"通常","file":"slurpuff.png","no":"685","id":"685_ペロリーム","t1":"fairy","name":"ペロリーム","t2":"none","display":"ペロリーム"},{"form":"通常","file":"malamar.png","no":"687","id":"687_カラマネロ","t1":"dark","name":"カラマネロ","t2":"psychic","display":"カラマネロ"},{"form":"通常","file":"barbaracle.png","no":"689","id":"689_ガメノデス","t1":"rock","name":"ガメノデス","t2":"water","display":"ガメノデス"},{"form":"通常","file":"dragalge.png","no":"691","id":"691_ドラミドロ","t1":"poison","name":"ドラミドロ","t2":"dragon","display":"ドラミドロ"},{"form":"通常","file":"clawitzer.png","no":"693","id":"693_ブロスター","t1":"water","name":"ブロスター","t2":"none","display":"ブロスター"},{"form":"通常","file":"heliolisk.png","no":"695","id":"695_エレザード","t1":"electric","name":"エレザード","t2":"normal","display":"エレザード"},{"form":"通常","file":"tyrantrum.png","no":"697","id":"697_ガチゴラス","t1":"rock","name":"ガチゴラス","t2":"dragon","display":"ガチゴラス"},{"form":"通常","file":"aurorus.png","no":"699","id":"699_アマルルガ","t1":"rock","name":"アマルルガ","t2":"ice","display":"アマルルガ"},{"form":"通常","file":"sylveon.png","no":"700","id":"700_ニンフィア","t1":"fairy","name":"ニンフィア","t2":"none","display":"ニンフィア"},{"form":"通常","file":"hawlucha.png","no":"701","id":"701_ルチャブル","t1":"fighting","name":"ルチャブル","t2":"flying","display":"ルチャブル"},{"form":"通常","file":"dedenne.png","no":"702","id":"702_デデンネ","t1":"electric","name":"デデンネ","t2":"fairy","display":"デデンネ"},{"form":"通常","file":"goodra.png","no":"706","id":"706_ヌメルゴン","t1":"dragon","name":"ヌメルゴン","t2":"none","display":"ヌメルゴン"},{"form":"ヒスイのすがた","file":"goodra.png","no":"706","id":"706_ヌメルゴン(ヒスイのすがた)","t1":"steel","name":"ヌメルゴン","t2":"dragon","display":"ヌメルゴン(ヒスイのすがた)"},{"form":"通常","file":"klefki.png","no":"707","id":"707_クレッフィ","t1":"steel","name":"クレッフィ","t2":"fairy","display":"クレッフィ"},{"form":"通常","file":"trevenant.png","no":"709","id":"709_オーロット","t1":"ghost","name":"オーロット","t2":"grass","display":"オーロット"},{"form":"通常","file":"gourgeist.png","no":"711","id":"711_パンプジン","t1":"ghost","name":"パンプジン","t2":"grass","display":"パンプジン"},{"form":"ちいさいサイズ","file":"gourgeist.png","no":"711","id":"711_パンプジン(ちいさいサイズ)","t1":"ghost","name":"パンプジン","t2":"grass","display":"パンプジン(ちいさいサイズ)"},{"form":"おおきいサイズ","file":"gourgeist.png","no":"711","id":"711_パンプジン(おおきいサイズ)","t1":"ghost","name":"パンプジン","t2":"grass","display":"パンプジン(おおきいサイズ)"},{"form":"とくだいサイズ","file":"gourgeist.png","no":"711","id":"711_パンプジン(とくだいサイズ)","t1":"ghost","name":"パンプジン","t2":"grass","display":"パンプジン(とくだいサイズ)"},{"form":"通常","file":"avalugg.png","no":"713","id":"713_クレベース","t1":"ice","name":"クレベース","t2":"none","display":"クレベース"},{"form":"ヒスイのすがた","file":"avalugg.png","no":"713","id":"713_クレベース(ヒスイのすがた)","t1":"ice","name":"クレベース","t2":"rock","display":"クレベース(ヒスイのすがた)"},{"form":"通常","file":"noivern.png","no":"715","id":"715_オンバーン","t1":"flying","name":"オンバーン","t2":"dragon","display":"オンバーン"},{"form":"通常","file":"decidueye.png","no":"724","id":"724_ジュナイパー","t1":"grass","name":"ジュナイパー","t2":"ghost","display":"ジュナイパー"},{"form":"ヒスイのすがた","file":"decidueye.png","no":"724","id":"724_ジュナイパー(ヒスイのすがた)","t1":"grass","name":"ジュナイパー","t2":"fighting","display":"ジュナイパー(ヒスイのすがた)"},{"form":"通常","file":"incineroar.png","no":"727","id":"727_ガオガエン","t1":"fire","name":"ガオガエン","t2":"dark","display":"ガオガエン"},{"form":"通常","file":"primarina.png","no":"730","id":"730_アシレーヌ","t1":"water","name":"アシレーヌ","t2":"fairy","display":"アシレーヌ"},{"form":"通常","file":"toucannon.png","no":"733","id":"733_ドデカバシ","t1":"normal","name":"ドデカバシ","t2":"flying","display":"ドデカバシ"},{"form":"通常","file":"crabominable.png","no":"740","id":"740_ケケンカニ","t1":"fighting","name":"ケケンカニ","t2":"ice","display":"ケケンカニ"},{"form":"まひるのすがた","file":"lycanroc-midday.png","no":"745","id":"745_ルガルガン(まひるのすがた)","t1":"rock","name":"ルガルガン","t2":"none","display":"ルガルガン(まひるのすがた)"},{"form":"まよなかのすがた","file":"lycanroc-midday.png","no":"745","id":"745_ルガルガン(まよなかのすがた)","t1":"rock","name":"ルガルガン","t2":"none","display":"ルガルガン(まよなかのすがた)"},{"form":"たそがれのすがた","file":"lycanroc-midday.png","no":"745","id":"745_ルガルガン(たそがれのすがた)","t1":"rock","name":"ルガルガン","t2":"none","display":"ルガルガン(たそがれのすがた)"},{"form":"通常","file":"toxapex.png","no":"748","id":"748_ドヒドイデ","t1":"poison","name":"ドヒドイデ","t2":"water","display":"ドヒドイデ"},{"form":"通常","file":"mudsdale.png","no":"750","id":"750_バンバドロ","t1":"ground","name":"バンバドロ","t2":"none","display":"バンバドロ"},{"form":"通常","file":"araquanid.png","no":"752","id":"752_オニシズクモ","t1":"water","name":"オニシズクモ","t2":"bug","display":"オニシズクモ"},{"form":"通常","file":"salazzle.png","no":"758","id":"758_エンニュート","t1":"poison","name":"エンニュート","t2":"fire","display":"エンニュート"},{"form":"通常","file":"tsareena.png","no":"763","id":"763_アマージョ","t1":"grass","name":"アマージョ","t2":"none","display":"アマージョ"},{"form":"通常","file":"oranguru.png","no":"765","id":"765_ヤレユータン","t1":"normal","name":"ヤレユータン","t2":"psychic","display":"ヤレユータン"},{"form":"通常","file":"passimian.png","no":"766","id":"766_ナゲツケサル","t1":"fighting","name":"ナゲツケサル","t2":"none","display":"ナゲツケサル"},{"form":"通常","file":"mimikyu.png","no":"778","id":"778_ミミッキュ","t1":"ghost","name":"ミミッキュ","t2":"fairy","display":"ミミッキュ"},{"form":"ばれたすがた","file":"mimikyu.png","no":"778","id":"778_ミミッキュ(ばれたすがた)","t1":"ghost","name":"ミミッキュ","t2":"fairy","display":"ミミッキュ(ばれたすがた)"},{"form":"通常","file":"drampa.png","no":"780","id":"780_ジジーロン","t1":"normal","name":"ジジーロン","t2":"dragon","display":"ジジーロン"},{"form":"通常","file":"kommo-o.png","no":"784","id":"784_ジャラランガ","t1":"dragon","name":"ジャラランガ","t2":"fighting","display":"ジャラランガ"},{"form":"通常","file":"corviknight.png","no":"823","id":"823_アーマーガア","t1":"flying","name":"アーマーガア","t2":"steel","display":"アーマーガア"},{"form":"通常","file":"flapple.png","no":"841","id":"841_アップリュー","t1":"grass","name":"アップリュー","t2":"dragon","display":"アップリュー"},{"form":"通常","file":"appletun.png","no":"842","id":"842_タルップル","t1":"grass","name":"タルップル","t2":"dragon","display":"タルップル"},{"form":"通常","file":"sandaconda.png","no":"844","id":"844_サダイジャ","t1":"ground","name":"サダイジャ","t2":"none","display":"サダイジャ"},{"form":"通常","file":"polteageist.png","no":"855","id":"855_ポットデス","t1":"ghost","name":"ポットデス","t2":"none","display":"ポットデス"},{"form":"しんさくフォルム","file":"polteageist.png","no":"855","id":"855_ポットデス(しんさくフォルム)","t1":"ghost","name":"ポットデス","t2":"none","display":"ポットデス(しんさくフォルム)"},{"form":"通常","file":"hatterene.png","no":"858","id":"858_ブリムオン","t1":"psychic","name":"ブリムオン","t2":"fairy","display":"ブリムオン"},{"form":"通常","file":"grimmsnarl.png","no":"861","id":"861_オーロンゲ","t1":"dark","name":"オーロンゲ","t2":"fairy","display":"オーロンゲ"},{"form":"通常","file":"mr-rime.png","no":"866","id":"866_バリコオル","t1":"ice","name":"バリコオル","t2":"psychic","display":"バリコオル"},{"form":"通常","file":"runerigus.png","no":"867","id":"867_デスバーン","t1":"ground","name":"デスバーン","t2":"ghost","display":"デスバーン"},{"form":"通常","file":"alcremie.png","no":"869","id":"869_マホイップ","t1":"fairy","name":"マホイップ","t2":"none","display":"マホイップ"},{"form":"通常","file":"falinks.png","no":"870","id":"870_タイレーツ","t1":"fighting","name":"タイレーツ","t2":"none","display":"タイレーツ"},{"form":"まんぷくもよう","file":"morpeko.png","no":"877","id":"877_モルぺコ(まんぷくもよう)","t1":"electric","name":"モルペコ","t2":"dark","display":"モルぺコ(まんぷくもよう)"},{"form":"はらぺこもよう","file":"morpeko.png","no":"877","id":"877_モルぺコ(はらぺこもよう)","t1":"electric","name":"モルペコ","t2":"dark","display":"モルぺコ(はらぺこもよう)"},{"form":"通常","file":"dragapult.png","no":"887","id":"887_ドラパルト","t1":"dragon","name":"ドラパルト","t2":"ghost","display":"ドラパルト"},{"form":"通常","file":"wyrdeer.png","no":"899","id":"899_アヤシシ","t1":"normal","name":"アヤシシ","t2":"psychic","display":"アヤシシ"},{"form":"通常","file":"kleavor.png","no":"900","id":"900_バサギリ","t1":"bug","name":"バサギリ","t2":"rock","display":"バサギリ"},{"form":"オスのすがた","file":"basculegion-male.png","no":"902","id":"902_イダイトウ(オスのすがた)","t1":"water","name":"イダイトウ","t2":"ghost","display":"イダイトウ(オスのすがた)"},{"form":"メスのすがた","file":"basculegion-male.png","no":"902","id":"902_イダイトウ(メスのすがた)","t1":"water","name":"イダイトウ","t2":"ghost","display":"イダイトウ(メスのすがた)"},{"form":"通常","file":"sneasler.png","no":"903","id":"903_オオニューラ","t1":"fighting","name":"オオニューラ","t2":"poison","display":"オオニューラ"},{"form":"通常","file":"overqwil.png","no":"904","id":"904_ハリーマン","t1":"dark","name":"ハリーマン","t2":"poison","display":"ハリーマン"},{"form":"通常","file":"meowscarada.png","no":"908","id":"908_マスカーニャ","t1":"grass","name":"マスカーニャ","t2":"dark","display":"マスカーニャ"},{"form":"通常","file":"skeledirge.png","no":"911","id":"911_ラウドボーン","t1":"fire","name":"ラウドボーン","t2":"ghost","display":"ラウドボーン"},{"form":"通常","file":"quaquaval.png","no":"914","id":"914_ウェーニバル","t1":"water","name":"ウェーニバル","t2":"fighting","display":"ウェーニバル"},{"form":"通常","file":"maushold-four.png","no":"925","id":"925_イッカネズミ","t1":"normal","name":"イッカネズミ","t2":"none","display":"イッカネズミ"},{"form":"Four","file":"maushold-four.png","no":"925","id":"925_イッカネズミ(Four)","t1":"normal","name":"イッカネズミ","t2":"none","display":"イッカネズミ(Four)"},{"form":"通常","file":"garganacl.png","no":"934","id":"934_キョジオーン","t1":"rock","name":"キョジオーン","t2":"none","display":"キョジオーン"},{"form":"通常","file":"armarouge.png","no":"936","id":"936_グレンアルマ","t1":"fire","name":"グレンアルマ","t2":"psychic","display":"グレンアルマ"},{"form":"通常","file":"ceruledge.png","no":"937","id":"937_ソウブレイズ","t1":"fire","name":"ソウブレイズ","t2":"ghost","display":"ソウブレイズ"},{"form":"通常","file":"bellibolt.png","no":"939","id":"939_ハラバリー","t1":"electric","name":"ハラバリー","t2":"none","display":"ハラバリー"},{"form":"通常","file":"scovillain.png","no":"952","id":"952_スコヴィラン","t1":"grass","name":"スコヴィラン","t2":"fire","display":"スコヴィラン"},{"form":"通常","file":"espathra.png","no":"956","id":"956_クエスパトラ","t1":"psychic","name":"クエスパトラ","t2":"none","display":"クエスパトラ"},{"form":"通常","file":"tinkaton.png","no":"959","id":"959_デカヌチャン","t1":"fairy","name":"デカヌチャン","t2":"steel","display":"デカヌチャン"},{"form":"通常","file":"palafin-zero.png","no":"964","id":"964_イルカマン","t1":"water","name":"イルカマン","t2":"none","display":"イルカマン"},{"form":"マイティフォルム","file":"palafin-zero.png","no":"964","id":"964_イルカマン(マイティフォルム)","t1":"water","name":"イルカマン","t2":"none","display":"イルカマン(マイティフォルム)"},{"form":"通常","file":"orthworm.png","no":"968","id":"968_ミミズズ","t1":"steel","name":"ミミズズ","t2":"none","display":"ミミズズ"},{"form":"通常","file":"glimmora.png","no":"970","id":"970_キラフロル","t1":"rock","name":"キラフロル","t2":"poison","display":"キラフロル"},{"form":"通常","file":"houndstone.png","no":"972","id":"972_ハカドッグ","t1":"ghost","name":"ハカドッグ","t2":"none","display":"ハカドッグ"},{"form":"通常","file":"annihilape.png","no":"979","id":"979_コノヨザル","t1":"fighting","name":"コノヨザル","t2":"ghost","display":"コノヨザル"},{"form":"通常","file":"farigiraf.png","no":"981","id":"981_リキキリン","t1":"normal","name":"リキキリン","t2":"psychic","display":"リキキリン"},{"form":"通常","file":"kingambit.png","no":"983","id":"983_ドドゲザン","t1":"dark","name":"ドドゲザン","t2":"steel","display":"ドドゲザン"},{"form":"通常","file":"gholdengo.png","no":"1000","id":"1000_サーフゴー","t1":"steel","name":"サーフゴー","t2":"ghost","display":"サーフゴー"},{"form":"通常","file":"sinistcha.png","no":"1013","id":"1013_ヤバソチャ","t1":"grass","name":"ヤバソチャ","t2":"ghost","display":"ヤバソチャ"},{"form":"ケッサクのすがた","file":"sinistcha.png","no":"1013","id":"1013_ヤバソチャ(ケッサクのすがた)","t1":"grass","name":"ヤバソチャ","t2":"ghost","display":"ヤバソチャ(ケッサクのすがた)"},{"form":"通常","file":"archaludon.png","no":"1018","id":"1018_ブリジュラス","t1":"steel","name":"ブリジュラス","t2":"dragon","display":"ブリジュラス"},{"form":"通常","file":"hydrapple.png","no":"1019","id":"1019_カミツオロチ","t1":"grass","name":"カミツオロチ","t2":"dragon","display":"カミツオロチ"}]
+﻿[
+    {
+        "id":  "3_フシギバナ",
+        "no":  "3",
+        "name":  "フシギバナ",
+        "display":  "フシギバナ",
+        "t1":  "grass",
+        "t2":  "poison",
+        "file":  "フシギバナ.png"
+    },
+    {
+        "id":  "3_フシギバナ(メガフシギバナ)",
+        "no":  "3",
+        "name":  "フシギバナ",
+        "display":  "フシギバナ(メガフシギバナ)",
+        "t1":  "grass",
+        "t2":  "poison",
+        "file":  "フシギバナ.png"
+    },
+    {
+        "id":  "6_リザードン",
+        "no":  "6",
+        "name":  "リザードン",
+        "display":  "リザードン",
+        "t1":  "fire",
+        "t2":  "flying",
+        "file":  "リザードン.png"
+    },
+    {
+        "id":  "6_リザードン(メガリザードンＸ)",
+        "no":  "6",
+        "name":  "リザードン",
+        "display":  "リザードン(メガリザードンＸ)",
+        "t1":  "fire",
+        "t2":  "dragon",
+        "file":  "リザードン.png"
+    },
+    {
+        "id":  "6_リザードン(メガリザードンＹ)",
+        "no":  "6",
+        "name":  "リザードン",
+        "display":  "リザードン(メガリザードンＹ)",
+        "t1":  "fire",
+        "t2":  "flying",
+        "file":  "リザードン.png"
+    },
+    {
+        "id":  "9_カメックス",
+        "no":  "9",
+        "name":  "カメックス",
+        "display":  "カメックス",
+        "t1":  "water",
+        "t2":  "none",
+        "file":  "カメックス.png"
+    },
+    {
+        "id":  "9_カメックス(メガカメックス)",
+        "no":  "9",
+        "name":  "カメックス",
+        "display":  "カメックス(メガカメックス)",
+        "t1":  "water",
+        "t2":  "none",
+        "file":  "カメックス.png"
+    },
+    {
+        "id":  "15_スピアー",
+        "no":  "15",
+        "name":  "スピアー",
+        "display":  "スピアー",
+        "t1":  "bug",
+        "t2":  "poison",
+        "file":  "スピアー.png"
+    },
+    {
+        "id":  "15_スピアー(メガスピアー)",
+        "no":  "15",
+        "name":  "スピアー",
+        "display":  "スピアー(メガスピアー)",
+        "t1":  "bug",
+        "t2":  "poison",
+        "file":  "スピアー.png"
+    },
+    {
+        "id":  "18_ピジョット",
+        "no":  "18",
+        "name":  "ピジョット",
+        "display":  "ピジョット",
+        "t1":  "normal",
+        "t2":  "flying",
+        "file":  "ピジョット.png"
+    },
+    {
+        "id":  "18_ピジョット(メガピジョット)",
+        "no":  "18",
+        "name":  "ピジョット",
+        "display":  "ピジョット(メガピジョット)",
+        "t1":  "normal",
+        "t2":  "flying",
+        "file":  "ピジョット.png"
+    },
+    {
+        "id":  "24_アーボック",
+        "no":  "24",
+        "name":  "アーボック",
+        "display":  "アーボック",
+        "t1":  "poison",
+        "t2":  "none",
+        "file":  "アーボック.png"
+    },
+    {
+        "id":  "25_ピカチュウ",
+        "no":  "25",
+        "name":  "ピカチュウ",
+        "display":  "ピカチュウ",
+        "t1":  "electric",
+        "t2":  "none",
+        "file":  "ピカチュウ.png"
+    },
+    {
+        "id":  "26_ライチュウ",
+        "no":  "26",
+        "name":  "ライチュウ",
+        "display":  "ライチュウ",
+        "t1":  "electric",
+        "t2":  "none",
+        "file":  "ライチュウ.png"
+    },
+    {
+        "id":  "26_ライチュウ(アローラのすがた)",
+        "no":  "26",
+        "name":  "ライチュウ",
+        "display":  "ライチュウ(アローラのすがた)",
+        "t1":  "electric",
+        "t2":  "psychic",
+        "file":  "ライチュウ.png"
+    },
+    {
+        "id":  "26_ライチュウ(メガライチュウＸ)",
+        "no":  "26",
+        "name":  "ライチュウ",
+        "display":  "ライチュウ(メガライチュウＸ)",
+        "t1":  "electric",
+        "t2":  "none",
+        "file":  "ライチュウ.png"
+    },
+    {
+        "id":  "26_ライチュウ(メガライチュウＹ)",
+        "no":  "26",
+        "name":  "ライチュウ",
+        "display":  "ライチュウ(メガライチュウＹ)",
+        "t1":  "electric",
+        "t2":  "none",
+        "file":  "ライチュウ.png"
+    },
+    {
+        "id":  "36_ピクシー",
+        "no":  "36",
+        "name":  "ピクシー",
+        "display":  "ピクシー",
+        "t1":  "fairy",
+        "t2":  "none",
+        "file":  "ピクシー.png"
+    },
+    {
+        "id":  "36_ピクシー(メガピクシー)",
+        "no":  "36",
+        "name":  "ピクシー",
+        "display":  "ピクシー(メガピクシー)",
+        "t1":  "fairy",
+        "t2":  "flying",
+        "file":  "ピクシー.png"
+    },
+    {
+        "id":  "38_キュウコン",
+        "no":  "38",
+        "name":  "キュウコン",
+        "display":  "キュウコン",
+        "t1":  "fire",
+        "t2":  "none",
+        "file":  "キュウコン.png"
+    },
+    {
+        "id":  "38_キュウコン(アローラのすがた)",
+        "no":  "38",
+        "name":  "キュウコン",
+        "display":  "キュウコン(アローラのすがた)",
+        "t1":  "ice",
+        "t2":  "fairy",
+        "file":  "キュウコン.png"
+    },
+    {
+        "id":  "45_ラフレシア",
+        "no":  "45",
+        "name":  "ラフレシア",
+        "display":  "ラフレシア",
+        "t1":  "grass",
+        "t2":  "poison",
+        "file":  "ラフレシア.png"
+    },
+    {
+        "id":  "59_ウインディ",
+        "no":  "59",
+        "name":  "ウインディ",
+        "display":  "ウインディ",
+        "t1":  "fire",
+        "t2":  "none",
+        "file":  "ウインディ.png"
+    },
+    {
+        "id":  "59_ウインディ(ヒスイのすがた)",
+        "no":  "59",
+        "name":  "ウインディ",
+        "display":  "ウインディ(ヒスイのすがた)",
+        "t1":  "fire",
+        "t2":  "rock",
+        "file":  "ウインディ.png"
+    },
+    {
+        "id":  "65_フーディン",
+        "no":  "65",
+        "name":  "フーディン",
+        "display":  "フーディン",
+        "t1":  "psychic",
+        "t2":  "none",
+        "file":  "フーディン.png"
+    },
+    {
+        "id":  "65_フーディン(メガフーディン)",
+        "no":  "65",
+        "name":  "フーディン",
+        "display":  "フーディン(メガフーディン)",
+        "t1":  "psychic",
+        "t2":  "none",
+        "file":  "フーディン.png"
+    },
+    {
+        "id":  "68_カイリキー",
+        "no":  "68",
+        "name":  "カイリキー",
+        "display":  "カイリキー",
+        "t1":  "fighting",
+        "t2":  "none",
+        "file":  "カイリキー.png"
+    },
+    {
+        "id":  "71_ウツボット",
+        "no":  "71",
+        "name":  "ウツボット",
+        "display":  "ウツボット",
+        "t1":  "grass",
+        "t2":  "poison",
+        "file":  "ウツボット.png"
+    },
+    {
+        "id":  "71_ウツボット(メガウツボット)",
+        "no":  "71",
+        "name":  "ウツボット",
+        "display":  "ウツボット(メガウツボット)",
+        "t1":  "grass",
+        "t2":  "poison",
+        "file":  "ウツボット.png"
+    },
+    {
+        "id":  "80_ヤドラン",
+        "no":  "80",
+        "name":  "ヤドラン",
+        "display":  "ヤドラン",
+        "t1":  "water",
+        "t2":  "psychic",
+        "file":  "ヤドラン.png"
+    },
+    {
+        "id":  "80_ヤドラン(メガヤドラン)",
+        "no":  "80",
+        "name":  "ヤドラン",
+        "display":  "ヤドラン(メガヤドラン)",
+        "t1":  "water",
+        "t2":  "psychic",
+        "file":  "ヤドラン.png"
+    },
+    {
+        "id":  "80_ヤドラン(ガラルのすがた)",
+        "no":  "80",
+        "name":  "ヤドラン",
+        "display":  "ヤドラン(ガラルのすがた)",
+        "t1":  "poison",
+        "t2":  "psychic",
+        "file":  "ヤドラン.png"
+    },
+    {
+        "id":  "94_ゲンガー",
+        "no":  "94",
+        "name":  "ゲンガー",
+        "display":  "ゲンガー",
+        "t1":  "none",
+        "t2":  "poison",
+        "file":  "ゲンガー.png"
+    },
+    {
+        "id":  "94_ゲンガー(メガゲンガー)",
+        "no":  "94",
+        "name":  "ゲンガー",
+        "display":  "ゲンガー(メガゲンガー)",
+        "t1":  "none",
+        "t2":  "poison",
+        "file":  "ゲンガー.png"
+    },
+    {
+        "id":  "115_ガルーラ",
+        "no":  "115",
+        "name":  "ガルーラ",
+        "display":  "ガルーラ",
+        "t1":  "normal",
+        "t2":  "none",
+        "file":  "ガルーラ.png"
+    },
+    {
+        "id":  "115_ガルーラ(メガガルーラ)",
+        "no":  "115",
+        "name":  "ガルーラ",
+        "display":  "ガルーラ(メガガルーラ)",
+        "t1":  "normal",
+        "t2":  "none",
+        "file":  "ガルーラ.png"
+    },
+    {
+        "id":  "121_スターミー",
+        "no":  "121",
+        "name":  "スターミー",
+        "display":  "スターミー",
+        "t1":  "water",
+        "t2":  "psychic",
+        "file":  "スターミー.png"
+    },
+    {
+        "id":  "121_スターミー(メガスターミー)",
+        "no":  "121",
+        "name":  "スターミー",
+        "display":  "スターミー(メガスターミー)",
+        "t1":  "water",
+        "t2":  "psychic",
+        "file":  "スターミー.png"
+    },
+    {
+        "id":  "127_カイロス",
+        "no":  "127",
+        "name":  "カイロス",
+        "display":  "カイロス",
+        "t1":  "bug",
+        "t2":  "none",
+        "file":  "カイロス.png"
+    },
+    {
+        "id":  "127_カイロス(メガカイロス)",
+        "no":  "127",
+        "name":  "カイロス",
+        "display":  "カイロス(メガカイロス)",
+        "t1":  "bug",
+        "t2":  "flying",
+        "file":  "カイロス.png"
+    },
+    {
+        "id":  "128_ケンタロス",
+        "no":  "128",
+        "name":  "ケンタロス",
+        "display":  "ケンタロス",
+        "t1":  "normal",
+        "t2":  "none",
+        "file":  "ケンタロス.png"
+    },
+    {
+        "id":  "128_ケンタロス(コンバット種)",
+        "no":  "128",
+        "name":  "ケンタロス",
+        "display":  "ケンタロス(コンバット種)",
+        "t1":  "fighting",
+        "t2":  "none",
+        "file":  "ケンタロス.png"
+    },
+    {
+        "id":  "128_ケンタロス(ブレイズ種)",
+        "no":  "128",
+        "name":  "ケンタロス",
+        "display":  "ケンタロス(ブレイズ種)",
+        "t1":  "fighting",
+        "t2":  "fire",
+        "file":  "ケンタロス.png"
+    },
+    {
+        "id":  "128_ケンタロス(ウォーター種)",
+        "no":  "128",
+        "name":  "ケンタロス",
+        "display":  "ケンタロス(ウォーター種)",
+        "t1":  "fighting",
+        "t2":  "water",
+        "file":  "ケンタロス.png"
+    },
+    {
+        "id":  "130_ギャラドス",
+        "no":  "130",
+        "name":  "ギャラドス",
+        "display":  "ギャラドス",
+        "t1":  "water",
+        "t2":  "flying",
+        "file":  "ギャラドス.png"
+    },
+    {
+        "id":  "130_ギャラドス(メガギャラドス)",
+        "no":  "130",
+        "name":  "ギャラドス",
+        "display":  "ギャラドス(メガギャラドス)",
+        "t1":  "water",
+        "t2":  "dark",
+        "file":  "ギャラドス.png"
+    },
+    {
+        "id":  "132_メタモン",
+        "no":  "132",
+        "name":  "メタモン",
+        "display":  "メタモン",
+        "t1":  "normal",
+        "t2":  "none",
+        "file":  "メタモン.png"
+    },
+    {
+        "id":  "134_シャワーズ",
+        "no":  "134",
+        "name":  "シャワーズ",
+        "display":  "シャワーズ",
+        "t1":  "water",
+        "t2":  "none",
+        "file":  "シャワーズ.png"
+    },
+    {
+        "id":  "135_サンダース",
+        "no":  "135",
+        "name":  "サンダース",
+        "display":  "サンダース",
+        "t1":  "electric",
+        "t2":  "none",
+        "file":  "サンダース.png"
+    },
+    {
+        "id":  "136_ブースター",
+        "no":  "136",
+        "name":  "ブースター",
+        "display":  "ブースター",
+        "t1":  "fire",
+        "t2":  "none",
+        "file":  "ブースター.png"
+    },
+    {
+        "id":  "142_プテラ",
+        "no":  "142",
+        "name":  "プテラ",
+        "display":  "プテラ",
+        "t1":  "rock",
+        "t2":  "flying",
+        "file":  "プテラ.png"
+    },
+    {
+        "id":  "142_プテラ(メガプテラ)",
+        "no":  "142",
+        "name":  "プテラ",
+        "display":  "プテラ(メガプテラ)",
+        "t1":  "rock",
+        "t2":  "flying",
+        "file":  "プテラ.png"
+    },
+    {
+        "id":  "143_カビゴン",
+        "no":  "143",
+        "name":  "カビゴン",
+        "display":  "カビゴン",
+        "t1":  "normal",
+        "t2":  "none",
+        "file":  "カビゴン.png"
+    },
+    {
+        "id":  "149_カイリュー",
+        "no":  "149",
+        "name":  "カイリュー",
+        "display":  "カイリュー",
+        "t1":  "dragon",
+        "t2":  "flying",
+        "file":  "カイリュー.png"
+    },
+    {
+        "id":  "149_カイリュー(メガカイリュー)",
+        "no":  "149",
+        "name":  "カイリュー",
+        "display":  "カイリュー(メガカイリュー)",
+        "t1":  "dragon",
+        "t2":  "flying",
+        "file":  "カイリュー.png"
+    },
+    {
+        "id":  "154_メガニウム",
+        "no":  "154",
+        "name":  "メガニウム",
+        "display":  "メガニウム",
+        "t1":  "grass",
+        "t2":  "none",
+        "file":  "メガニウム.png"
+    },
+    {
+        "id":  "154_メガニウム(メガメガニウム)",
+        "no":  "154",
+        "name":  "メガニウム",
+        "display":  "メガニウム(メガメガニウム)",
+        "t1":  "grass",
+        "t2":  "fairy",
+        "file":  "メガニウム.png"
+    },
+    {
+        "id":  "157_バクフーン",
+        "no":  "157",
+        "name":  "バクフーン",
+        "display":  "バクフーン",
+        "t1":  "fire",
+        "t2":  "none",
+        "file":  "バクフーン.png"
+    },
+    {
+        "id":  "157_バクフーン(ヒスイのすがた)",
+        "no":  "157",
+        "name":  "バクフーン",
+        "display":  "バクフーン(ヒスイのすがた)",
+        "t1":  "fire",
+        "t2":  "none",
+        "file":  "バクフーン.png"
+    },
+    {
+        "id":  "160_オーダイル",
+        "no":  "160",
+        "name":  "オーダイル",
+        "display":  "オーダイル",
+        "t1":  "water",
+        "t2":  "none",
+        "file":  "オーダイル.png"
+    },
+    {
+        "id":  "160_オーダイル(メガオーダイル)",
+        "no":  "160",
+        "name":  "オーダイル",
+        "display":  "オーダイル(メガオーダイル)",
+        "t1":  "water",
+        "t2":  "dragon",
+        "file":  "オーダイル.png"
+    },
+    {
+        "id":  "168_アリアドス",
+        "no":  "168",
+        "name":  "アリアドス",
+        "display":  "アリアドス",
+        "t1":  "bug",
+        "t2":  "poison",
+        "file":  "アリアドス.png"
+    },
+    {
+        "id":  "181_デンリュウ",
+        "no":  "181",
+        "name":  "デンリュウ",
+        "display":  "デンリュウ",
+        "t1":  "electric",
+        "t2":  "none",
+        "file":  "デンリュウ.png"
+    },
+    {
+        "id":  "181_デンリュウ(メガデンリュウ)",
+        "no":  "181",
+        "name":  "デンリュウ",
+        "display":  "デンリュウ(メガデンリュウ)",
+        "t1":  "electric",
+        "t2":  "dragon",
+        "file":  "デンリュウ.png"
+    },
+    {
+        "id":  "184_マリルリ",
+        "no":  "184",
+        "name":  "マリルリ",
+        "display":  "マリルリ",
+        "t1":  "water",
+        "t2":  "fairy",
+        "file":  "マリルリ.png"
+    },
+    {
+        "id":  "186_ニョロトノ",
+        "no":  "186",
+        "name":  "ニョロトノ",
+        "display":  "ニョロトノ",
+        "t1":  "water",
+        "t2":  "none",
+        "file":  "ニョロトノ.png"
+    },
+    {
+        "id":  "196_エーフィ",
+        "no":  "196",
+        "name":  "エーフィ",
+        "display":  "エーフィ",
+        "t1":  "psychic",
+        "t2":  "none",
+        "file":  "エーフィ.png"
+    },
+    {
+        "id":  "197_ブラッキー",
+        "no":  "197",
+        "name":  "ブラッキー",
+        "display":  "ブラッキー",
+        "t1":  "dark",
+        "t2":  "none",
+        "file":  "ブラッキー.png"
+    },
+    {
+        "id":  "199_ヤドキング",
+        "no":  "199",
+        "name":  "ヤドキング",
+        "display":  "ヤドキング",
+        "t1":  "water",
+        "t2":  "psychic",
+        "file":  "ヤドキング.png"
+    },
+    {
+        "id":  "199_ヤドキング(ガラルのすがた)",
+        "no":  "199",
+        "name":  "ヤドキング",
+        "display":  "ヤドキング(ガラルのすがた)",
+        "t1":  "poison",
+        "t2":  "psychic",
+        "file":  "ヤドキング.png"
+    },
+    {
+        "id":  "205_フォレトス",
+        "no":  "205",
+        "name":  "フォレトス",
+        "display":  "フォレトス",
+        "t1":  "bug",
+        "t2":  "steel",
+        "file":  "フォレトス.png"
+    },
+    {
+        "id":  "208_ハガネール",
+        "no":  "208",
+        "name":  "ハガネール",
+        "display":  "ハガネール",
+        "t1":  "steel",
+        "t2":  "ground",
+        "file":  "ハガネール.png"
+    },
+    {
+        "id":  "208_ハガネール(メガハガネール)",
+        "no":  "208",
+        "name":  "ハガネール",
+        "display":  "ハガネール(メガハガネール)",
+        "t1":  "steel",
+        "t2":  "ground",
+        "file":  "ハガネール.png"
+    },
+    {
+        "id":  "211_ハリーセン",
+        "no":  "211",
+        "name":  "ハリーセン",
+        "display":  "ハリーセン",
+        "t1":  "water",
+        "t2":  "poison",
+        "file":  "ハリーセン.png"
+    },
+    {
+        "id":  "212_ハッサム",
+        "no":  "212",
+        "name":  "ハッサム",
+        "display":  "ハッサム",
+        "t1":  "bug",
+        "t2":  "steel",
+        "file":  "ハッサム.png"
+    },
+    {
+        "id":  "212_ハッサム(メガハッサム)",
+        "no":  "212",
+        "name":  "ハッサム",
+        "display":  "ハッサム(メガハッサム)",
+        "t1":  "bug",
+        "t2":  "steel",
+        "file":  "ハッサム.png"
+    },
+    {
+        "id":  "214_ヘラクロス",
+        "no":  "214",
+        "name":  "ヘラクロス",
+        "display":  "ヘラクロス",
+        "t1":  "bug",
+        "t2":  "fighting",
+        "file":  "ヘラクロス.png"
+    },
+    {
+        "id":  "214_ヘラクロス(メガヘラクロス)",
+        "no":  "214",
+        "name":  "ヘラクロス",
+        "display":  "ヘラクロス(メガヘラクロス)",
+        "t1":  "bug",
+        "t2":  "fighting",
+        "file":  "ヘラクロス.png"
+    },
+    {
+        "id":  "227_エアームド",
+        "no":  "227",
+        "name":  "エアームド",
+        "display":  "エアームド",
+        "t1":  "steel",
+        "t2":  "flying",
+        "file":  "エアームド.png"
+    },
+    {
+        "id":  "227_エアームド(メガエアームド)",
+        "no":  "227",
+        "name":  "エアームド",
+        "display":  "エアームド(メガエアームド)",
+        "t1":  "steel",
+        "t2":  "flying",
+        "file":  "エアームド.png"
+    },
+    {
+        "id":  "229_ヘルガー",
+        "no":  "229",
+        "name":  "ヘルガー",
+        "display":  "ヘルガー",
+        "t1":  "dark",
+        "t2":  "fire",
+        "file":  "ヘルガー.png"
+    },
+    {
+        "id":  "229_ヘルガー(メガヘルガー)",
+        "no":  "229",
+        "name":  "ヘルガー",
+        "display":  "ヘルガー(メガヘルガー)",
+        "t1":  "dark",
+        "t2":  "fire",
+        "file":  "ヘルガー.png"
+    },
+    {
+        "id":  "248_バンギラス",
+        "no":  "248",
+        "name":  "バンギラス",
+        "display":  "バンギラス",
+        "t1":  "rock",
+        "t2":  "dark",
+        "file":  "バンギラス.png"
+    },
+    {
+        "id":  "248_バンギラス(メガバンギラス)",
+        "no":  "248",
+        "name":  "バンギラス",
+        "display":  "バンギラス(メガバンギラス)",
+        "t1":  "rock",
+        "t2":  "dark",
+        "file":  "バンギラス.png"
+    },
+    {
+        "id":  "254_ジュカイン",
+        "no":  "254",
+        "name":  "ジュカイン",
+        "display":  "ジュカイン",
+        "t1":  "grass",
+        "t2":  "none",
+        "file":  "ジュカイン.png"
+    },
+    {
+        "id":  "254_ジュカイン(メガジュカイン)",
+        "no":  "254",
+        "name":  "ジュカイン",
+        "display":  "ジュカイン(メガジュカイン)",
+        "t1":  "grass",
+        "t2":  "dragon",
+        "file":  "ジュカイン.png"
+    },
+    {
+        "id":  "257_バシャーモ",
+        "no":  "257",
+        "name":  "バシャーモ",
+        "display":  "バシャーモ",
+        "t1":  "fire",
+        "t2":  "fighting",
+        "file":  "バシャーモ.png"
+    },
+    {
+        "id":  "257_バシャーモ(メガバシャーモ)",
+        "no":  "257",
+        "name":  "バシャーモ",
+        "display":  "バシャーモ(メガバシャーモ)",
+        "t1":  "fire",
+        "t2":  "fighting",
+        "file":  "バシャーモ.png"
+    },
+    {
+        "id":  "260_ラグラージ",
+        "no":  "260",
+        "name":  "ラグラージ",
+        "display":  "ラグラージ",
+        "t1":  "water",
+        "t2":  "ground",
+        "file":  "ラグラージ.png"
+    },
+    {
+        "id":  "260_ラグラージ(メガラグラージ)",
+        "no":  "260",
+        "name":  "ラグラージ",
+        "display":  "ラグラージ(メガラグラージ)",
+        "t1":  "water",
+        "t2":  "ground",
+        "file":  "ラグラージ.png"
+    },
+    {
+        "id":  "279_ペリッパー",
+        "no":  "279",
+        "name":  "ペリッパー",
+        "display":  "ペリッパー",
+        "t1":  "water",
+        "t2":  "flying",
+        "file":  "ペリッパー.png"
+    },
+    {
+        "id":  "282_サーナイト",
+        "no":  "282",
+        "name":  "サーナイト",
+        "display":  "サーナイト",
+        "t1":  "psychic",
+        "t2":  "fairy",
+        "file":  "サーナイト.png"
+    },
+    {
+        "id":  "282_サーナイト(メガサーナイト)",
+        "no":  "282",
+        "name":  "サーナイト",
+        "display":  "サーナイト(メガサーナイト)",
+        "t1":  "psychic",
+        "t2":  "fairy",
+        "file":  "サーナイト.png"
+    },
+    {
+        "id":  "302_ヤミラミ",
+        "no":  "302",
+        "name":  "ヤミラミ",
+        "display":  "ヤミラミ",
+        "t1":  "dark",
+        "t2":  "none",
+        "file":  "ヤミラミ.png"
+    },
+    {
+        "id":  "302_ヤミラミ(メガヤミラミ)",
+        "no":  "302",
+        "name":  "ヤミラミ",
+        "display":  "ヤミラミ(メガヤミラミ)",
+        "t1":  "dark",
+        "t2":  "none",
+        "file":  "ヤミラミ.png"
+    },
+    {
+        "id":  "303_クチート",
+        "no":  "303",
+        "name":  "クチート",
+        "display":  "クチート",
+        "t1":  "steel",
+        "t2":  "fairy",
+        "file":  "クチート.png"
+    },
+    {
+        "id":  "303_クチート(メガクチート)",
+        "no":  "303",
+        "name":  "クチート",
+        "display":  "クチート(メガクチート)",
+        "t1":  "steel",
+        "t2":  "fairy",
+        "file":  "クチート.png"
+    },
+    {
+        "id":  "306_ボスゴドラ",
+        "no":  "306",
+        "name":  "ボスゴドラ",
+        "display":  "ボスゴドラ",
+        "t1":  "steel",
+        "t2":  "rock",
+        "file":  "ボスゴドラ.png"
+    },
+    {
+        "id":  "306_ボスゴドラ(メガボスゴドラ)",
+        "no":  "306",
+        "name":  "ボスゴドラ",
+        "display":  "ボスゴドラ(メガボスゴドラ)",
+        "t1":  "steel",
+        "t2":  "none",
+        "file":  "ボスゴドラ.png"
+    },
+    {
+        "id":  "308_チャーレム",
+        "no":  "308",
+        "name":  "チャーレム",
+        "display":  "チャーレム",
+        "t1":  "fighting",
+        "t2":  "psychic",
+        "file":  "チャーレム.png"
+    },
+    {
+        "id":  "308_チャーレム(メガチャーレム)",
+        "no":  "308",
+        "name":  "チャーレム",
+        "display":  "チャーレム(メガチャーレム)",
+        "t1":  "fighting",
+        "t2":  "psychic",
+        "file":  "チャーレム.png"
+    },
+    {
+        "id":  "310_ライボルト",
+        "no":  "310",
+        "name":  "ライボルト",
+        "display":  "ライボルト",
+        "t1":  "electric",
+        "t2":  "none",
+        "file":  "ライボルト.png"
+    },
+    {
+        "id":  "310_ライボルト(メガライボルト)",
+        "no":  "310",
+        "name":  "ライボルト",
+        "display":  "ライボルト(メガライボルト)",
+        "t1":  "electric",
+        "t2":  "none",
+        "file":  "ライボルト.png"
+    },
+    {
+        "id":  "319_サメハダー",
+        "no":  "319",
+        "name":  "サメハダー",
+        "display":  "サメハダー",
+        "t1":  "water",
+        "t2":  "dark",
+        "file":  "サメハダー.png"
+    },
+    {
+        "id":  "319_サメハダー(メガサメハダー)",
+        "no":  "319",
+        "name":  "サメハダー",
+        "display":  "サメハダー(メガサメハダー)",
+        "t1":  "water",
+        "t2":  "dark",
+        "file":  "サメハダー.png"
+    },
+    {
+        "id":  "323_バクーダ",
+        "no":  "323",
+        "name":  "バクーダ",
+        "display":  "バクーダ",
+        "t1":  "fire",
+        "t2":  "ground",
+        "file":  "バクーダ.png"
+    },
+    {
+        "id":  "323_バクーダ(メガバクーダ)",
+        "no":  "323",
+        "name":  "バクーダ",
+        "display":  "バクーダ(メガバクーダ)",
+        "t1":  "fire",
+        "t2":  "ground",
+        "file":  "バクーダ.png"
+    },
+    {
+        "id":  "324_コータス",
+        "no":  "324",
+        "name":  "コータス",
+        "display":  "コータス",
+        "t1":  "fire",
+        "t2":  "none",
+        "file":  "コータス.png"
+    },
+    {
+        "id":  "334_チルタリス",
+        "no":  "334",
+        "name":  "チルタリス",
+        "display":  "チルタリス",
+        "t1":  "dragon",
+        "t2":  "flying",
+        "file":  "チルタリス.png"
+    },
+    {
+        "id":  "334_チルタリス(メガチルタリス)",
+        "no":  "334",
+        "name":  "チルタリス",
+        "display":  "チルタリス(メガチルタリス)",
+        "t1":  "dragon",
+        "t2":  "fairy",
+        "file":  "チルタリス.png"
+    },
+    {
+        "id":  "350_ミロカロス",
+        "no":  "350",
+        "name":  "ミロカロス",
+        "display":  "ミロカロス",
+        "t1":  "water",
+        "t2":  "none",
+        "file":  "ミロカロス.png"
+    },
+    {
+        "id":  "351_ポワルン(ポワルンのすがた)",
+        "no":  "351",
+        "name":  "ポワルン",
+        "display":  "ポワルン(ポワルンのすがた)",
+        "t1":  "normal",
+        "t2":  "none",
+        "file":  "ポワルン.png"
+    },
+    {
+        "id":  "351_ポワルン(たいようのすがた)",
+        "no":  "351",
+        "name":  "ポワルン",
+        "display":  "ポワルン(たいようのすがた)",
+        "t1":  "fire",
+        "t2":  "none",
+        "file":  "ポワルン.png"
+    },
+    {
+        "id":  "351_ポワルン(あまみずのすがた)",
+        "no":  "351",
+        "name":  "ポワルン",
+        "display":  "ポワルン(あまみずのすがた)",
+        "t1":  "water",
+        "t2":  "none",
+        "file":  "ポワルン.png"
+    },
+    {
+        "id":  "351_ポワルン(ゆきぐものすがた)",
+        "no":  "351",
+        "name":  "ポワルン",
+        "display":  "ポワルン(ゆきぐものすがた)",
+        "t1":  "ice",
+        "t2":  "none",
+        "file":  "ポワルン.png"
+    },
+    {
+        "id":  "354_ジュペッタ",
+        "no":  "354",
+        "name":  "ジュペッタ",
+        "display":  "ジュペッタ",
+        "t1":  "none",
+        "t2":  "none",
+        "file":  "ジュペッタ.png"
+    },
+    {
+        "id":  "354_ジュペッタ(メガジュペッタ)",
+        "no":  "354",
+        "name":  "ジュペッタ",
+        "display":  "ジュペッタ(メガジュペッタ)",
+        "t1":  "none",
+        "t2":  "none",
+        "file":  "ジュペッタ.png"
+    },
+    {
+        "id":  "358_チリーン",
+        "no":  "358",
+        "name":  "チリーン",
+        "display":  "チリーン",
+        "t1":  "psychic",
+        "t2":  "none",
+        "file":  "チリーン.png"
+    },
+    {
+        "id":  "358_チリーン(メガチリーン)",
+        "no":  "358",
+        "name":  "チリーン",
+        "display":  "チリーン(メガチリーン)",
+        "t1":  "psychic",
+        "t2":  "steel",
+        "file":  "チリーン.png"
+    },
+    {
+        "id":  "359_アブソル",
+        "no":  "359",
+        "name":  "アブソル",
+        "display":  "アブソル",
+        "t1":  "dark",
+        "t2":  "none",
+        "file":  "アブソル.png"
+    },
+    {
+        "id":  "359_アブソル(メガアブソル)",
+        "no":  "359",
+        "name":  "アブソル",
+        "display":  "アブソル(メガアブソル)",
+        "t1":  "dark",
+        "t2":  "none",
+        "file":  "アブソル.png"
+    },
+    {
+        "id":  "362_オニゴーリ",
+        "no":  "362",
+        "name":  "オニゴーリ",
+        "display":  "オニゴーリ",
+        "t1":  "ice",
+        "t2":  "none",
+        "file":  "オニゴーリ.png"
+    },
+    {
+        "id":  "362_オニゴーリ(メガオニゴーリ)",
+        "no":  "362",
+        "name":  "オニゴーリ",
+        "display":  "オニゴーリ(メガオニゴーリ)",
+        "t1":  "ice",
+        "t2":  "none",
+        "file":  "オニゴーリ.png"
+    },
+    {
+        "id":  "376_メタグロス",
+        "no":  "376",
+        "name":  "メタグロス",
+        "display":  "メタグロス",
+        "t1":  "steel",
+        "t2":  "psychic",
+        "file":  "メタグロス.png"
+    },
+    {
+        "id":  "376_メタグロス(メガメタグロス)",
+        "no":  "376",
+        "name":  "メタグロス",
+        "display":  "メタグロス(メガメタグロス)",
+        "t1":  "steel",
+        "t2":  "psychic",
+        "file":  "メタグロス.png"
+    },
+    {
+        "id":  "389_ドダイトス",
+        "no":  "389",
+        "name":  "ドダイトス",
+        "display":  "ドダイトス",
+        "t1":  "grass",
+        "t2":  "ground",
+        "file":  "ドダイトス.png"
+    },
+    {
+        "id":  "392_ゴウカザル",
+        "no":  "392",
+        "name":  "ゴウカザル",
+        "display":  "ゴウカザル",
+        "t1":  "fire",
+        "t2":  "fighting",
+        "file":  "ゴウカザル.png"
+    },
+    {
+        "id":  "395_エンペルト",
+        "no":  "395",
+        "name":  "エンペルト",
+        "display":  "エンペルト",
+        "t1":  "water",
+        "t2":  "steel",
+        "file":  "エンペルト.png"
+    },
+    {
+        "id":  "398_ムクホーク",
+        "no":  "398",
+        "name":  "ムクホーク",
+        "display":  "ムクホーク",
+        "t1":  "normal",
+        "t2":  "flying",
+        "file":  "ムクホーク.png"
+    },
+    {
+        "id":  "398_ムクホーク(メガムクホーク)",
+        "no":  "398",
+        "name":  "ムクホーク",
+        "display":  "ムクホーク(メガムクホーク)",
+        "t1":  "fighting",
+        "t2":  "flying",
+        "file":  "ムクホーク.png"
+    },
+    {
+        "id":  "405_レントラー",
+        "no":  "405",
+        "name":  "レントラー",
+        "display":  "レントラー",
+        "t1":  "electric",
+        "t2":  "none",
+        "file":  "レントラー.png"
+    },
+    {
+        "id":  "407_ロズレイド",
+        "no":  "407",
+        "name":  "ロズレイド",
+        "display":  "ロズレイド",
+        "t1":  "grass",
+        "t2":  "poison",
+        "file":  "ロズレイド.png"
+    },
+    {
+        "id":  "409_ラムパルド",
+        "no":  "409",
+        "name":  "ラムパルド",
+        "display":  "ラムパルド",
+        "t1":  "rock",
+        "t2":  "none",
+        "file":  "ラムパルド.png"
+    },
+    {
+        "id":  "411_トリデプス",
+        "no":  "411",
+        "name":  "トリデプス",
+        "display":  "トリデプス",
+        "t1":  "rock",
+        "t2":  "steel",
+        "file":  "トリデプス.png"
+    },
+    {
+        "id":  "428_ミミロップ",
+        "no":  "428",
+        "name":  "ミミロップ",
+        "display":  "ミミロップ",
+        "t1":  "normal",
+        "t2":  "none",
+        "file":  "ミミロップ.png"
+    },
+    {
+        "id":  "428_ミミロップ(メガミミロップ)",
+        "no":  "428",
+        "name":  "ミミロップ",
+        "display":  "ミミロップ(メガミミロップ)",
+        "t1":  "normal",
+        "t2":  "fighting",
+        "file":  "ミミロップ.png"
+    },
+    {
+        "id":  "442_ミカルゲ",
+        "no":  "442",
+        "name":  "ミカルゲ",
+        "display":  "ミカルゲ",
+        "t1":  "none",
+        "t2":  "dark",
+        "file":  "ミカルゲ.png"
+    },
+    {
+        "id":  "445_ガブリアス",
+        "no":  "445",
+        "name":  "ガブリアス",
+        "display":  "ガブリアス",
+        "t1":  "dragon",
+        "t2":  "ground",
+        "file":  "ガブリアス.png"
+    },
+    {
+        "id":  "445_ガブリアス(メガガブリアス)",
+        "no":  "445",
+        "name":  "ガブリアス",
+        "display":  "ガブリアス(メガガブリアス)",
+        "t1":  "dragon",
+        "t2":  "ground",
+        "file":  "ガブリアス.png"
+    },
+    {
+        "id":  "448_ルカリオ",
+        "no":  "448",
+        "name":  "ルカリオ",
+        "display":  "ルカリオ",
+        "t1":  "fighting",
+        "t2":  "steel",
+        "file":  "ルカリオ.png"
+    },
+    {
+        "id":  "448_ルカリオ(メガルカリオ)",
+        "no":  "448",
+        "name":  "ルカリオ",
+        "display":  "ルカリオ(メガルカリオ)",
+        "t1":  "fighting",
+        "t2":  "steel",
+        "file":  "ルカリオ.png"
+    },
+    {
+        "id":  "450_カバルドン",
+        "no":  "450",
+        "name":  "カバルドン",
+        "display":  "カバルドン",
+        "t1":  "ground",
+        "t2":  "none",
+        "file":  "カバルドン.png"
+    },
+    {
+        "id":  "454_ドクロッグ",
+        "no":  "454",
+        "name":  "ドクロッグ",
+        "display":  "ドクロッグ",
+        "t1":  "poison",
+        "t2":  "fighting",
+        "file":  "ドクロッグ.png"
+    },
+    {
+        "id":  "460_ユキノオー",
+        "no":  "460",
+        "name":  "ユキノオー",
+        "display":  "ユキノオー",
+        "t1":  "grass",
+        "t2":  "ice",
+        "file":  "ユキノオー.png"
+    },
+    {
+        "id":  "460_ユキノオー(メガユキノオー)",
+        "no":  "460",
+        "name":  "ユキノオー",
+        "display":  "ユキノオー(メガユキノオー)",
+        "t1":  "grass",
+        "t2":  "ice",
+        "file":  "ユキノオー.png"
+    },
+    {
+        "id":  "461_マニューラ",
+        "no":  "461",
+        "name":  "マニューラ",
+        "display":  "マニューラ",
+        "t1":  "dark",
+        "t2":  "ice",
+        "file":  "マニューラ.png"
+    },
+    {
+        "id":  "464_ドサイドン",
+        "no":  "464",
+        "name":  "ドサイドン",
+        "display":  "ドサイドン",
+        "t1":  "ground",
+        "t2":  "rock",
+        "file":  "ドサイドン.png"
+    },
+    {
+        "id":  "470_リーフィア",
+        "no":  "470",
+        "name":  "リーフィア",
+        "display":  "リーフィア",
+        "t1":  "grass",
+        "t2":  "none",
+        "file":  "リーフィア.png"
+    },
+    {
+        "id":  "471_グレイシア",
+        "no":  "471",
+        "name":  "グレイシア",
+        "display":  "グレイシア",
+        "t1":  "ice",
+        "t2":  "none",
+        "file":  "グレイシア.png"
+    },
+    {
+        "id":  "472_グライオン",
+        "no":  "472",
+        "name":  "グライオン",
+        "display":  "グライオン",
+        "t1":  "ground",
+        "t2":  "flying",
+        "file":  "グライオン.png"
+    },
+    {
+        "id":  "473_マンムー",
+        "no":  "473",
+        "name":  "マンムー",
+        "display":  "マンムー",
+        "t1":  "ice",
+        "t2":  "ground",
+        "file":  "マンムー.png"
+    },
+    {
+        "id":  "475_エルレイド",
+        "no":  "475",
+        "name":  "エルレイド",
+        "display":  "エルレイド",
+        "t1":  "psychic",
+        "t2":  "fighting",
+        "file":  "エルレイド.png"
+    },
+    {
+        "id":  "475_エルレイド(メガエルレイド)",
+        "no":  "475",
+        "name":  "エルレイド",
+        "display":  "エルレイド(メガエルレイド)",
+        "t1":  "psychic",
+        "t2":  "fighting",
+        "file":  "エルレイド.png"
+    },
+    {
+        "id":  "478_ユキメノコ",
+        "no":  "478",
+        "name":  "ユキメノコ",
+        "display":  "ユキメノコ",
+        "t1":  "ice",
+        "t2":  "none",
+        "file":  "ユキメノコ.png"
+    },
+    {
+        "id":  "478_ユキメノコ(メガユキメノコ)",
+        "no":  "478",
+        "name":  "ユキメノコ",
+        "display":  "ユキメノコ(メガユキメノコ)",
+        "t1":  "ice",
+        "t2":  "none",
+        "file":  "ユキメノコ.png"
+    },
+    {
+        "id":  "479_ロトム(ロトムのすがた)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(ロトムのすがた)",
+        "t1":  "electric",
+        "t2":  "none",
+        "file":  "ロトム.png"
+    },
+    {
+        "id":  "479_ロトム(ヒートロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(ヒートロトム)",
+        "t1":  "electric",
+        "t2":  "fire",
+        "file":  "ロトム.png"
+    },
+    {
+        "id":  "479_ロトム(ウォッシュロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(ウォッシュロトム)",
+        "t1":  "electric",
+        "t2":  "water",
+        "file":  "ロトム.png"
+    },
+    {
+        "id":  "479_ロトム(フロストロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(フロストロトム)",
+        "t1":  "electric",
+        "t2":  "ice",
+        "file":  "ロトム.png"
+    },
+    {
+        "id":  "479_ロトム(スピンロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(スピンロトム)",
+        "t1":  "electric",
+        "t2":  "flying",
+        "file":  "ロトム.png"
+    },
+    {
+        "id":  "479_ロトム(カットロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(カットロトム)",
+        "t1":  "electric",
+        "t2":  "grass",
+        "file":  "ロトム.png"
+    },
+    {
+        "id":  "497_ジャローダ",
+        "no":  "497",
+        "name":  "ジャローダ",
+        "display":  "ジャローダ",
+        "t1":  "grass",
+        "t2":  "none",
+        "file":  "ジャローダ.png"
+    },
+    {
+        "id":  "500_エンブオー",
+        "no":  "500",
+        "name":  "エンブオー",
+        "display":  "エンブオー",
+        "t1":  "fire",
+        "t2":  "fighting",
+        "file":  "エンブオー.png"
+    },
+    {
+        "id":  "500_エンブオー(メガエンブオー)",
+        "no":  "500",
+        "name":  "エンブオー",
+        "display":  "エンブオー(メガエンブオー)",
+        "t1":  "fire",
+        "t2":  "fighting",
+        "file":  "エンブオー.png"
+    },
+    {
+        "id":  "503_ダイケンキ",
+        "no":  "503",
+        "name":  "ダイケンキ",
+        "display":  "ダイケンキ",
+        "t1":  "water",
+        "t2":  "none",
+        "file":  "ダイケンキ.png"
+    },
+    {
+        "id":  "503_ダイケンキ(ヒスイのすがた)",
+        "no":  "503",
+        "name":  "ダイケンキ",
+        "display":  "ダイケンキ(ヒスイのすがた)",
+        "t1":  "water",
+        "t2":  "dark",
+        "file":  "ダイケンキ.png"
+    },
+    {
+        "id":  "505_ミルホッグ",
+        "no":  "505",
+        "name":  "ミルホッグ",
+        "display":  "ミルホッグ",
+        "t1":  "normal",
+        "t2":  "none",
+        "file":  "ミルホッグ.png"
+    },
+    {
+        "id":  "510_レパルダス",
+        "no":  "510",
+        "name":  "レパルダス",
+        "display":  "レパルダス",
+        "t1":  "dark",
+        "t2":  "none",
+        "file":  "レパルダス.png"
+    },
+    {
+        "id":  "512_ヤナッキー",
+        "no":  "512",
+        "name":  "ヤナッキー",
+        "display":  "ヤナッキー",
+        "t1":  "grass",
+        "t2":  "none",
+        "file":  "ヤナッキー.png"
+    },
+    {
+        "id":  "514_バオッキー",
+        "no":  "514",
+        "name":  "バオッキー",
+        "display":  "バオッキー",
+        "t1":  "fire",
+        "t2":  "none",
+        "file":  "バオッキー.png"
+    },
+    {
+        "id":  "516_ヒヤッキー",
+        "no":  "516",
+        "name":  "ヒヤッキー",
+        "display":  "ヒヤッキー",
+        "t1":  "water",
+        "t2":  "none",
+        "file":  "ヒヤッキー.png"
+    },
+    {
+        "id":  "518_ムシャーナ",
+        "no":  "518",
+        "name":  "ムシャーナ",
+        "display":  "ムシャーナ",
+        "t1":  "psychic",
+        "t2":  "none",
+        "file":  "ムシャーナ.png"
+    },
+    {
+        "id":  "530_ドリュウズ",
+        "no":  "530",
+        "name":  "ドリュウズ",
+        "display":  "ドリュウズ",
+        "t1":  "ground",
+        "t2":  "steel",
+        "file":  "ドリュウズ.png"
+    },
+    {
+        "id":  "530_ドリュウズ(メガドリュウズ)",
+        "no":  "530",
+        "name":  "ドリュウズ",
+        "display":  "ドリュウズ(メガドリュウズ)",
+        "t1":  "ground",
+        "t2":  "steel",
+        "file":  "ドリュウズ.png"
+    },
+    {
+        "id":  "531_タブンネ",
+        "no":  "531",
+        "name":  "タブンネ",
+        "display":  "タブンネ",
+        "t1":  "normal",
+        "t2":  "none",
+        "file":  "タブンネ.png"
+    },
+    {
+        "id":  "531_タブンネ(メガタブンネ)",
+        "no":  "531",
+        "name":  "タブンネ",
+        "display":  "タブンネ(メガタブンネ)",
+        "t1":  "normal",
+        "t2":  "fairy",
+        "file":  "タブンネ.png"
+    },
+    {
+        "id":  "534_ローブシン",
+        "no":  "534",
+        "name":  "ローブシン",
+        "display":  "ローブシン",
+        "t1":  "fighting",
+        "t2":  "none",
+        "file":  "ローブシン.png"
+    },
+    {
+        "id":  "545_ペンドラー",
+        "no":  "545",
+        "name":  "ペンドラー",
+        "display":  "ペンドラー",
+        "t1":  "bug",
+        "t2":  "poison",
+        "file":  "ペンドラー.png"
+    },
+    {
+        "id":  "545_ペンドラー(メガペンドラー)",
+        "no":  "545",
+        "name":  "ペンドラー",
+        "display":  "ペンドラー(メガペンドラー)",
+        "t1":  "bug",
+        "t2":  "poison",
+        "file":  "ペンドラー.png"
+    },
+    {
+        "id":  "547_エルフーン",
+        "no":  "547",
+        "name":  "エルフーン",
+        "display":  "エルフーン",
+        "t1":  "grass",
+        "t2":  "fairy",
+        "file":  "エルフーン.png"
+    },
+    {
+        "id":  "553_ワルビアル",
+        "no":  "553",
+        "name":  "ワルビアル",
+        "display":  "ワルビアル",
+        "t1":  "ground",
+        "t2":  "dark",
+        "file":  "ワルビアル.png"
+    },
+    {
+        "id":  "560_ズルズキン",
+        "no":  "560",
+        "name":  "ズルズキン",
+        "display":  "ズルズキン",
+        "t1":  "dark",
+        "t2":  "fighting",
+        "file":  "ズルズキン.png"
+    },
+    {
+        "id":  "560_ズルズキン(メガズルズキン)",
+        "no":  "560",
+        "name":  "ズルズキン",
+        "display":  "ズルズキン(メガズルズキン)",
+        "t1":  "dark",
+        "t2":  "fighting",
+        "file":  "ズルズキン.png"
+    },
+    {
+        "id":  "563_デスカーン",
+        "no":  "563",
+        "name":  "デスカーン",
+        "display":  "デスカーン",
+        "t1":  "none",
+        "t2":  "none",
+        "file":  "デスカーン.png"
+    },
+    {
+        "id":  "569_ダストダス",
+        "no":  "569",
+        "name":  "ダストダス",
+        "display":  "ダストダス",
+        "t1":  "poison",
+        "t2":  "none",
+        "file":  "ダストダス.png"
+    },
+    {
+        "id":  "571_ゾロアーク",
+        "no":  "571",
+        "name":  "ゾロアーク",
+        "display":  "ゾロアーク",
+        "t1":  "dark",
+        "t2":  "none",
+        "file":  "ゾロアーク.png"
+    },
+    {
+        "id":  "571_ゾロアーク(ヒスイのすがた)",
+        "no":  "571",
+        "name":  "ゾロアーク",
+        "display":  "ゾロアーク(ヒスイのすがた)",
+        "t1":  "normal",
+        "t2":  "none",
+        "file":  "ゾロアーク.png"
+    },
+    {
+        "id":  "579_ランクルス",
+        "no":  "579",
+        "name":  "ランクルス",
+        "display":  "ランクルス",
+        "t1":  "psychic",
+        "t2":  "none",
+        "file":  "ランクルス.png"
+    },
+    {
+        "id":  "584_バイバニラ",
+        "no":  "584",
+        "name":  "バイバニラ",
+        "display":  "バイバニラ",
+        "t1":  "ice",
+        "t2":  "none",
+        "file":  "バイバニラ.png"
+    },
+    {
+        "id":  "587_エモンガ",
+        "no":  "587",
+        "name":  "エモンガ",
+        "display":  "エモンガ",
+        "t1":  "electric",
+        "t2":  "flying",
+        "file":  "エモンガ.png"
+    },
+    {
+        "id":  "604_シビルドン",
+        "no":  "604",
+        "name":  "シビルドン",
+        "display":  "シビルドン",
+        "t1":  "electric",
+        "t2":  "none",
+        "file":  "シビルドン.png"
+    },
+    {
+        "id":  "604_シビルドン(メガシビルドン)",
+        "no":  "604",
+        "name":  "シビルドン",
+        "display":  "シビルドン(メガシビルドン)",
+        "t1":  "electric",
+        "t2":  "none",
+        "file":  "シビルドン.png"
+    },
+    {
+        "id":  "609_シャンデラ",
+        "no":  "609",
+        "name":  "シャンデラ",
+        "display":  "シャンデラ",
+        "t1":  "none",
+        "t2":  "fire",
+        "file":  "シャンデラ.png"
+    },
+    {
+        "id":  "609_シャンデラ(メガシャンデラ)",
+        "no":  "609",
+        "name":  "シャンデラ",
+        "display":  "シャンデラ(メガシャンデラ)",
+        "t1":  "none",
+        "t2":  "fire",
+        "file":  "シャンデラ.png"
+    },
+    {
+        "id":  "614_ツンベアー",
+        "no":  "614",
+        "name":  "ツンベアー",
+        "display":  "ツンベアー",
+        "t1":  "ice",
+        "t2":  "none",
+        "file":  "ツンベアー.png"
+    },
+    {
+        "id":  "618_マッギョ",
+        "no":  "618",
+        "name":  "マッギョ",
+        "display":  "マッギョ",
+        "t1":  "ground",
+        "t2":  "electric",
+        "file":  "マッギョ.png"
+    },
+    {
+        "id":  "618_マッギョ(ガラルのすがた)",
+        "no":  "618",
+        "name":  "マッギョ",
+        "display":  "マッギョ(ガラルのすがた)",
+        "t1":  "ground",
+        "t2":  "steel",
+        "file":  "マッギョ.png"
+    },
+    {
+        "id":  "623_ゴルーグ",
+        "no":  "623",
+        "name":  "ゴルーグ",
+        "display":  "ゴルーグ",
+        "t1":  "ground",
+        "t2":  "none",
+        "file":  "ゴルーグ.png"
+    },
+    {
+        "id":  "623_ゴルーグ(メガゴルーグ)",
+        "no":  "623",
+        "name":  "ゴルーグ",
+        "display":  "ゴルーグ(メガゴルーグ)",
+        "t1":  "ground",
+        "t2":  "none",
+        "file":  "ゴルーグ.png"
+    },
+    {
+        "id":  "635_サザンドラ",
+        "no":  "635",
+        "name":  "サザンドラ",
+        "display":  "サザンドラ",
+        "t1":  "dark",
+        "t2":  "dragon",
+        "file":  "サザンドラ.png"
+    },
+    {
+        "id":  "637_ウルガモス",
+        "no":  "637",
+        "name":  "ウルガモス",
+        "display":  "ウルガモス",
+        "t1":  "bug",
+        "t2":  "fire",
+        "file":  "ウルガモス.png"
+    },
+    {
+        "id":  "652_ブリガロン",
+        "no":  "652",
+        "name":  "ブリガロン",
+        "display":  "ブリガロン",
+        "t1":  "grass",
+        "t2":  "fighting",
+        "file":  "ブリガロン.png"
+    },
+    {
+        "id":  "652_ブリガロン(メガブリガロン)",
+        "no":  "652",
+        "name":  "ブリガロン",
+        "display":  "ブリガロン(メガブリガロン)",
+        "t1":  "grass",
+        "t2":  "fighting",
+        "file":  "ブリガロン.png"
+    },
+    {
+        "id":  "655_マフォクシー",
+        "no":  "655",
+        "name":  "マフォクシー",
+        "display":  "マフォクシー",
+        "t1":  "fire",
+        "t2":  "psychic",
+        "file":  "マフォクシー.png"
+    },
+    {
+        "id":  "655_マフォクシー(メガマフォクシー)",
+        "no":  "655",
+        "name":  "マフォクシー",
+        "display":  "マフォクシー(メガマフォクシー)",
+        "t1":  "fire",
+        "t2":  "psychic",
+        "file":  "マフォクシー.png"
+    },
+    {
+        "id":  "658_ゲッコウガ",
+        "no":  "658",
+        "name":  "ゲッコウガ",
+        "display":  "ゲッコウガ",
+        "t1":  "water",
+        "t2":  "dark",
+        "file":  "ゲッコウガ.png"
+    },
+    {
+        "id":  "658_ゲッコウガ(メガゲッコウガ)",
+        "no":  "658",
+        "name":  "ゲッコウガ",
+        "display":  "ゲッコウガ(メガゲッコウガ)",
+        "t1":  "water",
+        "t2":  "dark",
+        "file":  "ゲッコウガ.png"
+    },
+    {
+        "id":  "660_ホルード",
+        "no":  "660",
+        "name":  "ホルード",
+        "display":  "ホルード",
+        "t1":  "normal",
+        "t2":  "ground",
+        "file":  "ホルード.png"
+    },
+    {
+        "id":  "663_ファイアロー",
+        "no":  "663",
+        "name":  "ファイアロー",
+        "display":  "ファイアロー",
+        "t1":  "fire",
+        "t2":  "flying",
+        "file":  "ファイアロー.png"
+    },
+    {
+        "id":  "666_ビビヨン",
+        "no":  "666",
+        "name":  "ビビヨン",
+        "display":  "ビビヨン",
+        "t1":  "bug",
+        "t2":  "flying",
+        "file":  "ビビヨン.png"
+    },
+    {
+        "id":  "666_ビビヨン(ファンシーなもよう)",
+        "no":  "666",
+        "name":  "ビビヨン",
+        "display":  "ビビヨン(ファンシーなもよう)",
+        "t1":  "bug",
+        "t2":  "flying",
+        "file":  "ビビヨン.png"
+    },
+    {
+        "id":  "666_ビビヨン(Pokeball)",
+        "no":  "666",
+        "name":  "ビビヨン",
+        "display":  "ビビヨン(Pokeball)",
+        "t1":  "bug",
+        "t2":  "flying",
+        "file":  "ビビヨン.png"
+    },
+    {
+        "id":  "668_カエンジシ",
+        "no":  "668",
+        "name":  "カエンジシ",
+        "display":  "カエンジシ",
+        "t1":  "fire",
+        "t2":  "normal",
+        "file":  "カエンジシ.png"
+    },
+    {
+        "id":  "668_カエンジシ(メガカエンジシ)",
+        "no":  "668",
+        "name":  "カエンジシ",
+        "display":  "カエンジシ(メガカエンジシ)",
+        "t1":  "fire",
+        "t2":  "normal",
+        "file":  "カエンジシ.png"
+    },
+    {
+        "id":  "670_フラエッテ(えいえんのはな)",
+        "no":  "670",
+        "name":  "フラエッテ",
+        "display":  "フラエッテ(えいえんのはな)",
+        "t1":  "fairy",
+        "t2":  "none",
+        "file":  "フラエッテ.png"
+    },
+    {
+        "id":  "670_フラエッテ(メガフラエッテ)",
+        "no":  "670",
+        "name":  "フラエッテ",
+        "display":  "フラエッテ(メガフラエッテ)",
+        "t1":  "fairy",
+        "t2":  "none",
+        "file":  "フラエッテ.png"
+    },
+    {
+        "id":  "671_フラージェス",
+        "no":  "671",
+        "name":  "フラージェス",
+        "display":  "フラージェス",
+        "t1":  "fairy",
+        "t2":  "none",
+        "file":  "フラージェス.png"
+    },
+    {
+        "id":  "675_ゴロンダ",
+        "no":  "675",
+        "name":  "ゴロンダ",
+        "display":  "ゴロンダ",
+        "t1":  "fighting",
+        "t2":  "dark",
+        "file":  "ゴロンダ.png"
+    },
+    {
+        "id":  "676_トリミアン",
+        "no":  "676",
+        "name":  "トリミアン",
+        "display":  "トリミアン",
+        "t1":  "normal",
+        "t2":  "none",
+        "file":  "トリミアン.png"
+    },
+    {
+        "id":  "678_ニャオニクス(オスのすがた)",
+        "no":  "678",
+        "name":  "ニャオニクス",
+        "display":  "ニャオニクス(オスのすがた)",
+        "t1":  "psychic",
+        "t2":  "none",
+        "file":  "ニャオニクス.png"
+    },
+    {
+        "id":  "678_ニャオニクス(メスのすがた)",
+        "no":  "678",
+        "name":  "ニャオニクス",
+        "display":  "ニャオニクス(メスのすがた)",
+        "t1":  "psychic",
+        "t2":  "none",
+        "file":  "ニャオニクス.png"
+    },
+    {
+        "id":  "678_ニャオニクス(M-Mega)",
+        "no":  "678",
+        "name":  "ニャオニクス",
+        "display":  "ニャオニクス(M-Mega)",
+        "t1":  "psychic",
+        "t2":  "none",
+        "file":  "ニャオニクス.png"
+    },
+    {
+        "id":  "678_ニャオニクス(F-Mega)",
+        "no":  "678",
+        "name":  "ニャオニクス",
+        "display":  "ニャオニクス(F-Mega)",
+        "t1":  "psychic",
+        "t2":  "none",
+        "file":  "ニャオニクス.png"
+    },
+    {
+        "id":  "681_ギルガルド(シールドフォルム)",
+        "no":  "681",
+        "name":  "ギルガルド",
+        "display":  "ギルガルド(シールドフォルム)",
+        "t1":  "steel",
+        "t2":  "none",
+        "file":  "ギルガルド.png"
+    },
+    {
+        "id":  "681_ギルガルド(ブレードフォルム)",
+        "no":  "681",
+        "name":  "ギルガルド",
+        "display":  "ギルガルド(ブレードフォルム)",
+        "t1":  "steel",
+        "t2":  "none",
+        "file":  "ギルガルド.png"
+    },
+    {
+        "id":  "683_フレフワン",
+        "no":  "683",
+        "name":  "フレフワン",
+        "display":  "フレフワン",
+        "t1":  "fairy",
+        "t2":  "none",
+        "file":  "フレフワン.png"
+    },
+    {
+        "id":  "685_ペロリーム",
+        "no":  "685",
+        "name":  "ペロリーム",
+        "display":  "ペロリーム",
+        "t1":  "fairy",
+        "t2":  "none",
+        "file":  "ペロリーム.png"
+    },
+    {
+        "id":  "687_カラマネロ",
+        "no":  "687",
+        "name":  "カラマネロ",
+        "display":  "カラマネロ",
+        "t1":  "dark",
+        "t2":  "psychic",
+        "file":  "カラマネロ.png"
+    },
+    {
+        "id":  "687_カラマネロ(メガカラマネロ)",
+        "no":  "687",
+        "name":  "カラマネロ",
+        "display":  "カラマネロ(メガカラマネロ)",
+        "t1":  "dark",
+        "t2":  "psychic",
+        "file":  "カラマネロ.png"
+    },
+    {
+        "id":  "689_ガメノデス",
+        "no":  "689",
+        "name":  "ガメノデス",
+        "display":  "ガメノデス",
+        "t1":  "rock",
+        "t2":  "water",
+        "file":  "ガメノデス.png"
+    },
+    {
+        "id":  "689_ガメノデス(メガガメノデス)",
+        "no":  "689",
+        "name":  "ガメノデス",
+        "display":  "ガメノデス(メガガメノデス)",
+        "t1":  "rock",
+        "t2":  "fighting",
+        "file":  "ガメノデス.png"
+    },
+    {
+        "id":  "691_ドラミドロ",
+        "no":  "691",
+        "name":  "ドラミドロ",
+        "display":  "ドラミドロ",
+        "t1":  "poison",
+        "t2":  "dragon",
+        "file":  "ドラミドロ.png"
+    },
+    {
+        "id":  "691_ドラミドロ(メガドラミドロ)",
+        "no":  "691",
+        "name":  "ドラミドロ",
+        "display":  "ドラミドロ(メガドラミドロ)",
+        "t1":  "poison",
+        "t2":  "dragon",
+        "file":  "ドラミドロ.png"
+    },
+    {
+        "id":  "693_ブロスター",
+        "no":  "693",
+        "name":  "ブロスター",
+        "display":  "ブロスター",
+        "t1":  "water",
+        "t2":  "none",
+        "file":  "ブロスター.png"
+    },
+    {
+        "id":  "695_エレザード",
+        "no":  "695",
+        "name":  "エレザード",
+        "display":  "エレザード",
+        "t1":  "electric",
+        "t2":  "normal",
+        "file":  "エレザード.png"
+    },
+    {
+        "id":  "697_ガチゴラス",
+        "no":  "697",
+        "name":  "ガチゴラス",
+        "display":  "ガチゴラス",
+        "t1":  "rock",
+        "t2":  "dragon",
+        "file":  "ガチゴラス.png"
+    },
+    {
+        "id":  "699_アマルルガ",
+        "no":  "699",
+        "name":  "アマルルガ",
+        "display":  "アマルルガ",
+        "t1":  "rock",
+        "t2":  "ice",
+        "file":  "アマルルガ.png"
+    },
+    {
+        "id":  "700_ニンフィア",
+        "no":  "700",
+        "name":  "ニンフィア",
+        "display":  "ニンフィア",
+        "t1":  "fairy",
+        "t2":  "none",
+        "file":  "ニンフィア.png"
+    },
+    {
+        "id":  "701_ルチャブル",
+        "no":  "701",
+        "name":  "ルチャブル",
+        "display":  "ルチャブル",
+        "t1":  "fighting",
+        "t2":  "flying",
+        "file":  "ルチャブル.png"
+    },
+    {
+        "id":  "701_ルチャブル(メガルチャブル)",
+        "no":  "701",
+        "name":  "ルチャブル",
+        "display":  "ルチャブル(メガルチャブル)",
+        "t1":  "fighting",
+        "t2":  "flying",
+        "file":  "ルチャブル.png"
+    },
+    {
+        "id":  "702_デデンネ",
+        "no":  "702",
+        "name":  "デデンネ",
+        "display":  "デデンネ",
+        "t1":  "electric",
+        "t2":  "fairy",
+        "file":  "デデンネ.png"
+    },
+    {
+        "id":  "706_ヌメルゴン",
+        "no":  "706",
+        "name":  "ヌメルゴン",
+        "display":  "ヌメルゴン",
+        "t1":  "dragon",
+        "t2":  "none",
+        "file":  "ヌメルゴン.png"
+    },
+    {
+        "id":  "706_ヌメルゴン(ヒスイのすがた)",
+        "no":  "706",
+        "name":  "ヌメルゴン",
+        "display":  "ヌメルゴン(ヒスイのすがた)",
+        "t1":  "steel",
+        "t2":  "dragon",
+        "file":  "ヌメルゴン.png"
+    },
+    {
+        "id":  "707_クレッフィ",
+        "no":  "707",
+        "name":  "クレッフィ",
+        "display":  "クレッフィ",
+        "t1":  "steel",
+        "t2":  "fairy",
+        "file":  "クレッフィ.png"
+    },
+    {
+        "id":  "709_オーロット",
+        "no":  "709",
+        "name":  "オーロット",
+        "display":  "オーロット",
+        "t1":  "none",
+        "t2":  "grass",
+        "file":  "オーロット.png"
+    },
+    {
+        "id":  "711_パンプジン",
+        "no":  "711",
+        "name":  "パンプジン",
+        "display":  "パンプジン",
+        "t1":  "none",
+        "t2":  "grass",
+        "file":  "パンプジン.png"
+    },
+    {
+        "id":  "711_パンプジン(ちいさいサイズ)",
+        "no":  "711",
+        "name":  "パンプジン",
+        "display":  "パンプジン(ちいさいサイズ)",
+        "t1":  "none",
+        "t2":  "grass",
+        "file":  "パンプジン.png"
+    },
+    {
+        "id":  "711_パンプジン(おおきいサイズ)",
+        "no":  "711",
+        "name":  "パンプジン",
+        "display":  "パンプジン(おおきいサイズ)",
+        "t1":  "none",
+        "t2":  "grass",
+        "file":  "パンプジン.png"
+    },
+    {
+        "id":  "711_パンプジン(とくだいサイズ)",
+        "no":  "711",
+        "name":  "パンプジン",
+        "display":  "パンプジン(とくだいサイズ)",
+        "t1":  "none",
+        "t2":  "grass",
+        "file":  "パンプジン.png"
+    },
+    {
+        "id":  "713_クレベース",
+        "no":  "713",
+        "name":  "クレベース",
+        "display":  "クレベース",
+        "t1":  "ice",
+        "t2":  "none",
+        "file":  "クレベース.png"
+    },
+    {
+        "id":  "713_クレベース(ヒスイのすがた)",
+        "no":  "713",
+        "name":  "クレベース",
+        "display":  "クレベース(ヒスイのすがた)",
+        "t1":  "ice",
+        "t2":  "rock",
+        "file":  "クレベース.png"
+    },
+    {
+        "id":  "715_オンバーン",
+        "no":  "715",
+        "name":  "オンバーン",
+        "display":  "オンバーン",
+        "t1":  "flying",
+        "t2":  "dragon",
+        "file":  "オンバーン.png"
+    },
+    {
+        "id":  "724_ジュナイパー",
+        "no":  "724",
+        "name":  "ジュナイパー",
+        "display":  "ジュナイパー",
+        "t1":  "grass",
+        "t2":  "none",
+        "file":  "ジュナイパー.png"
+    },
+    {
+        "id":  "724_ジュナイパー(ヒスイのすがた)",
+        "no":  "724",
+        "name":  "ジュナイパー",
+        "display":  "ジュナイパー(ヒスイのすがた)",
+        "t1":  "grass",
+        "t2":  "fighting",
+        "file":  "ジュナイパー.png"
+    },
+    {
+        "id":  "727_ガオガエン",
+        "no":  "727",
+        "name":  "ガオガエン",
+        "display":  "ガオガエン",
+        "t1":  "fire",
+        "t2":  "dark",
+        "file":  "ガオガエン.png"
+    },
+    {
+        "id":  "730_アシレーヌ",
+        "no":  "730",
+        "name":  "アシレーヌ",
+        "display":  "アシレーヌ",
+        "t1":  "water",
+        "t2":  "fairy",
+        "file":  "アシレーヌ.png"
+    },
+    {
+        "id":  "733_ドデカバシ",
+        "no":  "733",
+        "name":  "ドデカバシ",
+        "display":  "ドデカバシ",
+        "t1":  "normal",
+        "t2":  "flying",
+        "file":  "ドデカバシ.png"
+    },
+    {
+        "id":  "740_ケケンカニ",
+        "no":  "740",
+        "name":  "ケケンカニ",
+        "display":  "ケケンカニ",
+        "t1":  "fighting",
+        "t2":  "ice",
+        "file":  "ケケンカニ.png"
+    },
+    {
+        "id":  "740_ケケンカニ(メガケケンカニ)",
+        "no":  "740",
+        "name":  "ケケンカニ",
+        "display":  "ケケンカニ(メガケケンカニ)",
+        "t1":  "fighting",
+        "t2":  "ice",
+        "file":  "ケケンカニ.png"
+    },
+    {
+        "id":  "745_ルガルガン(まひるのすがた)",
+        "no":  "745",
+        "name":  "ルガルガン",
+        "display":  "ルガルガン(まひるのすがた)",
+        "t1":  "rock",
+        "t2":  "none",
+        "file":  "ルガルガン.png"
+    },
+    {
+        "id":  "745_ルガルガン(まよなかのすがた)",
+        "no":  "745",
+        "name":  "ルガルガン",
+        "display":  "ルガルガン(まよなかのすがた)",
+        "t1":  "rock",
+        "t2":  "none",
+        "file":  "ルガルガン.png"
+    },
+    {
+        "id":  "745_ルガルガン(たそがれのすがた)",
+        "no":  "745",
+        "name":  "ルガルガン",
+        "display":  "ルガルガン(たそがれのすがた)",
+        "t1":  "rock",
+        "t2":  "none",
+        "file":  "ルガルガン.png"
+    },
+    {
+        "id":  "748_ドヒドイデ",
+        "no":  "748",
+        "name":  "ドヒドイデ",
+        "display":  "ドヒドイデ",
+        "t1":  "poison",
+        "t2":  "water",
+        "file":  "ドヒドイデ.png"
+    },
+    {
+        "id":  "750_バンバドロ",
+        "no":  "750",
+        "name":  "バンバドロ",
+        "display":  "バンバドロ",
+        "t1":  "ground",
+        "t2":  "none",
+        "file":  "バンバドロ.png"
+    },
+    {
+        "id":  "752_オニシズクモ",
+        "no":  "752",
+        "name":  "オニシズクモ",
+        "display":  "オニシズクモ",
+        "t1":  "water",
+        "t2":  "bug",
+        "file":  "オニシズクモ.png"
+    },
+    {
+        "id":  "758_エンニュート",
+        "no":  "758",
+        "name":  "エンニュート",
+        "display":  "エンニュート",
+        "t1":  "poison",
+        "t2":  "fire",
+        "file":  "エンニュート.png"
+    },
+    {
+        "id":  "763_アマージョ",
+        "no":  "763",
+        "name":  "アマージョ",
+        "display":  "アマージョ",
+        "t1":  "grass",
+        "t2":  "none",
+        "file":  "アマージョ.png"
+    },
+    {
+        "id":  "765_ヤレユータン",
+        "no":  "765",
+        "name":  "ヤレユータン",
+        "display":  "ヤレユータン",
+        "t1":  "normal",
+        "t2":  "psychic",
+        "file":  "ヤレユータン.png"
+    },
+    {
+        "id":  "766_ナゲツケサル",
+        "no":  "766",
+        "name":  "ナゲツケサル",
+        "display":  "ナゲツケサル",
+        "t1":  "fighting",
+        "t2":  "none",
+        "file":  "ナゲツケサル.png"
+    },
+    {
+        "id":  "778_ミミッキュ",
+        "no":  "778",
+        "name":  "ミミッキュ",
+        "display":  "ミミッキュ",
+        "t1":  "none",
+        "t2":  "fairy",
+        "file":  "ミミッキュ.png"
+    },
+    {
+        "id":  "778_ミミッキュ(ばれたすがた)",
+        "no":  "778",
+        "name":  "ミミッキュ",
+        "display":  "ミミッキュ(ばれたすがた)",
+        "t1":  "none",
+        "t2":  "fairy",
+        "file":  "ミミッキュ.png"
+    },
+    {
+        "id":  "780_ジジーロン",
+        "no":  "780",
+        "name":  "ジジーロン",
+        "display":  "ジジーロン",
+        "t1":  "normal",
+        "t2":  "dragon",
+        "file":  "ジジーロン.png"
+    },
+    {
+        "id":  "780_ジジーロン(メガジジーロン)",
+        "no":  "780",
+        "name":  "ジジーロン",
+        "display":  "ジジーロン(メガジジーロン)",
+        "t1":  "normal",
+        "t2":  "dragon",
+        "file":  "ジジーロン.png"
+    },
+    {
+        "id":  "784_ジャラランガ",
+        "no":  "784",
+        "name":  "ジャラランガ",
+        "display":  "ジャラランガ",
+        "t1":  "dragon",
+        "t2":  "fighting",
+        "file":  "ジャラランガ.png"
+    },
+    {
+        "id":  "823_アーマーガア",
+        "no":  "823",
+        "name":  "アーマーガア",
+        "display":  "アーマーガア",
+        "t1":  "flying",
+        "t2":  "steel",
+        "file":  "アーマーガア.png"
+    },
+    {
+        "id":  "841_アップリュー",
+        "no":  "841",
+        "name":  "アップリュー",
+        "display":  "アップリュー",
+        "t1":  "grass",
+        "t2":  "dragon",
+        "file":  "アップリュー.png"
+    },
+    {
+        "id":  "842_タルップル",
+        "no":  "842",
+        "name":  "タルップル",
+        "display":  "タルップル",
+        "t1":  "grass",
+        "t2":  "dragon",
+        "file":  "タルップル.png"
+    },
+    {
+        "id":  "844_サダイジャ",
+        "no":  "844",
+        "name":  "サダイジャ",
+        "display":  "サダイジャ",
+        "t1":  "ground",
+        "t2":  "none",
+        "file":  "サダイジャ.png"
+    },
+    {
+        "id":  "855_ポットデス",
+        "no":  "855",
+        "name":  "ポットデス",
+        "display":  "ポットデス",
+        "t1":  "none",
+        "t2":  "none",
+        "file":  "ポットデス.png"
+    },
+    {
+        "id":  "855_ポットデス(しんさくフォルム)",
+        "no":  "855",
+        "name":  "ポットデス",
+        "display":  "ポットデス(しんさくフォルム)",
+        "t1":  "none",
+        "t2":  "none",
+        "file":  "ポットデス.png"
+    },
+    {
+        "id":  "858_ブリムオン",
+        "no":  "858",
+        "name":  "ブリムオン",
+        "display":  "ブリムオン",
+        "t1":  "psychic",
+        "t2":  "fairy",
+        "file":  "ブリムオン.png"
+    },
+    {
+        "id":  "861_オーロンゲ",
+        "no":  "861",
+        "name":  "オーロンゲ",
+        "display":  "オーロンゲ",
+        "t1":  "dark",
+        "t2":  "fairy",
+        "file":  "grimmsnarl.png"
+    },
+    {
+        "id":  "866_バリコオル",
+        "no":  "866",
+        "name":  "バリコオル",
+        "display":  "バリコオル",
+        "t1":  "ice",
+        "t2":  "psychic",
+        "file":  "バリコオル.png"
+    },
+    {
+        "id":  "867_デスバーン",
+        "no":  "867",
+        "name":  "デスバーン",
+        "display":  "デスバーン",
+        "t1":  "ground",
+        "t2":  "none",
+        "file":  "デスバーン.png"
+    },
+    {
+        "id":  "869_マホイップ",
+        "no":  "869",
+        "name":  "マホイップ",
+        "display":  "マホイップ",
+        "t1":  "fairy",
+        "t2":  "none",
+        "file":  "マホイップ.png"
+    },
+    {
+        "id":  "870_タイレーツ",
+        "no":  "870",
+        "name":  "タイレーツ",
+        "display":  "タイレーツ",
+        "t1":  "fighting",
+        "t2":  "none",
+        "file":  "タイレーツ.png"
+    },
+    {
+        "id":  "870_タイレーツ(メガタイレーツ)",
+        "no":  "870",
+        "name":  "タイレーツ",
+        "display":  "タイレーツ(メガタイレーツ)",
+        "t1":  "fighting",
+        "t2":  "none",
+        "file":  "タイレーツ.png"
+    },
+    {
+        "id":  "877_モルぺコ(まんぷくもよう)",
+        "no":  "877",
+        "name":  "モルペコ",
+        "display":  "モルぺコ(まんぷくもよう)",
+        "t1":  "electric",
+        "t2":  "dark",
+        "file":  "モルペコ.png"
+    },
+    {
+        "id":  "877_モルぺコ(はらぺこもよう)",
+        "no":  "877",
+        "name":  "モルペコ",
+        "display":  "モルぺコ(はらぺこもよう)",
+        "t1":  "electric",
+        "t2":  "dark",
+        "file":  "モルペコ.png"
+    },
+    {
+        "id":  "887_ドラパルト",
+        "no":  "887",
+        "name":  "ドラパルト",
+        "display":  "ドラパルト",
+        "t1":  "dragon",
+        "t2":  "none",
+        "file":  "ドラパルト.png"
+    },
+    {
+        "id":  "899_アヤシシ",
+        "no":  "899",
+        "name":  "アヤシシ",
+        "display":  "アヤシシ",
+        "t1":  "normal",
+        "t2":  "psychic",
+        "file":  "アヤシシ.png"
+    },
+    {
+        "id":  "900_バサギリ",
+        "no":  "900",
+        "name":  "バサギリ",
+        "display":  "バサギリ",
+        "t1":  "bug",
+        "t2":  "rock",
+        "file":  "バサギリ.png"
+    },
+    {
+        "id":  "902_イダイトウ(オスのすがた)",
+        "no":  "902",
+        "name":  "イダイトウ",
+        "display":  "イダイトウ(オスのすがた)",
+        "t1":  "water",
+        "t2":  "none",
+        "file":  "basculegion.png"
+    },
+    {
+        "id":  "902_イダイトウ(メスのすがた)",
+        "no":  "902",
+        "name":  "イダイトウ",
+        "display":  "イダイトウ(メスのすがた)",
+        "t1":  "water",
+        "t2":  "none",
+        "file":  "basculegion.png"
+    },
+    {
+        "id":  "903_オオニューラ",
+        "no":  "903",
+        "name":  "オオニューラ",
+        "display":  "オオニューラ",
+        "t1":  "fighting",
+        "t2":  "poison",
+        "file":  "sneasler.png"
+    },
+    {
+        "id":  "904_ハリーマン",
+        "no":  "904",
+        "name":  "ハリーマン",
+        "display":  "ハリーマン",
+        "t1":  "dark",
+        "t2":  "poison",
+        "file":  "ハリーマン.png"
+    },
+    {
+        "id":  "908_マスカーニャ",
+        "no":  "908",
+        "name":  "マスカーニャ",
+        "display":  "マスカーニャ",
+        "t1":  "grass",
+        "t2":  "dark",
+        "file":  "マスカーニャ.png"
+    },
+    {
+        "id":  "911_ラウドボーン",
+        "no":  "911",
+        "name":  "ラウドボーン",
+        "display":  "ラウドボーン",
+        "t1":  "fire",
+        "t2":  "none",
+        "file":  "ラウドボーン.png"
+    },
+    {
+        "id":  "914_ウェーニバル",
+        "no":  "914",
+        "name":  "ウェーニバル",
+        "display":  "ウェーニバル",
+        "t1":  "water",
+        "t2":  "fighting",
+        "file":  "ウェーニバル.png"
+    },
+    {
+        "id":  "925_イッカネズミ",
+        "no":  "925",
+        "name":  "イッカネズミ",
+        "display":  "イッカネズミ",
+        "t1":  "normal",
+        "t2":  "none",
+        "file":  "イッカネズミ.png"
+    },
+    {
+        "id":  "925_イッカネズミ(Four)",
+        "no":  "925",
+        "name":  "イッカネズミ",
+        "display":  "イッカネズミ(Four)",
+        "t1":  "normal",
+        "t2":  "none",
+        "file":  "イッカネズミ.png"
+    },
+    {
+        "id":  "934_キョジオーン",
+        "no":  "934",
+        "name":  "キョジオーン",
+        "display":  "キョジオーン",
+        "t1":  "rock",
+        "t2":  "none",
+        "file":  "キョジオーン.png"
+    },
+    {
+        "id":  "936_グレンアルマ",
+        "no":  "936",
+        "name":  "グレンアルマ",
+        "display":  "グレンアルマ",
+        "t1":  "fire",
+        "t2":  "psychic",
+        "file":  "armarouge.png"
+    },
+    {
+        "id":  "937_ソウブレイズ",
+        "no":  "937",
+        "name":  "ソウブレイズ",
+        "display":  "ソウブレイズ",
+        "t1":  "fire",
+        "t2":  "none",
+        "file":  "ceruledge.png"
+    },
+    {
+        "id":  "939_ハラバリー",
+        "no":  "939",
+        "name":  "ハラバリー",
+        "display":  "ハラバリー",
+        "t1":  "electric",
+        "t2":  "none",
+        "file":  "ハラバリー.png"
+    },
+    {
+        "id":  "952_スコヴィラン",
+        "no":  "952",
+        "name":  "スコヴィラン",
+        "display":  "スコヴィラン",
+        "t1":  "grass",
+        "t2":  "fire",
+        "file":  "スコヴィラン.png"
+    },
+    {
+        "id":  "952_スコヴィラン(メガスコヴィラン)",
+        "no":  "952",
+        "name":  "スコヴィラン",
+        "display":  "スコヴィラン(メガスコヴィラン)",
+        "t1":  "grass",
+        "t2":  "fire",
+        "file":  "スコヴィラン.png"
+    },
+    {
+        "id":  "956_クエスパトラ",
+        "no":  "956",
+        "name":  "クエスパトラ",
+        "display":  "クエスパトラ",
+        "t1":  "psychic",
+        "t2":  "none",
+        "file":  "クエスパトラ.png"
+    },
+    {
+        "id":  "959_デカヌチャン",
+        "no":  "959",
+        "name":  "デカヌチャン",
+        "display":  "デカヌチャン",
+        "t1":  "fairy",
+        "t2":  "steel",
+        "file":  "tinkaton.png"
+    },
+    {
+        "id":  "964_イルカマン",
+        "no":  "964",
+        "name":  "イルカマン",
+        "display":  "イルカマン",
+        "t1":  "water",
+        "t2":  "none",
+        "file":  "イルカマン.png"
+    },
+    {
+        "id":  "964_イルカマン(マイティフォルム)",
+        "no":  "964",
+        "name":  "イルカマン",
+        "display":  "イルカマン(マイティフォルム)",
+        "t1":  "water",
+        "t2":  "none",
+        "file":  "イルカマン.png"
+    },
+    {
+        "id":  "968_ミミズズ",
+        "no":  "968",
+        "name":  "ミミズズ",
+        "display":  "ミミズズ",
+        "t1":  "steel",
+        "t2":  "none",
+        "file":  "ミミズズ.png"
+    },
+    {
+        "id":  "970_キラフロル",
+        "no":  "970",
+        "name":  "キラフロル",
+        "display":  "キラフロル",
+        "t1":  "rock",
+        "t2":  "poison",
+        "file":  "glimmora.png"
+    },
+    {
+        "id":  "970_キラフロル(メガキラフロル)",
+        "no":  "970",
+        "name":  "キラフロル",
+        "display":  "キラフロル(メガキラフロル)",
+        "t1":  "rock",
+        "t2":  "poison",
+        "file":  "glimmora.png"
+    },
+    {
+        "id":  "972_ハカドッグ",
+        "no":  "972",
+        "name":  "ハカドッグ",
+        "display":  "ハカドッグ",
+        "t1":  "none",
+        "t2":  "none",
+        "file":  "ハカドッグ.png"
+    },
+    {
+        "id":  "979_コノヨザル",
+        "no":  "979",
+        "name":  "コノヨザル",
+        "display":  "コノヨザル",
+        "t1":  "fighting",
+        "t2":  "none",
+        "file":  "annihilape.png"
+    },
+    {
+        "id":  "981_リキキリン",
+        "no":  "981",
+        "name":  "リキキリン",
+        "display":  "リキキリン",
+        "t1":  "normal",
+        "t2":  "psychic",
+        "file":  "farigiraf.png"
+    },
+    {
+        "id":  "983_ドドゲザン",
+        "no":  "983",
+        "name":  "ドドゲザン",
+        "display":  "ドドゲザン",
+        "t1":  "dark",
+        "t2":  "steel",
+        "file":  "kingambit.png"
+    },
+    {
+        "id":  "1000_サーフゴー",
+        "no":  "1000",
+        "name":  "サーフゴー",
+        "display":  "サーフゴー",
+        "t1":  "steel",
+        "t2":  "none",
+        "file":  "サーフゴー.png"
+    },
+    {
+        "id":  "1013_ヤバソチャ",
+        "no":  "1013",
+        "name":  "ヤバソチャ",
+        "display":  "ヤバソチャ",
+        "t1":  "grass",
+        "t2":  "none",
+        "file":  "sinistcha.png"
+    },
+    {
+        "id":  "1013_ヤバソチャ(ケッサクのすがた)",
+        "no":  "1013",
+        "name":  "ヤバソチャ",
+        "display":  "ヤバソチャ(ケッサクのすがた)",
+        "t1":  "grass",
+        "t2":  "none",
+        "file":  "sinistcha.png"
+    },
+    {
+        "id":  "1018_ブリジュラス",
+        "no":  "1018",
+        "name":  "ブリジュラス",
+        "display":  "ブリジュラス",
+        "t1":  "steel",
+        "t2":  "dragon",
+        "file":  "archaludon.png"
+    },
+    {
+        "id":  "1019_カミツオロチ",
+        "no":  "1019",
+        "name":  "カミツオロチ",
+        "display":  "カミツオロチ",
+        "t1":  "grass",
+        "t2":  "dragon",
+        "file":  "カミツオロチ.png"
+    }
+]

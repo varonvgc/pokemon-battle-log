@@ -633,10 +633,16 @@ Write-Host "Saved data/pokemon.json ($($finalPokemonList.Count) total entries)" 
 [System.IO.File]::WriteAllText((Join-Path $dataDir "learnsets.json"), ($finalLearnsets | ConvertTo-Json -Depth 10), [System.Text.Encoding]::UTF8)
 Write-Host "Saved data/learnsets.json" -ForegroundColor Green
 
-$transObj = [System.Collections.Generic.Dictionary[string, object]]::new()
-$transObj["moves"] = $moveNameToId
-[System.IO.File]::WriteAllText((Join-Path $dataDir "translation_map.json"), ($transObj | ConvertTo-Json -Depth 10), [System.Text.Encoding]::UTF8)
-Write-Host "Saved data/translation_map.json" -ForegroundColor Green
+# 13. Generate Comprehensive Pokepaste Translation Map
+$transScript = Join-Path $scriptsDir "generate_translation_map.ps1"
+if (Test-Path $transScript) {
+    & $transScript
+} else {
+    $transObj = [System.Collections.Generic.Dictionary[string, object]]::new()
+    $transObj["moves"] = $moveNameToId
+    [System.IO.File]::WriteAllText((Join-Path $dataDir "translation_map.json"), ($transObj | ConvertTo-Json -Depth 10), [System.Text.Encoding]::UTF8)
+    Write-Host "Saved fallback data/translation_map.json" -ForegroundColor Yellow
+}
 
 [System.IO.File]::WriteAllText((Join-Path $dataDir "mega_stones.json"), ($megaMap | ConvertTo-Json -Depth 10), [System.Text.Encoding]::UTF8)
 Write-Host "Saved data/mega_stones.json ($($megaMap.Count) mapped)" -ForegroundColor Green
