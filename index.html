@@ -482,6 +482,96 @@
       font-weight: 700;
     }
 
+    .badge-draw {
+      background: #713f12;
+      color: #fde047;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    /* FORMAT TOGGLE (BO1 / BO3) */
+    .format-toggle-group {
+      display: flex;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 3px;
+      gap: 4px;
+      margin-bottom: 14px;
+    }
+
+    .format-toggle-btn {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .format-toggle-btn.active {
+      background: var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(108, 99, 255, 0.4);
+    }
+
+    .bo3-game-card {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 14px;
+      margin-bottom: 14px;
+    }
+
+    .bo3-game-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .bo3-total-score-card {
+      background: var(--surface2);
+      border: 1.5px solid var(--accent);
+      border-radius: 8px;
+      padding: 10px 16px;
+      margin: 16px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .bo3-total-score-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .bo3-total-score-nums {
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+
+    .bo3-score-win {
+      color: var(--win);
+    }
+
+    .bo3-score-lose {
+      color: var(--lose);
+    }
+
     .record-date {
       font-size: 12px;
       color: var(--text-muted);
@@ -2488,6 +2578,12 @@
   <div id="page-record" class="page">
     <h2 style="font-size:20px;font-weight:700;margin-bottom:20px">対戦を記録する</h2>
 
+    <!-- BO1 / BO3 切り替え -->
+    <div class="format-toggle-group">
+      <button type="button" class="format-toggle-btn active" id="btn-format-bo1" onclick="setRecordFormat('bo1')">🎮 BO1</button>
+      <button type="button" class="format-toggle-btn" id="btn-format-bo3" onclick="setRecordFormat('bo3')">🏆 BO3</button>
+    </div>
+
     <div class="card">
       <div class="card-title">自分のパーティを選択</div>
       <select id="party-select-dropdown" style="font-size:16px" onchange="onPartyDropdownChange(this.value)">
@@ -2564,16 +2660,89 @@
       <div class="section-label">相手のパーティ（6体）</div>
       <div class="slot-grid" id="opp-party-slots"></div>
 
-      <div class="section-label">自分の選出（4体タップ）</div>
-      <div class="selection-party-grid" id="my-selection-slots"></div>
+      <!-- BO1 入力セクション -->
+      <div id="rec-area-bo1">
+        <div class="section-label">自分の選出（4体タップ）</div>
+        <div class="selection-party-grid" id="my-selection-slots"></div>
 
-      <div class="section-label">相手の選出（4体タップ）</div>
-      <div class="selection-party-grid" id="opp-selection-slots"></div>
+        <div class="section-label">相手の選出（4体タップ）</div>
+        <div class="selection-party-grid" id="opp-selection-slots"></div>
 
-      <div class="section-label">勝敗</div>
-      <div class="result-toggle">
-        <button class="result-btn win" id="btn-win" onclick="setResult('win')">🏆 勝ち</button>
-        <button class="result-btn lose" id="btn-lose" onclick="setResult('lose')">💀 負け</button>
+        <div class="section-label">勝敗</div>
+        <div class="result-toggle">
+          <button type="button" class="result-btn win" id="btn-win" onclick="setResult('win')">🏆 勝ち</button>
+          <button type="button" class="result-btn lose" id="btn-lose" onclick="setResult('lose')">💀 負け</button>
+        </div>
+      </div>
+
+      <!-- BO3 入力セクション -->
+      <div id="rec-area-bo3" style="display:none">
+        <!-- 1試合目 -->
+        <div class="bo3-game-card" id="bo3-game-card-0">
+          <div class="bo3-game-title">
+            <span>⚔️ 1試合目</span>
+            <span id="bo3-badge-0" style="font-size:12px"></span>
+          </div>
+          <div class="section-label" style="margin-top:8px">自分の選出（4体タップ）</div>
+          <div class="selection-party-grid" id="my-selection-slots-bo3-0"></div>
+
+          <div class="section-label">相手の選出（4体タップ）</div>
+          <div class="selection-party-grid" id="opp-selection-slots-bo3-0"></div>
+
+          <div class="section-label">勝敗</div>
+          <div class="result-toggle">
+            <button type="button" class="result-btn win" id="btn-win-bo3-0" onclick="setBo3Result(0, 'win')">🏆 勝ち</button>
+            <button type="button" class="result-btn lose" id="btn-lose-bo3-0" onclick="setBo3Result(0, 'lose')">💀 負け</button>
+          </div>
+        </div>
+
+        <!-- 2試合目 -->
+        <div class="bo3-game-card" id="bo3-game-card-1">
+          <div class="bo3-game-title">
+            <span>⚔️ 2試合目</span>
+            <span id="bo3-badge-1" style="font-size:12px"></span>
+          </div>
+          <div class="section-label" style="margin-top:8px">自分の選出（4体タップ）</div>
+          <div class="selection-party-grid" id="my-selection-slots-bo3-1"></div>
+
+          <div class="section-label">相手の選出（4体タップ）</div>
+          <div class="selection-party-grid" id="opp-selection-slots-bo3-1"></div>
+
+          <div class="section-label">勝敗</div>
+          <div class="result-toggle">
+            <button type="button" class="result-btn win" id="btn-win-bo3-1" onclick="setBo3Result(1, 'win')">🏆 勝ち</button>
+            <button type="button" class="result-btn lose" id="btn-lose-bo3-1" onclick="setBo3Result(1, 'lose')">💀 負け</button>
+          </div>
+        </div>
+
+        <!-- 3試合目 (1-1など決着がついていない場合のみ表示) -->
+        <div class="bo3-game-card" id="bo3-game-card-2" style="display:none">
+          <div class="bo3-game-title">
+            <span>⚔️ 3試合目</span>
+            <span id="bo3-badge-2" style="font-size:12px"></span>
+          </div>
+          <div class="section-label" style="margin-top:8px">自分の選出（4体タップ）</div>
+          <div class="selection-party-grid" id="my-selection-slots-bo3-2"></div>
+
+          <div class="section-label">相手の選出（4体タップ）</div>
+          <div class="selection-party-grid" id="opp-selection-slots-bo3-2"></div>
+
+          <div class="section-label">勝敗</div>
+          <div class="result-toggle">
+            <button type="button" class="result-btn win" id="btn-win-bo3-2" onclick="setBo3Result(2, 'win')">🏆 勝ち</button>
+            <button type="button" class="result-btn lose" id="btn-lose-bo3-2" onclick="setBo3Result(2, 'lose')">💀 負け</button>
+          </div>
+        </div>
+
+        <!-- 総合勝敗数表示 -->
+        <div class="bo3-total-score-card">
+          <div class="bo3-total-score-title">総合勝敗数</div>
+          <div class="bo3-total-score-nums">
+            <span class="bo3-score-win" id="bo3-score-win">0</span>
+            <span style="color:var(--text-muted);margin:0 4px">-</span>
+            <span class="bo3-score-lose" id="bo3-score-lose">0</span>
+          </div>
+        </div>
       </div>
 
       <div style="margin-top:20px">
@@ -4008,6 +4177,36 @@
     }
 
     // ---- RECORD PAGE ----
+    let currentRecordFormat = 'bo1'; // 'bo1' | 'bo3'
+    let recordResult = null;
+    let mySelectionOrder = [];
+    let oppSelectionOrder = [];
+
+    // BO3用ゲームデータ（各試合の選出と勝敗）
+    let bo3Games = [
+      { mySelectionOrder: [], oppSelectionOrder: [], result: null },
+      { mySelectionOrder: [], oppSelectionOrder: [], result: null },
+      { mySelectionOrder: [], oppSelectionOrder: [], result: null }
+    ];
+
+    function setRecordFormat(fmt) {
+      currentRecordFormat = fmt;
+      const btnBo1 = document.getElementById('btn-format-bo1');
+      const btnBo3 = document.getElementById('btn-format-bo3');
+      if (btnBo1) btnBo1.classList.toggle('active', fmt === 'bo1');
+      if (btnBo3) btnBo3.classList.toggle('active', fmt === 'bo3');
+
+      const areaBo1 = document.getElementById('rec-area-bo1');
+      const areaBo3 = document.getElementById('rec-area-bo3');
+      if (areaBo1) areaBo1.style.display = (fmt === 'bo1') ? 'block' : 'none';
+      if (areaBo3) areaBo3.style.display = (fmt === 'bo3') ? 'block' : 'none';
+
+      if (fmt === 'bo3') {
+        renderAllBo3SelectionSlots();
+        updateBo3Score();
+      }
+    }
+
     function renderRecordPage() {
       const sel = document.getElementById('party-select-dropdown');
       if (!sel) return;
@@ -4040,6 +4239,11 @@
       recordResult = null;
       document.getElementById('btn-win').classList.remove('active');
       document.getElementById('btn-lose').classList.remove('active');
+      bo3Games = [
+        { mySelectionOrder: [], oppSelectionOrder: [], result: null },
+        { mySelectionOrder: [], oppSelectionOrder: [], result: null },
+        { mySelectionOrder: [], oppSelectionOrder: [], result: null }
+      ];
       renderRecordPage();
       showRecordForm();
     }
@@ -4075,11 +4279,14 @@
         myIcons.innerHTML = myPokemon.map(pk => typeof pk === 'string' ? pk : (pk && pk.name || '')).filter(Boolean).map(name => getPokeSpriteHTMLByDisplay(name)).join('');
       }
 
-      // 選出スロットの初期化（6体横並びタップUI）
+      // 選出スロットの初期化（BO1 & BO3）
       mySelectionOrder = [];
       oppSelectionOrder = [];
       renderSelectionSlots('my');
       renderSelectionSlots('opp');
+
+      renderAllBo3SelectionSlots();
+      updateBo3Score();
 
       const recOppTrainer = document.getElementById('rec-opp-trainer');
       if (recOppTrainer) recOppTrainer.value = '';
@@ -4090,45 +4297,70 @@
       form.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    let mySelectionOrder = [];
-    let oppSelectionOrder = [];
+    function toggleSelectionSlot(type, slotIdx, gameIdx = null) {
+      if (gameIdx === null) {
+        // BO1
+        if (type === 'my') {
+          const party = parties.find(p => p.id === selectedPartyId);
+          const myPokemon = party ? party.pokemon : [];
+          const pk = myPokemon[slotIdx];
+          const name = (typeof pk === 'string' ? pk : (pk && pk.name || '')) || '';
+          if (!name) return;
 
-    function toggleSelectionSlot(type, slotIdx) {
-      if (type === 'my') {
-        const party = parties.find(p => p.id === selectedPartyId);
-        const myPokemon = party ? party.pokemon : [];
-        const pk = myPokemon[slotIdx];
-        const name = (typeof pk === 'string' ? pk : (pk && pk.name || '')) || '';
-        if (!name) return; // 未登録スロットはタップ無効
-
-        const idx = mySelectionOrder.indexOf(slotIdx);
-        if (idx !== -1) {
-          // すでに選択済みなら解除し、以降の選出順を繰り上げ
-          mySelectionOrder.splice(idx, 1);
-        } else {
-          // 未選択で4体未満なら末尾に追加
-          if (mySelectionOrder.length < 4) {
+          const idx = mySelectionOrder.indexOf(slotIdx);
+          if (idx !== -1) {
+            mySelectionOrder.splice(idx, 1);
+          } else if (mySelectionOrder.length < 4) {
             mySelectionOrder.push(slotIdx);
           }
-        }
-        renderSelectionSlots('my');
-      } else if (type === 'opp') {
-        const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
-        const oppPokemon = Array.from(oppInputs).map(inp => inp.value.trim());
-        const name = oppPokemon[slotIdx] || '';
-        if (!name) return; // 未入力スロットはタップ無効
+          renderSelectionSlots('my');
+        } else if (type === 'opp') {
+          const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
+          const oppPokemon = Array.from(oppInputs).map(inp => inp.value.trim());
+          const name = oppPokemon[slotIdx] || '';
+          if (!name) return;
 
-        const idx = oppSelectionOrder.indexOf(slotIdx);
-        if (idx !== -1) {
-          // すでに選択済みなら解除し、以降の選出順を繰り上げ
-          oppSelectionOrder.splice(idx, 1);
-        } else {
-          // 未選択で4体未満なら末尾に追加
-          if (oppSelectionOrder.length < 4) {
+          const idx = oppSelectionOrder.indexOf(slotIdx);
+          if (idx !== -1) {
+            oppSelectionOrder.splice(idx, 1);
+          } else if (oppSelectionOrder.length < 4) {
             oppSelectionOrder.push(slotIdx);
           }
+          renderSelectionSlots('opp');
         }
-        renderSelectionSlots('opp');
+      } else {
+        // BO3 (指定gameIdx)
+        const g = bo3Games[gameIdx];
+        if (!g) return;
+
+        if (type === 'my') {
+          const party = parties.find(p => p.id === selectedPartyId);
+          const myPokemon = party ? party.pokemon : [];
+          const pk = myPokemon[slotIdx];
+          const name = (typeof pk === 'string' ? pk : (pk && pk.name || '')) || '';
+          if (!name) return;
+
+          const idx = g.mySelectionOrder.indexOf(slotIdx);
+          if (idx !== -1) {
+            g.mySelectionOrder.splice(idx, 1);
+          } else if (g.mySelectionOrder.length < 4) {
+            g.mySelectionOrder.push(slotIdx);
+          }
+          renderBo3SelectionSlot('my', gameIdx);
+        } else if (type === 'opp') {
+          const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
+          const oppPokemon = Array.from(oppInputs).map(inp => inp.value.trim());
+          const name = oppPokemon[slotIdx] || '';
+          if (!name) return;
+
+          const idx = g.oppSelectionOrder.indexOf(slotIdx);
+          if (idx !== -1) {
+            g.oppSelectionOrder.splice(idx, 1);
+          } else if (g.oppSelectionOrder.length < 4) {
+            g.oppSelectionOrder.push(slotIdx);
+          }
+          renderBo3SelectionSlot('opp', gameIdx);
+        }
       }
     }
 
@@ -4211,51 +4443,189 @@
       }
     }
 
-    function setSelectionFromNames(type, names) {
-      if (!names || !Array.isArray(names)) return;
-      if (type === 'my') {
-        const party = parties.find(p => p.id === selectedPartyId);
-        const myPokemon = party ? party.pokemon : [];
-        mySelectionOrder = [];
-        names.forEach(name => {
-          if (!name) return;
-          const norm = name.split('(')[0].split('（')[0].trim();
-          let bestIdx = -1;
+    function renderBo3SelectionSlot(type, gameIdx) {
+      const g = bo3Games[gameIdx];
+      if (!g) return;
+
+      if (type === 'my' || !type) {
+        const container = document.getElementById(`my-selection-slots-bo3-${gameIdx}`);
+        if (container) {
+          const party = parties.find(p => p.id === selectedPartyId);
+          const myPokemon = party ? party.pokemon : [];
+          let html = '';
           for (let i = 0; i < 6; i++) {
-            if (mySelectionOrder.includes(i)) continue;
             const pk = myPokemon[i];
-            const pName = (typeof pk === 'string' ? pk : (pk && pk.name || '')) || '';
-            if (!pName) continue;
-            if (pName === name) { bestIdx = i; break; }
-            const pNorm = pName.split('(')[0].split('（')[0].trim();
-            if (pNorm === norm) { bestIdx = i; break; }
+            const name = (typeof pk === 'string' ? pk : (pk && pk.name || '')) || '';
+            const orderIdx = g.mySelectionOrder.indexOf(i);
+            const isSelected = (orderIdx !== -1);
+            const isDisabled = !name;
+            const badge = isSelected ? (orderIdx + 1) : '-';
+
+            let iconHtml = '';
+            if (name) {
+              const poke = (localPokemon || POKEMON_LIST).find(p => p.display === name);
+              if (poke) {
+                const pos = getPokeIconPos(poke);
+                iconHtml = `<span class="poke-sprite" style="background-position:${pos}"></span>`;
+              } else {
+                iconHtml = `<img src="${BALL_ICON_SRC}" alt="${name}" class="ball-img">`;
+              }
+            } else {
+              iconHtml = `<img src="${BALL_ICON_SRC}" alt="未設定" class="ball-img">`;
+            }
+
+            const cls = `selection-poke-card${isSelected ? ' selected' : ''}${isDisabled ? ' disabled' : ''}`;
+            html += `
+              <div class="${cls}" onclick="toggleSelectionSlot('my', ${i}, ${gameIdx})" title="${name || '未設定'}">
+                ${iconHtml}
+                <div class="selection-order-badge">${badge}</div>
+              </div>
+            `;
           }
-          if (bestIdx !== -1 && mySelectionOrder.length < 4) {
-            mySelectionOrder.push(bestIdx);
-          }
-        });
-        renderSelectionSlots('my');
-      } else if (type === 'opp') {
-        const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
-        const oppPokemon = Array.from(oppInputs).map(inp => inp.value.trim());
-        oppSelectionOrder = [];
-        names.forEach(name => {
-          if (!name) return;
-          const norm = name.split('(')[0].split('（')[0].trim();
-          let bestIdx = -1;
+          container.innerHTML = html;
+        }
+      }
+
+      if (type === 'opp' || !type) {
+        const container = document.getElementById(`opp-selection-slots-bo3-${gameIdx}`);
+        if (container) {
+          const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
+          const oppPokemon = Array.from(oppInputs).map(inp => inp.value.trim());
+          let html = '';
           for (let i = 0; i < 6; i++) {
-            if (oppSelectionOrder.includes(i)) continue;
-            const pName = oppPokemon[i] || '';
-            if (!pName) continue;
-            if (pName === name) { bestIdx = i; break; }
-            const pNorm = pName.split('(')[0].split('（')[0].trim();
-            if (pNorm === norm) { bestIdx = i; break; }
+            const name = oppPokemon[i] || '';
+            const orderIdx = g.oppSelectionOrder.indexOf(i);
+            const isSelected = (orderIdx !== -1);
+            const isDisabled = !name;
+            const badge = isSelected ? (orderIdx + 1) : '-';
+
+            let iconHtml = '';
+            if (name) {
+              const poke = (localPokemon || POKEMON_LIST).find(p => p.display === name);
+              if (poke) {
+                const pos = getPokeIconPos(poke);
+                iconHtml = `<span class="poke-sprite" style="background-position:${pos}"></span>`;
+              } else {
+                iconHtml = `<img src="${BALL_ICON_SRC}" alt="${name}" class="ball-img">`;
+              }
+            } else {
+              iconHtml = `<img src="${BALL_ICON_SRC}" alt="未入力" class="ball-img">`;
+            }
+
+            const cls = `selection-poke-card${isSelected ? ' selected' : ''}${isDisabled ? ' disabled' : ''}`;
+            html += `
+              <div class="${cls}" onclick="toggleSelectionSlot('opp', ${i}, ${gameIdx})" title="${name || '未入力'}">
+                ${iconHtml}
+                <div class="selection-order-badge">${badge}</div>
+              </div>
+            `;
           }
-          if (bestIdx !== -1 && oppSelectionOrder.length < 4) {
-            oppSelectionOrder.push(bestIdx);
-          }
-        });
-        renderSelectionSlots('opp');
+          container.innerHTML = html;
+        }
+      }
+    }
+
+    function renderAllBo3SelectionSlots() {
+      for (let i = 0; i < 3; i++) {
+        renderBo3SelectionSlot('my', i);
+        renderBo3SelectionSlot('opp', i);
+      }
+    }
+
+    function setSelectionFromNames(type, names, gameIdx = null) {
+      if (!names || !Array.isArray(names)) return;
+      if (gameIdx === null) {
+        if (type === 'my') {
+          const party = parties.find(p => p.id === selectedPartyId);
+          const myPokemon = party ? party.pokemon : [];
+          mySelectionOrder = [];
+          names.forEach(name => {
+            if (!name) return;
+            const norm = name.split('(')[0].split('（')[0].trim();
+            let bestIdx = -1;
+            for (let i = 0; i < 6; i++) {
+              if (mySelectionOrder.includes(i)) continue;
+              const pk = myPokemon[i];
+              const pName = (typeof pk === 'string' ? pk : (pk && pk.name || '')) || '';
+              if (!pName) continue;
+              if (pName === name) { bestIdx = i; break; }
+              const pNorm = pName.split('(')[0].split('（')[0].trim();
+              if (pNorm === norm) { bestIdx = i; break; }
+            }
+            if (bestIdx !== -1 && mySelectionOrder.length < 4) {
+              mySelectionOrder.push(bestIdx);
+            }
+          });
+          renderSelectionSlots('my');
+        } else if (type === 'opp') {
+          const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
+          const oppPokemon = Array.from(oppInputs).map(inp => inp.value.trim());
+          oppSelectionOrder = [];
+          names.forEach(name => {
+            if (!name) return;
+            const norm = name.split('(')[0].split('（')[0].trim();
+            let bestIdx = -1;
+            for (let i = 0; i < 6; i++) {
+              if (oppSelectionOrder.includes(i)) continue;
+              const pName = oppPokemon[i] || '';
+              if (!pName) continue;
+              if (pName === name) { bestIdx = i; break; }
+              const pNorm = pName.split('(')[0].split('（')[0].trim();
+              if (pNorm === norm) { bestIdx = i; break; }
+            }
+            if (bestIdx !== -1 && oppSelectionOrder.length < 4) {
+              oppSelectionOrder.push(bestIdx);
+            }
+          });
+          renderSelectionSlots('opp');
+        }
+      } else {
+        const g = bo3Games[gameIdx];
+        if (!g) return;
+        if (type === 'my') {
+          const party = parties.find(p => p.id === selectedPartyId);
+          const myPokemon = party ? party.pokemon : [];
+          g.mySelectionOrder = [];
+          names.forEach(name => {
+            if (!name) return;
+            const norm = name.split('(')[0].split('（')[0].trim();
+            let bestIdx = -1;
+            for (let i = 0; i < 6; i++) {
+              if (g.mySelectionOrder.includes(i)) continue;
+              const pk = myPokemon[i];
+              const pName = (typeof pk === 'string' ? pk : (pk && pk.name || '')) || '';
+              if (!pName) continue;
+              if (pName === name) { bestIdx = i; break; }
+              const pNorm = pName.split('(')[0].split('（')[0].trim();
+              if (pNorm === norm) { bestIdx = i; break; }
+            }
+            if (bestIdx !== -1 && g.mySelectionOrder.length < 4) {
+              g.mySelectionOrder.push(bestIdx);
+            }
+          });
+          renderBo3SelectionSlot('my', gameIdx);
+        } else if (type === 'opp') {
+          const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
+          const oppPokemon = Array.from(oppInputs).map(inp => inp.value.trim());
+          g.oppSelectionOrder = [];
+          names.forEach(name => {
+            if (!name) return;
+            const norm = name.split('(')[0].split('（')[0].trim();
+            let bestIdx = -1;
+            for (let i = 0; i < 6; i++) {
+              if (g.oppSelectionOrder.includes(i)) continue;
+              const pName = oppPokemon[i] || '';
+              if (!pName) continue;
+              if (pName === name) { bestIdx = i; break; }
+              const pNorm = pName.split('(')[0].split('（')[0].trim();
+              if (pNorm === norm) { bestIdx = i; break; }
+            }
+            if (bestIdx !== -1 && g.oppSelectionOrder.length < 4) {
+              g.oppSelectionOrder.push(bestIdx);
+            }
+          });
+          renderBo3SelectionSlot('opp', gameIdx);
+        }
       }
     }
 
@@ -4265,6 +4635,11 @@
       // 相手パーティから削除されたスロット番号は選出から外す
       oppSelectionOrder = oppSelectionOrder.filter(idx => idx < oppPokemon.length && !!oppPokemon[idx]);
       renderSelectionSlots('opp');
+
+      for (let i = 0; i < 3; i++) {
+        bo3Games[i].oppSelectionOrder = bo3Games[i].oppSelectionOrder.filter(idx => idx < oppPokemon.length && !!oppPokemon[idx]);
+        renderBo3SelectionSlot('opp', i);
+      }
     }
 
     function setResult(r) {
@@ -4273,27 +4648,164 @@
       document.getElementById('btn-lose').classList.toggle('active', r === 'lose');
     }
 
+    function setBo3Result(gameIdx, r) {
+      if (bo3Games[gameIdx].result === r) {
+        bo3Games[gameIdx].result = null; // 再度タップで解除
+      } else {
+        bo3Games[gameIdx].result = r;
+      }
+      updateBo3Score();
+    }
+
+    function updateBo3Score() {
+      let wins = 0;
+      let losses = 0;
+      for (let i = 0; i < 3; i++) {
+        const g = bo3Games[i];
+        const btnWin = document.getElementById(`btn-win-bo3-${i}`);
+        const btnLose = document.getElementById(`btn-lose-bo3-${i}`);
+        if (btnWin) btnWin.classList.toggle('active', g.result === 'win');
+        if (btnLose) btnLose.classList.toggle('active', g.result === 'lose');
+
+        const badge = document.getElementById(`bo3-badge-${i}`);
+        if (badge) {
+          if (g.result === 'win') {
+            badge.innerHTML = '<span class="badge-win" style="font-size:10px;padding:2px 6px">🏆 勝ち</span>';
+          } else if (g.result === 'lose') {
+            badge.innerHTML = '<span class="badge-lose" style="font-size:10px;padding:2px 6px">💀 負け</span>';
+          } else {
+            badge.innerHTML = '';
+          }
+        }
+
+        if (g.result === 'win') wins++;
+        if (g.result === 'lose') losses++;
+      }
+
+      // 総合勝敗数の更新
+      const winEl = document.getElementById('bo3-score-win');
+      const loseEl = document.getElementById('bo3-score-lose');
+      if (winEl) winEl.textContent = wins;
+      if (loseEl) loseEl.textContent = losses;
+
+      // 3試合目の表示判定:
+      // 1戦目と2戦目の勝敗が 2-0 または 0-2 以外（例: 1-1, 1-0, 0-1, 未入力など）の場合に3戦目入力欄を表示
+      const g0 = bo3Games[0].result;
+      const g1 = bo3Games[1].result;
+      const card3 = document.getElementById('bo3-game-card-2');
+      if (card3) {
+        const isCleanSweep = (g0 === 'win' && g1 === 'win') || (g0 === 'lose' && g1 === 'lose');
+        if (isCleanSweep) {
+          card3.style.display = 'none';
+          bo3Games[2].result = null; // 2-0 または 0-2 のときは3戦目リセット
+          const btnWin3 = document.getElementById('btn-win-bo3-2');
+          const btnLose3 = document.getElementById('btn-lose-bo3-2');
+          if (btnWin3) btnWin3.classList.remove('active');
+          if (btnLose3) btnLose3.classList.remove('active');
+          const badge3 = document.getElementById('bo3-badge-2');
+          if (badge3) badge3.innerHTML = '';
+          // スコア再集計
+          const finalWins = (g0 === 'win' ? 1 : 0) + (g1 === 'win' ? 1 : 0);
+          const finalLosses = (g0 === 'lose' ? 1 : 0) + (g1 === 'lose' ? 1 : 0);
+          if (winEl) winEl.textContent = finalWins;
+          if (loseEl) loseEl.textContent = finalLosses;
+        } else {
+          card3.style.display = 'block';
+        }
+      }
+    }
+
+    function getBo3SlotValues(type, gameIdx) {
+      const g = bo3Games[gameIdx];
+      if (!g) return [];
+      if (type === 'my') {
+        const party = parties.find(p => p.id === selectedPartyId);
+        const myPokemon = party ? party.pokemon : [];
+        return g.mySelectionOrder.map(idx => {
+          const pk = myPokemon[idx];
+          return (typeof pk === 'string' ? pk : (pk && pk.name || '')) || '';
+        }).filter(Boolean);
+      } else {
+        const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
+        const oppPokemon = Array.from(oppInputs).map(inp => inp.value.trim());
+        return g.oppSelectionOrder.map(idx => oppPokemon[idx] || '').filter(Boolean);
+      }
+    }
+
     async function saveRecord() {
       if (!selectedPartyId) { alert('パーティを選択してください'); return; }
-      if (!recordResult) { alert('勝敗を選択してください'); return; }
       const oppParty = getSlotValues('opp-party-slots', 6);
       if (!oppParty.some(Boolean)) { alert('相手のパーティを1体以上入力してください'); return; }
 
       const oppTrainer = (document.getElementById('rec-opp-trainer')?.value || '').trim();
       const oppRating = (document.getElementById('rec-opp-rating')?.value || '').trim();
+      const memo = document.getElementById('rec-memo').value.trim();
+      const date = document.getElementById('rec-date').value;
 
-      const rec = {
-        id: Date.now().toString(),
-        partyId: selectedPartyId,
-        date: document.getElementById('rec-date').value,
-        oppTrainer,
-        oppRating,
-        oppParty,
-        mySelection: getSlotValues('my-selection-slots', 4),
-        oppSelection: getSlotValues('opp-selection-slots', 4),
-        result: recordResult,
-        memo: document.getElementById('rec-memo').value.trim()
-      };
+      let rec = null;
+
+      if (currentRecordFormat === 'bo1') {
+        if (!recordResult) { alert('勝敗を選択してください'); return; }
+        rec = {
+          id: Date.now().toString(),
+          format: 'bo1',
+          partyId: selectedPartyId,
+          date,
+          oppTrainer,
+          oppRating,
+          oppParty,
+          mySelection: getSlotValues('my-selection-slots', 4),
+          oppSelection: getSlotValues('opp-selection-slots', 4),
+          result: recordResult,
+          memo
+        };
+      } else {
+        // BO3
+        // 一つでも勝敗欄が入力されているか確認
+        const hasAnyResult = bo3Games.some(g => g.result !== null);
+        if (!hasAnyResult) { alert('少なくとも1試合の勝敗を入力してください'); return; }
+
+        let wins = 0;
+        let losses = 0;
+        const gamesData = [];
+
+        for (let i = 0; i < 3; i++) {
+          const g = bo3Games[i];
+          const cardEl = document.getElementById(`bo3-game-card-${i}`);
+          if (cardEl && cardEl.style.display === 'none') continue;
+
+          if (g.result !== null || g.mySelectionOrder.length > 0 || g.oppSelectionOrder.length > 0) {
+            if (g.result === 'win') wins++;
+            if (g.result === 'lose') losses++;
+            gamesData.push({
+              gameNum: i + 1,
+              result: g.result,
+              mySelection: getBo3SlotValues('my', i),
+              oppSelection: getBo3SlotValues('opp', i)
+            });
+          }
+        }
+
+        let overallResult = 'draw';
+        if (wins > losses) overallResult = 'win';
+        else if (losses > wins) overallResult = 'lose';
+        else overallResult = 'draw';
+
+        rec = {
+          id: Date.now().toString(),
+          format: 'bo3',
+          partyId: selectedPartyId,
+          date,
+          oppTrainer,
+          oppRating,
+          oppParty,
+          result: overallResult,
+          games: gamesData,
+          mySelection: gamesData[0] ? gamesData[0].mySelection : [],
+          oppSelection: gamesData[0] ? gamesData[0].oppSelection : [],
+          memo
+        };
+      }
 
       // 1. ローカルに即時保存
       records.unshift(rec);
@@ -4304,6 +4816,11 @@
       recordResult = null;
       document.getElementById('btn-win').classList.remove('active');
       document.getElementById('btn-lose').classList.remove('active');
+      bo3Games = [
+        { mySelectionOrder: [], oppSelectionOrder: [], result: null },
+        { mySelectionOrder: [], oppSelectionOrder: [], result: null },
+        { mySelectionOrder: [], oppSelectionOrder: [], result: null }
+      ];
       renderRecordPage();
       showRecordForm();
       showRecordToast('💾 対戦記録を保存しました！');
@@ -4318,10 +4835,12 @@
     function renderHistoryItemHTML(r) {
       const party = parties.find(p => p.id === r.partyId);
       const dateStr = r.date ? new Date(r.date).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
-      const mySelList = r.mySelection.filter(Boolean);
-      const oppPartyList = r.oppParty.filter(Boolean);
-      const oppSelList = r.oppSelection.filter(Boolean);
-      const isWin = r.result === 'win';
+      const oppPartyList = (r.oppParty || []).filter(Boolean);
+
+      // 左枠線の色（勝ち=緑、負け=赤、引き分け=黄）
+      let borderColor = 'var(--lose)';
+      if (r.result === 'win') borderColor = 'var(--win)';
+      else if (r.result === 'draw') borderColor = '#eab308';
 
       const tagRow = (arr, color, filterArr) => arr.length
         ? arr.map(p => {
@@ -4331,7 +4850,23 @@
         }).join('')
         : '<span style="font-size:11px;color:var(--text-muted)">なし</span>';
 
-      // トレーナー名・レート表示バッジ（共通の枠・背景スタイル）
+      // 勝敗バッジのHTML
+      let resultBadgeHtml = '';
+      if (r.format === 'bo3' && r.games && r.games.length > 0) {
+        resultBadgeHtml = r.games.map(g => {
+          if (g.result === 'win') return `<span class="badge-win" style="font-size:10px;padding:2px 6px">🏆勝</span>`;
+          if (g.result === 'lose') return `<span class="badge-lose" style="font-size:10px;padding:2px 6px">💀負</span>`;
+          return `<span class="badge-draw" style="font-size:10px;padding:2px 6px">-</span>`;
+        }).join(' ');
+      } else {
+        const isWin = r.result === 'win';
+        const isDraw = r.result === 'draw';
+        const badgeCls = isWin ? 'badge-win' : (isDraw ? 'badge-draw' : 'badge-lose');
+        const badgeTxt = isWin ? '🏆勝' : (isDraw ? '⚖️分' : '💀負');
+        resultBadgeHtml = `<span class="${badgeCls}" style="font-size:10px;padding:2px 6px">${badgeTxt}</span>`;
+      }
+
+      // トレーナー名・レート表示バッジ
       let oppInfoHtml = '';
       const badgeStyle = 'font-size:11px;font-weight:700;color:var(--text);background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px;border:1px solid rgba(255,255,255,0.1)';
       if (r.oppTrainer && r.oppRating) {
@@ -4342,12 +4877,32 @@
         oppInfoHtml = `<span style="${badgeStyle}"><span style="color:#f59e0b">★</span> ${r.oppRating}</span>`;
       }
 
-      return `<div class="record-item" onclick="openDetail('${r.id}')" style="border-left:3px solid ${isWin ? 'var(--win)' : 'var(--lose)'}">
+      // 選出ポケモンのHTML（BO3の場合は1試合目・2試合目・3試合目を縦に並べる）
+      let mySelHtml = '';
+      let oppSelHtml = '';
+
+      if (r.format === 'bo3' && r.games && r.games.length > 0) {
+        mySelHtml = r.games.map(g => {
+          const list = (g.mySelection || []).filter(Boolean);
+          return `<div style="display:flex;flex-wrap:nowrap;gap:2px;overflow:visible;margin-bottom:3px">${tagRow(list, 'rgba(108,99,255,0.25)', [mySelFilterName])}</div>`;
+        }).join('');
+        oppSelHtml = r.games.map(g => {
+          const list = (g.oppSelection || []).filter(Boolean);
+          return `<div style="display:flex;flex-wrap:nowrap;gap:2px;overflow:visible;margin-bottom:3px">${tagRow(list, 'rgba(255,101,132,0.2)', oppSelFilter)}</div>`;
+        }).join('');
+      } else {
+        const mySelList = (r.mySelection || []).filter(Boolean);
+        const oppSelList = (r.oppSelection || []).filter(Boolean);
+        mySelHtml = `<div style="display:flex;flex-wrap:nowrap;gap:2px;overflow:visible">${tagRow(mySelList, 'rgba(108,99,255,0.25)', [mySelFilterName])}</div>`;
+        oppSelHtml = `<div style="display:flex;flex-wrap:nowrap;gap:2px;overflow:visible">${tagRow(oppSelList, 'rgba(255,101,132,0.2)', oppSelFilter)}</div>`;
+      }
+
+      return `<div class="record-item" onclick="openDetail('${r.id}')" style="border-left:3px solid ${borderColor}">
     <div class="hist-card-body">
       <div class="hist-opp-party">
         <div class="hist-row-label" style="display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap">
           <div style="display:flex;align-items:center;gap:6px">
-            <span class="${isWin ? 'badge-win' : 'badge-lose'}" style="font-size:10px;padding:2px 6px">${isWin ? '🏆勝' : '💀負'}</span>
+            <div style="display:flex;align-items:center;gap:4px">${resultBadgeHtml}</div>
             <span class="record-date" style="font-size:11px">${dateStr}</span>
             ${oppInfoHtml}
           </div>
@@ -4357,11 +4912,11 @@
       <div class="hist-sel-row" style="display:contents">
         <div class="hist-my-sel">
           <div class="hist-row-label" style="color:var(--text-muted);font-size:11px">自分の選出</div>
-          <div style="display:flex;flex-wrap:nowrap;gap:2px;overflow:visible">${tagRow(mySelList, 'rgba(108,99,255,0.25)', [mySelFilterName])}</div>
+          ${mySelHtml}
         </div>
         <div class="hist-opp-sel">
           <div class="hist-row-label" style="color:var(--text-muted);font-size:11px">相手の選出</div>
-          <div style="display:flex;flex-wrap:nowrap;gap:2px;overflow:visible">${tagRow(oppSelList, 'rgba(255,101,132,0.2)', oppSelFilter)}</div>
+          ${oppSelHtml}
         </div>
       </div>
     </div>
@@ -4427,16 +4982,20 @@
       if (resultFilterVal) filtered = filtered.filter(r => r.result === resultFilterVal);
       // 自分の選出絞り込み（1体）
       if (mySelFilterName) {
-        filtered = filtered.filter(r => r.mySelection.includes(mySelFilterName));
+        filtered = filtered.filter(r => {
+          if (r.mySelection && r.mySelection.includes(mySelFilterName)) return true;
+          if (r.games && r.games.some(g => g.mySelection && g.mySelection.includes(mySelFilterName))) return true;
+          return false;
+        });
       }
       // 相手のパーティ絞り込み（1体、oppPartyで判定）
       if (oppPartyFilterName) {
-        filtered = filtered.filter(r => r.oppParty.includes(oppPartyFilterName));
+        filtered = filtered.filter(r => r.oppParty && r.oppParty.includes(oppPartyFilterName));
       }
 
       _histFilteredCache = filtered;
 
-      // Stats（全試合を対象に正確に計算）
+      // Stats（全試合を対象に正確に計算、BO3も1カウント）
       const stats = document.getElementById('history-stats');
       if (filtered.length) {
         stats.style.display = 'block';
@@ -4472,9 +5031,63 @@
       const party = parties.find(p => p.id === r.partyId);
       const dateStr = r.date ? new Date(r.date).toLocaleString('ja-JP') : '';
 
+      let headerResultHtml = '';
+      if (r.format === 'bo3' && r.games && r.games.length > 0) {
+        headerResultHtml = r.games.map((g, idx) => {
+          if (g.result === 'win') return `<span class="badge-win" style="font-size:15px;padding:4px 12px">🏆 ${idx + 1}戦目: 勝ち</span>`;
+          if (g.result === 'lose') return `<span class="badge-lose" style="font-size:15px;padding:4px 12px">💀 ${idx + 1}戦目: 負け</span>`;
+          return `<span class="badge-draw" style="font-size:15px;padding:4px 12px">⚖️ ${idx + 1}戦目: 引き分け</span>`;
+        }).join(' ');
+      } else {
+        const isWin = r.result === 'win';
+        const isDraw = r.result === 'draw';
+        const badgeCls = isWin ? 'badge-win' : (isDraw ? 'badge-draw' : 'badge-lose');
+        const badgeTxt = isWin ? '🏆 勝ち' : (isDraw ? '⚖️ 引き分け' : '💀 負け');
+        headerResultHtml = `<span class="${badgeCls}" style="font-size:16px;padding:4px 16px">${badgeTxt}</span>`;
+      }
+
+      let selectionDetailHtml = '';
+      if (r.format === 'bo3' && r.games && r.games.length > 0) {
+        selectionDetailHtml = r.games.map((g, idx) => {
+          const mySel = (g.mySelection || []).filter(Boolean);
+          const oppSel = (g.oppSelection || []).filter(Boolean);
+          return `
+            <div class="detail-section">
+              <h4>${idx + 1}戦目の自分の選出（4体）</h4>
+              <div class="detail-pokemon">
+                ${mySel.map(p => getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">記録なし</span>'}
+              </div>
+            </div>
+            <div class="detail-section">
+              <h4>${idx + 1}戦目の相手の選出（4体）</h4>
+              <div class="detail-pokemon">
+                ${oppSel.map(p => getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">記録なし</span>'}
+              </div>
+            </div>
+          `;
+        }).join('');
+      } else {
+        const mySel = (r.mySelection || []).filter(Boolean);
+        const oppSel = (r.oppSelection || []).filter(Boolean);
+        selectionDetailHtml = `
+          <div class="detail-section">
+            <h4>自分の選出（4体）</h4>
+            <div class="detail-pokemon">
+              ${mySel.map(p => getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">記録なし</span>'}
+            </div>
+          </div>
+          <div class="detail-section">
+            <h4>相手の選出（4体）</h4>
+            <div class="detail-pokemon">
+              ${oppSel.map(p => getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">記録なし</span>'}
+            </div>
+          </div>
+        `;
+      }
+
       document.getElementById('detail-content').innerHTML = `
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-      <span class="${r.result === 'win' ? 'badge-win' : 'badge-lose'}" style="font-size:16px;padding:4px 16px">${r.result === 'win' ? '🏆 勝ち' : '💀 負け'}</span>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      ${headerResultHtml}
       <span style="color:var(--text-muted);font-size:13px">${dateStr}</span>
     </div>
     ${r.oppTrainer ? `<div style="margin-bottom:${r.oppRating ? '6px' : '14px'}"><span style="font-size:12px;color:var(--text-muted)">相手トレーナー: </span><span style="font-weight:700;font-size:14px;color:var(--accent)">👤 ${r.oppTrainer}</span></div>` : ''}
@@ -4488,21 +5101,10 @@
     <div class="detail-section">
       <h4>相手のパーティ（6体）</h4>
       <div class="detail-pokemon">
-        ${r.oppParty.filter(Boolean).map(p => getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">記録なし</span>'}
+        ${(r.oppParty || []).filter(Boolean).map(p => getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">記録なし</span>'}
       </div>
     </div>
-    <div class="detail-section">
-      <h4>自分の選出（4体）</h4>
-      <div class="detail-pokemon">
-        ${r.mySelection.filter(Boolean).map(p => getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">記録なし</span>'}
-      </div>
-    </div>
-    <div class="detail-section">
-      <h4>相手の選出（4体）</h4>
-      <div class="detail-pokemon">
-        ${r.oppSelection.filter(Boolean).map(p => getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">記録なし</span>'}
-      </div>
-    </div>
+    ${selectionDetailHtml}
     ${r.memo ? `<div class="detail-section"><h4>メモ</h4><p style="font-size:13px">${r.memo}</p></div>` : ''}
   `;
 
@@ -7855,7 +8457,10 @@
         let isSelectionAutoFilled = false;
         if (result.mode === 'AFTER' && result.mySelection && result.mySelection.length === 4) {
           setSelectionFromNames('my', result.mySelection);
-          if (mySelectionOrder.length > 0) {
+          if (currentRecordFormat === 'bo3') {
+            setSelectionFromNames('my', result.mySelection, 0);
+          }
+          if (mySelectionOrder.length > 0 || (bo3Games[0] && bo3Games[0].mySelectionOrder.length > 0)) {
             isSelectionAutoFilled = true;
           }
         }
