@@ -2687,9 +2687,15 @@
 
   <!-- RECORD PAGE -->
   <div id="page-record" class="page">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
       <h2 style="font-size:20px;font-weight:700" id="record-page-title">対戦を記録する</h2>
       <button type="button" id="record-cancel-edit-btn" class="btn btn-ghost btn-sm" onclick="cancelRecordEdit()" style="display:none;color:#ef4444;border-color:#ef4444">✕ 編集をキャンセル</button>
+    </div>
+
+    <!-- チャンピオンズ / Showdown 切り替え -->
+    <div class="format-toggle-group" style="margin-bottom:10px">
+      <button type="button" class="format-toggle-btn active" id="btn-mode-champions" onclick="setRecordMode('champions')">🏆 チャンピオンズ</button>
+      <button type="button" class="format-toggle-btn" id="btn-mode-showdown" onclick="setRecordMode('showdown')">⚔️ Showdown</button>
     </div>
 
     <!-- BO1 / BO3 切り替え -->
@@ -2712,7 +2718,7 @@
       <div class="section-label">日時</div>
       <input type="datetime-local" id="rec-date" style="max-width:260px">
 
-      <!-- AUTO記録（選出スクショ解析）エリア -->
+      <!-- AUTO記録（選出スクショ解析）エリア（チャンピオンズ用） -->
       <div class="rec-ai-box" id="rec-ai-box" style="margin-top:16px;margin-bottom:8px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px">
           <div style="font-size:13px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:6px">
@@ -2746,6 +2752,52 @@
               <div class="rec-ai-preview-hint">🔍 タップで拡大 / ✕で画像クリア</div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- AUTO記録（Showdown URL自動入力）エリア（Showdown用） -->
+      <div class="rec-showdown-box" id="rec-showdown-box" style="display:none;margin-top:16px;margin-bottom:8px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px">
+          <div style="font-size:13px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:6px">
+            <span>🔗 Showdown リプレイURLから自動入力</span>
+          </div>
+        </div>
+
+        <!-- BO1用 URL入力 -->
+        <div id="showdown-url-area-bo1">
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" id="rec-showdown-url" placeholder="https://replay.pokemonshowdown.com/..." autocomplete="off" style="font-size:13px;flex:1">
+            <button type="button" class="btn btn-primary btn-sm" id="btn-showdown-load-bo1" onclick="loadShowdownReplayBO1()" style="white-space:nowrap;padding:8px 14px">⚡ 読み込み</button>
+          </div>
+        </div>
+
+        <!-- BO3用 URL入力 (3段) -->
+        <div id="showdown-url-area-bo3" style="display:none">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;gap:8px;align-items:center">
+              <span style="font-size:12px;font-weight:700;min-width:44px;color:var(--text-muted)">1戦目</span>
+              <input type="text" id="rec-showdown-url-0" placeholder="1戦目のリプレイURL..." autocomplete="off" style="font-size:13px;flex:1">
+              <button type="button" class="btn btn-ghost btn-sm" onclick="loadShowdownReplayBO3Game(0)" style="white-space:nowrap;padding:8px 12px">⚡ 読込</button>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span style="font-size:12px;font-weight:700;min-width:44px;color:var(--text-muted)">2戦目</span>
+              <input type="text" id="rec-showdown-url-1" placeholder="2戦目のリプレイURL..." autocomplete="off" style="font-size:13px;flex:1">
+              <button type="button" class="btn btn-ghost btn-sm" onclick="loadShowdownReplayBO3Game(1)" style="white-space:nowrap;padding:8px 12px">⚡ 読込</button>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <span style="font-size:12px;font-weight:700;min-width:44px;color:var(--text-muted)">3戦目</span>
+              <input type="text" id="rec-showdown-url-2" placeholder="3戦目のリプレイURL（ある場合）..." autocomplete="off" style="font-size:13px;flex:1">
+              <button type="button" class="btn btn-ghost btn-sm" onclick="loadShowdownReplayBO3Game(2)" style="white-space:nowrap;padding:8px 12px">⚡ 読込</button>
+            </div>
+            <div style="display:flex;justify-content:flex-end;margin-top:4px">
+              <button type="button" class="btn btn-primary btn-sm" id="btn-showdown-load-all-bo3" onclick="loadAllShowdownReplayBO3()" style="padding:8px 16px">⚡ まとめて読み込み</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="showdown-loading-msg" style="display:none;font-size:12px;color:#c4b5fd;margin-top:8px;align-items:center;gap:6px">
+          <span class="ai-loading-spinner" style="width:14px;height:14px;border-width:2px;display:inline-block"></span>
+          <span>対戦ログを取得・解析中...</span>
         </div>
       </div>
 
@@ -2971,6 +3023,21 @@
   <!-- DATA MANAGE PAGE -->
   <div id="page-datamanage" class="page">
     <h2 style="font-size:20px;font-weight:700;margin-bottom:20px">データ管理</h2>
+
+    <!-- Showdown ユーザー名設定カード（全ユーザー共通） -->
+    <div class="card mb-4" id="dm-showdown-user-card">
+      <div class="card-title" style="display:flex;align-items:center;gap:6px;margin-bottom:12px">
+        <span>🎮 Pokemon Showdown 設定</span>
+      </div>
+      <label for="dm-showdown-username" style="font-size:12px;color:var(--text-muted);margin-bottom:6px">Showdown ユーザー名</label>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="text" id="dm-showdown-username" placeholder="例: PencilNum2" style="flex:1" autocomplete="off">
+        <button type="button" class="btn btn-primary" onclick="saveShowdownUsername()" style="white-space:nowrap">💾 保存</button>
+      </div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:6px">
+        ※ ShowdownのリプレイURLから対戦を記録する際、自分と相手を判別するために使用します。
+      </div>
+    </div>
 
     <!-- 非管理者向けメッセージ（管理者ログイン時は非表示） -->
     <div id="dm-no-permission" class="card mb-4"
@@ -3558,6 +3625,39 @@
       return false;
     }
 
+    function getShowdownUsername() {
+      return localStorage.getItem('pkm_showdown_username') || '';
+    }
+
+    async function saveShowdownUsername(nameFromInput = null) {
+      const input = document.getElementById('dm-showdown-username');
+      const name = (nameFromInput !== null ? nameFromInput : (input ? input.value : '')).trim();
+      localStorage.setItem('pkm_showdown_username', name);
+      if (input) input.value = name;
+
+      if (currentUser && _fbReady) {
+        const { doc, setDoc } = window._firestoreOps;
+        const db = window._db;
+        try {
+          await setDoc(doc(db, 'users', currentUser.uid, 'data', 'main'), {
+            showdownUsername: name,
+            updatedAt: window._firestoreOps.serverTimestamp(),
+            updatedBy: CLIENT_ID
+          }, { merge: true });
+        } catch (e) {
+          console.error('Failed to save showdown username to Firestore:', e);
+        }
+      }
+      showRecordToast(name ? '✅ Showdownユーザー名を保存しました！' : 'ℹ️ Showdownユーザー名をクリアしました');
+    }
+
+    function updateShowdownUserUI() {
+      const input = document.getElementById('dm-showdown-username');
+      if (input) {
+        input.value = getShowdownUsername();
+      }
+    }
+
     // Firestoreへのデータ保存
     async function saveData() {
       localStorage.setItem('pkm_parties', JSON.stringify(parties));
@@ -3575,6 +3675,8 @@
         };
         const apiKey = getGeminiApiKey();
         if (apiKey) payload.geminiApiKey = apiKey;
+        const sdUser = getShowdownUsername();
+        if (sdUser) payload.showdownUsername = sdUser;
 
         await setDoc(doc(db, 'users', uid, 'data', 'main'), payload, { merge: true });
         _lastLoadedAt = Date.now();
@@ -3670,6 +3772,12 @@
             localStorage.setItem('pkm_gemini_api_key', data.geminiApiKey);
           }
           updateAiApiKeyUI();
+
+          // Showdownユーザー名の同期（読み取りのみ）
+          if (data.showdownUsername !== undefined) {
+            localStorage.setItem('pkm_showdown_username', data.showdownUsername || '');
+          }
+          updateShowdownUserUI();
 
           const ud2 = data.updatedAt;
           _lastLoadedAt = (ud2 && ud2.toMillis) ? ud2.toMillis() : Date.now();
@@ -3813,6 +3921,7 @@
       if (name === 'record') renderRecordPage();
       if (name === 'history') renderHistory();
       if (name === 'datamanage') {
+        updateShowdownUserUI();
         dmType = null; dmAction = null;
         ['dm-tab-pokemon', 'dm-tab-move', 'dm-tab-item', 'dm-btn-list', 'dm-btn-search'].forEach(id => { const el = document.getElementById(id); if (el) el.className = 'btn btn-ghost'; });
         document.getElementById('dm-action-area').style.display = 'none';
@@ -4336,6 +4445,7 @@
 
     // ---- RECORD PAGE ----
     let currentRecordFormat = 'bo1'; // 'bo1' | 'bo3'
+    let currentRecordSourceMode = 'champions'; // 'champions' | 'showdown'
     let editingRecordId = null;
     let mySelectionOrder = [];
     let oppSelectionOrder = [];
@@ -4346,6 +4456,27 @@
       { mySelectionOrder: [], oppSelectionOrder: [], result: null },
       { mySelectionOrder: [], oppSelectionOrder: [], result: null }
     ];
+
+    function setRecordMode(mode) {
+      if (mode === 'showdown') {
+        const username = getShowdownUsername();
+        if (!username || !username.trim()) {
+          alert('データ管理画面でShowdownユーザー名を登録してください。');
+          return;
+        }
+      }
+
+      currentRecordSourceMode = mode;
+      const btnChamp = document.getElementById('btn-mode-champions');
+      const btnShowdown = document.getElementById('btn-mode-showdown');
+      if (btnChamp) btnChamp.classList.toggle('active', mode === 'champions');
+      if (btnShowdown) btnShowdown.classList.toggle('active', mode === 'showdown');
+
+      const aiBox = document.getElementById('rec-ai-box');
+      const showdownBox = document.getElementById('rec-showdown-box');
+      if (aiBox) aiBox.style.display = (mode === 'champions') ? 'block' : 'none';
+      if (showdownBox) showdownBox.style.display = (mode === 'showdown') ? 'block' : 'none';
+    }
 
     function setRecordFormat(fmt) {
       currentRecordFormat = fmt;
@@ -4359,10 +4490,385 @@
       if (areaBo1) areaBo1.style.display = (fmt === 'bo1') ? 'block' : 'none';
       if (areaBo3) areaBo3.style.display = (fmt === 'bo3') ? 'block' : 'none';
 
+      const sdAreaBo1 = document.getElementById('showdown-url-area-bo1');
+      const sdAreaBo3 = document.getElementById('showdown-url-area-bo3');
+      if (sdAreaBo1) sdAreaBo1.style.display = (fmt === 'bo1') ? 'block' : 'none';
+      if (sdAreaBo3) sdAreaBo3.style.display = (fmt === 'bo3') ? 'block' : 'none';
+
       if (fmt === 'bo3') {
         renderAllBo3SelectionSlots();
         updateBo3Score();
       }
+    }
+
+    // ===== Pokemon Showdown リプレイ解析エンジン =====
+    function normalizeShowdownSpeciesName(raw) {
+      if (!raw) return '';
+      return raw.split(',')[0].trim();
+    }
+
+    function matchShowdownPokemonName(rawName) {
+      if (!rawName) return '';
+      const clean = normalizeShowdownSpeciesName(rawName);
+
+      const specialMap = {
+        'floetteeternal': 'フラエッテ(えいえんのはな)',
+        'arcaninehisui': 'ウインディ(ヒスイのすがた)',
+        'growlithehisui': 'ガーディ(ヒスイのすがた)',
+        'zoruahisui': 'ゾロア(ヒスイのすがた)',
+        'zoroarkhisui': 'ゾロアーク(ヒスイのすがた)',
+        'braviaryhisui': 'ウォーグル(ヒスイのすがた)',
+        'sliggoohisui': 'ヌメイル(ヒスイのすがた)',
+        'goodrahisui': 'ヌメルゴン(ヒスイのすがた)',
+        'avalugghisui': 'クレベース(ヒスイのすがた)',
+        'decidueyehisui': 'ジュナイパー(ヒスイのすがた)',
+        'samurotthisui': 'ダイケンキ(ヒスイのすがた)',
+        'typhlosionhisui': 'バクフーン(ヒスイのすがた)',
+        'qwilfishhisui': 'ハリーセン(ヒスイのすがた)',
+        'lilliganthisui': 'ドレディア(ヒスイのすがた)',
+        'voltorbhisui': 'ビリリダマ(ヒスイのすがた)',
+        'electrodehisui': 'マルマイン(ヒスイのすがた)',
+        'basculinwhitestriped': 'バスラオ(しろかすじのすがた)',
+        'basculegion': 'イダイトウ(オス)',
+        'basculegionm': 'イダイトウ(オス)',
+        'basculegionf': 'イダイトウ(メス)',
+        'taurospaldeacombat': 'パルデアケンタロス(かくとう)',
+        'taurospaldeablaze': 'パルデアケンタロス(ほのお)',
+        'taurospaldeaaqua': 'パルデアケンタロス(みず)',
+        'taurospaldea': 'パルデアケンタロス(かくとう)',
+        'urshifurapidstrike': 'ウーラオス(れんげきのかた)',
+        'urshifusinglestrike': 'ウーラオス(いちげきのかた)',
+        'urshifu': 'ウーラオス(いちげきのかた)',
+        'ogerponhearthflame': 'オーガポン(かまどのめん)',
+        'ogerponwellspring': 'オーガポン(いどのめん)',
+        'ogerponcornerstone': 'オーガポン(いしずえのめん)',
+        'ogerpon': 'オーガポン(みどりのめん)',
+        'ogerponteal': 'オーガポン(みどりのめん)',
+        'ogerponhearthflamemask': 'オーガポン(かまどのめん)',
+        'ogerponwellspringmask': 'オーガポン(いどのめん)',
+        'ogerponcornerstonemask': 'オーガポン(いしずえのめん)',
+        'terapagos': 'テラパゴス',
+        'terapagosterastal': 'テラパゴス',
+        'terapagosstellar': 'テラパゴス',
+        'rotomheat': 'ロトム(ヒート)',
+        'rotomwash': 'ロトム(ウォッシュ)',
+        'rotomfrost': 'ロトム(フロスト)',
+        'rotomfan': 'ロトム(スピン)',
+        'rotommow': 'ロトム(カット)',
+        'indeedee': 'イエッサン(オスのすがた)',
+        'indeedeef': 'イエッサン(メスのすがた)',
+        'meowstic': 'ニャオニクス(オスのすがた)',
+        'meowsticf': 'ニャオニクス(メスのすがた)',
+        'porygon2': 'ポリゴン２',
+        'porygonz': 'ポリゴンＺ'
+      };
+
+      const id = toTransId(clean);
+      if (specialMap[id]) return specialMap[id];
+
+      if (typeof translatePokemonToJa === 'function') {
+        const ja = translatePokemonToJa(clean);
+        if (ja && ja !== clean) return ja;
+
+        // メガシンカ除去等で再試行 (例: Charizard-Mega-Y -> Charizard -> リザードン)
+        const baseName = clean.split('-')[0];
+        const baseJa = translatePokemonToJa(baseName);
+        if (baseJa && baseJa !== baseName) return baseJa;
+      }
+
+      if (POKEMON_MAP_LIST && POKEMON_MAP_LIST.length) {
+        const match = POKEMON_MAP_LIST.find(p => toTransId(p.nameEn) === id);
+        if (match && match.nameJa) return match.nameJa;
+        const baseId = toTransId(clean.split('-')[0]);
+        const matchBase = POKEMON_MAP_LIST.find(p => toTransId(p.nameEn) === baseId);
+        if (matchBase && matchBase.nameJa) return matchBase.nameJa;
+      }
+
+      return clean;
+    }
+
+    function parseShowdownReplayJson(replayData, myUsername) {
+      if (!replayData || !replayData.log) {
+        throw new Error('対戦ログデータが不正です');
+      }
+
+      const myUserNorm = toTransId(myUsername);
+      if (!myUserNorm) {
+        throw new Error('Showdownユーザー名が設定されていません');
+      }
+
+      const lines = replayData.log.split('\n');
+      let p1Name = '', p2Name = '';
+      let p1Rating = null, p2Rating = null;
+
+      for (const line of lines) {
+        if (line.startsWith('|player|p1|')) {
+          const parts = line.split('|');
+          p1Name = parts[3] || '';
+          if (parts[5] && !isNaN(Number(parts[5]))) p1Rating = parts[5].trim();
+        } else if (line.startsWith('|player|p2|')) {
+          const parts = line.split('|');
+          p2Name = parts[3] || '';
+          if (parts[5] && !isNaN(Number(parts[5]))) p2Rating = parts[5].trim();
+        }
+      }
+
+      const p1Norm = toTransId(p1Name);
+      const p2Norm = toTransId(p2Name);
+
+      let myPlayerId = null;
+      let oppPlayerId = null;
+      let oppTrainerName = '';
+
+      if (p1Norm === myUserNorm) {
+        myPlayerId = 'p1';
+        oppPlayerId = 'p2';
+        oppTrainerName = p2Name;
+      } else if (p2Norm === myUserNorm) {
+        myPlayerId = 'p2';
+        oppPlayerId = 'p1';
+        oppTrainerName = p1Name;
+      } else {
+        throw new Error(`設定されたユーザー名「${myUsername}」がログ内のプレイヤー（${p1Name || '未検出'} / ${p2Name || '未検出'}）と一致しませんでした。データ管理画面で正しいユーザー名を登録してください。`);
+      }
+
+      // 相手パーティ（6体）
+      const oppPartyNames = [];
+      for (const line of lines) {
+        if (line.startsWith(`|poke|${oppPlayerId}|`)) {
+          const parts = line.split('|');
+          const rawSpecies = parts[3] || '';
+          const jaName = matchShowdownPokemonName(rawSpecies);
+          if (jaName && oppPartyNames.length < 6) {
+            oppPartyNames.push(jaName);
+          }
+        }
+      }
+
+      // 選出ポケモンの抽出 (繰り出された順)
+      // メガシンカポケモンは繰り出し時は通常名でswitch/dragされるため、そのタイミングで選出順に反映される
+      const mySelectionNames = [];
+      const oppSelectionNames = [];
+
+      for (const line of lines) {
+        if (line.startsWith('|switch|') || line.startsWith('|drag|')) {
+          const parts = line.split('|');
+          const playerSide = (parts[2] || '').trim().slice(0, 2);
+          const rawSpecies = parts[3] || '';
+          const jaName = matchShowdownPokemonName(rawSpecies);
+
+          if (!jaName) continue;
+
+          if (playerSide === myPlayerId) {
+            if (!mySelectionNames.includes(jaName) && mySelectionNames.length < 4) {
+              mySelectionNames.push(jaName);
+            }
+          } else if (playerSide === oppPlayerId) {
+            if (!oppSelectionNames.includes(jaName) && oppSelectionNames.length < 4) {
+              oppSelectionNames.push(jaName);
+            }
+          }
+        }
+      }
+
+      // 勝敗判定
+      let result = null;
+      for (const line of lines) {
+        if (line.startsWith('|win|')) {
+          const winner = line.split('|')[2] || '';
+          if (toTransId(winner) === myUserNorm) {
+            result = 'win';
+          } else {
+            result = 'lose';
+          }
+        } else if (line.startsWith('|tie')) {
+          result = 'draw';
+        }
+      }
+
+      // 相手レート判定
+      let oppRating = (oppPlayerId === 'p1') ? p1Rating : p2Rating;
+      for (const line of lines) {
+        if (line.startsWith('|raw|')) {
+          const oppPlayerEsc = oppTrainerName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+          const regex = new RegExp(`${oppPlayerEsc}'s rating:\\s*(\\d+)`, 'i');
+          const match = line.match(regex);
+          if (match && match[1]) {
+            oppRating = match[1];
+          }
+        }
+      }
+
+      return {
+        myPlayerId,
+        oppPlayerId,
+        oppTrainer: oppTrainerName,
+        oppRating: oppRating || '',
+        oppParty: oppPartyNames,
+        mySelection: mySelectionNames,
+        oppSelection: oppSelectionNames,
+        result: result
+      };
+    }
+
+    async function fetchShowdownReplayJson(rawUrl) {
+      let url = (rawUrl || '').trim();
+      if (!url) throw new Error('URLを入力してください');
+      if (!url.startsWith('http://') && !url.startsWith('https://')) {
+        url = 'https://' + url;
+      }
+      const jsonUrl = url.replace(/\.json(\?.*)?$/, '').replace(/(\?.*)?$/, '') + '.json';
+
+      const res = await fetch(jsonUrl);
+      if (!res.ok) {
+        throw new Error(`リプレイの取得に失敗しました (HTTP ${res.status})。URLをご確認ください。`);
+      }
+      const data = await res.json();
+      return data;
+    }
+
+    async function loadShowdownReplayBO1() {
+      const urlInput = document.getElementById('rec-showdown-url');
+      const url = urlInput ? urlInput.value.trim() : '';
+      if (!url) {
+        alert('ShowdownのリプレイURLを入力してください');
+        return;
+      }
+      const username = getShowdownUsername();
+      if (!username) {
+        alert('データ管理画面でShowdownユーザー名を登録してください');
+        return;
+      }
+
+      const loadingEl = document.getElementById('showdown-loading-msg');
+      if (loadingEl) loadingEl.style.display = 'inline-flex';
+
+      try {
+        await loadTranslationMap();
+        const replayData = await fetchShowdownReplayJson(url);
+        const parsed = parseShowdownReplayJson(replayData, username);
+
+        // 1. 相手トレーナー名
+        if (parsed.oppTrainer) {
+          const tInput = document.getElementById('rec-opp-trainer');
+          if (tInput) tInput.value = parsed.oppTrainer;
+        }
+        // 2. 相手レート
+        if (parsed.oppRating) {
+          const rInput = document.getElementById('rec-opp-rating');
+          if (rInput) rInput.value = parsed.oppRating;
+        }
+        // 3. 相手パーティ（6体）
+        if (parsed.oppParty && parsed.oppParty.length) {
+          const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
+          parsed.oppParty.forEach((pName, idx) => {
+            if (idx < 6 && oppInputs[idx]) {
+              oppInputs[idx].value = pName;
+              updateSlotIcon(oppInputs[idx], pName);
+            }
+          });
+          rebuildOppSelectionDropdowns();
+        }
+        // 4. 自分・相手の選出
+        if (parsed.mySelection && parsed.mySelection.length) {
+          setSelectionFromNames('my', parsed.mySelection);
+        }
+        if (parsed.oppSelection && parsed.oppSelection.length) {
+          setSelectionFromNames('opp', parsed.oppSelection);
+        }
+        // 5. 勝敗
+        if (parsed.result) {
+          setResult(parsed.result);
+        }
+
+        showRecordToast('✨ Showdown対戦ログを自動反映しました！');
+      } catch (err) {
+        console.error('Showdown parse error:', err);
+        alert(err.message || 'Showdownリプレイの解析に失敗しました');
+      } finally {
+        if (loadingEl) loadingEl.style.display = 'none';
+      }
+    }
+
+    async function loadShowdownReplayBO3Game(gameIdx) {
+      const urlInput = document.getElementById(`rec-showdown-url-${gameIdx}`);
+      const url = urlInput ? urlInput.value.trim() : '';
+      if (!url) {
+        alert(`${gameIdx + 1}戦目のShowdownリプレイURLを入力してください`);
+        return;
+      }
+      const username = getShowdownUsername();
+      if (!username) {
+        alert('データ管理画面でShowdownユーザー名を登録してください');
+        return;
+      }
+
+      const loadingEl = document.getElementById('showdown-loading-msg');
+      if (loadingEl) loadingEl.style.display = 'inline-flex';
+
+      try {
+        await loadTranslationMap();
+        const replayData = await fetchShowdownReplayJson(url);
+        const parsed = parseShowdownReplayJson(replayData, username);
+
+        // 相手トレーナー名
+        if (parsed.oppTrainer) {
+          const tInput = document.getElementById('rec-opp-trainer');
+          if (tInput && !tInput.value) tInput.value = parsed.oppTrainer;
+        }
+        // 相手レート
+        if (parsed.oppRating) {
+          const rInput = document.getElementById('rec-opp-rating');
+          if (rInput) rInput.value = parsed.oppRating;
+        }
+        // 相手パーティ（未入力または1戦目の場合は設定）
+        if (parsed.oppParty && parsed.oppParty.length) {
+          const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
+          const hasExisting = Array.from(oppInputs).some(inp => inp.value.trim());
+          if (!hasExisting || gameIdx === 0) {
+            parsed.oppParty.forEach((pName, idx) => {
+              if (idx < 6 && oppInputs[idx]) {
+                oppInputs[idx].value = pName;
+                updateSlotIcon(oppInputs[idx], pName);
+              }
+            });
+            rebuildOppSelectionDropdowns();
+          }
+        }
+
+        // 各ゲームの選出反映
+        if (parsed.mySelection && parsed.mySelection.length) {
+          setSelectionFromNames('my', parsed.mySelection, gameIdx);
+        }
+        if (parsed.oppSelection && parsed.oppSelection.length) {
+          setSelectionFromNames('opp', parsed.oppSelection, gameIdx);
+        }
+        if (parsed.result) {
+          setBo3Result(gameIdx, parsed.result);
+        }
+
+        showRecordToast(`✨ ${gameIdx + 1}戦目の対戦ログを自動反映しました！`);
+      } catch (err) {
+        console.error(`Showdown parse error (game ${gameIdx + 1}):`, err);
+        alert(err.message || `${gameIdx + 1}戦目のShowdownリプレイ解析に失敗しました`);
+      } finally {
+        if (loadingEl) loadingEl.style.display = 'none';
+      }
+    }
+
+    async function loadAllShowdownReplayBO3() {
+      const u0 = document.getElementById('rec-showdown-url-0')?.value.trim();
+      const u1 = document.getElementById('rec-showdown-url-1')?.value.trim();
+      const u2 = document.getElementById('rec-showdown-url-2')?.value.trim();
+
+      if (!u0 && !u1 && !u2) {
+        alert('ShowdownのリプレイURLを入力してください');
+        return;
+      }
+
+      if (u0) await loadShowdownReplayBO3Game(0);
+      if (u1) await loadShowdownReplayBO3Game(1);
+      if (u2) await loadShowdownReplayBO3Game(2);
     }
 
     function renderRecordPage() {
@@ -4915,6 +5421,20 @@
       const memo = document.getElementById('rec-memo').value.trim();
       const date = document.getElementById('rec-date').value;
 
+      let showdownUrl = null;
+      let showdownUrls = null;
+      if (currentRecordSourceMode === 'showdown') {
+        if (currentRecordFormat === 'bo1') {
+          showdownUrl = document.getElementById('rec-showdown-url')?.value.trim() || null;
+        } else {
+          showdownUrls = [
+            document.getElementById('rec-showdown-url-0')?.value.trim() || '',
+            document.getElementById('rec-showdown-url-1')?.value.trim() || '',
+            document.getElementById('rec-showdown-url-2')?.value.trim() || ''
+          ];
+        }
+      }
+
       let rec = null;
 
       if (currentRecordFormat === 'bo1') {
@@ -4922,6 +5442,7 @@
         rec = {
           id: Date.now().toString(),
           format: 'bo1',
+          sourceMode: currentRecordSourceMode,
           partyId: selectedPartyId,
           date,
           oppTrainer,
@@ -4932,6 +5453,7 @@
           result: recordResult,
           memo
         };
+        if (showdownUrl) rec.showdownUrl = showdownUrl;
       } else {
         // BO3
         // 一つでも勝敗欄が入力されているか確認（引き分けを含む）
@@ -4967,6 +5489,7 @@
         rec = {
           id: Date.now().toString(),
           format: 'bo3',
+          sourceMode: currentRecordSourceMode,
           partyId: selectedPartyId,
           date,
           oppTrainer,
@@ -4978,6 +5501,7 @@
           oppSelection: gamesData[0] ? gamesData[0].oppSelection : [],
           memo
         };
+        if (showdownUrls && showdownUrls.some(Boolean)) rec.showdownUrls = showdownUrls;
       }
 
       // 1. ローカルに即時保存 (編集中は上書き更新、新規は先頭に追加)
@@ -5004,6 +5528,12 @@
       document.getElementById('btn-win').classList.remove('active');
       document.getElementById('btn-lose').classList.remove('active');
       document.getElementById('btn-draw')?.classList.remove('active');
+      const uBo1 = document.getElementById('rec-showdown-url');
+      if (uBo1) uBo1.value = '';
+      for (let i = 0; i < 3; i++) {
+        const uBo3 = document.getElementById(`rec-showdown-url-${i}`);
+        if (uBo3) uBo3.value = '';
+      }
       bo3Games = [
         { mySelectionOrder: [], oppSelectionOrder: [], result: null },
         { mySelectionOrder: [], oppSelectionOrder: [], result: null },
@@ -5275,6 +5805,38 @@
         `;
       }
 
+      let replayLinkHtml = '';
+      if (r.format === 'bo3') {
+        const urls = r.showdownUrls || (r.showdownUrl ? [r.showdownUrl] : []);
+        const validLinks = urls.map((u, idx) => {
+          if (!u || !u.trim()) return '';
+          return `<a href="${u.trim()}" target="_blank" rel="noopener noreferrer" style="color:var(--accent);text-decoration:underline;font-size:13px;word-break:break-all;display:inline-block">🔗 ${idx + 1}戦目の対戦記録</a>`;
+        }).filter(Boolean);
+
+        if (validLinks.length > 0) {
+          replayLinkHtml = `
+            <div class="detail-section">
+              <h4>対戦記録</h4>
+              <div style="display:flex;flex-direction:column;gap:6px">
+                ${validLinks.join('')}
+              </div>
+            </div>
+          `;
+        }
+      } else {
+        const u = r.showdownUrl || (r.showdownUrls && r.showdownUrls[0]) || '';
+        if (u && u.trim()) {
+          replayLinkHtml = `
+            <div class="detail-section">
+              <h4>対戦記録</h4>
+              <div>
+                <a href="${u.trim()}" target="_blank" rel="noopener noreferrer" style="color:var(--accent);text-decoration:underline;font-size:13px;word-break:break-all;display:inline-block">🔗 対戦記録</a>
+              </div>
+            </div>
+          `;
+        }
+      }
+
       document.getElementById('detail-content').innerHTML = `
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
       ${headerResultHtml}
@@ -5296,6 +5858,7 @@
     </div>
     ${selectionDetailHtml}
     ${r.memo ? `<div class="detail-section"><h4>メモ</h4><p style="font-size:13px">${r.memo}</p></div>` : ''}
+    ${replayLinkHtml}
   `;
 
       const editBtn = document.getElementById('detail-edit-btn');
@@ -5319,6 +5882,23 @@
       const navBtns = document.querySelectorAll('nav button');
       const recordNavBtn = Array.from(navBtns).find(b => b.textContent.includes('記録する'));
       showPage('record', recordNavBtn);
+
+      // モード切り替え & Showdown URL復元
+      if (r.sourceMode === 'showdown' || r.showdownUrl || (r.showdownUrls && r.showdownUrls.some(Boolean))) {
+        setRecordMode('showdown');
+        if (r.format === 'bo1') {
+          const sdInput = document.getElementById('rec-showdown-url');
+          if (sdInput) sdInput.value = r.showdownUrl || (r.showdownUrls && r.showdownUrls[0]) || '';
+        } else {
+          const urls = r.showdownUrls || (r.showdownUrl ? [r.showdownUrl] : []);
+          for (let i = 0; i < 3; i++) {
+            const sdInput = document.getElementById(`rec-showdown-url-${i}`);
+            if (sdInput) sdInput.value = urls[i] || '';
+          }
+        }
+      } else {
+        setRecordMode('champions');
+      }
 
       // フォーマット設定
       const fmt = r.format || 'bo1';
