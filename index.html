@@ -2302,16 +2302,24 @@
 
   <!-- PARTIES PAGE -->
   <div id="page-parties" class="page active">
-    <div class="flex justify-between items-center mb-4" style="flex-wrap:wrap;gap:8px">
+    <div class="flex justify-between items-center mb-3" style="flex-wrap:wrap;gap:8px">
       <div>
         <h2 style="font-size:20px;font-weight:700">自分のパーティ</h2>
-        <p class="text-muted mt-2">自由に登録できます</p>
+        <p class="text-muted mt-1">自由に登録できます</p>
       </div>
       <div style="display:flex;gap:8px;align-items:center">
         <button class="btn btn-ghost" onclick="openAiPartyModal(null)"
           style="border-color:var(--accent);color:#c4b5fd">📸 画像から自動作成</button>
         <button class="btn btn-primary" onclick="openPartyEdit(null)">＋ 新規登録</button>
       </div>
+    </div>
+    <!-- パーティ検索バー -->
+    <div style="margin-bottom:14px;position:relative">
+      <input type="text" id="party-search-input" placeholder="🔍 パーティ名やポケモン名で検索..."
+        oninput="onPartySearchInput(this.value)"
+        style="width:100%;padding:8px 12px;padding-right:32px;font-size:14px;border-radius:8px;background:var(--surface);border:1px solid var(--border);color:var(--text)">
+      <button id="party-search-clear" onclick="clearPartySearch()"
+        style="display:none;position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer">✕</button>
     </div>
     <div id="pe-copy-board"></div>
     <div id="party-grid" class="party-grid"></div>
@@ -2828,21 +2836,17 @@
       return null;
     }
 
+    // 静的マスタデータの高速読み込み（基本マスタ最優先＋AI特徴量バックグラウンドプリロード）
     async function loadStaticMasterData() {
       if (_masterDataPromise) return _masterDataPromise;
       _masterDataPromise = (async () => {
         try {
-          const v = Date.now();
-          const [pokeRes, moveRes, itemRes, lsRes, msRes, mapRes, featRes, typeFeatRes, verRes] = await Promise.all([
-            fetch('data/pokemon.json?v=' + v),
-            fetch('data/moves.json?v=' + v),
-            fetch('data/items.json?v=' + v),
-            fetch('data/learnsets.json?v=' + v).catch(() => null),
-            fetch('data/mega_stones.json?v=' + v).catch(() => null),
-            fetch('assets/pokemon_map.json?v=' + v).catch(() => null),
-            fetch('assets/pokemon_features.json?v=' + v).catch(() => null),
-            fetch('assets/type_features.json?v=' + v).catch(() => null),
-            fetch('data/version.json?v=' + v).catch(() => null)
+          // 1. 基本マスタを最優先で高速取得（ブラウザキャッシュを有効活用）
+          const [pokeRes, moveRes, itemRes, verRes] = await Promise.all([
+            fetch('data/pokemon.json'),
+            fetch('data/moves.json'),
+            fetch('data/items.json'),
+            fetch('data/version.json').catch(() => null)
           ]);
           POKEMON_LIST = await pokeRes.json();
           MOVES_LIST = await moveRes.json();
@@ -2850,73 +2854,76 @@
           if (verRes && verRes.ok) {
             try {
               window.STATIC_VERSION_DATA = await verRes.json();
-              console.log('STATIC_VERSION_DATA loaded:', window.STATIC_VERSION_DATA);
             } catch (e) { }
-          }
-          if (lsRes && lsRes.ok) {
-            try {
-              LEARNSETS_DATA = await lsRes.json();
-              console.log('LEARNSETS_DATA loaded successfully:', Object.keys(LEARNSETS_DATA).length, 'entries');
-            } catch (e) {
-              console.error('Failed to parse learnsets.json:', e);
-            }
-          }
-          if (msRes && msRes.ok) {
-            try {
-              MEGA_STONE_MAP = await msRes.json();
-              console.log('MEGA_STONE_MAP loaded successfully:', Object.keys(MEGA_STONE_MAP).length, 'entries');
-            } catch (e) {
-              console.error('Failed to parse mega_stones.json:', e);
-            }
-          }
-          if (mapRes && mapRes.ok) {
-            try {
-              POKEMON_MAP_LIST = await mapRes.json();
-              initPokemonIconMap();
-              console.log('POKEMON_MAP_LIST loaded successfully:', POKEMON_MAP_LIST.length, 'entries');
-            } catch (e) {
-              console.error('Failed to parse pokemon_map.json:', e);
-            }
-          }
-          if (featRes && featRes.ok) {
-            try {
-              const featJson = await featRes.json();
-              POKEMON_FEATURES_DECODED = {};
-              for (const [fn, b64] of Object.entries(featJson)) {
-                const binStr = atob(b64);
-                const u8 = new Uint8Array(binStr.length);
-                for (let i = 0; i < binStr.length; i++) {
-                  u8[i] = binStr.charCodeAt(i);
-                }
-                POKEMON_FEATURES_DECODED[fn] = u8;
-              }
-              console.log('POKEMON_FEATURES_DECODED loaded:', Object.keys(POKEMON_FEATURES_DECODED).length, 'entries');
-            } catch (e) {
-              console.error('Failed to parse pokemon_features.json:', e);
-            }
-          }
-          if (typeFeatRes && typeFeatRes.ok) {
-            try {
-              const tJson = await typeFeatRes.json();
-              TYPE_FEATURES_DECODED = {};
-              for (const [tn, b64] of Object.entries(tJson)) {
-                const binStr = atob(b64);
-                const u8 = new Uint8Array(binStr.length);
-                for (let i = 0; i < binStr.length; i++) {
-                  u8[i] = binStr.charCodeAt(i);
-                }
-                TYPE_FEATURES_DECODED[tn] = u8;
-              }
-              console.log('TYPE_FEATURES_DECODED loaded:', Object.keys(TYPE_FEATURES_DECODED).length, 'entries');
-            } catch (e) {
-              console.error('Failed to parse type_features.json:', e);
-            }
           }
 
           localPokemon = JSON.parse(JSON.stringify(POKEMON_LIST));
           localMoves = JSON.parse(JSON.stringify(MOVES_LIST)).map(m => ({ confirmed: true, ...m }));
           localItems = ITEMS_LIST.map(name => ({ name, confirmed: true }));
           rebuildPokemonMap();
+
+          // 基本マスタが揃った瞬間に即座にパーティ・履歴を描画（0.01秒）
+          try {
+            renderParties();
+            renderHistory();
+          } catch (renderErr) { }
+
+          // 2. 技マシン・メガストーン・AI特徴量などの詳細データは裏側で非同期プリロード（画面を一切邪魔しない）
+          setTimeout(async () => {
+            try {
+              const [lsRes, msRes, mapRes, featRes, typeFeatRes] = await Promise.all([
+                fetch('data/learnsets.json').catch(() => null),
+                fetch('data/mega_stones.json').catch(() => null),
+                fetch('assets/pokemon_map.json').catch(() => null),
+                fetch('assets/pokemon_features.json').catch(() => null),
+                fetch('assets/type_features.json').catch(() => null)
+              ]);
+
+              if (lsRes && lsRes.ok) {
+                try { LEARNSETS_DATA = await lsRes.json(); } catch (e) { }
+              }
+              if (msRes && msRes.ok) {
+                try { MEGA_STONE_MAP = await msRes.json(); } catch (e) { }
+              }
+              if (mapRes && mapRes.ok) {
+                try {
+                  POKEMON_MAP_LIST = await mapRes.json();
+                  initPokemonIconMap();
+                } catch (e) { }
+              }
+              if (featRes && featRes.ok) {
+                try {
+                  const featJson = await featRes.json();
+                  POKEMON_FEATURES_DECODED = {};
+                  for (const [fn, b64] of Object.entries(featJson)) {
+                    const binStr = atob(b64);
+                    const u8 = new Uint8Array(binStr.length);
+                    for (let i = 0; i < binStr.length; i++) {
+                      u8[i] = binStr.charCodeAt(i);
+                    }
+                    POKEMON_FEATURES_DECODED[fn] = u8;
+                  }
+                } catch (e) { }
+              }
+              if (typeFeatRes && typeFeatRes.ok) {
+                try {
+                  const tJson = await typeFeatRes.json();
+                  TYPE_FEATURES_DECODED = {};
+                  for (const [tn, b64] of Object.entries(tJson)) {
+                    const binStr = atob(b64);
+                    const u8 = new Uint8Array(binStr.length);
+                    for (let i = 0; i < binStr.length; i++) {
+                      u8[i] = binStr.charCodeAt(i);
+                    }
+                    TYPE_FEATURES_DECODED[tn] = u8;
+                  }
+                } catch (e) { }
+              }
+            } catch (bgErr) {
+              console.warn('Background master preload warning:', bgErr);
+            }
+          }, 200);
+
         } catch (e) {
           console.error('Failed to load static master data:', e);
         }
@@ -3601,8 +3608,29 @@
       ).join('');
     }
 
-    // ---- PARTIES ----
+    // ---- PARTIES (無限スクロール＆リアルタイム検索対応) ----
+    const PARTY_PAGE_SIZE = 30;
+    let _partySearchQuery = '';
+    let _partyCurrentRenderedCount = 0;
+    let _partyFilteredCache = [];
+    let _partyObserver = null;
     let _partyGridBound = false;
+
+    function onPartySearchInput(val) {
+      _partySearchQuery = (val || '').trim().toLowerCase();
+      const clearBtn = document.getElementById('party-search-clear');
+      if (clearBtn) clearBtn.style.display = _partySearchQuery ? 'block' : 'none';
+      renderParties();
+    }
+
+    function clearPartySearch() {
+      _partySearchQuery = '';
+      const input = document.getElementById('party-search-input');
+      if (input) input.value = '';
+      const clearBtn = document.getElementById('party-search-clear');
+      if (clearBtn) clearBtn.style.display = 'none';
+      renderParties();
+    }
 
     function initPartyGridDelegation() {
       if (_partyGridBound) return;
@@ -3648,19 +3676,9 @@
       });
     }
 
-    function renderParties() {
-      const grid = document.getElementById('party-grid');
-      if (!grid) return;
-      initPartyGridDelegation();
-
-      if (!parties.length) {
-        grid.innerHTML = '<div class="empty"><div class="empty-icon">🎮</div><p>パーティがまだありません</p><p>右上のボタンから登録してください</p></div>';
-        return;
-      }
-      grid.innerHTML = parties.map(p => {
-        // pokemon は文字列配列 or オブジェクト配列に対応
-        const pokeNames = p.pokemon.map(pk => typeof pk === 'string' ? pk : (pk && pk.name || ''));
-        return `
+    function renderPartyCardHTML(p) {
+      const pokeNames = p.pokemon.map(pk => typeof pk === 'string' ? pk : (pk && pk.name || ''));
+      return `
     <div class="party-card" data-party-id="${p.id}">
       <div class="flex justify-between items-center mb-3">
         <div class="party-name party-edit-trigger" data-party-id="${p.id}" style="cursor:pointer;flex:1">${p.name}</div>
@@ -3673,10 +3691,87 @@
         ${pokeNames.filter(Boolean).map(pk => getPokeSpriteHTMLByDisplay(pk)).join('')}
       </div>
     </div>`;
-      }).join('');
+    }
 
-      // PC環境のみドラッグ&ドロップ並び替えを初期化
-      if (!('ontouchstart' in window)) {
+    function appendMoreParties() {
+      if (_partyCurrentRenderedCount >= _partyFilteredCache.length) return;
+      const grid = document.getElementById('party-grid');
+      const nextItems = _partyFilteredCache.slice(_partyCurrentRenderedCount, _partyCurrentRenderedCount + PARTY_PAGE_SIZE);
+      _partyCurrentRenderedCount += nextItems.length;
+
+      const sentinel = document.getElementById('party-sentinel');
+      if (sentinel) sentinel.remove();
+
+      const html = nextItems.map(renderPartyCardHTML).join('');
+      grid.insertAdjacentHTML('beforeend', html);
+
+      if (_partyCurrentRenderedCount < _partyFilteredCache.length) {
+        setupPartySentinel(grid);
+      }
+    }
+
+    function setupPartySentinel(grid) {
+      const sentinel = document.createElement('div');
+      sentinel.id = 'party-sentinel';
+      sentinel.style.padding = '14px 0';
+      sentinel.style.textAlign = 'center';
+      sentinel.style.color = 'var(--text-muted)';
+      sentinel.style.fontSize = '12px';
+      sentinel.style.gridColumn = '1 / -1';
+      sentinel.textContent = `パーティをさらに読み込み中... (${_partyCurrentRenderedCount} / ${_partyFilteredCache.length}件)`;
+      grid.appendChild(sentinel);
+
+      if (!_partyObserver) {
+        _partyObserver = new IntersectionObserver((entries) => {
+          if (entries[0] && entries[0].isIntersecting) {
+            appendMoreParties();
+          }
+        }, { rootMargin: '300px' });
+      } else {
+        _partyObserver.disconnect();
+      }
+      _partyObserver.observe(sentinel);
+    }
+
+    function renderParties() {
+      const grid = document.getElementById('party-grid');
+      if (!grid) return;
+      initPartyGridDelegation();
+
+      if (!parties.length) {
+        grid.innerHTML = '<div class="empty"><div class="empty-icon">🎮</div><p>パーティがまだありません</p><p>右上のボタンから登録してください</p></div>';
+        return;
+      }
+
+      // 検索絞り込み（パーティ名または含まれるポケモン名）
+      let filtered = parties;
+      if (_partySearchQuery) {
+        filtered = parties.filter(p => {
+          const matchName = (p.name || '').toLowerCase().includes(_partySearchQuery);
+          if (matchName) return true;
+          const pokeNames = p.pokemon.map(pk => typeof pk === 'string' ? pk : (pk && pk.name || '')).filter(Boolean);
+          return pokeNames.some(pn => pn.toLowerCase().includes(_partySearchQuery));
+        });
+      }
+
+      _partyFilteredCache = filtered;
+
+      if (!filtered.length) {
+        grid.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><p>一致するパーティが見つかりません</p></div>';
+        return;
+      }
+
+      // 初期30件のみを描画（何百パーティあっても一瞬で完了）
+      const initialItems = filtered.slice(0, PARTY_PAGE_SIZE);
+      _partyCurrentRenderedCount = initialItems.length;
+      grid.innerHTML = initialItems.map(renderPartyCardHTML).join('');
+
+      if (_partyCurrentRenderedCount < filtered.length) {
+        setupPartySentinel(grid);
+      }
+
+      // PC環境のみドラッグ&ドロップ並び替えを初期化（検索時は無効）
+      if (!_partySearchQuery && !('ontouchstart' in window)) {
         initPartyDragSort(grid);
       }
       // コピーボードを先頭に表示
