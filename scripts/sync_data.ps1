@@ -43,6 +43,7 @@ $learnsetsUrl = "https://raw.githubusercontent.com/smogon/pokemon-showdown/maste
 $champLsUrl = "https://raw.githubusercontent.com/smogon/pokemon-showdown/master/data/mods/champions/learnsets.ts"
 $formatsDataUrl = "https://raw.githubusercontent.com/smogon/pokemon-showdown/master/data/formats-data.ts"
 $champFdUrl = "https://raw.githubusercontent.com/smogon/pokemon-showdown/master/data/mods/champions/formats-data.ts"
+$formatsTsUrl = "https://raw.githubusercontent.com/smogon/pokemon-showdown/master/config/formats.ts"
 $battleDexDataUrl = "https://play.pokemonshowdown.com/js/battle-dex-data.js"
 
 $speciesCsvUrl = "https://raw.githubusercontent.com/PokeAPI/pokeapi/master/data/v2/csv/pokemon_species_names.csv"
@@ -53,6 +54,13 @@ $pokedexRaw = (Invoke-WebRequest -Uri $pokedexUrl -UseBasicParsing).Content
 $movesRaw = (Invoke-WebRequest -Uri $movesUrl -UseBasicParsing).Content
 $learnsetsRaw = (Invoke-WebRequest -Uri $learnsetsUrl -UseBasicParsing).Content
 $formatsDataRaw = (Invoke-WebRequest -Uri $formatsDataUrl -UseBasicParsing).Content
+$formatsTsRaw = ""
+try {
+    $formatsTsRaw = (Invoke-WebRequest -Uri $formatsTsUrl -UseBasicParsing).Content
+    Write-Host "Downloaded Showdown config/formats.ts" -ForegroundColor Green
+} catch {
+    Write-Warning "Could not download formats.ts: $($_.Exception.Message)"
+}
 $battleDexDataRaw = (Invoke-WebRequest -Uri $battleDexDataUrl -UseBasicParsing).Content
 
 $speciesCsvRaw = (Invoke-WebRequest -Uri $speciesCsvUrl -UseBasicParsing).Content | ConvertFrom-Csv
@@ -614,12 +622,71 @@ foreach ($it in $stoneItems) {
     }
 }
 
-# 12. Save version.json (Unique timestamp for auto-reset in frontend)
+# 12. Parse Showdown Regulation formats and generate regulations.json
+Write-Host "Extracting Regulation list from formats.ts..." -ForegroundColor Cyan
+$regMap = [System.Collections.Generic.List[string]]::new()
+$champRegs = [System.Collections.Generic.List[string]]::new()
+$svRegs = [System.Collections.Generic.List[string]]::new()
+
+$uRegStr = [System.Text.RegularExpressions.Regex]::Unescape("\u30ec\u30ae\u30e5\u30ec\u30fc\u30b7\u30e7\u30f3") # レギュレーション
+
+if ($formatsTsRaw) {
+    $fMatches = [regex]::Matches($formatsTsRaw, 'name:\s*"([^"]+)"')
+    foreach ($fm in $fMatches) {
+        $fName = $fm.Groups[1].Value
+        if ($fName -match 'Reg\s+([A-Za-z0-9\-]+)') {
+            $regCode = $matches[1].ToUpper()
+            $regJp = $uRegStr + $regCode
+            if ($fName -match 'Champions' -or $regCode -match '^M-') {
+                if (-not $champRegs.Contains($regJp)) { $champRegs.Add($regJp) }
+            } else {
+                if (-not $svRegs.Contains($regJp)) { $svRegs.Add($regJp) }
+            }
+        }
+    }
+}
+
+# Sort Champions regs descending (e.g. M-B, M-A)
+$champSorted = $champRegs | Sort-Object -Descending
+$champRegs = [System.Collections.Generic.List[string]]::new([string[]]$champSorted)
+
+if ($champRegs.Count -eq 0) {
+    $champRegs.Add($uRegStr + "M-B")
+    $champRegs.Add($uRegStr + "M-A")
+}
+
+# Always ensure full standard SV regulation list (I down to A)
+$allSvLetters = @("I", "H", "G", "F", "E", "D", "C", "B", "A")
+foreach ($letter in $allSvLetters) {
+    $rName = $uRegStr + $letter
+    if (-not $svRegs.Contains($rName)) {
+        $svRegs.Add($rName)
+    }
+}
+$svSorted = $svRegs | Sort-Object {
+    if ($_ -match '([A-Z])$') { [array]::IndexOf($allSvLetters, $matches[1]) } else { 99 }
+}
+$svRegs = [System.Collections.Generic.List[string]]::new([string[]]$svSorted)
+
+foreach ($r in $champRegs) { if (-not $regMap.Contains($r)) { $regMap.Add($r) } }
+foreach ($r in $svRegs) { if (-not $regMap.Contains($r)) { $regMap.Add($r) } }
+
+$latestRegulation = if ($regMap.Count -gt 0) { $regMap[0] } else { $uRegStr + "M-B" }
+
+$regObj = [PSCustomObject]@{
+    latest = $latestRegulation
+    list   = $regMap.ToArray()
+}
+$regPath = Join-Path $dataDir "regulations.json"
+[System.IO.File]::WriteAllText($regPath, ($regObj | ConvertTo-Json -Depth 5), [System.Text.Encoding]::UTF8)
+Write-Host "Saved data/regulations.json (Latest: $latestRegulation, Total: $($regMap.Count))" -ForegroundColor Green
+
+# 13. Save version.json (Unique timestamp for auto-reset in frontend)
 $currentTimestamp = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
 $versionObj = [PSCustomObject]@{
     version      = $currentTimestamp
     updatedAt    = (Get-Date).ToString("yyyy-MM-ddTHH:mm:sszzz")
-    regulation   = "Champions (Reg M-B)"
+    regulation   = $latestRegulation
     totalPokemon = $finalPokemonList.Count
     confirmed    = $confirmedCount
 }

@@ -2630,6 +2630,205 @@
         transform: rotate(360deg);
       }
     }
+
+    /* META INPUTS (Regulation, Season, Match Type, Tags) */
+    .record-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    @media (max-width: 600px) {
+      .record-meta-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+    }
+    .match-type-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .match-type-btn {
+      flex: 1;
+      min-width: 60px;
+      padding: 8px 8px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all .15s ease;
+    }
+    .match-type-btn:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+    .match-type-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(108, 99, 255, 0.3);
+    }
+    .tag-container-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 10px;
+      min-height: 42px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+    }
+    .tag-container-box:focus-within {
+      border-color: var(--accent);
+    }
+    .tag-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(108, 99, 255, 0.2);
+      border: 1px solid rgba(108, 99, 255, 0.4);
+      color: #c4b5fd;
+      padding: 3px 8px;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .tag-badge-remove {
+      background: none;
+      border: none;
+      color: #c4b5fd;
+      cursor: pointer;
+      font-size: 12px;
+      padding: 0 2px;
+      line-height: 1;
+      border-radius: 50%;
+    }
+    .tag-badge-remove:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.2);
+    }
+    .tag-input-inline {
+      border: none !important;
+      background: transparent !important;
+      padding: 4px 6px !important;
+      font-size: 14px !important;
+      color: var(--text) !important;
+      flex: 1;
+      min-width: 120px;
+      outline: none !important;
+      box-shadow: none !important;
+    }
+    .tag-ac-list {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      max-height: 220px;
+      overflow-y: auto;
+      z-index: 200;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      margin-top: 4px;
+      display: none;
+    }
+    .tag-ac-list.open {
+      display: block;
+    }
+    .tag-ac-item {
+      padding: 8px 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-size: 13px;
+    }
+    .tag-ac-item:hover, .tag-ac-item.selected {
+      background: var(--surface2);
+      color: var(--accent);
+    }
+    .tag-ac-create {
+      padding: 8px 12px;
+      cursor: pointer;
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 13px;
+      border-top: 1px solid var(--border);
+      background: rgba(108, 99, 255, 0.08);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tag-ac-create:hover {
+      background: rgba(108, 99, 255, 0.16);
+    }
+
+    /* History and Detail Badges */
+    .badge-meta {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .badge-reg {
+      background: rgba(59, 130, 246, 0.15);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      color: #93c5fd;
+    }
+    .badge-season {
+      background: rgba(168, 85, 247, 0.15);
+      border: 1px solid rgba(168, 85, 247, 0.35);
+      color: #d8b4fe;
+    }
+    .badge-match-type {
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.35);
+      color: #fcd34d;
+    }
+    .badge-tag-item {
+      background: rgba(236, 72, 153, 0.15);
+      border: 1px solid rgba(236, 72, 153, 0.35);
+      color: #f9a8d4;
+    }
+
+    /* Tag Filter in History */
+    .filter-tag-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 16px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+      transition: all .15s ease;
+    }
+    .filter-tag-chip:hover {
+      border-color: var(--accent);
+      color: var(--text);
+    }
+    .filter-tag-chip.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(108, 99, 255, 0.3);
+    }
   </style>
 </head>
 
@@ -2807,6 +3006,54 @@
         <img id="image-lightbox-img" class="image-lightbox-img" src="" alt="拡大スクリーンショット" onclick="event.stopPropagation()">
       </div>
 
+      <!-- 対戦属性（レギュレーション・シーズン・形式・タグ） -->
+      <div class="record-meta-grid" style="margin-top:16px">
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">レギュレーション</label>
+          <select id="rec-regulation" onchange="onRecordRegulationChange(this.value)" style="font-size:14px">
+            <option value="">記載なし</option>
+          </select>
+        </div>
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+            <label style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:0">シーズン</label>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="openCreateSeasonModal()" style="padding:2px 6px;font-size:11px;color:var(--accent);border:none">+ 新規登録</button>
+          </div>
+          <select id="rec-season" onchange="onRecordSeasonChange(this.value)" style="font-size:14px">
+            <option value="">記載なし</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 形式 (ランクマ / 公式大会 / 非公式 / フレ戦 / showdown) -->
+      <div style="margin-bottom:14px">
+        <label style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">形式</label>
+        <div id="rec-match-type-group" class="match-type-group">
+          <button type="button" class="match-type-btn active" data-type="ランクマ" onclick="setRecordMatchType('ランクマ')">ランクマ</button>
+          <button type="button" class="match-type-btn" data-type="公式大会" onclick="setRecordMatchType('公式大会')">公式大会</button>
+          <button type="button" class="match-type-btn" data-type="非公式" onclick="setRecordMatchType('非公式')">非公式</button>
+          <button type="button" class="match-type-btn" data-type="フレ戦" onclick="setRecordMatchType('フレ戦')">フレ戦</button>
+          <button type="button" class="match-type-btn" data-type="showdown" onclick="setRecordMatchType('showdown')" style="display:none">showdown</button>
+        </div>
+      </div>
+
+      <!-- タグ付け -->
+      <div style="margin-bottom:16px;position:relative">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+          <label style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:0">
+            <span>タグ付け</span>
+            <span style="font-size:11px;font-weight:normal;color:var(--text-muted)">（任意・複数可）</span>
+          </label>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="openCreateTagModal()" style="padding:2px 6px;font-size:11px;color:var(--accent);border:none">+ 新規タグ作成</button>
+        </div>
+        <div class="tag-container-box" id="rec-tag-container" onclick="focusTagInput()">
+          <div id="rec-tag-chips" style="display:inline-flex;flex-wrap:wrap;gap:4px"></div>
+          <input type="text" id="rec-tag-input" class="tag-input-inline" placeholder="タグを選択または入力..." autocomplete="off"
+            onfocus="onRecordTagFocus(this)" oninput="onRecordTagInput(this)" onkeydown="onRecordTagKeydown(event, this)">
+          <div id="rec-tag-ac" class="tag-ac-list"></div>
+        </div>
+      </div>
+
       <div style="margin-top:14px;margin-bottom:8px">
         <label style="font-size:12px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;margin-bottom:4px">
           <span>相手のトレーナー名</span>
@@ -2949,6 +3196,42 @@
             <option value="lose">負け</option>
             <option value="draw">引き分け</option>
           </select>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+        <div>
+          <label>レギュレーション</label>
+          <select id="history-reg-filter" onchange="renderHistory()">
+            <option value="">すべて</option>
+            <option value="__none__">記載なし</option>
+          </select>
+        </div>
+        <div>
+          <label>シーズン</label>
+          <select id="history-season-filter" onchange="renderHistory()">
+            <option value="">すべて</option>
+            <option value="__none__">記載なし</option>
+          </select>
+        </div>
+        <div>
+          <label>形式</label>
+          <select id="history-match-type-filter" onchange="renderHistory()">
+            <option value="">すべて</option>
+            <option value="ランクマ">ランクマ</option>
+            <option value="公式大会">公式大会</option>
+            <option value="非公式">非公式</option>
+            <option value="フレ戦">フレ戦</option>
+            <option value="showdown">showdown</option>
+          </select>
+        </div>
+      </div>
+      <div id="history-tags-filter-container" style="margin-bottom:12px">
+        <label style="display:flex;align-items:center;justify-content:space-between">
+          <span>タグで絞り込み <span style="font-size:11px;font-weight:normal;color:var(--text-muted)">（複数選択: OR検索）</span></span>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="clearHistoryTagFilters()" style="padding:1px 6px;font-size:11px;color:var(--text-muted);border:none" id="btn-clear-tag-filters">クリア</button>
+        </label>
+        <div id="history-tags-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">
+          <span style="font-size:12px;color:var(--text-muted)">登録されたタグがありません</span>
         </div>
       </div>
       <div style="margin-bottom:10px">
@@ -3265,6 +3548,68 @@
     </div>
   </div>
 
+  <!-- NEW TAG MODAL -->
+  <div id="new-tag-modal" class="modal" style="display:none;align-items:center;justify-content:center;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:650;padding:16px">
+    <div class="card" style="width:100%;max-width:440px;margin-bottom:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 10px 30px rgba(0,0,0,0.5)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <h3 style="font-size:16px;font-weight:700;color:var(--accent)">🏷️ 新規タグの作成</h3>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="closeCreateTagModal()">✕</button>
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="font-size:12px;font-weight:700;margin-bottom:4px">タグ名</label>
+        <input type="text" id="new-tag-name-input" placeholder="例: 仲間大会, 予選, テスト..." autocomplete="off" style="font-size:14px">
+      </div>
+      <div style="margin-bottom:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <label style="font-size:12px;font-weight:700;margin-bottom:0">紐付ける形式（複数選択可）</label>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="toggleAllTagModalFormats()" style="padding:1px 6px;font-size:11px;color:var(--accent);border:none" id="btn-toggle-all-tag-formats">全選択</button>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:8px;background:var(--surface2);padding:10px;border-radius:8px;border:1px solid var(--border)">
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;margin-bottom:0">
+            <input type="checkbox" id="tag-fmt-ランクマ" value="ランクマ" style="width:auto"> ランクマ
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;margin-bottom:0">
+            <input type="checkbox" id="tag-fmt-公式大会" value="公式大会" style="width:auto"> 公式大会
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;margin-bottom:0">
+            <input type="checkbox" id="tag-fmt-非公式" value="非公式" style="width:auto"> 非公式
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;margin-bottom:0">
+            <input type="checkbox" id="tag-fmt-フレ戦" value="フレ戦" style="width:auto"> フレ戦
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:13px;cursor:pointer;margin-bottom:0;grid-column:1 / -1">
+            <input type="checkbox" id="tag-fmt-showdown" value="showdown" style="width:auto"> showdown
+          </label>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">
+          ※ 選択した形式で対戦を記録する際、このタグがサジェスト候補に表示されます。
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px">
+        <button type="button" class="btn btn-ghost" onclick="closeCreateTagModal()">キャンセル</button>
+        <button type="button" class="btn btn-primary" onclick="saveNewTag()">作成して追加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEW SEASON MODAL -->
+  <div id="new-season-modal" class="modal" style="display:none;align-items:center;justify-content:center;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:650;padding:16px">
+    <div class="card" style="width:100%;max-width:380px;margin-bottom:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:0 10px 30px rgba(0,0,0,0.5)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <h3 style="font-size:16px;font-weight:700;color:var(--accent)">📅 新規シーズンの登録</h3>
+        <button type="button" class="btn btn-ghost btn-sm" onclick="closeCreateSeasonModal()">✕</button>
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="font-size:12px;font-weight:700;margin-bottom:4px">シーズン名</label>
+        <input type="text" id="new-season-name-input" placeholder="例: シーズン21, S22..." autocomplete="off" style="font-size:14px">
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px">
+        <button type="button" class="btn btn-ghost" onclick="closeCreateSeasonModal()">キャンセル</button>
+        <button type="button" class="btn btn-primary" onclick="saveNewSeason()">登録</button>
+      </div>
+    </div>
+  </div>
+
   <!-- MOVE PICKER POPUP -->
   <div class="move-picker-overlay" id="move-picker-overlay" onclick="if(event.target===this)closeMovePickerPopup()">
     <div class="move-picker-modal">
@@ -3407,11 +3752,12 @@
       _masterDataPromise = (async () => {
         try {
           // 1. 基本マスタを最優先で高速取得（ブラウザキャッシュを有効活用）
-          const [pokeRes, moveRes, itemRes, verRes] = await Promise.all([
+          const [pokeRes, moveRes, itemRes, verRes, regRes] = await Promise.all([
             fetch('data/pokemon.json'),
             fetch('data/moves.json'),
             fetch('data/items.json'),
-            fetch('data/version.json').catch(() => null)
+            fetch('data/version.json').catch(() => null),
+            fetch('data/regulations.json').catch(() => null)
           ]);
           POKEMON_LIST = await pokeRes.json();
           MOVES_LIST = await moveRes.json();
@@ -3421,11 +3767,20 @@
               window.STATIC_VERSION_DATA = await verRes.json();
             } catch (e) { }
           }
+          if (regRes && regRes.ok) {
+            try {
+              const regJson = await regRes.json();
+              if (regJson && regJson.list && Array.isArray(regJson.list)) {
+                regulationsData = regJson;
+              }
+            } catch (e) { }
+          }
 
           localPokemon = JSON.parse(JSON.stringify(POKEMON_LIST));
           localMoves = JSON.parse(JSON.stringify(MOVES_LIST)).map(m => ({ confirmed: true, ...m }));
           localItems = ITEMS_LIST.map(name => ({ name, confirmed: true }));
           rebuildPokemonMap();
+          initRecordFormMeta();
 
           // 基本マスタが揃った瞬間に即座にパーティ・履歴を描画（0.01秒）
           try {
@@ -3581,6 +3936,22 @@
     let editingPartyId = null;
     const mySelFilter = [];
     const oppSelFilter = [];
+
+    // Regulations, Seasons, Match Type, Tags
+    let regulationsData = {
+      latest: "レギュレーションM-B",
+      list: ["レギュレーションM-B", "レギュレーションM-A", "レギュレーションI", "レギュレーションH", "レギュレーションG", "レギュレーションF", "レギュレーションE", "レギュレーションD", "レギュレーションC", "レギュレーションB", "レギュレーションA"]
+    };
+    let seasons = JSON.parse(localStorage.getItem('pkm_seasons') || '[]');
+    let customTags = JSON.parse(localStorage.getItem('pkm_custom_tags') || '[]');
+    // 直前の記録設定（維持用）
+    let currentRecordRegulation = localStorage.getItem('pkm_last_regulation') || '';
+    let currentRecordSeason = localStorage.getItem('pkm_last_season') || '';
+    let currentRecordMatchType = localStorage.getItem('pkm_last_match_type') || 'ランクマ';
+    let currentRecordTags = JSON.parse(localStorage.getItem('pkm_last_tags') || '[]');
+    // 履歴画面のタグフィルター（OR検索用）
+    let historyTagFilters = [];
+
     // 最近選んだポケモン（最大20件、先頭が最新）
     let recentPicks = JSON.parse(localStorage.getItem('pkm_recent_picks') || '[]');
     function recordRecentPick(displayName) {
@@ -3662,6 +4033,8 @@
     async function saveData() {
       localStorage.setItem('pkm_parties', JSON.stringify(parties));
       localStorage.setItem('pkm_records', JSON.stringify(records));
+      localStorage.setItem('pkm_seasons', JSON.stringify(seasons));
+      localStorage.setItem('pkm_custom_tags', JSON.stringify(customTags));
       if (!currentUser || !_fbReady) return;
       const { doc, setDoc } = window._firestoreOps;
       const db = window._db;
@@ -3670,6 +4043,8 @@
         const payload = {
           parties,
           records,
+          seasons,
+          customTags,
           updatedAt: window._firestoreOps.serverTimestamp(),
           updatedBy: CLIENT_ID
         };
@@ -3715,6 +4090,14 @@
           records = _latestRemoteData.records;
           localStorage.setItem('pkm_records', JSON.stringify(records));
         }
+        if (_latestRemoteData.seasons && Array.isArray(_latestRemoteData.seasons)) {
+          seasons = _latestRemoteData.seasons;
+          localStorage.setItem('pkm_seasons', JSON.stringify(seasons));
+        }
+        if (_latestRemoteData.customTags && Array.isArray(_latestRemoteData.customTags)) {
+          customTags = _latestRemoteData.customTags;
+          localStorage.setItem('pkm_custom_tags', JSON.stringify(customTags));
+        }
         if (_latestRemoteData.updatedAt && _latestRemoteData.updatedAt.toMillis) {
           _lastLoadedAt = _latestRemoteData.updatedAt.toMillis();
         } else {
@@ -3723,6 +4106,7 @@
       } else {
         await loadFromFirestore();
       }
+      initRecordFormMeta();
       renderParties();
       renderHistory();
       renderRecordPage();
@@ -3767,6 +4151,15 @@
           }
           localStorage.setItem('pkm_parties', JSON.stringify(parties));
 
+          if (data.seasons && Array.isArray(data.seasons)) {
+            seasons = data.seasons;
+            localStorage.setItem('pkm_seasons', JSON.stringify(seasons));
+          }
+          if (data.customTags && Array.isArray(data.customTags)) {
+            customTags = data.customTags;
+            localStorage.setItem('pkm_custom_tags', JSON.stringify(customTags));
+          }
+
           // Gemini APIキーの同期（読み取りのみ）
           if (data.geminiApiKey) {
             localStorage.setItem('pkm_gemini_api_key', data.geminiApiKey);
@@ -3778,6 +4171,8 @@
             localStorage.setItem('pkm_showdown_username', data.showdownUsername || '');
           }
           updateShowdownUserUI();
+
+          initRecordFormMeta();
 
           const ud2 = data.updatedAt;
           _lastLoadedAt = (ud2 && ud2.toMillis) ? ud2.toMillis() : Date.now();
@@ -4457,6 +4852,346 @@
       { mySelectionOrder: [], oppSelectionOrder: [], result: null }
     ];
 
+    // ===== レギュレーション・シーズン・形式・タグ付けロジック =====
+    function initRecordFormMeta() {
+      // 1. レギュレーションの初期化
+      const regSel = document.getElementById('rec-regulation');
+      if (regSel) {
+        if (currentRecordRegulation === null || currentRecordRegulation === undefined || currentRecordRegulation === '') {
+          currentRecordRegulation = (regulationsData && regulationsData.latest) ? regulationsData.latest : '';
+        }
+        initRegulationSelect('rec-regulation', currentRecordRegulation);
+      }
+
+      // 2. シーズンの初期化
+      const seasonSel = document.getElementById('rec-season');
+      if (seasonSel) {
+        initSeasonSelect('rec-season', currentRecordSeason);
+      }
+
+      // 3. 形式の初期化
+      setRecordMatchType(currentRecordMatchType || 'ランクマ');
+
+      // 4. タグの初期化
+      renderRecordTagChips();
+
+      // 5. 履歴フィルターのレギュ・シーズン・タグ更新
+      initRegulationSelect('history-reg-filter', document.getElementById('history-reg-filter')?.value || '', true);
+      initSeasonSelect('history-season-filter', document.getElementById('history-season-filter')?.value || '', true);
+      renderHistoryTagChips();
+    }
+
+    function initRegulationSelect(selectId, selectedVal, isFilter = false) {
+      const sel = document.getElementById(selectId);
+      if (!sel) return;
+      const list = (regulationsData && regulationsData.list) ? regulationsData.list : [];
+      let html = '';
+      if (isFilter) {
+        html += '<option value="">すべて</option>';
+        html += '<option value="__none__"' + (selectedVal === '__none__' ? ' selected' : '') + '>記載なし</option>';
+      } else {
+        html += '<option value="">記載なし</option>';
+      }
+      list.forEach(r => {
+        const isSel = (r === selectedVal) ? ' selected' : '';
+        html += `<option value="${r}"${isSel}>${r}</option>`;
+      });
+      sel.innerHTML = html;
+    }
+
+    function onRecordRegulationChange(val) {
+      currentRecordRegulation = val;
+      localStorage.setItem('pkm_last_regulation', val);
+    }
+
+    function initSeasonSelect(selectId, selectedVal, isFilter = false) {
+      const sel = document.getElementById(selectId);
+      if (!sel) return;
+      let html = '';
+      if (isFilter) {
+        html += '<option value="">すべて</option>';
+        html += '<option value="__none__"' + (selectedVal === '__none__' ? ' selected' : '') + '>記載なし</option>';
+      } else {
+        html += '<option value="">記載なし</option>';
+      }
+      seasons.forEach(s => {
+        const isSel = (s === selectedVal) ? ' selected' : '';
+        html += `<option value="${s}"${isSel}>${s}</option>`;
+      });
+      sel.innerHTML = html;
+    }
+
+    function onRecordSeasonChange(val) {
+      currentRecordSeason = val;
+      localStorage.setItem('pkm_last_season', val);
+    }
+
+    function openCreateSeasonModal() {
+      const inp = document.getElementById('new-season-name-input');
+      if (inp) inp.value = '';
+      const modal = document.getElementById('new-season-modal');
+      if (modal) modal.style.display = 'flex';
+      setTimeout(() => { inp?.focus(); }, 50);
+    }
+
+    function closeCreateSeasonModal() {
+      const modal = document.getElementById('new-season-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function saveNewSeason() {
+      const inp = document.getElementById('new-season-name-input');
+      const name = (inp?.value || '').trim();
+      if (!name) { alert('シーズン名を入力してください'); return; }
+      if (!seasons.includes(name)) {
+        seasons.push(name);
+        saveData();
+      }
+      currentRecordSeason = name;
+      localStorage.setItem('pkm_last_season', name);
+      initSeasonSelect('rec-season', currentRecordSeason);
+      initSeasonSelect('history-season-filter', document.getElementById('history-season-filter')?.value || '', true);
+      closeCreateSeasonModal();
+      showRecordToast(`📅 シーズン「${name}」を登録しました！`);
+    }
+
+    function setRecordMatchType(type) {
+      currentRecordMatchType = type;
+      localStorage.setItem('pkm_last_match_type', type);
+
+      const btns = document.querySelectorAll('#rec-match-type-group .match-type-btn');
+      btns.forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.type === type);
+      });
+
+      const tagAc = document.getElementById('rec-tag-ac');
+      if (tagAc && tagAc.classList.contains('open')) {
+        const input = document.getElementById('rec-tag-input');
+        showTagAc(input ? input.value : '');
+      }
+    }
+
+    function renderRecordTagChips() {
+      const container = document.getElementById('rec-tag-chips');
+      if (!container) return;
+      if (!currentRecordTags || !currentRecordTags.length) {
+        container.innerHTML = '';
+        return;
+      }
+      container.innerHTML = currentRecordTags.map(t => `
+        <span class="tag-badge">
+          <span>🏷️ ${t}</span>
+          <button type="button" class="tag-badge-remove" onclick="event.stopPropagation(); removeRecordTag('${t}')">✕</button>
+        </span>
+      `).join('');
+    }
+
+    function addRecordTag(name) {
+      if (!name) return;
+      name = name.trim();
+      if (!currentRecordTags.includes(name)) {
+        currentRecordTags.push(name);
+        localStorage.setItem('pkm_last_tags', JSON.stringify(currentRecordTags));
+      }
+      renderRecordTagChips();
+      const input = document.getElementById('rec-tag-input');
+      if (input) {
+        input.value = '';
+        input.focus();
+      }
+      closeTagAc();
+    }
+
+    function removeRecordTag(name) {
+      currentRecordTags = currentRecordTags.filter(t => t !== name);
+      localStorage.setItem('pkm_last_tags', JSON.stringify(currentRecordTags));
+      renderRecordTagChips();
+    }
+
+    function focusTagInput() {
+      const input = document.getElementById('rec-tag-input');
+      if (input) input.focus();
+    }
+
+    function onRecordTagFocus(input) {
+      showTagAc(input.value);
+    }
+
+    function onRecordTagInput(input) {
+      showTagAc(input.value);
+    }
+
+    function onRecordTagKeydown(e, input) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const acList = document.getElementById('rec-tag-ac');
+        const firstItem = acList ? acList.querySelector('.tag-ac-item') : null;
+        if (firstItem && firstItem.dataset.name) {
+          addRecordTag(firstItem.dataset.name);
+        } else if (input.value.trim()) {
+          openCreateTagModal(input.value.trim());
+        }
+      } else if (e.key === 'Escape') {
+        closeTagAc();
+      }
+    }
+
+    function showTagAc(val) {
+      const list = document.getElementById('rec-tag-ac');
+      if (!list) return;
+      val = (val || '').trim().toLowerCase();
+
+      const currentFmt = currentRecordMatchType || 'ランクマ';
+      let availableTags = customTags.filter(t => {
+        if (!t.formats || !Array.isArray(t.formats) || t.formats.length === 0) return true;
+        return t.formats.includes(currentFmt);
+      });
+
+      availableTags = availableTags.filter(t => !currentRecordTags.includes(t.name));
+
+      if (val) {
+        availableTags = availableTags.filter(t => t.name.toLowerCase().includes(val));
+      }
+
+      let html = '';
+      if (availableTags.length > 0) {
+        availableTags.forEach(t => {
+          const fmts = (t.formats && t.formats.length) ? t.formats.join(', ') : '全形式';
+          html += `
+            <div class="tag-ac-item" data-name="${t.name}" onclick="addRecordTag('${t.name}')">
+              <span style="font-weight:600">🏷️ ${t.name}</span>
+              <span style="font-size:11px;color:var(--text-muted)">(${fmts})</span>
+            </div>
+          `;
+        });
+      }
+
+      const inputVal = (document.getElementById('rec-tag-input')?.value || '').trim();
+      if (inputVal) {
+        const exactMatch = customTags.some(t => t.name.toLowerCase() === inputVal.toLowerCase());
+        if (!exactMatch) {
+          html += `
+            <div class="tag-ac-create" onclick="openCreateTagModal('${inputVal}')">
+              <span>➕ 「${inputVal}」を新規タグとして作成...</span>
+            </div>
+          `;
+        }
+      } else {
+        html += `
+          <div class="tag-ac-create" onclick="openCreateTagModal()">
+            <span>➕ 新規タグを作成...</span>
+          </div>
+        `;
+      }
+
+      list.innerHTML = html;
+      list.classList.add('open');
+    }
+
+    function closeTagAc() {
+      const list = document.getElementById('rec-tag-ac');
+      if (list) list.classList.remove('open');
+    }
+
+    document.addEventListener('click', (e) => {
+      const box = document.getElementById('rec-tag-container');
+      if (box && !box.contains(e.target)) {
+        closeTagAc();
+      }
+    });
+
+    function openCreateTagModal(initialName = '') {
+      closeTagAc();
+      const inp = document.getElementById('new-tag-name-input');
+      if (inp) inp.value = initialName;
+
+      const currentFmt = currentRecordMatchType || 'ランクマ';
+      const allFmts = ['ランクマ', '公式大会', '非公式', 'フレ戦', 'showdown'];
+      allFmts.forEach(fmt => {
+        const cb = document.getElementById(`tag-fmt-${fmt}`);
+        if (cb) cb.checked = (fmt === currentFmt);
+      });
+
+      const modal = document.getElementById('new-tag-modal');
+      if (modal) modal.style.display = 'flex';
+      setTimeout(() => { inp?.focus(); }, 50);
+    }
+
+    function closeCreateTagModal() {
+      const modal = document.getElementById('new-tag-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function toggleAllTagModalFormats() {
+      const allFmts = ['ランクマ', '公式大会', '非公式', 'フレ戦', 'showdown'];
+      const cbs = allFmts.map(fmt => document.getElementById(`tag-fmt-${fmt}`)).filter(Boolean);
+      const allChecked = cbs.every(cb => cb.checked);
+      cbs.forEach(cb => cb.checked = !allChecked);
+      const btn = document.getElementById('btn-toggle-all-tag-formats');
+      if (btn) btn.textContent = allChecked ? '全選択' : '全解除';
+    }
+
+    function saveNewTag() {
+      const inp = document.getElementById('new-tag-name-input');
+      const name = (inp?.value || '').trim();
+      if (!name) { alert('タグ名を入力してください'); return; }
+
+      const allFmts = ['ランクマ', '公式大会', '非公式', 'フレ戦', 'showdown'];
+      const selectedFmts = allFmts.filter(fmt => {
+        const cb = document.getElementById(`tag-fmt-${fmt}`);
+        return cb && cb.checked;
+      });
+
+      const existing = customTags.find(t => t.name === name);
+      if (existing) {
+        existing.formats = selectedFmts;
+      } else {
+        customTags.unshift({
+          id: 'tag_' + Date.now(),
+          name,
+          formats: selectedFmts
+        });
+      }
+      saveData();
+      addRecordTag(name);
+      renderHistoryTagChips();
+      closeCreateTagModal();
+      showRecordToast(`🏷️ タグ「${name}」を登録しました！`);
+    }
+
+    function renderHistoryTagChips() {
+      const container = document.getElementById('history-tags-chips');
+      if (!container) return;
+      if (!customTags || !customTags.length) {
+        container.innerHTML = '<span style="font-size:12px;color:var(--text-muted)">登録されたタグがありません</span>';
+        return;
+      }
+      container.innerHTML = customTags.map(t => {
+        const isActive = historyTagFilters.includes(t.name);
+        return `
+          <button type="button" class="filter-tag-chip${isActive ? ' active' : ''}" onclick="toggleHistoryTagFilter('${t.name}')">
+            🏷️ ${t.name}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function toggleHistoryTagFilter(tag) {
+      if (historyTagFilters.includes(tag)) {
+        historyTagFilters = historyTagFilters.filter(t => t !== tag);
+      } else {
+        historyTagFilters.push(tag);
+      }
+      renderHistoryTagChips();
+      renderHistory();
+    }
+
+    function clearHistoryTagFilters() {
+      historyTagFilters = [];
+      renderHistoryTagChips();
+      renderHistory();
+    }
+
     function setRecordMode(mode) {
       if (mode === 'showdown') {
         const username = getShowdownUsername();
@@ -4476,6 +5211,31 @@
       const showdownBox = document.getElementById('rec-showdown-box');
       if (aiBox) aiBox.style.display = (mode === 'champions') ? 'block' : 'none';
       if (showdownBox) showdownBox.style.display = (mode === 'showdown') ? 'block' : 'none';
+
+      const btns = document.querySelectorAll('#rec-match-type-group .match-type-btn');
+      if (mode === 'champions') {
+        btns.forEach(btn => {
+          if (btn.dataset.type === 'showdown') {
+            btn.style.display = 'none';
+          } else {
+            btn.style.display = 'block';
+          }
+        });
+        if (currentRecordMatchType === 'showdown' || !currentRecordMatchType) {
+          setRecordMatchType('ランクマ');
+        } else {
+          setRecordMatchType(currentRecordMatchType);
+        }
+      } else {
+        btns.forEach(btn => {
+          if (btn.dataset.type === 'showdown') {
+            btn.style.display = 'block';
+          } else {
+            btn.style.display = 'none';
+          }
+        });
+        setRecordMatchType('showdown');
+      }
     }
 
     function setRecordFormat(fmt) {
@@ -4903,6 +5663,7 @@
         const now = new Date();
         const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
         document.getElementById('rec-date').value = local.toISOString().slice(0, 16);
+        initRecordFormMeta();
       }
 
       // 自分のパーティ
@@ -5402,6 +6163,11 @@
       const memo = document.getElementById('rec-memo').value.trim();
       const date = document.getElementById('rec-date').value;
 
+      const regulation = (document.getElementById('rec-regulation')?.value || '').trim();
+      const season = (document.getElementById('rec-season')?.value || '').trim();
+      const matchType = currentRecordMatchType || (currentRecordSourceMode === 'showdown' ? 'showdown' : 'ランクマ');
+      const tags = [...currentRecordTags];
+
       let showdownUrl = null;
       let showdownUrls = null;
       if (currentRecordSourceMode === 'showdown') {
@@ -5429,6 +6195,10 @@
           oppTrainer,
           oppRating,
           oppParty,
+          regulation,
+          season,
+          matchType,
+          tags,
           mySelection: getSlotValues('my-selection-slots', 4),
           oppSelection: getSlotValues('opp-selection-slots', 4),
           result: recordResult,
@@ -5476,6 +6246,10 @@
           oppTrainer,
           oppRating,
           oppParty,
+          regulation,
+          season,
+          matchType,
+          tags,
           result: overallResult,
           games: gamesData,
           mySelection: gamesData[0] ? gamesData[0].mySelection : [],
@@ -5575,6 +6349,24 @@
         oppInfoHtml = `<span style="${badgeStyle}"><span style="color:#f59e0b">★</span> ${r.oppRating}</span>`;
       }
 
+      // メタバッジ群（レギュレーション、シーズン、形式、タグ）
+      let metaBadgesHtml = '';
+      if (r.regulation) {
+        metaBadgesHtml += `<span class="badge-meta badge-reg">📜 ${r.regulation}</span>`;
+      }
+      if (r.season) {
+        metaBadgesHtml += `<span class="badge-meta badge-season">📅 ${r.season}</span>`;
+      }
+      const matchType = r.matchType || (r.sourceMode === 'showdown' ? 'showdown' : 'ランクマ');
+      if (matchType) {
+        metaBadgesHtml += `<span class="badge-meta badge-match-type">🎮 ${matchType}</span>`;
+      }
+      if (r.tags && Array.isArray(r.tags) && r.tags.length > 0) {
+        r.tags.forEach(t => {
+          metaBadgesHtml += `<span class="badge-meta badge-tag-item">🏷️ ${t}</span>`;
+        });
+      }
+
       // 選出ポケモンのHTML（BO3の場合は1試合目・2試合目・3試合目を縦に並べる）
       let mySelHtml = '';
       let oppSelHtml = '';
@@ -5599,10 +6391,11 @@
     <div class="hist-card-body">
       <div class="hist-opp-party">
         <div class="hist-row-label" style="display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap">
-          <div style="display:flex;align-items:center;gap:6px">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
             <div style="display:flex;align-items:center;gap:4px">${resultBadgeHtml}</div>
             <span class="record-date" style="font-size:11px">${dateStr}</span>
             ${oppInfoHtml}
+            ${metaBadgesHtml}
           </div>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:3px">${tagRow(oppPartyList, 'rgba(255,255,255,0.06)', oppSelFilter)}</div>
@@ -5674,6 +6467,47 @@
 
       const filterVal = filter.value;
       const resultFilterVal = document.getElementById('history-result-filter').value;
+      const regFilterVal = document.getElementById('history-reg-filter')?.value || '';
+      const seasonFilterVal = document.getElementById('history-season-filter')?.value || '';
+      const matchTypeFilterVal = document.getElementById('history-match-type-filter')?.value || '';
+
+      // パーティ未選択 = 全試合表示
+      let filtered = filterVal ? records.filter(r => r.partyId === filterVal) : records.slice();
+      if (resultFilterVal) filtered = filtered.filter(r => r.result === resultFilterVal);
+
+      // レギュレーションフィルター
+      if (regFilterVal) {
+        if (regFilterVal === '__none__') {
+          filtered = filtered.filter(r => !r.regulation);
+        } else {
+          filtered = filtered.filter(r => r.regulation === regFilterVal);
+        }
+      }
+
+      // シーズンフィルター
+      if (seasonFilterVal) {
+        if (seasonFilterVal === '__none__') {
+          filtered = filtered.filter(r => !r.season);
+        } else {
+          filtered = filtered.filter(r => r.season === seasonFilterVal);
+        }
+      }
+
+      // 形式フィルター
+      if (matchTypeFilterVal) {
+        filtered = filtered.filter(r => {
+          const mt = r.matchType || (r.sourceMode === 'showdown' ? 'showdown' : 'ランクマ');
+          return mt === matchTypeFilterVal;
+        });
+      }
+
+      // タグフィルター（複数選択時はOR検索）
+      if (historyTagFilters && historyTagFilters.length > 0) {
+        filtered = filtered.filter(r => {
+          const rTags = r.tags || [];
+          return historyTagFilters.some(tf => rTags.includes(tf));
+        });
+      }
 
       // パーティ未選択 = 全試合表示
       let filtered = filterVal ? records.filter(r => r.partyId === filterVal) : records.slice();
@@ -5818,10 +6652,28 @@
         }
       }
 
+      let metaBadgesDetailHtml = '';
+      if (r.regulation) {
+        metaBadgesDetailHtml += `<span class="badge-meta badge-reg" style="font-size:12px;padding:3px 8px">📜 ${r.regulation}</span>`;
+      }
+      if (r.season) {
+        metaBadgesDetailHtml += `<span class="badge-meta badge-season" style="font-size:12px;padding:3px 8px">📅 ${r.season}</span>`;
+      }
+      const matchTypeDetail = r.matchType || (r.sourceMode === 'showdown' ? 'showdown' : 'ランクマ');
+      if (matchTypeDetail) {
+        metaBadgesDetailHtml += `<span class="badge-meta badge-match-type" style="font-size:12px;padding:3px 8px">🎮 ${matchTypeDetail}</span>`;
+      }
+      if (r.tags && Array.isArray(r.tags) && r.tags.length > 0) {
+        r.tags.forEach(t => {
+          metaBadgesDetailHtml += `<span class="badge-meta badge-tag-item" style="font-size:12px;padding:3px 8px">🏷️ ${t}</span>`;
+        });
+      }
+
       document.getElementById('detail-content').innerHTML = `
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap">
       ${headerResultHtml}
       <span style="color:var(--text-muted);font-size:13px">${dateStr}</span>
+      ${metaBadgesDetailHtml}
     </div>
     ${r.oppTrainer ? `<div style="margin-bottom:${r.oppRating ? '6px' : '14px'}"><span style="font-size:12px;color:var(--text-muted)">相手トレーナー: </span><span style="font-weight:700;font-size:14px;color:var(--accent)">👤 ${r.oppTrainer}</span></div>` : ''}
     ${r.oppRating ? `<div style="margin-bottom:14px"><span style="font-size:12px;color:var(--text-muted)">相手レート: </span><span style="font-weight:700;font-size:14px;color:var(--text)"><span style="color:#f59e0b">★</span> ${r.oppRating}</span></div>` : ''}
@@ -5896,6 +6748,17 @@
         if (r.date) {
           document.getElementById('rec-date').value = r.date;
         }
+
+        // レギュレーション・シーズン・形式・タグの復元
+        currentRecordRegulation = r.regulation !== undefined ? r.regulation : '';
+        currentRecordSeason = r.season !== undefined ? r.season : '';
+        currentRecordMatchType = r.matchType || (r.sourceMode === 'showdown' ? 'showdown' : 'ランクマ');
+        currentRecordTags = Array.isArray(r.tags) ? [...r.tags] : [];
+
+        initRegulationSelect('rec-regulation', currentRecordRegulation);
+        initSeasonSelect('rec-season', currentRecordSeason);
+        setRecordMatchType(currentRecordMatchType);
+        renderRecordTagChips();
 
         // 相手トレーナー名・レート・メモ
         const recOppTrainer = document.getElementById('rec-opp-trainer');
