@@ -6509,9 +6509,6 @@
         });
       }
 
-      // パーティ未選択 = 全試合表示
-      let filtered = filterVal ? records.filter(r => r.partyId === filterVal) : records.slice();
-      if (resultFilterVal) filtered = filtered.filter(r => r.result === resultFilterVal);
       // 自分の選出絞り込み（1体）
       if (mySelFilterName) {
         filtered = filtered.filter(r => {
