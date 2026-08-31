@@ -2268,6 +2268,49 @@
       display: none;
     }
 
+    /* ドラッグ＆ドロップ並び替えスタイル */
+    .sortable-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface2);
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      gap: 8px;
+      user-select: none;
+      transition: transform 0.15s, border-color 0.15s, background-color 0.15s, opacity 0.15s;
+    }
+    .sortable-item.dragging {
+      opacity: 0.35;
+      border: 1px dashed var(--accent);
+      background: rgba(108, 99, 255, 0.1);
+    }
+    .sortable-item.drag-over-top {
+      border-top: 2px solid var(--accent);
+    }
+    .sortable-item.drag-over-bottom {
+      border-bottom: 2px solid var(--accent);
+    }
+    .drag-handle {
+      cursor: grab;
+      color: var(--text-muted);
+      font-size: 16px;
+      padding: 4px 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      touch-action: none;
+    }
+    .drag-handle:hover {
+      color: var(--accent);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .drag-handle:active {
+      cursor: grabbing;
+    }
+
     #pe-copy-board.visible {
       display: block;
     }
@@ -4894,6 +4937,9 @@
       // 2. シーズンの初期化
       const seasonSel = document.getElementById('rec-season');
       if (seasonSel) {
+        if (currentRecordSeason === null || currentRecordSeason === undefined || currentRecordSeason === '') {
+          currentRecordSeason = (seasons && seasons.length > 0) ? seasons[0] : '';
+        }
         initSeasonSelect('rec-season', currentRecordSeason);
       }
 
@@ -4955,6 +5001,7 @@
     }
 
     let editingSeasonName = null;
+    let _draggedSeasonIdx = null;
 
     function renderDmSeasons() {
       const listEl = document.getElementById('dm-seasons-list');
@@ -4964,18 +5011,88 @@
         return;
       }
 
-      listEl.innerHTML = seasons.map(s => {
+      listEl.innerHTML = seasons.map((s, idx) => {
         const safeS = s.replace(/'/g, "\\'");
+        const isDefault = (idx === 0);
         return `
-          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface2);padding:8px 12px;border-radius:6px;border:1px solid var(--border)">
-            <span style="font-size:14px;font-weight:600;color:var(--text)">📅 ${s}</span>
-            <div style="display:flex;gap:6px">
+          <div class="sortable-item" draggable="true" data-index="${idx}"
+            ondragstart="onDmSeasonDragStart(event, ${idx})"
+            ondragover="onDmSeasonDragOver(event, ${idx})"
+            ondragleave="onDmSeasonDragLeave(event, ${idx})"
+            ondrop="onDmSeasonDrop(event, ${idx})"
+            ondragend="onDmSeasonDragEnd(event)">
+            <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
+              <span class="drag-handle" title="ドラッグして並び替え">☰</span>
+              <span style="font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📅 ${s}</span>
+              ${isDefault ? '<span style="font-size:10px;background:var(--accent);color:#fff;padding:1px 6px;border-radius:4px;font-weight:700;white-space:nowrap">最新(デフォルト)</span>' : ''}
+            </div>
+            <div style="display:flex;gap:6px;flex-shrink:0">
               <button type="button" class="btn btn-ghost btn-sm" onclick="editSeason('${safeS}')" style="padding:3px 8px;font-size:12px">✏️ 編集</button>
               <button type="button" class="btn btn-ghost btn-sm" onclick="deleteSeason('${safeS}')" style="padding:3px 8px;font-size:12px;color:#ef4444">🗑️ 削除</button>
             </div>
           </div>
         `;
       }).join('');
+    }
+
+    function onDmSeasonDragStart(e, idx) {
+      _draggedSeasonIdx = idx;
+      e.currentTarget.classList.add('dragging');
+      if (e.dataTransfer) {
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', idx);
+      }
+    }
+
+    function onDmSeasonDragOver(e, idx) {
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+      const target = e.currentTarget;
+      const rect = target.getBoundingClientRect();
+      const next = (e.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
+      target.classList.toggle('drag-over-top', !next);
+      target.classList.toggle('drag-over-bottom', next);
+    }
+
+    function onDmSeasonDragLeave(e, idx) {
+      e.currentTarget.classList.remove('drag-over-top', 'drag-over-bottom');
+    }
+
+    function onDmSeasonDrop(e, targetIdx) {
+      e.preventDefault();
+      const target = e.currentTarget;
+      target.classList.remove('drag-over-top', 'drag-over-bottom');
+      if (_draggedSeasonIdx === null || _draggedSeasonIdx === undefined) return;
+      const fromIdx = _draggedSeasonIdx;
+      const rect = target.getBoundingClientRect();
+      const isAfter = (e.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
+      let toIdx = targetIdx;
+      if (isAfter && fromIdx > targetIdx) toIdx = targetIdx + 1;
+      else if (!isAfter && fromIdx < targetIdx) toIdx = targetIdx - 1;
+      if (toIdx < 0) toIdx = 0;
+      if (toIdx >= seasons.length) toIdx = seasons.length - 1;
+
+      if (fromIdx !== toIdx) {
+        const [moved] = seasons.splice(fromIdx, 1);
+        seasons.splice(toIdx, 0, moved);
+        // 一番上（index 0）が最新＝デフォルト
+        if (seasons.length > 0) {
+          currentRecordSeason = seasons[0];
+          localStorage.setItem('pkm_last_season', seasons[0]);
+        }
+        saveData();
+        renderDmSeasons();
+        initSeasonSelect('rec-season', currentRecordSeason);
+        initSeasonSelect('history-season-filter', document.getElementById('history-season-filter')?.value || '', true);
+        showRecordToast(`📅 シーズンを並び替えました（最上位「${seasons[0]}」をデフォルトに設定）`);
+      }
+    }
+
+    function onDmSeasonDragEnd(e) {
+      _draggedSeasonIdx = null;
+      document.querySelectorAll('#dm-seasons-list .sortable-item').forEach(el => {
+        el.classList.remove('dragging', 'drag-over-top', 'drag-over-bottom');
+      });
     }
 
     function openCreateSeasonModal() {
@@ -5023,7 +5140,7 @@
         if (idx !== -1) {
           seasons[idx] = name;
         } else if (!seasons.includes(name)) {
-          seasons.push(name);
+          seasons.unshift(name);
         }
         if (records && records.length) {
           records.forEach(r => {
@@ -5036,9 +5153,9 @@
         editingSeasonName = null;
         showRecordToast(`📅 シーズン名を「${name}」に更新しました！`);
       } else {
-        if (!seasons.includes(name)) {
-          seasons.push(name);
-        }
+        // 新規登録は先頭に追加（＝最新・デフォルト）
+        seasons = seasons.filter(s => s !== name);
+        seasons.unshift(name);
         currentRecordSeason = name;
         showRecordToast(`📅 シーズン「${name}」を登録しました！`);
       }
@@ -5055,8 +5172,8 @@
       if (!confirm(`シーズン「${name}」を削除しますか？\n※ 過去の対戦記録のシーズン情報は保持されます。`)) return;
       seasons = seasons.filter(s => s !== name);
       if (currentRecordSeason === name) {
-        currentRecordSeason = '';
-        localStorage.setItem('pkm_last_season', '');
+        currentRecordSeason = (seasons.length > 0) ? seasons[0] : '';
+        localStorage.setItem('pkm_last_season', currentRecordSeason);
       }
       saveData();
       initSeasonSelect('rec-season', currentRecordSeason);
@@ -5215,6 +5332,7 @@
     });
 
     let editingTagId = null;
+    let _draggedTagIdx = null;
 
     function renderDmTags() {
       const listEl = document.getElementById('dm-tags-list');
@@ -5224,22 +5342,81 @@
         return;
       }
 
-      listEl.innerHTML = customTags.map(t => {
+      listEl.innerHTML = customTags.map((t, idx) => {
         const fmts = (t.formats && t.formats.length) ? t.formats.join(', ') : '全形式';
         const safeId = t.id ? t.id.replace(/'/g, "\\'") : '';
         return `
-          <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface2);padding:8px 12px;border-radius:6px;border:1px solid var(--border);flex-wrap:wrap;gap:8px">
-            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <div class="sortable-item" draggable="true" data-index="${idx}"
+            ondragstart="onDmTagDragStart(event, ${idx})"
+            ondragover="onDmTagDragOver(event, ${idx})"
+            ondragleave="onDmTagDragLeave(event, ${idx})"
+            ondrop="onDmTagDrop(event, ${idx})"
+            ondragend="onDmTagDragEnd(event)">
+            <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex:1;min-width:0">
+              <span class="drag-handle" title="ドラッグして並び替え">☰</span>
               <span style="font-size:14px;font-weight:600;color:var(--text)">🏷️ ${t.name}</span>
-              <span style="font-size:11px;color:var(--text-muted);background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px">対応形式: ${fmts}</span>
+              <span style="font-size:11px;color:var(--text-muted);background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px">形式: ${fmts}</span>
             </div>
-            <div style="display:flex;gap:6px">
+            <div style="display:flex;gap:6px;flex-shrink:0">
               <button type="button" class="btn btn-ghost btn-sm" onclick="editTag('${safeId}')" style="padding:3px 8px;font-size:12px">✏️ 編集</button>
               <button type="button" class="btn btn-ghost btn-sm" onclick="deleteTag('${safeId}')" style="padding:3px 8px;font-size:12px;color:#ef4444">🗑️ 削除</button>
             </div>
           </div>
         `;
       }).join('');
+    }
+
+    function onDmTagDragStart(e, idx) {
+      _draggedTagIdx = idx;
+      e.currentTarget.classList.add('dragging');
+      if (e.dataTransfer) {
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', idx);
+      }
+    }
+
+    function onDmTagDragOver(e, idx) {
+      e.preventDefault();
+      if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
+      const target = e.currentTarget;
+      const rect = target.getBoundingClientRect();
+      const next = (e.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
+      target.classList.toggle('drag-over-top', !next);
+      target.classList.toggle('drag-over-bottom', next);
+    }
+
+    function onDmTagDragLeave(e, idx) {
+      e.currentTarget.classList.remove('drag-over-top', 'drag-over-bottom');
+    }
+
+    function onDmTagDrop(e, targetIdx) {
+      e.preventDefault();
+      const target = e.currentTarget;
+      target.classList.remove('drag-over-top', 'drag-over-bottom');
+      if (_draggedTagIdx === null || _draggedTagIdx === undefined) return;
+      const fromIdx = _draggedTagIdx;
+      const rect = target.getBoundingClientRect();
+      const isAfter = (e.clientY - rect.top) / (rect.bottom - rect.top) > 0.5;
+      let toIdx = targetIdx;
+      if (isAfter && fromIdx > targetIdx) toIdx = targetIdx + 1;
+      else if (!isAfter && fromIdx < targetIdx) toIdx = targetIdx - 1;
+      if (toIdx < 0) toIdx = 0;
+      if (toIdx >= customTags.length) toIdx = customTags.length - 1;
+
+      if (fromIdx !== toIdx) {
+        const [moved] = customTags.splice(fromIdx, 1);
+        customTags.splice(toIdx, 0, moved);
+        saveData();
+        renderDmTags();
+        showRecordToast(`🏷️ タグを並び替えました`);
+      }
+    }
+
+    function onDmTagDragEnd(e) {
+      _draggedTagIdx = null;
+      document.querySelectorAll('#dm-tags-list .sortable-item').forEach(el => {
+        el.classList.remove('dragging', 'drag-over-top', 'drag-over-bottom');
+      });
     }
 
     function openCreateTagModal(initialName = '') {
