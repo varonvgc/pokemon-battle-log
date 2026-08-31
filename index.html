@@ -2897,6 +2897,56 @@
       <button type="button" class="format-toggle-btn" id="btn-mode-showdown" onclick="setRecordMode('showdown')">⚔️ Showdown</button>
     </div>
 
+    <!-- 対戦属性（レギュレーション・シーズン・形式・タグ） -->
+    <div class="card" style="margin-bottom:10px;padding:14px">
+      <div class="record-meta-grid" style="margin-bottom:12px">
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">レギュレーション</label>
+          <select id="rec-regulation" onchange="onRecordRegulationChange(this.value)" style="font-size:14px">
+            <option value="">記載なし</option>
+          </select>
+        </div>
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+            <label style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:0">シーズン</label>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="openCreateSeasonModal()" style="padding:2px 6px;font-size:11px;color:var(--accent);border:none">+ 新規登録</button>
+          </div>
+          <select id="rec-season" onchange="onRecordSeasonChange(this.value)" style="font-size:14px">
+            <option value="">記載なし</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 形式 (ランクマ / 公式大会 / 非公式 / フレ戦 / showdown) -->
+      <div style="margin-bottom:12px">
+        <label style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">形式</label>
+        <div id="rec-match-type-group" class="match-type-group">
+          <button type="button" class="match-type-btn active" data-type="ランクマ" onclick="setRecordMatchType('ランクマ')">ランクマ</button>
+          <button type="button" class="match-type-btn" data-type="公式大会" onclick="setRecordMatchType('公式大会')">公式大会</button>
+          <button type="button" class="match-type-btn" data-type="非公式" onclick="setRecordMatchType('非公式')">非公式</button>
+          <button type="button" class="match-type-btn" data-type="フレ戦" onclick="setRecordMatchType('フレ戦')">フレ戦</button>
+          <button type="button" class="match-type-btn" data-type="showdown" onclick="setRecordMatchType('showdown')" style="display:none">showdown</button>
+        </div>
+      </div>
+
+      <!-- タグ付け -->
+      <div style="position:relative">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+          <label style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:0">
+            <span>タグ付け</span>
+            <span style="font-size:11px;font-weight:normal;color:var(--text-muted)">（任意・複数可）</span>
+          </label>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="openCreateTagModal()" style="padding:2px 6px;font-size:11px;color:var(--accent);border:none">+ 新規タグ作成</button>
+        </div>
+        <div class="tag-container-box" id="rec-tag-container" onclick="focusTagInput()">
+          <div id="rec-tag-chips" style="display:inline-flex;flex-wrap:wrap;gap:4px"></div>
+          <input type="text" id="rec-tag-input" class="tag-input-inline" placeholder="タグを選択または入力..." autocomplete="off"
+            onfocus="onRecordTagFocus(this)" oninput="onRecordTagInput(this)" onkeydown="onRecordTagKeydown(event, this)">
+          <div id="rec-tag-ac" class="tag-ac-list"></div>
+        </div>
+      </div>
+    </div>
+
     <!-- BO1 / BO3 切り替え -->
     <div class="format-toggle-group">
       <button type="button" class="format-toggle-btn active" id="btn-format-bo1" onclick="setRecordFormat('bo1')">🎮 BO1</button>
@@ -2916,54 +2966,6 @@
 
       <div class="section-label">日時</div>
       <input type="datetime-local" id="rec-date" style="max-width:260px">
-
-      <!-- 対戦属性（レギュレーション・シーズン・形式・タグ） -->
-      <div class="record-meta-grid" style="margin-top:14px">
-        <div>
-          <label style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">レギュレーション</label>
-          <select id="rec-regulation" onchange="onRecordRegulationChange(this.value)" style="font-size:14px">
-            <option value="">記載なし</option>
-          </select>
-        </div>
-        <div>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-            <label style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:0">シーズン</label>
-            <button type="button" class="btn btn-ghost btn-sm" onclick="openCreateSeasonModal()" style="padding:2px 6px;font-size:11px;color:var(--accent);border:none">+ 新規登録</button>
-          </div>
-          <select id="rec-season" onchange="onRecordSeasonChange(this.value)" style="font-size:14px">
-            <option value="">記載なし</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- 形式 (ランクマ / 公式大会 / 非公式 / フレ戦 / showdown) -->
-      <div style="margin-bottom:14px">
-        <label style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">形式</label>
-        <div id="rec-match-type-group" class="match-type-group">
-          <button type="button" class="match-type-btn active" data-type="ランクマ" onclick="setRecordMatchType('ランクマ')">ランクマ</button>
-          <button type="button" class="match-type-btn" data-type="公式大会" onclick="setRecordMatchType('公式大会')">公式大会</button>
-          <button type="button" class="match-type-btn" data-type="非公式" onclick="setRecordMatchType('非公式')">非公式</button>
-          <button type="button" class="match-type-btn" data-type="フレ戦" onclick="setRecordMatchType('フレ戦')">フレ戦</button>
-          <button type="button" class="match-type-btn" data-type="showdown" onclick="setRecordMatchType('showdown')" style="display:none">showdown</button>
-        </div>
-      </div>
-
-      <!-- タグ付け -->
-      <div style="margin-bottom:16px;position:relative">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-          <label style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:0">
-            <span>タグ付け</span>
-            <span style="font-size:11px;font-weight:normal;color:var(--text-muted)">（任意・複数可）</span>
-          </label>
-          <button type="button" class="btn btn-ghost btn-sm" onclick="openCreateTagModal()" style="padding:2px 6px;font-size:11px;color:var(--accent);border:none">+ 新規タグ作成</button>
-        </div>
-        <div class="tag-container-box" id="rec-tag-container" onclick="focusTagInput()">
-          <div id="rec-tag-chips" style="display:inline-flex;flex-wrap:wrap;gap:4px"></div>
-          <input type="text" id="rec-tag-input" class="tag-input-inline" placeholder="タグを選択または入力..." autocomplete="off"
-            onfocus="onRecordTagFocus(this)" oninput="onRecordTagInput(this)" onkeydown="onRecordTagKeydown(event, this)">
-          <div id="rec-tag-ac" class="tag-ac-list"></div>
-        </div>
-      </div>
 
       <!-- AUTO記録（選出スクショ解析）エリア（チャンピオンズ用） -->
       <div class="rec-ai-box" id="rec-ai-box" style="margin-top:16px;margin-bottom:8px">
