@@ -2917,6 +2917,54 @@
       <div class="section-label">日時</div>
       <input type="datetime-local" id="rec-date" style="max-width:260px">
 
+      <!-- 対戦属性（レギュレーション・シーズン・形式・タグ） -->
+      <div class="record-meta-grid" style="margin-top:14px">
+        <div>
+          <label style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">レギュレーション</label>
+          <select id="rec-regulation" onchange="onRecordRegulationChange(this.value)" style="font-size:14px">
+            <option value="">記載なし</option>
+          </select>
+        </div>
+        <div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+            <label style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:0">シーズン</label>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="openCreateSeasonModal()" style="padding:2px 6px;font-size:11px;color:var(--accent);border:none">+ 新規登録</button>
+          </div>
+          <select id="rec-season" onchange="onRecordSeasonChange(this.value)" style="font-size:14px">
+            <option value="">記載なし</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- 形式 (ランクマ / 公式大会 / 非公式 / フレ戦 / showdown) -->
+      <div style="margin-bottom:14px">
+        <label style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">形式</label>
+        <div id="rec-match-type-group" class="match-type-group">
+          <button type="button" class="match-type-btn active" data-type="ランクマ" onclick="setRecordMatchType('ランクマ')">ランクマ</button>
+          <button type="button" class="match-type-btn" data-type="公式大会" onclick="setRecordMatchType('公式大会')">公式大会</button>
+          <button type="button" class="match-type-btn" data-type="非公式" onclick="setRecordMatchType('非公式')">非公式</button>
+          <button type="button" class="match-type-btn" data-type="フレ戦" onclick="setRecordMatchType('フレ戦')">フレ戦</button>
+          <button type="button" class="match-type-btn" data-type="showdown" onclick="setRecordMatchType('showdown')" style="display:none">showdown</button>
+        </div>
+      </div>
+
+      <!-- タグ付け -->
+      <div style="margin-bottom:16px;position:relative">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+          <label style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:0">
+            <span>タグ付け</span>
+            <span style="font-size:11px;font-weight:normal;color:var(--text-muted)">（任意・複数可）</span>
+          </label>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="openCreateTagModal()" style="padding:2px 6px;font-size:11px;color:var(--accent);border:none">+ 新規タグ作成</button>
+        </div>
+        <div class="tag-container-box" id="rec-tag-container" onclick="focusTagInput()">
+          <div id="rec-tag-chips" style="display:inline-flex;flex-wrap:wrap;gap:4px"></div>
+          <input type="text" id="rec-tag-input" class="tag-input-inline" placeholder="タグを選択または入力..." autocomplete="off"
+            onfocus="onRecordTagFocus(this)" oninput="onRecordTagInput(this)" onkeydown="onRecordTagKeydown(event, this)">
+          <div id="rec-tag-ac" class="tag-ac-list"></div>
+        </div>
+      </div>
+
       <!-- AUTO記録（選出スクショ解析）エリア（チャンピオンズ用） -->
       <div class="rec-ai-box" id="rec-ai-box" style="margin-top:16px;margin-bottom:8px">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;flex-wrap:wrap;gap:6px">
@@ -3004,54 +3052,6 @@
       <div id="image-lightbox-modal" class="image-lightbox-modal" onclick="closeImageLightbox(event)">
         <button type="button" class="image-lightbox-close" onclick="closeImageLightbox(event)">✕</button>
         <img id="image-lightbox-img" class="image-lightbox-img" src="" alt="拡大スクリーンショット" onclick="event.stopPropagation()">
-      </div>
-
-      <!-- 対戦属性（レギュレーション・シーズン・形式・タグ） -->
-      <div class="record-meta-grid" style="margin-top:16px">
-        <div>
-          <label style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">レギュレーション</label>
-          <select id="rec-regulation" onchange="onRecordRegulationChange(this.value)" style="font-size:14px">
-            <option value="">記載なし</option>
-          </select>
-        </div>
-        <div>
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-            <label style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:0">シーズン</label>
-            <button type="button" class="btn btn-ghost btn-sm" onclick="openCreateSeasonModal()" style="padding:2px 6px;font-size:11px;color:var(--accent);border:none">+ 新規登録</button>
-          </div>
-          <select id="rec-season" onchange="onRecordSeasonChange(this.value)" style="font-size:14px">
-            <option value="">記載なし</option>
-          </select>
-        </div>
-      </div>
-
-      <!-- 形式 (ランクマ / 公式大会 / 非公式 / フレ戦 / showdown) -->
-      <div style="margin-bottom:14px">
-        <label style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">形式</label>
-        <div id="rec-match-type-group" class="match-type-group">
-          <button type="button" class="match-type-btn active" data-type="ランクマ" onclick="setRecordMatchType('ランクマ')">ランクマ</button>
-          <button type="button" class="match-type-btn" data-type="公式大会" onclick="setRecordMatchType('公式大会')">公式大会</button>
-          <button type="button" class="match-type-btn" data-type="非公式" onclick="setRecordMatchType('非公式')">非公式</button>
-          <button type="button" class="match-type-btn" data-type="フレ戦" onclick="setRecordMatchType('フレ戦')">フレ戦</button>
-          <button type="button" class="match-type-btn" data-type="showdown" onclick="setRecordMatchType('showdown')" style="display:none">showdown</button>
-        </div>
-      </div>
-
-      <!-- タグ付け -->
-      <div style="margin-bottom:16px;position:relative">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-          <label style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:0">
-            <span>タグ付け</span>
-            <span style="font-size:11px;font-weight:normal;color:var(--text-muted)">（任意・複数可）</span>
-          </label>
-          <button type="button" class="btn btn-ghost btn-sm" onclick="openCreateTagModal()" style="padding:2px 6px;font-size:11px;color:var(--accent);border:none">+ 新規タグ作成</button>
-        </div>
-        <div class="tag-container-box" id="rec-tag-container" onclick="focusTagInput()">
-          <div id="rec-tag-chips" style="display:inline-flex;flex-wrap:wrap;gap:4px"></div>
-          <input type="text" id="rec-tag-input" class="tag-input-inline" placeholder="タグを選択または入力..." autocomplete="off"
-            onfocus="onRecordTagFocus(this)" oninput="onRecordTagInput(this)" onkeydown="onRecordTagKeydown(event, this)">
-          <div id="rec-tag-ac" class="tag-ac-list"></div>
-        </div>
       </div>
 
       <div style="margin-top:14px;margin-bottom:8px">
@@ -3225,13 +3225,19 @@
           </select>
         </div>
       </div>
-      <div id="history-tags-filter-container" style="margin-bottom:12px">
-        <label style="display:flex;align-items:center;justify-content:space-between">
-          <span>タグで絞り込み <span style="font-size:11px;font-weight:normal;color:var(--text-muted)">（複数選択: OR検索）</span></span>
+      <div id="history-tags-filter-container" style="margin-bottom:12px;position:relative">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+          <label style="margin-bottom:0">
+            <span>タグで絞り込み</span>
+            <span style="font-size:11px;font-weight:normal;color:var(--text-muted)">（複数選択: OR検索）</span>
+          </label>
           <button type="button" class="btn btn-ghost btn-sm" onclick="clearHistoryTagFilters()" style="padding:1px 6px;font-size:11px;color:var(--text-muted);border:none" id="btn-clear-tag-filters">クリア</button>
-        </label>
-        <div id="history-tags-chips" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px">
-          <span style="font-size:12px;color:var(--text-muted)">登録されたタグがありません</span>
+        </div>
+        <div class="tag-container-box" id="history-tag-container" onclick="focusHistoryTagInput()" style="margin-top:4px">
+          <div id="history-tag-selected-chips" style="display:inline-flex;flex-wrap:wrap;gap:4px"></div>
+          <input type="text" id="history-tag-filter-input" class="tag-input-inline" placeholder="タグを選択または検索..." autocomplete="off"
+            onfocus="onHistoryTagFilterFocus(this)" oninput="onHistoryTagFilterInput(this)" onkeydown="onHistoryTagFilterKeydown(event, this)">
+          <div id="history-tag-filter-ac" class="tag-ac-list"></div>
         </div>
       </div>
       <div style="margin-bottom:10px">
@@ -5098,6 +5104,10 @@
       if (box && !box.contains(e.target)) {
         closeTagAc();
       }
+      const histBox = document.getElementById('history-tag-container');
+      if (histBox && !histBox.contains(e.target)) {
+        closeHistoryTagAc();
+      }
     });
 
     function openCreateTagModal(initialName = '') {
@@ -5159,35 +5169,111 @@
       showRecordToast(`🏷️ タグ「${name}」を登録しました！`);
     }
 
+    // 履歴画面のタグフィルター用
     function renderHistoryTagChips() {
-      const container = document.getElementById('history-tags-chips');
+      const container = document.getElementById('history-tag-selected-chips');
       if (!container) return;
-      if (!customTags || !customTags.length) {
-        container.innerHTML = '<span style="font-size:12px;color:var(--text-muted)">登録されたタグがありません</span>';
+      if (!historyTagFilters || !historyTagFilters.length) {
+        container.innerHTML = '';
         return;
       }
-      container.innerHTML = customTags.map(t => {
-        const isActive = historyTagFilters.includes(t.name);
-        return `
-          <button type="button" class="filter-tag-chip${isActive ? ' active' : ''}" onclick="toggleHistoryTagFilter('${t.name}')">
-            🏷️ ${t.name}
-          </button>
-        `;
-      }).join('');
+      container.innerHTML = historyTagFilters.map(t => `
+        <span class="tag-badge">
+          <span>🏷️ ${t}</span>
+          <button type="button" class="tag-badge-remove" onclick="event.stopPropagation(); removeHistoryTagFilter('${t}')">✕</button>
+        </span>
+      `).join('');
     }
 
-    function toggleHistoryTagFilter(tag) {
-      if (historyTagFilters.includes(tag)) {
-        historyTagFilters = historyTagFilters.filter(t => t !== tag);
+    function focusHistoryTagInput() {
+      const input = document.getElementById('history-tag-filter-input');
+      if (input) input.focus();
+    }
+
+    function onHistoryTagFilterFocus(input) {
+      showHistoryTagAc(input.value);
+    }
+
+    function onHistoryTagFilterInput(input) {
+      showHistoryTagAc(input.value);
+    }
+
+    function onHistoryTagFilterKeydown(e, input) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const acList = document.getElementById('history-tag-filter-ac');
+        const firstItem = acList ? acList.querySelector('.tag-ac-item') : null;
+        if (firstItem && firstItem.dataset.name) {
+          addHistoryTagFilter(firstItem.dataset.name);
+        }
+      } else if (e.key === 'Escape') {
+        closeHistoryTagAc();
+      }
+    }
+
+    function showHistoryTagAc(val) {
+      const list = document.getElementById('history-tag-filter-ac');
+      if (!list) return;
+      val = (val || '').trim().toLowerCase();
+
+      // 既に選択中のフィルタータグは除外
+      let availableTags = customTags.filter(t => !historyTagFilters.includes(t.name));
+
+      if (val) {
+        availableTags = availableTags.filter(t => t.name.toLowerCase().includes(val));
+      }
+
+      let html = '';
+      if (availableTags.length > 0) {
+        availableTags.forEach(t => {
+          const fmts = (t.formats && t.formats.length) ? t.formats.join(', ') : '全形式';
+          html += `
+            <div class="tag-ac-item" data-name="${t.name}" onclick="addHistoryTagFilter('${t.name}')">
+              <span style="font-weight:600">🏷️ ${t.name}</span>
+              <span style="font-size:11px;color:var(--text-muted)">(${fmts})</span>
+            </div>
+          `;
+        });
       } else {
+        html = '<div style="padding:8px 12px;font-size:12px;color:var(--text-muted)">該当するタグがありません</div>';
+      }
+
+      list.innerHTML = html;
+      list.classList.add('open');
+    }
+
+    function closeHistoryTagAc() {
+      const list = document.getElementById('history-tag-filter-ac');
+      if (list) list.classList.remove('open');
+    }
+
+    function addHistoryTagFilter(tag) {
+      if (!tag) return;
+      tag = tag.trim();
+      if (!historyTagFilters.includes(tag)) {
         historyTagFilters.push(tag);
       }
+      renderHistoryTagChips();
+      renderHistory();
+      const input = document.getElementById('history-tag-filter-input');
+      if (input) {
+        input.value = '';
+        input.focus();
+      }
+      closeHistoryTagAc();
+    }
+
+    function removeHistoryTagFilter(tag) {
+      historyTagFilters = historyTagFilters.filter(t => t !== tag);
       renderHistoryTagChips();
       renderHistory();
     }
 
     function clearHistoryTagFilters() {
       historyTagFilters = [];
+      const input = document.getElementById('history-tag-filter-input');
+      if (input) input.value = '';
+      closeHistoryTagAc();
       renderHistoryTagChips();
       renderHistory();
     }
@@ -6349,24 +6435,6 @@
         oppInfoHtml = `<span style="${badgeStyle}"><span style="color:#f59e0b">★</span> ${r.oppRating}</span>`;
       }
 
-      // メタバッジ群（レギュレーション、シーズン、形式、タグ）
-      let metaBadgesHtml = '';
-      if (r.regulation) {
-        metaBadgesHtml += `<span class="badge-meta badge-reg">📜 ${r.regulation}</span>`;
-      }
-      if (r.season) {
-        metaBadgesHtml += `<span class="badge-meta badge-season">📅 ${r.season}</span>`;
-      }
-      const matchType = r.matchType || (r.sourceMode === 'showdown' ? 'showdown' : 'ランクマ');
-      if (matchType) {
-        metaBadgesHtml += `<span class="badge-meta badge-match-type">🎮 ${matchType}</span>`;
-      }
-      if (r.tags && Array.isArray(r.tags) && r.tags.length > 0) {
-        r.tags.forEach(t => {
-          metaBadgesHtml += `<span class="badge-meta badge-tag-item">🏷️ ${t}</span>`;
-        });
-      }
-
       // 選出ポケモンのHTML（BO3の場合は1試合目・2試合目・3試合目を縦に並べる）
       let mySelHtml = '';
       let oppSelHtml = '';
@@ -6391,11 +6459,10 @@
     <div class="hist-card-body">
       <div class="hist-opp-party">
         <div class="hist-row-label" style="display:flex;align-items:center;justify-content:space-between;gap:6px;flex-wrap:wrap">
-          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:6px">
             <div style="display:flex;align-items:center;gap:4px">${resultBadgeHtml}</div>
             <span class="record-date" style="font-size:11px">${dateStr}</span>
             ${oppInfoHtml}
-            ${metaBadgesHtml}
           </div>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:3px">${tagRow(oppPartyList, 'rgba(255,255,255,0.06)', oppSelFilter)}</div>
