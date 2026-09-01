@@ -84,17 +84,38 @@ def fetch_pending_records(db):
     作成日時の昇順 (FIFO: 古い順) でソートして返す
     """
     pending_items = []
-    users_ref = db.collection('users')
-    users_docs = users_ref.stream()
+    
+    # 1. collection_group('data') で全 data/main ドキュメントを走査
+    main_docs = []
+    try:
+        data_query = db.collection_group('data').stream()
+        for d in data_query:
+            if d.id == 'main':
+                main_docs.append(d)
+    except Exception as e:
+        print(f"⚠️ collection_group 取得警告: {e}")
 
-    for user_doc in users_docs:
-        uid = user_doc.id
-        main_doc_ref = users_ref.document(uid).collection('data').document('main')
-        main_doc = main_doc_ref.get()
-        if not main_doc.exists:
-            continue
+    # 2. 念のため users コレクションの list_documents() からも走査
+    if not main_docs:
+        try:
+            users_ref = db.collection('users')
+            for user_doc in users_ref.list_documents():
+                m_doc = user_doc.collection('data').document('main').get()
+                if m_doc.exists:
+                    main_docs.append(m_doc)
+        except Exception as e:
+            print(f"⚠️ list_documents 取得警告: {e}")
 
-        data = main_doc.to_dict()
+    print(f"  🔍 対象 Firestore ドキュメント数: {len(main_docs)}")
+
+    for main_doc in main_docs:
+        try:
+            # users/{uid}/data/main -> uid を取得
+            uid = main_doc.reference.parent.parent.id
+        except Exception:
+            uid = 'unknown'
+
+        data = main_doc.to_dict() or {}
         records = data.get('records', [])
         if not isinstance(records, list):
             continue
