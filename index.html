@@ -43,6 +43,12 @@
     window._firebaseReady = true;
     document.dispatchEvent(new Event('firebase-ready'));
   </script>
+  <!-- Google Identity Services (GIS) & Drive Uploader -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script type="module">
+    import { GoogleDriveResumableUploader } from "./src/utils/driveUploader.js";
+    window.GoogleDriveResumableUploader = GoogleDriveResumableUploader;
+  </script>
   <style>
     :root {
       --bg: #0f1117;
@@ -3212,6 +3218,55 @@
         <textarea id="rec-memo" rows="3" placeholder="特記事項など..."></textarea>
       </div>
 
+      <!-- 動画添付エリア（Google Drive一時保存 ➔ YouTube自動転送） -->
+      <div class="card" style="margin-top:20px;padding:14px;border:1px dashed var(--accent);background:rgba(108,99,255,0.04)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <label style="font-size:13px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:6px;margin-bottom:0">
+            <span>🎥 対戦録画の添付</span>
+            <span style="font-size:11px;font-weight:normal;color:var(--text-muted)">（任意）</span>
+          </label>
+          <span id="rec-video-status-badge" style="display:none;font-size:11px;padding:2px 8px;border-radius:4px"></span>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">
+          ※ 動画ファイルを選択するとGoogle Driveへ直接アップロード（一時保存）され、夜間にYouTube（限定公開）へ自動転送されます。
+        </div>
+
+        <div id="rec-video-select-section">
+          <input type="file" id="rec-video-file-input" accept="video/*" onchange="onVideoFileSelected(this)" style="font-size:13px;padding:6px;width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px">
+        </div>
+
+        <!-- アップロード進捗表示エリア -->
+        <div id="rec-video-progress-area" style="display:none;margin-top:10px">
+          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
+            <span id="rec-video-filename" style="font-weight:600;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+            <span id="rec-video-progress-percent" style="font-weight:700;color:var(--accent)">0%</span>
+          </div>
+          <div style="width:100%;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;margin-bottom:6px">
+            <div id="rec-video-progress-bar" style="width:0%;height:100%;background:linear-gradient(90deg,var(--accent),#a78bfa);transition:width 0.2s ease"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted)">
+            <span id="rec-video-progress-status">準備中...</span>
+            <span id="rec-video-progress-speed"></span>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button type="button" class="btn btn-ghost btn-sm" id="rec-video-pause-btn" onclick="togglePauseVideoUpload()" style="font-size:11px;padding:3px 8px">一時停止</button>
+            <button type="button" class="btn btn-ghost btn-sm" onclick="cancelVideoUpload()" style="font-size:11px;padding:3px 8px;color:#ef4444;border-color:#ef4444">キャンセル</button>
+          </div>
+        </div>
+
+        <!-- アップロード完了済みの動画情報表示 -->
+        <div id="rec-video-attached-info" style="display:none;align-items:center;justify-content:space-between;background:var(--surface);padding:8px 12px;border-radius:6px;border:1px solid var(--border);margin-top:8px">
+          <div style="display:flex;align-items:center;gap:8px;overflow:hidden">
+            <span style="font-size:18px">🎥</span>
+            <div style="overflow:hidden">
+              <div id="rec-video-attached-name" style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">動画添付済み</div>
+              <div id="rec-video-attached-link" style="font-size:11px;color:var(--accent)">Google Driveに保存済み (YouTube転送待ち)</div>
+            </div>
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="removeAttachedVideo()" style="color:#ef4444;border:none;padding:2px 6px">✕ 削除</button>
+        </div>
+      </div>
+
       <div style="margin-top:20px;display:flex;justify-content:flex-end;align-items:center;gap:10px">
         <button type="button" id="record-cancel-edit-btn-bottom" class="btn btn-ghost" onclick="cancelRecordEdit()" style="display:none;color:#ef4444;border-color:#ef4444">✕ 編集をキャンセル</button>
         <button type="button" class="btn btn-primary" id="record-save-btn" onclick="saveRecord()">💾 記録を保存</button>
@@ -3388,6 +3443,35 @@
       </div>
       <div style="font-size:11px;color:var(--text-muted);margin-top:6px">
         ※ ShowdownのリプレイURLから対戦を記録する際、自分と相手を判別するために使用します。
+      </div>
+    </div>
+
+    <!-- Google Drive 動画連携設定カード -->
+    <div class="card mb-4" id="dm-drive-settings-card">
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <span style="display:flex;align-items:center;gap:6px">🎥 Google Drive 動画連携設定</span>
+        <span id="dm-drive-status-badge" style="font-size:11px;padding:2px 8px;border-radius:4px;background:var(--surface2);color:var(--text-muted)">未接続</span>
+      </div>
+
+      <div style="margin-bottom:12px">
+        <label for="dm-drive-folder-id" style="font-size:12px;color:var(--text-muted);margin-bottom:4px;display:block">Google Drive 保存先フォルダID</label>
+        <input type="text" id="dm-drive-folder-id" placeholder="例: 1a2B3c4D5e6F7g8H9i0jK" style="width:100%" autocomplete="off">
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">
+          ※ 動画をアップロードするGoogle DriveのフォルダURL末尾のIDを入力してください。
+        </div>
+      </div>
+
+      <div style="margin-bottom:14px">
+        <label for="dm-drive-client-id" style="font-size:12px;color:var(--text-muted);margin-bottom:4px;display:block">Google OAuth Client ID（Web用）</label>
+        <input type="text" id="dm-drive-client-id" placeholder="例: xxxxx-xxxxx.apps.googleusercontent.com" style="width:100%" autocomplete="off">
+        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">
+          ※ ブラウザからDriveへ直接アップロードするためのOAuth Web Client IDです（詳細は <a href="./docs/SETUP_OAUTH.md" target="_blank" style="color:var(--accent)">設定ガイド</a> 参照）。
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <button type="button" class="btn btn-primary" onclick="saveDriveSettings()" style="white-space:nowrap">💾 設定を保存</button>
+        <button type="button" class="btn btn-ghost" onclick="testGoogleDriveAuth()" style="white-space:nowrap">🔑 Googleアカウント連携・テスト</button>
       </div>
     </div>
 
@@ -4098,6 +4182,124 @@
       }
     }
 
+    // Google Drive 設定
+    function getDriveFolderId() {
+      return localStorage.getItem('pkm_drive_folder_id') || '';
+    }
+
+    function getDriveClientId() {
+      return localStorage.getItem('pkm_drive_client_id') || '';
+    }
+
+    async function saveDriveSettings() {
+      const folderInput = document.getElementById('dm-drive-folder-id');
+      const clientInput = document.getElementById('dm-drive-client-id');
+      const folderId = (folderInput ? folderInput.value : '').trim();
+      const clientId = (clientInput ? clientInput.value : '').trim();
+
+      localStorage.setItem('pkm_drive_folder_id', folderId);
+      localStorage.setItem('pkm_drive_client_id', clientId);
+
+      if (currentUser && _fbReady) {
+        const { doc, setDoc } = window._firestoreOps;
+        const db = window._db;
+        try {
+          await setDoc(doc(db, 'users', currentUser.uid, 'data', 'main'), {
+            driveFolderId: folderId,
+            driveClientId: clientId,
+            updatedAt: window._firestoreOps.serverTimestamp(),
+            updatedBy: CLIENT_ID
+          }, { merge: true });
+        } catch (e) {
+          console.error('Failed to save Drive settings to Firestore:', e);
+        }
+      }
+      showRecordToast('✅ Google Drive設定を保存しました！');
+      updateDriveSettingsUI();
+    }
+
+    function updateDriveSettingsUI() {
+      const folderInput = document.getElementById('dm-drive-folder-id');
+      const clientInput = document.getElementById('dm-drive-client-id');
+      if (folderInput) folderInput.value = getDriveFolderId();
+      if (clientInput) clientInput.value = getDriveClientId();
+
+      const badge = document.getElementById('dm-drive-status-badge');
+      if (badge) {
+        if (window._googleDriveAccessToken && Date.now() < window._googleDriveTokenExpiresAt) {
+          badge.textContent = '認証済み (接続中)';
+          badge.style.background = 'rgba(74,222,128,0.15)';
+          badge.style.color = 'var(--win)';
+        } else if (getDriveClientId()) {
+          badge.textContent = 'Client ID設定済 (未認証)';
+          badge.style.background = 'rgba(245,158,11,0.15)';
+          badge.style.color = '#f59e0b';
+        } else {
+          badge.textContent = '未設定';
+          badge.style.background = 'var(--surface2)';
+          badge.style.color = 'var(--text-muted)';
+        }
+      }
+    }
+
+    // Google Drive認証トークン要求 (GIS)
+    window._googleDriveAccessToken = null;
+    window._googleDriveTokenExpiresAt = 0;
+
+    function requestGoogleDriveAccessToken(interactive = true) {
+      return new Promise((resolve, reject) => {
+        if (window._googleDriveAccessToken && Date.now() < window._googleDriveTokenExpiresAt) {
+          resolve(window._googleDriveAccessToken);
+          return;
+        }
+        const cId = getDriveClientId();
+        if (!cId) {
+          const err = new Error('Google OAuth Client ID が設定されていません。「データ管理」画面で設定してください。');
+          alert(err.message);
+          reject(err);
+          return;
+        }
+        if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
+          const err = new Error('Google Identity Services が読み込まれていません。');
+          alert(err.message);
+          reject(err);
+          return;
+        }
+
+        try {
+          const client = google.accounts.oauth2.initTokenClient({
+            client_id: cId,
+            scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive',
+            callback: (response) => {
+              if (response.error) {
+                console.error('Google OAuth error:', response);
+                reject(new Error(response.error_description || response.error));
+                return;
+              }
+              window._googleDriveAccessToken = response.access_token;
+              window._googleDriveTokenExpiresAt = Date.now() + (parseInt(response.expires_in, 10) - 60) * 1000;
+              updateDriveSettingsUI();
+              resolve(window._googleDriveAccessToken);
+            }
+          });
+          client.requestAccessToken({ prompt: interactive ? 'consent' : '' });
+        } catch (e) {
+          reject(e);
+        }
+      });
+    }
+
+    async function testGoogleDriveAuth() {
+      try {
+        const token = await requestGoogleDriveAccessToken(true);
+        if (token) {
+          showRecordToast('🎉 Googleアカウントの連携に成功しました！');
+        }
+      } catch (e) {
+        alert(`Google連携エラー: ${e.message}`);
+      }
+    }
+
     // Firestoreへのデータ保存
     async function saveData() {
       localStorage.setItem('pkm_parties', JSON.stringify(parties));
@@ -4121,6 +4323,10 @@
         if (apiKey) payload.geminiApiKey = apiKey;
         const sdUser = getShowdownUsername();
         if (sdUser) payload.showdownUsername = sdUser;
+        const driveFolderId = getDriveFolderId();
+        if (driveFolderId) payload.driveFolderId = driveFolderId;
+        const driveClientId = getDriveClientId();
+        if (driveClientId) payload.driveClientId = driveClientId;
 
         await setDoc(doc(db, 'users', uid, 'data', 'main'), payload, { merge: true });
         _lastLoadedAt = Date.now();
@@ -4240,6 +4446,15 @@
             localStorage.setItem('pkm_showdown_username', data.showdownUsername || '');
           }
           updateShowdownUserUI();
+
+          // Google Drive設定の同期（読み取りのみ）
+          if (data.driveFolderId !== undefined) {
+            localStorage.setItem('pkm_drive_folder_id', data.driveFolderId || '');
+          }
+          if (data.driveClientId !== undefined) {
+            localStorage.setItem('pkm_drive_client_id', data.driveClientId || '');
+          }
+          updateDriveSettingsUI();
 
           initRecordFormMeta();
 
@@ -6741,6 +6956,16 @@
         if (showdownUrls && showdownUrls.some(Boolean)) rec.showdownUrls = showdownUrls;
       }
 
+      // 添付動画情報の引き継ぎ・保存
+      if (_attachedVideoData) {
+        rec.drive_file_id = _attachedVideoData.drive_file_id;
+        rec.video_url = _attachedVideoData.video_url;
+        rec.sync_status = _attachedVideoData.sync_status || 'pending';
+        rec.created_at = _attachedVideoData.created_at || Date.now();
+        if (_attachedVideoData.youtube_video_id) rec.youtube_video_id = _attachedVideoData.youtube_video_id;
+        if (_attachedVideoData.original_name) rec.video_original_name = _attachedVideoData.original_name;
+      }
+
       // 1. ローカルに即時保存 (編集中は上書き更新、新規は先頭に追加)
       if (editingRecordId) {
         rec.id = editingRecordId;
@@ -6759,6 +6984,10 @@
         saveData();
         showRecordToast('💾 対戦記録を保存しました！');
       }
+
+      // 動画添付状態のリセット
+      _attachedVideoData = null;
+      resetRecordVideoUI();
 
       // 2. UIのリセット（前回選択したパーティは維持し、フォームを展開状態にする）
       recordResult = null;
@@ -6851,6 +7080,17 @@
         oppSelHtml = `<div style="display:flex;flex-wrap:nowrap;gap:2px;overflow:visible">${tagRow(oppSelList, 'rgba(255,101,132,0.2)', oppSelFilter)}</div>`;
       }
 
+      // 動画バッジのHTML
+      let videoBadgeHtml = '';
+      if (r.video_url || r.drive_file_id || r.youtube_video_id) {
+        const isUploaded = r.sync_status === 'uploaded' || (r.video_url && r.video_url.includes('youtu'));
+        if (isUploaded) {
+          videoBadgeHtml = `<span style="font-size:10px;padding:1px 5px;background:#dc2626;color:#fff;border-radius:4px;font-weight:700" title="YouTube録画あり">▶️ 動画</span>`;
+        } else {
+          videoBadgeHtml = `<span style="font-size:10px;padding:1px 5px;background:var(--accent);color:#fff;border-radius:4px;font-weight:700" title="Google Driveに保存中 (YouTube転送待ち)">📁 Drive</span>`;
+        }
+      }
+
       return `<div class="record-item" onclick="openDetail('${r.id}')" style="border-left:3px solid ${borderColor}">
     <div class="hist-card-body">
       <div class="hist-opp-party">
@@ -6859,6 +7099,7 @@
             <div style="display:flex;align-items:center;gap:4px">${resultBadgeHtml}</div>
             <span class="record-date" style="font-size:11px">${dateStr}</span>
             ${oppInfoHtml}
+            ${videoBadgeHtml}
           </div>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:3px">${tagRow(oppPartyList, 'rgba(255,255,255,0.06)', oppSelFilter)}</div>
@@ -7019,6 +7260,153 @@
       }
     }
 
+    // ---- VIDEO UPLOAD & ATTACHMENT ----
+    let _currentVideoUploader = null;
+    let _attachedVideoData = null; // { drive_file_id, video_url, sync_status: 'pending', created_at, original_name, file_size }
+
+    async function onVideoFileSelected(input) {
+      const file = input.files && input.files[0];
+      if (!file) return;
+
+      const folderId = getDriveFolderId();
+      if (!folderId) {
+        alert('Google Driveの保存先フォルダIDが未設定です。「データ管理」画面でフォルダIDを設定してください。');
+        input.value = '';
+        return;
+      }
+
+      // 認証トークンの取得
+      let token = null;
+      try {
+        token = await requestGoogleDriveAccessToken(true);
+      } catch (e) {
+        input.value = '';
+        return;
+      }
+
+      // UI表示切り替え
+      document.getElementById('rec-video-select-section').style.display = 'none';
+      const progressArea = document.getElementById('rec-video-progress-area');
+      progressArea.style.display = 'block';
+
+      document.getElementById('rec-video-filename').textContent = file.name;
+      document.getElementById('rec-video-progress-percent').textContent = '0%';
+      document.getElementById('rec-video-progress-bar').style.width = '0%';
+      document.getElementById('rec-video-progress-status').textContent = '初期化中...';
+      document.getElementById('rec-video-progress-speed').textContent = '';
+
+      const UploaderClass = window.GoogleDriveResumableUploader || (typeof GoogleDriveResumableUploader !== 'undefined' ? GoogleDriveResumableUploader : null);
+      if (!UploaderClass) {
+        alert('アップローダーモジュールが初期化されていません。ページを再読み込みしてください。');
+        resetRecordVideoUI();
+        return;
+      }
+
+      const customFileName = `battle_log_${Date.now()}_${file.name}`;
+
+      _currentVideoUploader = new UploaderClass({
+        file,
+        accessToken: token,
+        folderId,
+        customFileName,
+        chunkSize: 2 * 1024 * 1024, // 2MB
+        onProgress: (prog) => {
+          document.getElementById('rec-video-progress-percent').textContent = `${prog.percent}%`;
+          document.getElementById('rec-video-progress-bar').style.width = `${prog.percent}%`;
+          const speedMB = (prog.speedBytesPerSec / (1024 * 1024)).toFixed(2);
+          document.getElementById('rec-video-progress-speed').textContent = `${speedMB} MB/s`;
+          const loadedMB = (prog.loadedBytes / (1024 * 1024)).toFixed(1);
+          const totalMB = (prog.totalBytes / (1024 * 1024)).toFixed(1);
+          document.getElementById('rec-video-progress-status').textContent = `${loadedMB}MB / ${totalMB}MB`;
+        },
+        onStatusChange: (status, msg) => {
+          if (status === 'error') {
+            alert(`アップロードエラー: ${msg}`);
+            resetRecordVideoUI();
+          }
+        }
+      });
+
+      try {
+        const result = await _currentVideoUploader.start();
+        const fileId = result.id;
+        _attachedVideoData = {
+          drive_file_id: fileId,
+          video_url: `https://drive.google.com/file/d/${fileId}/preview`,
+          sync_status: 'pending',
+          created_at: Date.now(),
+          original_name: file.name,
+          file_size: file.size
+        };
+        showAttachedVideoUI(_attachedVideoData);
+        showRecordToast('✅ 動画のGoogle Driveアップロードが完了しました！');
+      } catch (e) {
+        if (e.message !== 'Upload aborted by user') {
+          console.error('Upload failed:', e);
+        }
+        resetRecordVideoUI();
+      }
+    }
+
+    function showAttachedVideoUI(videoData) {
+      document.getElementById('rec-video-select-section').style.display = 'none';
+      document.getElementById('rec-video-progress-area').style.display = 'none';
+      const infoArea = document.getElementById('rec-video-attached-info');
+      infoArea.style.display = 'flex';
+
+      const nameEl = document.getElementById('rec-video-attached-name');
+      const linkEl = document.getElementById('rec-video-attached-link');
+      if (nameEl) nameEl.textContent = videoData.original_name || '対戦動画ファイル';
+      if (linkEl) {
+        if (videoData.sync_status === 'uploaded' || (videoData.video_url && videoData.video_url.includes('youtu'))) {
+          linkEl.textContent = 'YouTube (限定公開) に公開済み';
+          linkEl.style.color = '#ef4444';
+        } else {
+          linkEl.textContent = 'Google Driveに保存済み (YouTube転送待ち)';
+          linkEl.style.color = 'var(--accent)';
+        }
+      }
+    }
+
+    function togglePauseVideoUpload() {
+      if (!_currentVideoUploader) return;
+      const btn = document.getElementById('rec-video-pause-btn');
+      if (_currentVideoUploader.isPaused) {
+        _currentVideoUploader.resume();
+        if (btn) btn.textContent = '一時停止';
+      } else {
+        _currentVideoUploader.pause();
+        if (btn) btn.textContent = '再開';
+      }
+    }
+
+    function cancelVideoUpload() {
+      if (_currentVideoUploader) {
+        _currentVideoUploader.abort();
+        _currentVideoUploader = null;
+      }
+      resetRecordVideoUI();
+      showRecordToast('動画アップロードをキャンセルしました');
+    }
+
+    function removeAttachedVideo() {
+      _attachedVideoData = null;
+      resetRecordVideoUI();
+      showRecordToast('添付動画を解除しました');
+    }
+
+    function resetRecordVideoUI() {
+      _currentVideoUploader = null;
+      const fileInput = document.getElementById('rec-video-file-input');
+      if (fileInput) fileInput.value = '';
+      const sec = document.getElementById('rec-video-select-section');
+      if (sec) sec.style.display = 'block';
+      const prog = document.getElementById('rec-video-progress-area');
+      if (prog) prog.style.display = 'none';
+      const info = document.getElementById('rec-video-attached-info');
+      if (info) info.style.display = 'none';
+    }
+
     // ---- DETAIL MODAL ----
     function openDetail(id) {
       const r = records.find(x => x.id === id);
@@ -7091,7 +7479,7 @@
         if (validLinks.length > 0) {
           replayLinkHtml = `
             <div class="detail-section">
-              <h4>対戦記録</h4>
+              <h4>対戦記録 (Showdown)</h4>
               <div style="display:flex;flex-direction:column;gap:6px">
                 ${validLinks.join('')}
               </div>
@@ -7103,12 +7491,45 @@
         if (u && u.trim()) {
           replayLinkHtml = `
             <div class="detail-section">
-              <h4>対戦記録</h4>
+              <h4>対戦記録 (Showdown)</h4>
               <div>
                 <a href="${u.trim()}" target="_blank" rel="noopener noreferrer" style="color:var(--accent);text-decoration:underline;font-size:13px;word-break:break-all;display:inline-block">🔗 対戦記録</a>
               </div>
             </div>
           `;
+        }
+      }
+
+      // 動画録画リンク（YouTube または Google Drive）
+      let videoLinkHtml = '';
+      if (r.video_url || r.drive_file_id || r.youtube_video_id) {
+        const isUploaded = r.sync_status === 'uploaded' || (r.video_url && r.video_url.includes('youtu'));
+        const url = r.video_url || (r.youtube_video_id ? `https://youtu.be/${r.youtube_video_id}` : (r.drive_file_id ? `https://drive.google.com/file/d/${r.drive_file_id}/preview` : ''));
+        
+        if (url) {
+          if (isUploaded) {
+            videoLinkHtml = `
+              <div class="detail-section">
+                <h4>🎥 対戦録画 (YouTube)</h4>
+                <a href="${url}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;color:#ffffff;background:#dc2626;padding:8px 14px;border-radius:8px;font-weight:600;font-size:13px;text-decoration:none;box-shadow:0 2px 8px rgba(220,38,38,0.3)">
+                  <span>▶️ YouTubeで見る</span>
+                  <span style="font-size:11px;opacity:0.85">（限定公開）</span>
+                </a>
+              </div>
+            `;
+          } else {
+            videoLinkHtml = `
+              <div class="detail-section">
+                <h4>🎥 対戦録画 (Google Drive一時保存)</h4>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <a href="${url}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;color:#ffffff;background:var(--accent);padding:8px 14px;border-radius:8px;font-weight:600;font-size:13px;text-decoration:none;width:fit-content;box-shadow:0 2px 8px rgba(108,99,255,0.3)">
+                    <span>📁 Google Driveでプレビュー</span>
+                  </a>
+                  <span style="font-size:11px;color:var(--text-muted)">⏳ 本日夜間の定期バッチでYouTubeへ自動転送されます</span>
+                </div>
+              </div>
+            `;
+          }
         }
       }
 
@@ -7152,6 +7573,7 @@
     ${selectionDetailHtml}
     ${r.memo ? `<div class="detail-section"><h4>メモ</h4><p style="font-size:13px">${r.memo}</p></div>` : ''}
     ${replayLinkHtml}
+    ${videoLinkHtml}
   `;
 
       const editBtn = document.getElementById('detail-edit-btn');
@@ -7260,6 +7682,22 @@
           }
           updateBo3Score();
         }
+
+        // 動画添付情報の復元
+        if (r.drive_file_id || r.video_url || r.youtube_video_id) {
+          _attachedVideoData = {
+            drive_file_id: r.drive_file_id || '',
+            video_url: r.video_url || '',
+            sync_status: r.sync_status || 'pending',
+            created_at: r.created_at || Date.now(),
+            youtube_video_id: r.youtube_video_id || '',
+            original_name: r.video_original_name || (r.sync_status === 'uploaded' ? 'YouTube動画' : 'Google Drive動画')
+          };
+          showAttachedVideoUI(_attachedVideoData);
+        } else {
+          _attachedVideoData = null;
+          resetRecordVideoUI();
+        }
       }
 
       updateRecordFormEditModeUI();
@@ -7270,6 +7708,8 @@
 
     function cancelRecordEdit() {
       editingRecordId = null;
+      _attachedVideoData = null;
+      resetRecordVideoUI();
       updateRecordFormEditModeUI();
       recordResult = null;
       document.getElementById('btn-win').classList.remove('active');
