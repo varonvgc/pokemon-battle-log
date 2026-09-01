@@ -4269,7 +4269,7 @@
         try {
           const client = google.accounts.oauth2.initTokenClient({
             client_id: cId,
-            scope: 'https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/drive',
+            scope: 'https://www.googleapis.com/auth/drive.file',
             callback: (response) => {
               if (response.error) {
                 console.error('Google OAuth error:', response);
