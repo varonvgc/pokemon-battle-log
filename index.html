@@ -4282,7 +4282,7 @@
               resolve(window._googleDriveAccessToken);
             }
           });
-          client.requestAccessToken({ prompt: interactive ? 'consent' : '' });
+          client.requestAccessToken({ prompt: interactive ? 'select_account' : '' });
         } catch (e) {
           reject(e);
         }
