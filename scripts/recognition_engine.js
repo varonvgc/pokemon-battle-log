@@ -110,14 +110,17 @@ class PokemonRecognitionEngine {
     for (const [tName, tb] of Object.entries(dict)) {
       let diff = 0.0;
       let tbR = 0, tbG = 0, tbB = 0;
+      let idx3 = 0;
+
       for (let k = 0; k < 1600; k += 4) {
-        const dr = imgData[k] - tb[k];
-        const dg = imgData[k + 1] - tb[k + 1];
-        const db = imgData[k + 2] - tb[k + 2];
+        const dr = imgData[k] - tb[idx3];
+        const dg = imgData[k + 1] - tb[idx3 + 1];
+        const db = imgData[k + 2] - tb[idx3 + 2];
         diff += (dr * dr + dg * dg + db * db);
-        tbR += tb[k];
-        tbG += tb[k + 1];
-        tbB += tb[k + 2];
+        tbR += tb[idx3];
+        tbG += tb[idx3 + 1];
+        tbB += tb[idx3 + 2];
+        idx3 += 3;
       }
       const tbMeanR = tbR / 400.0;
       const tbMeanG = tbG / 400.0;
@@ -128,6 +131,7 @@ class PokemonRecognitionEngine {
       const meanDiff = (dmr * dmr + dmg * dmg + dmb * dmb);
 
       const totalScore = diff + (100.0 * meanDiff);
+
       if (totalScore < bestScore) {
         bestScore = totalScore;
         bestType = tName;
@@ -704,8 +708,8 @@ class PokemonRecognitionEngine {
         const slotY = slot0Y + i * slotPitch;
         const res1 = this._matchTypeTemplate(sCtx, t1X, slotY + t1YOff, tW, tH, this.typeFeaturesAfter);
         const res2 = this._matchTypeTemplate(sCtx, t2X, slotY + t2YOff, tW, tH, this.typeFeaturesAfter);
-        const t1 = res1.score < 15000000 ? res1.type : 'none';
-        const t2 = res2.score < 15000000 ? res2.type : 'none';
+        const t1 = res1.score < 8000000 ? res1.type : 'none';
+        const t2 = res2.score < 8000000 ? res2.type : 'none';
 
         const candidates = this._getCandidates(t1, t2);
         const pName = this._matchPokemonGeoPHOG(sCtx, iconX, slotY + iconYOff, iconW, iconH, candidates);

@@ -5,12 +5,16 @@ Add-Type -AssemblyName System.Drawing
 # (Otsu Thresholding + 680-dim PHOG + Solidity/Extent Descriptors)
 # -------------------------------------------------------------
 
-$gt = Get-Content 'test/ground_truth.json' -Encoding UTF8 -Raw | ConvertFrom-Json
-$roster = Get-Content 'assets/clean_roster.json' -Encoding UTF8 -Raw | ConvertFrom-Json
-$typeFeatAfterJson = Get-Content 'assets/type_features.json' -Raw | ConvertFrom-Json
-$typeFeatBeforeJson = Get-Content 'assets/type_features_before.json' -Raw | ConvertFrom-Json
-$geoJson = Get-Content 'assets/pokemon_geo_phog_features.json' -Raw | ConvertFrom-Json
-$badgeFeatJson = Get-Content 'assets/badge_features.json' -Raw | ConvertFrom-Json
+$rootDir = Split-Path $PSScriptRoot -Parent
+$gtPath = Join-Path $rootDir "test/ground_truth.json"
+$assetsDir = Join-Path $rootDir "assets"
+
+$gt = Get-Content $gtPath -Encoding UTF8 -Raw | ConvertFrom-Json
+$roster = Get-Content (Join-Path $assetsDir "clean_roster.json") -Encoding UTF8 -Raw | ConvertFrom-Json
+$typeFeatAfterJson = Get-Content (Join-Path $assetsDir "type_features.json") -Raw | ConvertFrom-Json
+$typeFeatBeforeJson = Get-Content (Join-Path $assetsDir "type_features_before.json") -Raw | ConvertFrom-Json
+$geoJson = Get-Content (Join-Path $assetsDir "pokemon_geo_phog_features.json") -Raw | ConvertFrom-Json
+$badgeFeatJson = Get-Content (Join-Path $assetsDir "badge_features.json") -Raw | ConvertFrom-Json
 
 # Decode Type Features
 $typeFeatAfterDecoded = @{}
@@ -65,7 +69,7 @@ function Match-TypeTemplate($bmp, $x, $y, $w, $h, $dict) {
     for ($cy = 0; $cy -lt 20; $cy++) {
         for ($cx = 0; $cx -lt 20; $cx++) {
             $p = $t20.GetPixel($cx, $cy)
-            $b[$i++] = [byte]$p.R; $b[$i++] = [byte]$p.G; $b[$i++] = [byte]$p.B; $b[$i++] = [byte]$p.A
+            $b[$i++] = [byte]$p.R; $b[$i++] = [byte]$p.G; $b[$i++] = [byte]$p.A; $b[$i++] = [byte]$p.A
             $rSum += $p.R; $gSum += $p.G; $bSum += $p.B
         }
     }
@@ -488,7 +492,7 @@ $totalBeforeSlots = 0; $correctBeforeSlots = 0
 foreach ($prop in $gt.before.PSObject.Properties) {
     $imgName = $prop.Name
     $expected = $prop.Value
-    $imgPath = "test/before/$imgName"
+    $imgPath = Join-Path $rootDir "test/before/$imgName"
     if (-not (Test-Path $imgPath)) { continue }
 
     $bmp = New-Object System.Drawing.Bitmap($imgPath)
@@ -538,7 +542,7 @@ $perfectMatches = 0; $totalMatches = 0
 foreach ($prop in $gt.after.PSObject.Properties) {
     $imgName = $prop.Name
     $afterData = $prop.Value
-    $imgPath = "test/after/$imgName"
+    $imgPath = Join-Path $rootDir "test/after/$imgName"
     if (-not (Test-Path $imgPath)) { continue }
 
     $bmp = New-Object System.Drawing.Bitmap($imgPath)
@@ -615,5 +619,4 @@ $report += "  My Selection Slot:        $correctSelectedSlots / $totalSelectedSl
 $report += "  My Selection Match 100%:  $perfectMatches / $totalMatches ($perfPct %)"
 $report += "======================================================="
 
-$report | Out-File "eval_report.txt" -Encoding UTF8
 $report | ForEach-Object { Write-Host $_ }

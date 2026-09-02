@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 
 <head>
@@ -3807,8 +3807,6 @@
     let POKEMON_MAP_LIST = [];
     let POKEMON_ICON_BY_NAME = {};
     let POKEMON_BY_ICON_FILE = {};
-    let POKEMON_FEATURES_DECODED = {};
-    let TYPE_FEATURES_DECODED = {};
     let _masterDataPromise = null;
 
     const TYPE_NAME_JA_MAP = {
@@ -3925,15 +3923,13 @@
             renderHistory();
           } catch (renderErr) { }
 
-          // 2. 技マシン・メガストーン・AI特徴量などの詳細データは裏側で非同期プリロード（画面を一切邪魔しない）
+          // 2. Preload dictionaries and AI recognition engine in background
           setTimeout(async () => {
             try {
-              const [lsRes, msRes, mapRes, featRes, typeFeatRes] = await Promise.all([
+              const [lsRes, msRes, mapRes] = await Promise.all([
                 fetch('data/learnsets.json').catch(() => null),
                 fetch('data/mega_stones.json').catch(() => null),
-                fetch('assets/pokemon_map.json').catch(() => null),
-                fetch('assets/pokemon_features.json').catch(() => null),
-                fetch('assets/type_features.json').catch(() => null)
+                fetch('assets/pokemon_map.json').catch(() => null)
               ]);
 
               if (lsRes && lsRes.ok) {
@@ -3948,38 +3944,17 @@
                   initPokemonIconMap();
                 } catch (e) { }
               }
-              if (featRes && featRes.ok) {
-                try {
-                  const featJson = await featRes.json();
-                  POKEMON_FEATURES_DECODED = {};
-                  for (const [fn, b64] of Object.entries(featJson)) {
-                    const binStr = atob(b64);
-                    const u8 = new Uint8Array(binStr.length);
-                    for (let i = 0; i < binStr.length; i++) {
-                      u8[i] = binStr.charCodeAt(i);
-                    }
-                    POKEMON_FEATURES_DECODED[fn] = u8;
-                  }
-                } catch (e) { }
-              }
-              if (typeFeatRes && typeFeatRes.ok) {
-                try {
-                  const tJson = await typeFeatRes.json();
-                  TYPE_FEATURES_DECODED = {};
-                  for (const [tn, b64] of Object.entries(tJson)) {
-                    const binStr = atob(b64);
-                    const u8 = new Uint8Array(binStr.length);
-                    for (let i = 0; i < binStr.length; i++) {
-                      u8[i] = binStr.charCodeAt(i);
-                    }
-                    TYPE_FEATURES_DECODED[tn] = u8;
-                  }
-                } catch (e) { }
-              }
+
+              // AI Engine Preload
+              ensureAiEngineLoaded().then(() => {
+                if (window.recognitionEngine && typeof window.recognitionEngine.loadDictionaries === 'function') {
+                  window.recognitionEngine.loadDictionaries().catch(() => { });
+                }
+              }).catch(() => { });
             } catch (bgErr) {
               console.warn('Background master preload warning:', bgErr);
             }
-          }, 200);
+          }, 300);
 
         } catch (e) {
           console.error('Failed to load static master data:', e);
@@ -11559,265 +11534,6 @@
         reader.readAsDataURL(file);
       });
     }
-
-    // カード開始Y座標の自動アライメント（どんな解像度・黒帯でもジャストフィット）
-    function findCardStartY(mainCanvas, scanX) {
-      const ctx = mainCanvas.getContext('2d');
-      const h = mainCanvas.height;
-      const scanData = ctx.getImageData(scanX, 0, 1, Math.round(h * 0.45)).data;
-
-      for (let y = 15; y < Math.round(h * 0.45) - 6; y++) {
-        const idx = y * 4;
-        const r = scanData[idx], g = scanData[idx + 1], b = scanData[idx + 2];
-        // 赤紫色カード背景 (#78103c) の検出
-        if (r > 85 && r < 170 && g < 50 && b > 20 && b < 105) {
-          let match = true;
-          for (let k = 1; k <= 5; k++) {
-            const kidx = (y + k) * 4;
-            const kr = scanData[kidx], kg = scanData[kidx + 1], kb = scanData[kidx + 2];
-            if (!(kr > 85 && kr < 170 && kg < 50 && kb > 20 && kb < 105)) {
-              match = false;
-              break;
-            }
-          }
-          if (match) return y;
-        }
-      }
-      return Math.round(h * 0.12); // フォールバック
-    }
-
-    // タイプ照合ヘルパー
-    function recognizeTypeFromCanvas(mainCanvas, cropX, cropY, cropW, cropH) {
-      if (!TYPE_FEATURES_DECODED || !Object.keys(TYPE_FEATURES_DECODED).length) return 'none';
-
-      const tCanvas = document.createElement('canvas');
-      tCanvas.width = 20;
-      tCanvas.height = 20;
-      const tCtx = tCanvas.getContext('2d');
-      tCtx.imageSmoothingEnabled = true;
-      tCtx.imageSmoothingQuality = 'high';
-      tCtx.drawImage(mainCanvas, cropX, cropY, cropW, cropH, 0, 0, 20, 20);
-
-      const imgData = tCtx.getImageData(0, 0, 20, 20);
-      const data = imgData.data;
-
-      let bestType = 'none';
-      let bestScore = Infinity;
-
-      for (const [tn, tBytes] of Object.entries(TYPE_FEATURES_DECODED)) {
-        let diff = 0;
-        for (let i = 0; i < 1600; i += 4) {
-          const dr = data[i] - tBytes[i];
-          const dg = data[i + 1] - tBytes[i + 1];
-          const db = data[i + 2] - tBytes[i + 2];
-          diff += (dr * dr + dg * dg + db * db);
-        }
-        if (diff < bestScore) {
-          bestScore = diff;
-          bestType = tn;
-        }
-      }
-
-      return (bestScore < 14000000) ? bestType : 'none';
-    }
-
-    // 性別判定ヘルパー
-    function recognizeGenderFromCanvas(mainCanvas, gx, gy) {
-      const gCanvas = document.createElement('canvas');
-      gCanvas.width = 14;
-      gCanvas.height = 14;
-      const gCtx = gCanvas.getContext('2d');
-      gCtx.drawImage(mainCanvas, gx, gy, 14, 14, 0, 0, 14, 14);
-      const data = gCtx.getImageData(0, 0, 14, 14).data;
-
-      let blueCount = 0;
-      let redCount = 0;
-      for (let i = 0; i < data.length; i += 4) {
-        const r = data[i], g = data[i + 1], b = data[i + 2];
-        if (b > 130 && b > (r * 1.4) && g > 40) blueCount++;
-        if (r > 160 && r > (b * 2.0) && g < 60) redCount++;
-      }
-
-      if (blueCount > 8) return '♂';
-      if (redCount > 8) return '♀';
-      return 'none';
-    }
-
-    function rgbToHsv(r, g, b) {
-      const r_ = r / 255, g_ = g / 255, b_ = b / 255;
-      const max = Math.max(r_, g_, b_), min = Math.min(r_, g_, b_);
-      const delta = max - min;
-      const v = max;
-      const s = max === 0 ? 0 : delta / max;
-      let h = 0;
-      if (delta > 0) {
-        if (max === r_) h = 60 * (((g_ - b_) / delta) % 6);
-        else if (max === g_) h = 60 * (((b_ - r_) / delta) + 2);
-        else h = 60 * (((r_ - g_) / delta) + 4);
-        if (h < 0) h += 360;
-      }
-      return [h, s, v];
-    }
-
-    // アイコン画像と特定候補群の比較（色相・彩度・占有面積・シルエットを統合した高精度版）
-    function matchCropToCandidatePokemons(cropImgData, candidateFiles) {
-      const data = cropImgData.data;
-
-      let cropFgCount = 0;
-      let cropHueSum = 0, cropSatSum = 0;
-      for (let k = 0; k < 1024; k += 4) {
-        const r = data[k], g = data[k + 1], b = data[k + 2];
-        const isBg = (r > 85 && r < 170 && g < 50 && b > 20 && b < 105);
-        if (!isBg) {
-          cropFgCount++;
-          const [h, s] = rgbToHsv(r, g, b);
-          cropHueSum += h;
-          cropSatSum += s;
-        }
-      }
-      const cropAvgHue = cropFgCount > 0 ? (cropHueSum / cropFgCount) : 0;
-      const cropAvgSat = cropFgCount > 0 ? (cropSatSum / cropFgCount) : 0;
-
-      const targetList = (candidateFiles && candidateFiles.length) ? candidateFiles : Object.keys(POKEMON_FEATURES_DECODED);
-      const scoredList = [];
-
-      for (const fn of targetList) {
-        const iconBytes = POKEMON_FEATURES_DECODED[fn];
-        if (!iconBytes) continue;
-
-        let diff = 0;
-        let weightSum = 0;
-        let iconFgCount = 0;
-        let iconHueSum = 0, iconSatSum = 0;
-
-        for (let k = 0; k < 1024; k += 4) {
-          const a = iconBytes[k + 3] / 255;
-          const cr = data[k], cg = data[k + 1], cb = data[k + 2];
-          const isBg = (cr > 85 && cr < 170 && cg < 50 && cb > 20 && cb < 105);
-
-          if (a > 0.25) {
-            iconFgCount++;
-            const dr = cr - iconBytes[k];
-            const dg = cg - iconBytes[k + 1];
-            const db = cb - iconBytes[k + 2];
-            diff += (dr * dr + dg * dg + db * db) * a;
-            weightSum += a;
-
-            const [ih, is] = rgbToHsv(iconBytes[k], iconBytes[k + 1], iconBytes[k + 2]);
-            iconHueSum += ih;
-            iconSatSum += is;
-          }
-        }
-
-        if (weightSum > 15) {
-          let score = diff / weightSum;
-
-          // 1. 占有面積（シルエットの広がり）一致判定（ドヒドイデの殻など）
-          const areaRatioDiff = Math.abs(cropFgCount - iconFgCount) / Math.max(1, cropFgCount + iconFgCount);
-          score += areaRatioDiff * 3000;
-
-          // 2. 色相（Hue）一致判定
-          const iconAvgHue = iconFgCount > 0 ? (iconHueSum / iconFgCount) : 0;
-          let hueDiff = Math.abs(cropAvgHue - iconAvgHue);
-          if (hueDiff > 180) hueDiff = 360 - hueDiff;
-          score += hueDiff * 100;
-
-          // 3. 彩度（Saturation）一致判定（鮮やかな黄色/オレンジのカイリュー vs 暗いオンバーン等）
-          const iconAvgSat = iconFgCount > 0 ? (iconSatSum / iconFgCount) : 0;
-          const satDiff = Math.abs(cropAvgSat - iconAvgSat);
-          score += satDiff * 1500;
-
-          scoredList.push({ fileName: fn, score });
-        }
-      }
-
-      scoredList.sort((a, b) => a.score - b.score);
-      const best = scoredList[0] || { fileName: targetList[0] || '', score: 999999 };
-      return {
-        fileName: best.fileName,
-        score: best.score,
-        topCandidates: scoredList.slice(0, 3).map(s => s.fileName)
-      };
-    }
-
-    // 選出番号（1, 2, 3, 4）のピクセルパターン判定
-    function detectOrderNumberFromImageData(imgData) {
-      const { data, width, height } = imgData;
-      let topCount = 0, midCount = 0, bottomCount = 0, leftCount = 0, rightCount = 0;
-      let totalNonBg = 0;
-      const midX = width / 2;
-
-      for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
-          const idx = (y * width + x) * 4;
-          const r = data[idx], g = data[idx + 1], b = data[idx + 2];
-          // 白地上の濃紺の数字ピクセル
-          const isDark = (r < 110 && g < 110 && b < 160) || (b > 130 && r < 90 && g < 90);
-          if (isDark) {
-            totalNonBg++;
-            if (y < height * 0.35) topCount++;
-            else if (y < height * 0.70) midCount++;
-            else bottomCount++;
-
-            if (x < midX) leftCount++;
-            else rightCount++;
-          }
-        }
-      }
-
-      if (totalNonBg < 10) return 0;
-
-      // 4: 左側と中央の比率が高い
-      if (leftCount > rightCount * 1.25 && midCount > topCount) return 4;
-      // 3: 右側が張り出している
-      if (rightCount > leftCount * 1.35) return 3;
-      // 2: 下部の横棒が重い
-      if (bottomCount > topCount * 1.25) return 2;
-      // 1: 縦棒が中央に立つ
-      if (totalNonBg > 0 && Math.abs(leftCount - rightCount) < totalNonBg * 0.3) return 1;
-
-      return 1;
-    }
-
-    // クイックサジェストチップの描画
-    function renderOppSuggestChips(slotIdx, candidates, currentName) {
-      const slotEl = document.querySelectorAll('#opp-party-slots .pokemon-slot')[slotIdx];
-      if (!slotEl) return;
-
-      let chipContainer = slotEl.querySelector('.rec-suggest-chips');
-      if (!chipContainer) {
-        chipContainer = document.createElement('div');
-        chipContainer.className = 'rec-suggest-chips';
-        chipContainer.style.cssText = 'display:flex;flex-wrap:wrap;gap:4px;margin-top:4px;font-size:10px';
-        slotEl.appendChild(chipContainer);
-      }
-      chipContainer.innerHTML = '';
-
-      if (!candidates || candidates.length <= 1) return;
-
-      candidates.forEach(fn => {
-        const pObj = findPokemonByIconFile(fn);
-        const name = pObj ? pObj.display : fn;
-        if (name === currentName) return;
-
-        const chip = document.createElement('span');
-        chip.textContent = name;
-        chip.style.cssText = 'background:var(--surface);border:1px solid var(--border);padding:1px 6px;border-radius:4px;cursor:pointer;color:var(--accent);font-weight:600';
-        chip.onclick = () => {
-          const input = slotEl.querySelector('input[type=text]');
-          if (input) {
-            input.value = name;
-            updateSlotIcon(input, name);
-            rebuildOppSelectionDropdowns();
-            renderOppSuggestChips(slotIdx, candidates, name);
-          }
-        };
-        chipContainer.appendChild(chip);
-      });
-    }
-
-    // AI画像認識モジュールの動的オンデマンド読み込み（起動時・リロード時のブロッキングを完全防止）
-    let _aiEngineLoadingPromise = null;
     function ensureAiEngineLoaded() {
       if (window.recognitionEngine && window.Tesseract) {
         return Promise.resolve();
