@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 
 <head>
@@ -3228,42 +3228,26 @@
           <span id="rec-video-status-badge" style="display:none;font-size:11px;padding:2px 8px;border-radius:4px"></span>
         </div>
         <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px">
-          ※ 動画ファイルを選択するとGoogle Driveへ直接アップロード（一時保存）され、夜間にYouTube（限定公開）へ自動転送されます。
+          ※ 動画を添付すると端末内に一時保存されます。WiFi接続時にGoogle Driveへ自動アップロードされ、夜間にYouTube（限定公開）へ転送されます。
         </div>
 
         <div id="rec-video-select-section">
           <input type="file" id="rec-video-file-input" accept="video/*" onchange="onVideoFileSelected(this)" style="font-size:13px;padding:6px;width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px">
         </div>
 
-        <!-- アップロード進捗表示エリア -->
-        <div id="rec-video-progress-area" style="display:none;margin-top:10px">
-          <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
-            <span id="rec-video-filename" style="font-weight:600;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
-            <span id="rec-video-progress-percent" style="font-weight:700;color:var(--accent)">0%</span>
-          </div>
-          <div style="width:100%;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;margin-bottom:6px">
-            <div id="rec-video-progress-bar" style="width:0%;height:100%;background:linear-gradient(90deg,var(--accent),#a78bfa);transition:width 0.2s ease"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text-muted)">
-            <span id="rec-video-progress-status">準備中...</span>
-            <span id="rec-video-progress-speed"></span>
-          </div>
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <button type="button" class="btn btn-ghost btn-sm" id="rec-video-pause-btn" onclick="togglePauseVideoUpload()" style="font-size:11px;padding:3px 8px">一時停止</button>
-            <button type="button" class="btn btn-ghost btn-sm" onclick="cancelVideoUpload()" style="font-size:11px;padding:3px 8px;color:#ef4444;border-color:#ef4444">キャンセル</button>
-          </div>
-        </div>
+        <!-- バックグラウンドアップロード中は画面下部のピルに表示 -->
+        <div id="rec-video-progress-area" style="display:none"></div>
 
-        <!-- アップロード完了済みの動画情報表示 -->
-        <div id="rec-video-attached-info" style="display:none;align-items:center;justify-content:space-between;background:var(--surface);padding:8px 12px;border-radius:6px;border:1px solid var(--border);margin-top:8px">
+        <!-- 動画添付情報表示（状態別） -->
+        <div id="rec-video-attached-info" style="display:none;flex-direction:column;background:var(--surface);padding:10px 12px;border-radius:6px;border:1px solid var(--border);margin-top:8px;gap:6px">
           <div style="display:flex;align-items:center;gap:8px;overflow:hidden">
             <span style="font-size:18px">🎥</span>
             <div style="overflow:hidden">
               <div id="rec-video-attached-name" style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">動画添付済み</div>
-              <div id="rec-video-attached-link" style="font-size:11px;color:var(--accent)">Google Driveに保存済み (YouTube転送待ち)</div>
+              <div id="rec-video-attached-link" style="font-size:11px;color:var(--accent)">WiFi接続後に自動アップロード</div>
             </div>
           </div>
-          <button type="button" class="btn btn-ghost btn-sm" onclick="removeAttachedVideo()" style="color:#ef4444;border:none;padding:2px 6px">✕ 削除</button>
+          <div id="rec-video-attached-actions" style="display:flex;gap:6px;flex-wrap:wrap"></div>
         </div>
       </div>
 
@@ -4279,6 +4263,8 @@
               window._googleDriveAccessToken = response.access_token;
               window._googleDriveTokenExpiresAt = Date.now() + (parseInt(response.expires_in, 10) - 60) * 1000;
               updateDriveSettingsUI();
+              // 認証成功後にアップロードキューを開始
+              setTimeout(() => startUploadQueue(), 500);
               resolve(window._googleDriveAccessToken);
             }
           });
@@ -6958,12 +6944,20 @@
 
       // 添付動画情報の引き継ぎ・保存
       if (_attachedVideoData) {
-        rec.drive_file_id = _attachedVideoData.drive_file_id;
-        rec.video_url = _attachedVideoData.video_url;
-        rec.sync_status = _attachedVideoData.sync_status || 'pending';
+        rec.sync_status = _attachedVideoData.sync_status || 'local_pending';
         rec.created_at = _attachedVideoData.created_at || Date.now();
-        if (_attachedVideoData.youtube_video_id) rec.youtube_video_id = _attachedVideoData.youtube_video_id;
         if (_attachedVideoData.original_name) rec.video_original_name = _attachedVideoData.original_name;
+        if (_attachedVideoData.drive_file_id) rec.drive_file_id = _attachedVideoData.drive_file_id;
+        if (_attachedVideoData.video_url) rec.video_url = _attachedVideoData.video_url;
+        if (_attachedVideoData.youtube_video_id) rec.youtube_video_id = _attachedVideoData.youtube_video_id;
+        // local_pendingかつ仮キーの場合、IndexedDBのキーを実レコードIDに変更
+        if (_attachedVideoData.sync_status === 'local_pending' &&
+            _attachedVideoData.local_key && _attachedVideoData.local_key.startsWith('_new_')) {
+          const finalId = editingRecordId || rec.id;
+          VideoStore.rename(_attachedVideoData.local_key, finalId)
+            .catch(e => console.warn('IndexedDB rename error:', e));
+          _attachedVideoData.local_key = finalId;
+        }
       }
 
       // 1. ローカルに即時保存 (編集中は上書き更新、新規は先頭に追加)
@@ -7082,12 +7076,15 @@
 
       // 動画バッジのHTML
       let videoBadgeHtml = '';
-      if (r.video_url || r.drive_file_id || r.youtube_video_id) {
-        const isUploaded = r.sync_status === 'uploaded' || (r.video_url && r.video_url.includes('youtu'));
+      if (r.sync_status === 'local_pending') {
+        videoBadgeHtml = `<span style="font-size:10px;padding:1px 5px;background:var(--accent);color:#fff;border-radius:4px;font-weight:700" title="WiFi接続待ち">📱 待機中</span>`;
+      } else if (r.video_url || r.drive_file_id || r.youtube_video_id) {
+        const isUploaded = r.sync_status === 'yt_uploaded' || r.sync_status === 'uploaded' ||
+                           (r.video_url && r.video_url.includes('youtu'));
         if (isUploaded) {
           videoBadgeHtml = `<span style="font-size:10px;padding:1px 5px;background:#dc2626;color:#fff;border-radius:4px;font-weight:700" title="YouTube録画あり">▶️ 動画</span>`;
         } else {
-          videoBadgeHtml = `<span style="font-size:10px;padding:1px 5px;background:var(--accent);color:#fff;border-radius:4px;font-weight:700" title="Google Driveに保存中 (YouTube転送待ち)">📁 Drive</span>`;
+          videoBadgeHtml = `<span style="font-size:10px;padding:1px 5px;background:#22c55e;color:#fff;border-radius:4px;font-weight:700" title="Google Drive保存済 (YouTube転送待ち)">☁️ Drive</span>`;
         }
       }
 
@@ -7260,9 +7257,61 @@
       }
     }
 
+    // ---- VIDEO STORE (IndexedDB) ----
+    const VideoStore = (() => {
+      const DB_NAME = 'PokemonBattleVideoStore';
+      const STORE_NAME = 'videos';
+      let _db = null;
+      async function open() {
+        if (_db) return _db;
+        return new Promise((resolve, reject) => {
+          const req = indexedDB.open(DB_NAME, 1);
+          req.onupgradeneeded = (e) => { e.target.result.createObjectStore(STORE_NAME); };
+          req.onsuccess = (e) => { _db = e.target.result; resolve(_db); };
+          req.onerror = (e) => reject(e.target.error);
+        });
+      }
+      return {
+        async save(key, file) {
+          const db = await open();
+          return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            tx.objectStore(STORE_NAME).put(file, key);
+            tx.oncomplete = () => resolve();
+            tx.onerror = (e) => reject(e.target.error);
+          });
+        },
+        async get(key) {
+          const db = await open();
+          return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, 'readonly');
+            const req = tx.objectStore(STORE_NAME).get(key);
+            req.onsuccess = (e) => resolve(e.target.result || null);
+            req.onerror = (e) => reject(e.target.error);
+          });
+        },
+        async delete(key) {
+          const db = await open();
+          return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_NAME, 'readwrite');
+            tx.objectStore(STORE_NAME).delete(key);
+            tx.oncomplete = () => resolve();
+            tx.onerror = (e) => reject(e.target.error);
+          });
+        },
+        async rename(oldKey, newKey) {
+          const file = await this.get(oldKey);
+          if (!file) return;
+          await this.save(newKey, file);
+          await this.delete(oldKey);
+        }
+      };
+    })();
+
     // ---- VIDEO UPLOAD & ATTACHMENT ----
     let _currentVideoUploader = null;
-    let _attachedVideoData = null; // { drive_file_id, video_url, sync_status: 'pending', created_at, original_name, file_size }
+    let _pendingOldVideoForCleanup = null; // 差し替え時に旧動画を一時保持
+    let _attachedVideoData = null; // { local_key?, drive_file_id?, video_url?, sync_status, original_name, file_size, created_at }
 
     async function onVideoFileSelected(input) {
       const file = input.files && input.files[0];
@@ -7275,77 +7324,46 @@
         return;
       }
 
-      // 認証トークンの取得
-      let token = null;
+      // 差し替え時：旧動画のクリーンアップ
+      if (_pendingOldVideoForCleanup) {
+        const old = _pendingOldVideoForCleanup;
+        _pendingOldVideoForCleanup = null;
+        if (old.sync_status === 'local_pending' && old.local_key) {
+          VideoStore.delete(old.local_key).catch(e => console.warn('IndexedDB delete error:', e));
+        } else if ((old.sync_status === 'drive_pending' || old.sync_status === 'pending') && old.drive_file_id) {
+          const tok = window._googleDriveAccessToken;
+          if (tok) {
+            fetch(`https://www.googleapis.com/drive/v3/files/${old.drive_file_id}`, {
+              method: 'DELETE',
+              headers: { Authorization: `Bearer ${tok}` }
+            }).catch(e => console.warn('Drive delete error:', e));
+          } else {
+            showRecordToast('⚠️ 旧DriveファイルはGoogle Driveから手動削除してください。');
+          }
+        }
+      }
+
+      // IndexedDBに保存（通信なし・即完了）
+      const tempKey = `_new_${Date.now()}`;
       try {
-        token = await requestGoogleDriveAccessToken(true);
+        await VideoStore.save(tempKey, file);
       } catch (e) {
+        console.error('IndexedDB save failed:', e);
+        alert('動画の保存に失敗しました。端末のストレージ容量を確認してください。');
         input.value = '';
         return;
       }
 
-      // UI表示切り替え
-      document.getElementById('rec-video-select-section').style.display = 'none';
-      const progressArea = document.getElementById('rec-video-progress-area');
-      progressArea.style.display = 'block';
+      _attachedVideoData = {
+        local_key: tempKey,
+        sync_status: 'local_pending',
+        original_name: file.name,
+        file_size: file.size,
+        created_at: Date.now()
+      };
 
-      document.getElementById('rec-video-filename').textContent = file.name;
-      document.getElementById('rec-video-progress-percent').textContent = '0%';
-      document.getElementById('rec-video-progress-bar').style.width = '0%';
-      document.getElementById('rec-video-progress-status').textContent = '初期化中...';
-      document.getElementById('rec-video-progress-speed').textContent = '';
-
-      const UploaderClass = window.GoogleDriveResumableUploader || (typeof GoogleDriveResumableUploader !== 'undefined' ? GoogleDriveResumableUploader : null);
-      if (!UploaderClass) {
-        alert('アップローダーモジュールが初期化されていません。ページを再読み込みしてください。');
-        resetRecordVideoUI();
-        return;
-      }
-
-      const customFileName = `battle_log_${Date.now()}_${file.name}`;
-
-      _currentVideoUploader = new UploaderClass({
-        file,
-        accessToken: token,
-        folderId,
-        customFileName,
-        chunkSize: 2 * 1024 * 1024, // 2MB
-        onProgress: (prog) => {
-          document.getElementById('rec-video-progress-percent').textContent = `${prog.percent}%`;
-          document.getElementById('rec-video-progress-bar').style.width = `${prog.percent}%`;
-          const speedMB = (prog.speedBytesPerSec / (1024 * 1024)).toFixed(2);
-          document.getElementById('rec-video-progress-speed').textContent = `${speedMB} MB/s`;
-          const loadedMB = (prog.loadedBytes / (1024 * 1024)).toFixed(1);
-          const totalMB = (prog.totalBytes / (1024 * 1024)).toFixed(1);
-          document.getElementById('rec-video-progress-status').textContent = `${loadedMB}MB / ${totalMB}MB`;
-        },
-        onStatusChange: (status, msg) => {
-          if (status === 'error') {
-            alert(`アップロードエラー: ${msg}`);
-            resetRecordVideoUI();
-          }
-        }
-      });
-
-      try {
-        const result = await _currentVideoUploader.start();
-        const fileId = result.id;
-        _attachedVideoData = {
-          drive_file_id: fileId,
-          video_url: `https://drive.google.com/file/d/${fileId}/preview`,
-          sync_status: 'pending',
-          created_at: Date.now(),
-          original_name: file.name,
-          file_size: file.size
-        };
-        showAttachedVideoUI(_attachedVideoData);
-        showRecordToast('✅ 動画のGoogle Driveアップロードが完了しました！');
-      } catch (e) {
-        if (e.message !== 'Upload aborted by user') {
-          console.error('Upload failed:', e);
-        }
-        resetRecordVideoUI();
-      }
+      showAttachedVideoUI(_attachedVideoData);
+      showRecordToast('📱 動画を保存しました。WiFi接続時に自動アップロードします。');
     }
 
     function showAttachedVideoUI(videoData) {
@@ -7356,16 +7374,89 @@
 
       const nameEl = document.getElementById('rec-video-attached-name');
       const linkEl = document.getElementById('rec-video-attached-link');
+      const actionsEl = document.getElementById('rec-video-attached-actions');
       if (nameEl) nameEl.textContent = videoData.original_name || '対戦動画ファイル';
+
+      const status = videoData.sync_status;
+      const isYt = status === 'yt_uploaded' || status === 'uploaded' ||
+                   (videoData.video_url && videoData.video_url.includes('youtu'));
+      const isDrive = status === 'drive_pending' || status === 'pending';
+
       if (linkEl) {
-        if (videoData.sync_status === 'uploaded' || (videoData.video_url && videoData.video_url.includes('youtu'))) {
-          linkEl.textContent = 'YouTube (限定公開) に公開済み';
+        if (isYt) {
+          linkEl.textContent = '▶️ YouTube（限定公開）に公開済み';
           linkEl.style.color = '#ef4444';
-        } else {
-          linkEl.textContent = 'Google Driveに保存済み (YouTube転送待ち)';
+        } else if (isDrive) {
+          linkEl.textContent = '☁️ Drive保存済・夕間にYouTube自動転送';
+          linkEl.style.color = '#22c55e';
+        } else if (status === 'local_pending') {
+          linkEl.textContent = '📱 WiFi接続後に自動アップロード';
           linkEl.style.color = 'var(--accent)';
+        } else if (status === 'lost') {
+          linkEl.textContent = '⚠️ 動画データが消えています。再添付してください';
+          linkEl.style.color = '#f59e0b';
         }
       }
+
+      if (actionsEl) {
+        const youtubeUrl = videoData.video_url || (videoData.youtube_video_id ? `https://youtu.be/${videoData.youtube_video_id}` : null);
+        let html = '';
+        if (isYt && youtubeUrl) {
+          html += `<a href="${youtubeUrl}" target="_blank" class="btn btn-ghost btn-sm" style="font-size:11px;padding:2px 8px;color:#ef4444;border-color:#ef4444;text-decoration:none">▶ 見る</a>`;
+        }
+        if (status !== 'lost') {
+          html += `<button type="button" class="btn btn-ghost btn-sm" onclick="replaceAttachedVideo()" style="font-size:11px;padding:2px 8px">差し替え</button>`;
+        } else {
+          html += `<button type="button" class="btn btn-ghost btn-sm" onclick="replaceAttachedVideo()" style="font-size:11px;padding:2px 8px;color:#f59e0b;border-color:#f59e0b">再添付</button>`;
+        }
+        html += `<button type="button" class="btn btn-ghost btn-sm" onclick="removeAttachedVideo()" style="font-size:11px;padding:2px 8px;color:#ef4444;border-color:#ef4444">✕ 削除</button>`;
+        actionsEl.innerHTML = html;
+      }
+    }
+
+    function replaceAttachedVideo() {
+      // 旧動画を一時保持し、ファイル選択ダイアログを開く
+      _pendingOldVideoForCleanup = _attachedVideoData ? { ..._attachedVideoData } : null;
+      _attachedVideoData = null;
+      const input = document.getElementById('rec-video-file-input');
+      if (input) { input.value = ''; input.click(); }
+    }
+
+    async function removeAttachedVideo() {
+      if (!_attachedVideoData) { resetRecordVideoUI(); return; }
+      const status = _attachedVideoData.sync_status;
+
+      // local_pending: IndexedDBから削除
+      if (status === 'local_pending' && _attachedVideoData.local_key) {
+        VideoStore.delete(_attachedVideoData.local_key).catch(e => console.warn('IndexedDB delete error:', e));
+      }
+
+      // drive_pending: Drive APIで削除（認証済みのみ）
+      if ((status === 'drive_pending' || status === 'pending') && _attachedVideoData.drive_file_id) {
+        const tok = window._googleDriveAccessToken;
+        if (tok) {
+          fetch(`https://www.googleapis.com/drive/v3/files/${_attachedVideoData.drive_file_id}`, {
+            method: 'DELETE',
+            headers: { Authorization: `Bearer ${tok}` }
+          }).catch(e => console.warn('Drive delete error:', e));
+        } else {
+          showRecordToast('⚠️ Drive上のファイルはGoogle Driveから手動削除してください。');
+        }
+      }
+
+      // yt_uploaded: 手動削除を案内
+      if (isYtStatus(status, _attachedVideoData.video_url)) {
+        showRecordToast('⚠️ YouTube動画はYouTube Studioで手動削除してください。');
+      }
+
+      _attachedVideoData = null;
+      resetRecordVideoUI();
+      showRecordToast('添付動画を解除しました');
+    }
+
+    function isYtStatus(status, videoUrl) {
+      return status === 'yt_uploaded' || status === 'uploaded' ||
+             (videoUrl && videoUrl.includes('youtu'));
     }
 
     function togglePauseVideoUpload() {
@@ -7385,14 +7476,9 @@
         _currentVideoUploader.abort();
         _currentVideoUploader = null;
       }
-      resetRecordVideoUI();
+      _isUploadQueueRunning = false;
+      hideUploadPill();
       showRecordToast('動画アップロードをキャンセルしました');
-    }
-
-    function removeAttachedVideo() {
-      _attachedVideoData = null;
-      resetRecordVideoUI();
-      showRecordToast('添付動画を解除しました');
     }
 
     function resetRecordVideoUI() {
@@ -7405,6 +7491,120 @@
       if (prog) prog.style.display = 'none';
       const info = document.getElementById('rec-video-attached-info');
       if (info) info.style.display = 'none';
+    }
+
+    // ---- UPLOAD QUEUE (WiFi接続時自動アップロード) ----
+    let _isUploadQueueRunning = false;
+    let _uploadPillTimer = null;
+
+    async function startUploadQueue() {
+      if (_isUploadQueueRunning) return;
+
+      // Drive認証確認（キャッシュのみ・非インタラクティブ）
+      const token = window._googleDriveAccessToken;
+      const tokenValid = token && window._googleDriveTokenExpiresAt && Date.now() < window._googleDriveTokenExpiresAt;
+      if (!tokenValid) return;
+
+      const folderId = getDriveFolderId();
+      if (!folderId) return;
+
+      const pendingRecords = records.filter(r => r.sync_status === 'local_pending');
+      if (pendingRecords.length === 0) return;
+
+      _isUploadQueueRunning = true;
+
+      try {
+        const UploaderClass = window.GoogleDriveResumableUploader ||
+          (typeof GoogleDriveResumableUploader !== 'undefined' ? GoogleDriveResumableUploader : null);
+        if (!UploaderClass) { _isUploadQueueRunning = false; return; }
+
+        let successCount = 0;
+        for (let i = 0; i < pendingRecords.length; i++) {
+          const rec = pendingRecords[i];
+          const file = await VideoStore.get(rec.id);
+
+          if (!file) {
+            console.warn(`Video data not found in IndexedDB for record ${rec.id}`);
+            continue;
+          }
+
+          try {
+            const pillText = `${i + 1}/${pendingRecords.length}件: ${rec.video_original_name || 'video'}`;
+            showUploadPill(pillText, 0);
+
+            const customFileName = `battle_log_${rec.id}_${rec.video_original_name || 'video'}`;
+            _currentVideoUploader = new UploaderClass({
+              file,
+              accessToken: token,
+              folderId,
+              customFileName,
+              chunkSize: 5 * 1024 * 1024,
+              onProgress: (prog) => updateUploadPill(prog.percent),
+              onStatusChange: () => {}
+            });
+
+            const result = await _currentVideoUploader.start();
+            _currentVideoUploader = null;
+
+            // Firestore & ローカル更新
+            rec.drive_file_id = result.id;
+            rec.video_url = `https://drive.google.com/file/d/${result.id}/preview`;
+            rec.sync_status = 'drive_pending';
+            saveData();
+
+            // IndexedDBから削除
+            await VideoStore.delete(rec.id);
+
+            successCount++;
+          } catch(e) {
+            _currentVideoUploader = null;
+            if (e.message !== 'Upload aborted by user') {
+              console.error(`Upload failed for record ${rec.id}:`, e);
+            }
+          }
+        }
+
+        hideUploadPill();
+        if (successCount > 0) {
+          showRecordToast(`✅ ${successCount}件の動画をGoogle Driveにアップロードしました`);
+          renderHistory();
+        }
+      } finally {
+        _isUploadQueueRunning = false;
+      }
+    }
+
+    function showUploadPill(text, percent) {
+      const pill = document.getElementById('upload-pill');
+      const pillText = document.getElementById('upload-pill-text');
+      const pillBar = document.getElementById('upload-pill-bar');
+      const pillPercent = document.getElementById('upload-pill-percent');
+      if (!pill) return;
+      clearTimeout(_uploadPillTimer);
+      pill.style.display = 'flex';
+      if (pillText) pillText.textContent = text;
+      if (pillBar) pillBar.style.width = `${percent}%`;
+      if (pillPercent) pillPercent.textContent = `${percent}%`;
+    }
+
+    function updateUploadPill(percent) {
+      const pillBar = document.getElementById('upload-pill-bar');
+      const pillPercent = document.getElementById('upload-pill-percent');
+      if (pillBar) pillBar.style.width = `${percent}%`;
+      if (pillPercent) pillPercent.textContent = `${Math.round(percent)}%`;
+    }
+
+    function hideUploadPill() {
+      const pill = document.getElementById('upload-pill');
+      if (!pill) return;
+      const pillText = document.getElementById('upload-pill-text');
+      const pillBar = document.getElementById('upload-pill-bar');
+      const pillPercent = document.getElementById('upload-pill-percent');
+      if (pillText) pillText.textContent = 'アップロード完了！';
+      if (pillBar) pillBar.style.width = '100%';
+      if (pillPercent) pillPercent.textContent = '✅';
+      clearTimeout(_uploadPillTimer);
+      _uploadPillTimer = setTimeout(() => { pill.style.display = 'none'; }, 2500);
     }
 
     // ---- DETAIL MODAL ----
@@ -7683,17 +7883,31 @@
           updateBo3Score();
         }
 
-        // 動画添付情報の復元
-        if (r.drive_file_id || r.video_url || r.youtube_video_id) {
+        // 動画添付情報の復元（全状態対応）
+        if (r.sync_status === 'local_pending' || r.drive_file_id || r.video_url || r.youtube_video_id) {
           _attachedVideoData = {
+            local_key: r.sync_status === 'local_pending' ? r.id : null,
             drive_file_id: r.drive_file_id || '',
             video_url: r.video_url || '',
             sync_status: r.sync_status || 'pending',
             created_at: r.created_at || Date.now(),
             youtube_video_id: r.youtube_video_id || '',
-            original_name: r.video_original_name || (r.sync_status === 'uploaded' ? 'YouTube動画' : 'Google Drive動画')
+            original_name: r.video_original_name || (
+              (r.sync_status === 'yt_uploaded' || r.sync_status === 'uploaded') ? 'YouTube動画' :
+              r.sync_status === 'local_pending' ? '保存済み動画' : 'Google Drive動画'
+            )
           };
-          showAttachedVideoUI(_attachedVideoData);
+          // local_pendingの場合、IndexedDBにデータがあるか確認
+          if (r.sync_status === 'local_pending') {
+            VideoStore.get(r.id).then(file => {
+              if (!file && _attachedVideoData) {
+                _attachedVideoData.sync_status = 'lost';
+              }
+              showAttachedVideoUI(_attachedVideoData);
+            }).catch(() => showAttachedVideoUI(_attachedVideoData));
+          } else {
+            showAttachedVideoUI(_attachedVideoData);
+          }
         } else {
           _attachedVideoData = null;
           resetRecordVideoUI();
@@ -11568,7 +11782,32 @@
         regs.forEach(reg => reg.unregister());
       });
     }
+
+    // ---- WiFi検知: 接続変化時にアップロードキューを起動 ----
+    if (navigator.connection) {
+      navigator.connection.addEventListener('change', () => {
+        const c = navigator.connection;
+        if (c.type === 'wifi' || c.type === 'ethernet' || !c.saveData) {
+          setTimeout(() => startUploadQueue(), 1000);
+        }
+      });
+    }
+    // アプリ起動時にもキューを確認（認証済みの場合のみ実行）
+    setTimeout(() => startUploadQueue(), 2000);
   </script>
+
+  <!-- アップロード進捗ピル（画面右下固定浮遊） -->
+  <div id="upload-pill" style="display:none;position:fixed;bottom:72px;right:12px;z-index:9999;flex-direction:column;background:rgba(15,15,30,0.95);border:1px solid rgba(139,92,246,0.4);border-radius:12px;padding:10px 14px;min-width:200px;max-width:260px;box-shadow:0 4px 24px rgba(0,0,0,0.5);backdrop-filter:blur(8px);gap:6px">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+      <span style="font-size:12px;font-weight:600;color:#e2e8f0">&#x2B06;&#xFE0F; <span id="upload-pill-text">アップロード中...</span></span>
+      <span id="upload-pill-percent" style="font-size:11px;font-weight:700;color:#a78bfa">0%</span>
+    </div>
+    <div style="width:100%;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden">
+      <div id="upload-pill-bar" style="width:0%;height:100%;background:linear-gradient(90deg,#7c3aed,#a78bfa);transition:width 0.3s ease"></div>
+    </div>
+    <div style="font-size:10px;color:#64748b;text-align:center">バックグラウンドアップロード中 — アプリは通常通り使えます</div>
+  </div>
+
 </body>
 
 </html>
