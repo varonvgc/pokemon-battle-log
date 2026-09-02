@@ -7526,8 +7526,22 @@
     let _isUploadQueueRunning = false;
     let _uploadPillTimer = null;
 
-    async function startUploadQueue() {
+    function isWifiOrFastConnection() {
+      const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      if (!c) return true; // iOS Safari等のNetwork Information API非対応環境
+      if (c.saveData) return false;
+      if (c.type === 'cellular') return false;
+      return true;
+    }
+
+    async function startUploadQueue(force = false) {
       if (_isUploadQueueRunning) return;
+
+      // WiFi環境でない場合は自動アップロードを保留（通信量節約）
+      if (!force && !isWifiOrFastConnection()) {
+        console.log('Mobile network detected - upload postponed until WiFi connection.');
+        return;
+      }
 
       // Drive認証確認（キャッシュが無ければサイレント再認証を自動試行）
       let token = window._googleDriveAccessToken;
@@ -11868,35 +11882,39 @@
         }
       });
     }
-    // アプリ起動時にトークン有効性を確認し、必要ならサイレント認証やキューを実行
+    // アプリ起動時にトークン有効性を確認し、WiFi環境ならキューを実行
     setTimeout(async () => {
-      // 1. ローカルストレージに有効なトークンがあるか確認
       const validToken = loadStoredDriveToken();
       updateDriveSettingsUI();
 
       const pendingCount = (records || []).filter(r => r.sync_status === 'local_pending').length;
+      if (pendingCount === 0) return;
+
+      const isWifi = isWifiOrFastConnection();
 
       if (validToken) {
-        // トークン有効なら即座にアップロードキューを実行
-        startUploadQueue();
-      } else if (getDriveClientId()) {
-        // トークン切れまたは未取得の場合、サイレント再認証を試行
-        if (pendingCount > 0) {
-          showUploadPill('☁️ Google Drive接続確認中...', 0);
-        }
-        try {
-          await requestGoogleDriveAccessToken(false);
-          if (pendingCount > 0) {
-            hideUploadPill();
-          }
+        if (isWifi) {
           startUploadQueue();
-        } catch (e) {
-          // サイレント認証失敗（ユーザーのタップ操作が必要）
-          if (pendingCount > 0) {
+        } else {
+          // モバイル回線時はWiFi待ちピルを表示
+          showUploadPill(📱 WiFi接続待ち (件待機中), 0);
+        }
+      } else if (getDriveClientId()) {
+        // トークン切れの場合
+        if (isWifi) {
+          showUploadPill('☁️ Google Drive接続確認中...', 0);
+          try {
+            await requestGoogleDriveAccessToken(false);
+            hideUploadPill();
+            startUploadQueue();
+          } catch (e) {
             showActionUploadPill(⚠️ 動画件が未送信 (タップして連携), () => {
               requestGoogleDriveAccessToken(true);
             });
           }
+        } else {
+          // モバイル回線時は静かに待機
+          showUploadPill(📱 WiFi接続待ち (件待機中), 0);
         }
       }
     }, 1200);
