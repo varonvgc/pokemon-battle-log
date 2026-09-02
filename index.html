@@ -50,7 +50,7 @@
     window.GoogleDriveResumableUploader = GoogleDriveResumableUploader;
   </script>
   <!-- Pokemon Recognition Engine Script -->
-  <script src="scripts/recognition_engine.js?v=20260903_v23"></script>
+  <script src="scripts/recognition_engine.js?v=20260903_v24"></script>
   <style>
     :root {
       --bg: #0f1117;
@@ -3811,6 +3811,22 @@
     let POKEMON_BY_ICON_FILE = {};
     let _masterDataPromise = null;
 
+    // ---- PARTIES (State variables hoisted to top) ----
+    const PARTY_PAGE_SIZE = 30;
+    let _partySearchQuery = '';
+    let _partyCurrentRenderedCount = 0;
+    let _partyFilteredCache = [];
+    let _partyObserver = null;
+    let _partyGridBound = false;
+    let mySelFilterName = '';
+    let oppPartyFilterName = '';
+
+    // ---- HISTORY (State variables hoisted to top) ----
+    const HIST_PAGE_SIZE = 50;
+    let _histCurrentRenderedCount = 0;
+    let _histFilteredCache = [];
+    let _histObserver = null;
+
     const TYPE_NAME_JA_MAP = {
       "normal": "ノーマル", "fire": "ほのお", "water": "みず", "grass": "くさ", "electric": "でんき", "ice": "こおり",
       "fighting": "かくとう", "poison": "どく", "ground": "じめん", "flying": "ひこう", "psychic": "エスパー",
@@ -4889,12 +4905,6 @@
     }
 
     // ---- PARTIES (無限スクロール＆リアルタイム検索対応) ----
-    const PARTY_PAGE_SIZE = 30;
-    let _partySearchQuery = '';
-    let _partyCurrentRenderedCount = 0;
-    let _partyFilteredCache = [];
-    let _partyObserver = null;
-    let _partyGridBound = false;
 
     function onPartySearchInput(val) {
       _partySearchQuery = (val || '').trim().toLowerCase();
@@ -7018,10 +7028,6 @@
 
 
     // ---- HISTORY (無限スクロール / ページネーション対応) ----
-    const HIST_PAGE_SIZE = 50;
-    let _histCurrentRenderedCount = 0;
-    let _histFilteredCache = [];
-    let _histObserver = null;
 
     function renderHistoryItemHTML(r) {
       const party = parties.find(p => p.id === r.partyId);
@@ -10599,7 +10605,6 @@
     // ============================================================
     // ---- 相手パーティ絞り込み（テキスト入力AC） ----
     // ============================================================
-    let oppPartyFilterName = '';
 
     function onOppPartyFilterFocus(input) { showOppPartyAC(input.value); }
     function onOppPartyFilterInput(input) { showOppPartyAC(input.value); }
@@ -10703,7 +10708,6 @@
 
 
     // ---- 自分の選出フィルター（テキストAC方式） ----
-    let mySelFilterName = '';
 
     // 対象試合の自分の選出から候補を収集
     function getMySelCandidates() {
@@ -11536,36 +11540,6 @@
         reader.readAsDataURL(file);
       });
     }
-    let recordScanMode = 'auto'; // 'auto' | 'not_selected' | 'selected'
-
-    function setRecordScanMode(mode) {
-      recordScanMode = mode;
-      const btnAuto = document.getElementById('rec-mode-auto');
-      const btnUnsel = document.getElementById('rec-mode-unselected');
-      const btnSel = document.getElementById('rec-mode-selected');
-
-      [btnAuto, btnUnsel, btnSel].forEach(b => {
-        if (!b) return;
-        b.style.background = 'transparent';
-        b.style.color = 'var(--text-muted)';
-        b.style.fontWeight = '500';
-      });
-
-      if (mode === 'auto' && btnAuto) {
-        btnAuto.style.background = 'var(--accent)';
-        btnAuto.style.color = '#fff';
-        btnAuto.style.fontWeight = '600';
-      } else if (mode === 'not_selected' && btnUnsel) {
-        btnUnsel.style.background = 'var(--accent)';
-        btnUnsel.style.color = '#fff';
-        btnUnsel.style.fontWeight = '600';
-      } else if (mode === 'selected' && btnSel) {
-        btnSel.style.background = 'var(--accent)';
-        btnSel.style.color = '#fff';
-        btnSel.style.fontWeight = '600';
-      }
-    }
-
     let _aiEngineLoadingPromise = null;
     function ensureAiEngineLoaded() {
       if (window.recognitionEngine && window.recognitionEngine.isLoaded) {
