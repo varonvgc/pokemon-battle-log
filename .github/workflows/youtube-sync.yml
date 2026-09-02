@@ -1,10 +1,8 @@
 name: Sync Drive Videos to YouTube
 
 on:
-  schedule:
-    # 毎日 UTC 08:00 (日本時間 午後5:00・YouTubeクォータリセット直後) に自動実行
-    - cron: '0 8 * * *'
-  # GitHub Web画面から手動実行可能
+  # cron-job.org から毎日 JST 22:00 に workflow_dispatch で自動起動
+  # GitHub Actions 自身の schedule は使用しない（遅延が発生するため）
   workflow_dispatch:
 
 jobs:
