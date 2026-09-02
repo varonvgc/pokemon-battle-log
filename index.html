@@ -8151,7 +8151,7 @@
         const token = loadStoredDriveToken();
         if (token) {
           try {
-            await fetch(https://www.googleapis.com/drive/v3/files/ + targetRec.drive_file_id, {
+            await fetch('https://www.googleapis.com/drive/v3/files/' + targetRec.drive_file_id, {
               method: 'DELETE',
               headers: { Authorization: 'Bearer ' + token }
             });
