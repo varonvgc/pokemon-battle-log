@@ -4239,13 +4239,13 @@
         const cId = getDriveClientId();
         if (!cId) {
           const err = new Error('Google OAuth Client ID が設定されていません。「データ管理」画面で設定してください。');
-          alert(err.message);
+          if (interactive) alert(err.message);
           reject(err);
           return;
         }
         if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
           const err = new Error('Google Identity Services が読み込まれていません。');
-          alert(err.message);
+          if (interactive) alert(err.message);
           reject(err);
           return;
         }
@@ -11799,8 +11799,18 @@
         }
       });
     }
-    // アプリ起動時にもキューを確認（認証済みの場合のみ実行）
-    setTimeout(() => startUploadQueue(), 2000);
+    // アプリ起動時にサイレント再認証を試行し、完了後にアップロードキューを確認
+    setTimeout(async () => {
+      if (getDriveClientId()) {
+        try {
+          await requestGoogleDriveAccessToken(false);
+          console.log('Google Drive silent auth succeeded on startup');
+        } catch (e) {
+          console.log('Google Drive silent auth failed (user interaction needed):', e);
+        }
+      }
+      startUploadQueue();
+    }, 1500);
   </script>
 
   <!-- アップロード進捗ピル（画面右下固定浮遊） -->
