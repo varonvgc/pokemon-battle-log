@@ -7639,44 +7639,20 @@
       if (pillPercent) pillPercent.textContent = '👆';
     }
 
-    function showActionUploadPill(text, onClick) {
-      const pill = document.getElementById('upload-pill');
-      const pillText = document.getElementById('upload-pill-text');
-      const pillBar = document.getElementById('upload-pill-bar');
-      const pillPercent = document.getElementById('upload-pill-percent');
-      if (!pill) return;
-      clearTimeout(_uploadPillTimer);
-      pill.style.display = 'flex';
-      pill.style.cursor = 'pointer';
-      pill.onclick = onClick;
-      if (pillText) pillText.textContent = text;
-      if (pillBar) pillBar.style.width = '0%';
-      if (pillPercent) pillPercent.textContent = '👆';
-    }
-
     function showUploadPill(text, percent) {
       const pill = document.getElementById('upload-pill');
-      if (pill) {
-        pill.onclick = null;
-        pill.style.cursor = 'default';
-      }
-      const pill = document.getElementById('upload-pill');
-      if (pill) {
-        pill.onclick = null;
-        pill.style.cursor = 'default';
-      }
-      const pill = document.getElementById('upload-pill');
+      if (!pill) return;
+      pill.onclick = null;
+      pill.style.cursor = 'default';
       const pillText = document.getElementById('upload-pill-text');
       const pillBar = document.getElementById('upload-pill-bar');
       const pillPercent = document.getElementById('upload-pill-percent');
-      if (!pill) return;
       clearTimeout(_uploadPillTimer);
       pill.style.display = 'flex';
       if (pillText) pillText.textContent = text;
-      if (pillBar) pillBar.style.width = `${percent}%`;
-      if (pillPercent) pillPercent.textContent = `${percent}%`;
+      if (pillBar) pillBar.style.width = percent + '%';
+      if (pillPercent) pillPercent.textContent = percent + '%';
     }
-
     function updateUploadPill(percent) {
       const pillBar = document.getElementById('upload-pill-bar');
       const pillPercent = document.getElementById('upload-pill-percent');
@@ -11882,6 +11858,7 @@
         }
       });
     }
+
     // アプリ起動時にトークン有効性を確認し、WiFi環境ならキューを実行
     setTimeout(async () => {
       const validToken = loadStoredDriveToken();
@@ -11896,11 +11873,9 @@
         if (isWifi) {
           startUploadQueue();
         } else {
-          // モバイル回線時はWiFi待ちピルを表示
-          showUploadPill(📱 WiFi接続待ち (件待機中), 0);
+          showUploadPill('📱 WiFi接続待ち (' + pendingCount + '件待機中)', 0);
         }
       } else if (getDriveClientId()) {
-        // トークン切れの場合
         if (isWifi) {
           showUploadPill('☁️ Google Drive接続確認中...', 0);
           try {
@@ -11908,17 +11883,16 @@
             hideUploadPill();
             startUploadQueue();
           } catch (e) {
-            showActionUploadPill(⚠️ 動画件が未送信 (タップして連携), () => {
+            showActionUploadPill('⚠️ 動画' + pendingCount + '件が未送信 (タップして連携)', () => {
               requestGoogleDriveAccessToken(true);
             });
           }
         } else {
-          // モバイル回線時は静かに待機
-          showUploadPill(📱 WiFi接続待ち (件待機中), 0);
+          showUploadPill('📱 WiFi接続待ち (' + pendingCount + '件待機中)', 0);
         }
       }
     }, 1200);
-  </script>
+    </script>
 
   <!-- アップロード進捗ピル（画面右下固定浮遊） -->
   <div id="upload-pill" style="display:none;position:fixed;bottom:72px;right:12px;z-index:9999;flex-direction:column;background:rgba(15,15,30,0.95);border:1px solid rgba(139,92,246,0.4);border-radius:12px;padding:10px 14px;min-width:200px;max-width:260px;box-shadow:0 4px 24px rgba(0,0,0,0.5);backdrop-filter:blur(8px);gap:6px">
