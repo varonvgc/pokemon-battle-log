@@ -124,8 +124,8 @@ def fetch_pending_records(db):
             if not isinstance(rec, dict):
                 continue
             
-            # sync_status が pending かつ drive_file_id が存在するもの
-            if rec.get('sync_status') == 'pending' and rec.get('drive_file_id'):
+            # sync_status が pending または drive_pending かつ drive_file_id が存在するもの
+            if rec.get('sync_status') in ['pending', 'drive_pending'] and rec.get('drive_file_id'):
                 # ソート用キーの決定: created_at (数値/文字列) または date
                 created_at = rec.get('created_at')
                 if not created_at:

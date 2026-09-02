@@ -7531,6 +7531,7 @@
     // ---- UPLOAD QUEUE (WiFi接続時自動アップロード) ----
     let _isUploadQueueRunning = false;
     let _uploadPillTimer = null;
+    let _currentUploadingRecordId = null;
 
     function isWifiOrFastConnection() {
       const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
@@ -7615,6 +7616,7 @@
             successCount++;
           } catch(e) {
             _currentVideoUploader = null;
+            _currentUploadingRecordId = null;
             if (e.message !== 'Upload aborted by user') {
               console.error(`Upload failed for record ${rec.id}:`, e);
             }
@@ -8117,16 +8119,77 @@
     }
 
     async function deleteRecord(id) {
+      const targetRec = records.find(r => r.id === id);
+      if (!targetRec) return;
       if (!confirm('この記録を削除しますか？')) return;
+
       if (editingRecordId === id) {
         editingRecordId = null;
         updateRecordFormEditModeUI();
       }
+
+      // 1. もし今まさにこのレコードの動画をアップロード中なら中断
+      if (_currentUploadingRecordId === id && _currentVideoUploader) {
+        try {
+          _currentVideoUploader.abort();
+        } catch (e) {}
+        _currentVideoUploader = null;
+        _currentUploadingRecordId = null;
+        hideUploadPill();
+      }
+
+      // 2. IndexedDBの動画データを削除（端末容量解放）
+      try {
+        await VideoStore.delete(id);
+      } catch (e) {
+        console.warn('IndexedDB delete error on deleteRecord:', e);
+      }
+
+      // 3. Google Driveに保存済みの場合はDrive上のファイルを削除
+      let driveDeleted = false;
+      if (targetRec.drive_file_id) {
+        const token = loadStoredDriveToken();
+        if (token) {
+          try {
+            await fetch(https://www.googleapis.com/drive/v3/files/ + targetRec.drive_file_id, {
+              method: 'DELETE',
+              headers: { Authorization: 'Bearer ' + token }
+            });
+            driveDeleted = true;
+          } catch (e) {
+            console.warn('Drive file deletion failed:', e);
+          }
+        }
+      }
+
+      // 4. Firestore / localStorage から削除
       records = records.filter(r => r.id !== id);
       saveData();
       closeDetailModal();
       renderHistory();
-      showRecordToast('🗑️ 記録を削除しました');
+
+      // 5. 待機ピルの再計算・更新
+      const remainingPending = records.filter(r => r.sync_status === 'local_pending').length;
+      if (remainingPending === 0) {
+        hideUploadPill();
+      } else if (!loadStoredDriveToken()) {
+        showActionUploadPill('⚠️ 動画' + remainingPending + '件が未送信 (タップして連携)', () => {
+          requestGoogleDriveAccessToken(true);
+        });
+      }
+
+      // 6. メッセージ案内
+      if (targetRec.drive_file_id) {
+        if (driveDeleted) {
+          showRecordToast('🗑️ 記録とDrive動画を削除しました');
+        } else {
+          showRecordToast('🗑️ 記録を削除しました（※Drive動画は手動で削除してください）');
+        }
+      } else if (targetRec.sync_status === 'yt_uploaded' || targetRec.youtube_video_id) {
+        showRecordToast('🗑️ 記録を削除しました（※YouTube動画はYouTube Studioから削除してください）');
+      } else {
+        showRecordToast('🗑️ 記録を削除しました');
+      }
     }
 
 
