@@ -8171,11 +8171,13 @@
       // 5. 待機ピルの再計算・更新
       const remainingPending = records.filter(r => r.sync_status === 'local_pending').length;
       if (remainingPending === 0) {
-        hideUploadPill();
+        closeUploadPill(); // 未送信動画が0件なら即座にメッセージを完全消去
       } else if (!loadStoredDriveToken()) {
         showActionUploadPill('⚠️ 動画' + remainingPending + '件が未送信 (タップして連携)', () => {
           requestGoogleDriveAccessToken(true);
         });
+      } else if (!isWifiOrFastConnection()) {
+        showUploadPill('📱 WiFi接続待ち (' + remainingPending + '件待機中)', 0);
       }
 
       // 6. メッセージ案内
