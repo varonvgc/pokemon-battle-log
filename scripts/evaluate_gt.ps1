@@ -80,10 +80,13 @@ function Match-TypeTemplate($bmp, $x, $y, $w, $h, $dict) {
     $bestType = "none"; $bestScore = 999999999.0
     foreach ($entry in $dict.GetEnumerator()) {
         $tb = $entry.Value; $diff = 0.0; $tbR = 0; $tbG = 0; $tbB = 0
-        for ($k = 0; $k -lt 1600; $k += 4) {
-            $dr = $b[$k] - $tb[$k]; $dg = $b[$k+1] - $tb[$k+1]; $db = $b[$k+2] - $tb[$k+2]
+        $isRgb = ($tb.Length -eq 1200)
+        for ($p = 0; $p -lt 400; $p++) {
+            $k = $p * 4
+            $t = if ($isRgb) { $p * 3 } else { $p * 4 }
+            $dr = $b[$k] - $tb[$t]; $dg = $b[$k+1] - $tb[$t+1]; $db = $b[$k+2] - $tb[$t+2]
             $diff += ($dr*$dr + $dg*$dg + $db*$db)
-            $tbR += $tb[$k]; $tbG += $tb[$k+1]; $tbB += $tb[$k+2]
+            $tbR += $tb[$t]; $tbG += $tb[$t+1]; $tbB += $tb[$t+2]
         }
         $tbMeanR = $tbR / 400.0; $tbMeanG = $tbG / 400.0; $tbMeanB = $tbB / 400.0
         $dmr = $meanR - $tbMeanR; $dmg = $meanG - $tbMeanG; $dmb = $meanB - $tbMeanB

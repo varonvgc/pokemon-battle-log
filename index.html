@@ -50,7 +50,7 @@
     window.GoogleDriveResumableUploader = GoogleDriveResumableUploader;
   </script>
   <!-- Pokemon Recognition Engine Script -->
-  <script src="scripts/recognition_engine.js?v=20260902_v21"></script>
+  <script src="scripts/recognition_engine.js?v=20260903_v22"></script>
   <style>
     :root {
       --bg: #0f1117;
@@ -11536,6 +11536,36 @@
         reader.readAsDataURL(file);
       });
     }
+    let recordScanMode = 'auto'; // 'auto' | 'not_selected' | 'selected'
+
+    function setRecordScanMode(mode) {
+      recordScanMode = mode;
+      const btnAuto = document.getElementById('rec-mode-auto');
+      const btnUnsel = document.getElementById('rec-mode-unselected');
+      const btnSel = document.getElementById('rec-mode-selected');
+
+      [btnAuto, btnUnsel, btnSel].forEach(b => {
+        if (!b) return;
+        b.style.background = 'transparent';
+        b.style.color = 'var(--text-muted)';
+        b.style.fontWeight = '500';
+      });
+
+      if (mode === 'auto' && btnAuto) {
+        btnAuto.style.background = 'var(--accent)';
+        btnAuto.style.color = '#fff';
+        btnAuto.style.fontWeight = '600';
+      } else if (mode === 'not_selected' && btnUnsel) {
+        btnUnsel.style.background = 'var(--accent)';
+        btnUnsel.style.color = '#fff';
+        btnUnsel.style.fontWeight = '600';
+      } else if (mode === 'selected' && btnSel) {
+        btnSel.style.background = 'var(--accent)';
+        btnSel.style.color = '#fff';
+        btnSel.style.fontWeight = '600';
+      }
+    }
+
     let _aiEngineLoadingPromise = null;
     function ensureAiEngineLoaded() {
       if (window.recognitionEngine && window.recognitionEngine.isLoaded) {
@@ -11608,7 +11638,7 @@
         }
 
         // 高精度認識エンジン（大津2値化＋680次元PHOG＋幾何Solidity記述子＋タイプ認識）の実行
-        const result = await window.recognitionEngine.recognize(img, myTeamList);
+        const result = await window.recognitionEngine.recognize(img, myTeamList, recordScanMode);
         console.log('Recognition Result:', result);
 
         // 1. 相手トレーナー名の反映

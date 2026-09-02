@@ -110,10 +110,11 @@ class PokemonRecognitionEngine {
     for (const [tName, tb] of Object.entries(dict)) {
       let diff = 0.0;
       let tbR = 0, tbG = 0, tbB = 0;
+      const isRgb = (tb.length === 1200);
 
       for (let p = 0; p < 400; p++) {
         const k = p * 4;   // RGBA stride in imgData
-        const t = p * 3;   // RGB stride in tb
+        const t = isRgb ? (p * 3) : (p * 4);   // RGB or RGBA stride in tb
         const dr = imgData[k] - tb[t];
         const dg = imgData[k + 1] - tb[t + 1];
         const db = imgData[k + 2] - tb[t + 2];
@@ -648,7 +649,7 @@ class PokemonRecognitionEngine {
    * @param {Array<string>} [myTeam] Optional user registered 6-pokemon team for AFTER mode
    * @returns {Promise<{mode: 'BEFORE'|'AFTER', opponent: Array<string>, mySelection?: Array<string>, trainerName?: string}>}
    */
-  async recognize(imageSource, myTeam = []) {
+  async recognize(imageSource, myTeam = [], forcedMode = 'auto') {
     await this.loadDictionaries();
 
     // Standardize to Canvas (Exact 2532 x 1170 Coordinate Space)
@@ -661,11 +662,17 @@ class PokemonRecognitionEngine {
     sCtx.drawImage(imageSource, 0, 0, 2532, 1170);
 
     // 1. Detect Mode: BEFORE (Selection screen) vs AFTER (Battle preparation screen)
-    const testBefore = this._matchTypeTemplate(sCtx, 2117, 137 + 12, 45, 45, this.typeFeaturesBefore);
-    const testAfter = this._matchTypeTemplate(sCtx, 1912, 160 + 12, 45, 45, this.typeFeaturesAfter);
-
-    const isBefore = (testBefore.score < testAfter.score) || (testBefore.score < 10000000);
-    const detectedMode = isBefore ? 'BEFORE' : 'AFTER';
+    let detectedMode;
+    if (forcedMode === 'not_selected' || forcedMode === 'BEFORE') {
+      detectedMode = 'BEFORE';
+    } else if (forcedMode === 'selected' || forcedMode === 'AFTER') {
+      detectedMode = 'AFTER';
+    } else {
+      const testBefore = this._matchTypeTemplate(sCtx, 2117, 137 + 12, 45, 45, this.typeFeaturesBefore);
+      const testAfter = this._matchTypeTemplate(sCtx, 1912, 160 + 12, 45, 45, this.typeFeaturesAfter);
+      const isBefore = (testBefore.score < testAfter.score) || (testBefore.score < 10000000);
+      detectedMode = isBefore ? 'BEFORE' : 'AFTER';
+    }
 
     // OCR Trainer Name in parallel / background
     const trainerNamePromise = this._extractTrainerName(sCtx, detectedMode);
