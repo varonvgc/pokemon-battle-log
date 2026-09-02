@@ -6983,8 +6983,11 @@
         if (_attachedVideoData.sync_status === 'local_pending' &&
             _attachedVideoData.local_key && _attachedVideoData.local_key.startsWith('_new_')) {
           const finalId = editingRecordId || rec.id;
-          VideoStore.rename(_attachedVideoData.local_key, finalId)
-            .catch(e => console.warn('IndexedDB rename error:', e));
+          try {
+            await VideoStore.rename(_attachedVideoData.local_key, finalId);
+          } catch(e) {
+            console.warn('IndexedDB rename error:', e);
+          }
           _attachedVideoData.local_key = finalId;
         }
       }
@@ -7007,6 +7010,9 @@
         saveData();
         showRecordToast('💾 対戦記録を保存しました！');
       }
+
+      // WiFi環境かつ認証済みなら即座にアップロードキューを起動
+      setTimeout(() => startUploadQueue(), 300);
 
       // 動画添付状態のリセット
       _attachedVideoData = null;
@@ -7543,17 +7549,18 @@
         return;
       }
 
-      // Drive認証確認（キャッシュが無ければサイレント再認証を自動試行）
-      let token = window._googleDriveAccessToken;
-      const tokenValid = token && window._googleDriveTokenExpiresAt && Date.now() < window._googleDriveTokenExpiresAt;
-      if (!tokenValid) {
-        try {
-          token = await requestGoogleDriveAccessToken(false);
-        } catch (e) {
-          return;
+      // Drive認証確認（有効なトークンをメモリまたはlocalStorageから取得）
+      let token = loadStoredDriveToken();
+      if (!token) {
+        // トークン未取得/期限切れの場合、WiFi環境なら連携アクションピルを表示
+        const pendingCount = records.filter(r => r.sync_status === 'local_pending').length;
+        if (pendingCount > 0 && getDriveClientId()) {
+          showActionUploadPill('⚠️ 動画' + pendingCount + '件が未送信 (タップして連携)', () => {
+            requestGoogleDriveAccessToken(true);
+          });
         }
+        return;
       }
-      if (!token) return;
 
       const folderId = getDriveFolderId();
       if (!folderId) return;
