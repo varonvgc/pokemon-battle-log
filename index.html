@@ -7003,6 +7003,8 @@
       showRecordForm();
     }
 
+
+
     // ---- HISTORY (無限スクロール / ページネーション対応) ----
     const HIST_PAGE_SIZE = 50;
     let _histCurrentRenderedCount = 0;
@@ -7317,11 +7319,9 @@
       const file = input.files && input.files[0];
       if (!file) return;
 
-      const folderId = getDriveFolderId();
-      if (!folderId) {
-        alert('Google Driveの保存先フォルダIDが未設定です。「データ管理」画面でフォルダIDを設定してください。');
-        input.value = '';
-        return;
+      // フォルダID未設定の場合でも端末IndexedDBへの添付は許可（後から設定・認証時に自動アップロード）
+      if (!getDriveFolderId()) {
+        showRecordToast('⚠️ DriveフォルダID未設定。「データ管理」で設定後に自動アップロードされます。');
       }
 
       // 差し替え時：旧動画のクリーンアップ
@@ -7500,10 +7500,17 @@
     async function startUploadQueue() {
       if (_isUploadQueueRunning) return;
 
-      // Drive認証確認（キャッシュのみ・非インタラクティブ）
-      const token = window._googleDriveAccessToken;
+      // Drive認証確認（キャッシュが無ければサイレント再認証を自動試行）
+      let token = window._googleDriveAccessToken;
       const tokenValid = token && window._googleDriveTokenExpiresAt && Date.now() < window._googleDriveTokenExpiresAt;
-      if (!tokenValid) return;
+      if (!tokenValid) {
+        try {
+          token = await requestGoogleDriveAccessToken(false);
+        } catch (e) {
+          return;
+        }
+      }
+      if (!token) return;
 
       const folderId = getDriveFolderId();
       if (!folderId) return;
