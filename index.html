@@ -7624,6 +7624,9 @@
       }
     }
 
+    let _pillActionCallback = null;
+    let _pillDragMoved = false;
+
     function showActionUploadPill(text, onClick) {
       const pill = document.getElementById('upload-pill');
       const pillText = document.getElementById('upload-pill-text');
@@ -7631,9 +7634,9 @@
       const pillPercent = document.getElementById('upload-pill-percent');
       if (!pill) return;
       clearTimeout(_uploadPillTimer);
+      _pillActionCallback = onClick;
       pill.style.display = 'flex';
-      pill.style.cursor = 'pointer';
-      pill.onclick = onClick;
+      pill.style.cursor = 'grab';
       if (pillText) pillText.textContent = text;
       if (pillBar) pillBar.style.width = '0%';
       if (pillPercent) pillPercent.textContent = '👆';
@@ -7642,8 +7645,8 @@
     function showUploadPill(text, percent) {
       const pill = document.getElementById('upload-pill');
       if (!pill) return;
-      pill.onclick = null;
-      pill.style.cursor = 'default';
+      _pillActionCallback = null;
+      pill.style.cursor = 'grab';
       const pillText = document.getElementById('upload-pill-text');
       const pillBar = document.getElementById('upload-pill-bar');
       const pillPercent = document.getElementById('upload-pill-percent');
@@ -7653,11 +7656,12 @@
       if (pillBar) pillBar.style.width = percent + '%';
       if (pillPercent) pillPercent.textContent = percent + '%';
     }
+
     function updateUploadPill(percent) {
       const pillBar = document.getElementById('upload-pill-bar');
       const pillPercent = document.getElementById('upload-pill-percent');
-      if (pillBar) pillBar.style.width = `${percent}%`;
-      if (pillPercent) pillPercent.textContent = `${Math.round(percent)}%`;
+      if (pillBar) pillBar.style.width = percent + '%';
+      if (pillPercent) pillPercent.textContent = Math.round(percent) + '%';
     }
 
     function hideUploadPill() {
@@ -7672,6 +7676,87 @@
       clearTimeout(_uploadPillTimer);
       _uploadPillTimer = setTimeout(() => { pill.style.display = 'none'; }, 2500);
     }
+
+    function closeUploadPill(e) {
+      if (e) e.stopPropagation();
+      const pill = document.getElementById('upload-pill');
+      if (pill) pill.style.display = 'none';
+      clearTimeout(_uploadPillTimer);
+    }
+
+    // ドラッグ＆ドロップ機能の初期化
+    function initDraggableUploadPill() {
+      const pill = document.getElementById('upload-pill');
+      if (!pill) return;
+
+      let isDragging = false;
+      let startX, startY, initialLeft, initialTop;
+
+      function onStart(e) {
+        const target = e.target;
+        if (target && target.closest('.pill-close-btn')) return;
+
+        isDragging = true;
+        _pillDragMoved = false;
+        const pt = e.touches ? e.touches[0] : e;
+        startX = pt.clientX;
+        startY = pt.clientY;
+
+        const rect = pill.getBoundingClientRect();
+        // right/bottom固定から left/top絶対指定に切り替え
+        pill.style.right = 'auto';
+        pill.style.bottom = 'auto';
+        pill.style.left = rect.left + 'px';
+        pill.style.top = rect.top + 'px';
+        initialLeft = rect.left;
+        initialTop = rect.top;
+        pill.style.cursor = 'grabbing';
+      }
+
+      function onMove(e) {
+        if (!isDragging) return;
+        const pt = e.touches ? e.touches[0] : e;
+        const dx = pt.clientX - startX;
+        const dy = pt.clientY - startY;
+
+        if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+          _pillDragMoved = true;
+        }
+
+        let newLeft = initialLeft + dx;
+        let newTop = initialTop + dy;
+
+        // 画面外にはみ出さないよう制限
+        const maxLeft = window.innerWidth - pill.offsetWidth - 8;
+        const maxTop = window.innerHeight - pill.offsetHeight - 8;
+        newLeft = Math.max(8, Math.min(newLeft, maxLeft));
+        newTop = Math.max(8, Math.min(newTop, maxTop));
+
+        pill.style.left = newLeft + 'px';
+        pill.style.top = newTop + 'px';
+      }
+
+      function onEnd(e) {
+        if (!isDragging) return;
+        isDragging = false;
+        pill.style.cursor = 'grab';
+
+        // ドラッグ移動しなかった場合（クリック判定）
+        if (!_pillDragMoved && _pillActionCallback) {
+          _pillActionCallback();
+        }
+      }
+
+      pill.addEventListener('mousedown', onStart);
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onEnd);
+
+      pill.addEventListener('touchstart', onStart, { passive: true });
+      window.addEventListener('touchmove', onMove, { passive: true });
+      window.addEventListener('touchend', onEnd);
+    }
+
+    document.addEventListener('DOMContentLoaded', initDraggableUploadPill);
 
     // ---- DETAIL MODAL ----
     function openDetail(id) {
@@ -11861,6 +11946,7 @@
 
     // アプリ起動時にトークン有効性を確認し、WiFi環境ならキューを実行
     setTimeout(async () => {
+      initDraggableUploadPill();
       const validToken = loadStoredDriveToken();
       updateDriveSettingsUI();
 
@@ -11877,33 +11963,33 @@
         }
       } else if (getDriveClientId()) {
         if (isWifi) {
-          showUploadPill('☁️ Google Drive接続確認中...', 0);
-          try {
-            await requestGoogleDriveAccessToken(false);
-            hideUploadPill();
-            startUploadQueue();
-          } catch (e) {
-            showActionUploadPill('⚠️ 動画' + pendingCount + '件が未送信 (タップして連携)', () => {
-              requestGoogleDriveAccessToken(true);
-            });
-          }
+          // WiFi環境で未認証の場合は、サイレントで待たせず直接タップ連携を案内
+          showActionUploadPill('⚠️ 動画' + pendingCount + '件が未送信 (タップして連携)', () => {
+            requestGoogleDriveAccessToken(true);
+          });
         } else {
           showUploadPill('📱 WiFi接続待ち (' + pendingCount + '件待機中)', 0);
         }
       }
-    }, 1200);
+    }, 800);
     </script>
 
-  <!-- アップロード進捗ピル（画面右下固定浮遊） -->
-  <div id="upload-pill" style="display:none;position:fixed;bottom:72px;right:12px;z-index:9999;flex-direction:column;background:rgba(15,15,30,0.95);border:1px solid rgba(139,92,246,0.4);border-radius:12px;padding:10px 14px;min-width:200px;max-width:260px;box-shadow:0 4px 24px rgba(0,0,0,0.5);backdrop-filter:blur(8px);gap:6px">
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
-      <span style="font-size:12px;font-weight:600;color:#e2e8f0">&#x2B06;&#xFE0F; <span id="upload-pill-text">アップロード中...</span></span>
-      <span id="upload-pill-percent" style="font-size:11px;font-weight:700;color:#a78bfa">0%</span>
+  <!-- アップロード進捗ピル（ドラッグ移動可能・✕ボタン付き） -->
+  <div id="upload-pill" style="display:none;position:fixed;bottom:72px;right:12px;z-index:99999;flex-direction:column;background:rgba(15,15,30,0.96);border:1px solid rgba(139,92,246,0.5);border-radius:12px;padding:10px 12px;min-width:220px;max-width:280px;box-shadow:0 6px 28px rgba(0,0,0,0.7);backdrop-filter:blur(10px);gap:6px;user-select:none;touch-action:none">
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:6px">
+      <span style="font-size:12px;font-weight:600;color:#e2e8f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">&#x2B06;&#xFE0F; <span id="upload-pill-text">アップロード中...</span></span>
+      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
+        <span id="upload-pill-percent" style="font-size:11px;font-weight:700;color:#a78bfa">0%</span>
+        <button type="button" class="pill-close-btn" onclick="closeUploadPill(event)" style="background:transparent;border:none;color:#94a3b8;font-size:14px;cursor:pointer;padding:0 2px;line-height:1" title="閉じる">✕</button>
+      </div>
     </div>
     <div style="width:100%;height:4px;background:rgba(255,255,255,0.1);border-radius:2px;overflow:hidden">
       <div id="upload-pill-bar" style="width:0%;height:100%;background:linear-gradient(90deg,#7c3aed,#a78bfa);transition:width 0.3s ease"></div>
     </div>
-    <div style="font-size:10px;color:#64748b;text-align:center">バックグラウンドアップロード中 — アプリは通常通り使えます</div>
+    <div style="font-size:9.5px;color:#64748b;display:flex;justify-content:space-between;align-items:center">
+      <span>アプリは通常通り使えます</span>
+      <span style="color:#a78bfa;font-size:9px">⠿ ドラッグで移動</span>
+    </div>
   </div>
 
 </body>
