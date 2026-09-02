@@ -49,6 +49,8 @@
     import { GoogleDriveResumableUploader } from "./src/utils/driveUploader.js";
     window.GoogleDriveResumableUploader = GoogleDriveResumableUploader;
   </script>
+  <!-- Pokemon Recognition Engine Script -->
+  <script src="scripts/recognition_engine.js?v=20260902_v21" defer></script>
   <style>
     :root {
       --bg: #0f1117;
@@ -11535,29 +11537,46 @@
       });
     }
     function ensureAiEngineLoaded() {
-      if (window.recognitionEngine && window.Tesseract) {
+      if (window.recognitionEngine && window.recognitionEngine.isLoaded) {
         return Promise.resolve();
       }
       if (_aiEngineLoadingPromise) return _aiEngineLoadingPromise;
 
-      _aiEngineLoadingPromise = new Promise((resolve, reject) => {
+      _aiEngineLoadingPromise = new Promise(async (resolve, reject) => {
         function loadScript(src) {
           return new Promise((res, rej) => {
             const s = document.createElement('script');
             s.src = src;
             s.onload = res;
-            s.onerror = rej;
+            s.onerror = (e) => rej(new Error(`Failed to load script: ${src}`));
             document.head.appendChild(s);
           });
         }
 
-        Promise.all([
-          window.Tesseract ? Promise.resolve() : loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'),
-          window.recognitionEngine ? Promise.resolve() : loadScript('scripts/recognition_engine.js?v=20260830_v19')
-        ]).then(resolve).catch(err => {
+        // 1. Tesseract.js (Optional, do not block main recognition engine if CDN fails)
+        if (!window.Tesseract) {
+          loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js')
+            .catch(tErr => console.warn('Tesseract OCR CDN load warning (Trainer OCR will fallback):', tErr));
+        }
+
+        // 2. Load Recognition Engine Core Script
+        try {
+          if (!window.recognitionEngine) {
+            await loadScript('scripts/recognition_engine.js?v=20260902_v21');
+          }
+
+          if (window.recognitionEngine && typeof window.recognitionEngine.loadDictionaries === 'function') {
+            const loaded = await window.recognitionEngine.loadDictionaries();
+            if (!loaded) {
+              throw new Error('Recognition dictionaries failed to initialize');
+            }
+          }
+          resolve();
+        } catch (err) {
+          console.error('ensureAiEngineLoaded error:', err);
           _aiEngineLoadingPromise = null;
           reject(err);
-        });
+        }
       });
 
       return _aiEngineLoadingPromise;
