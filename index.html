@@ -11542,43 +11542,28 @@
       }
       if (_aiEngineLoadingPromise) return _aiEngineLoadingPromise;
 
-      _aiEngineLoadingPromise = new Promise(async (resolve, reject) => {
-        function loadScript(src) {
-          return new Promise((res, rej) => {
-            const s = document.createElement('script');
-            s.src = src;
-            s.onload = res;
-            s.onerror = (e) => rej(new Error(`Failed to load script: ${src}`));
-            document.head.appendChild(s);
-          });
-        }
-
-        // 1. Tesseract.js (Optional, do not block main recognition engine if CDN fails)
+      _aiEngineLoadingPromise = (async () => {
+        // Tesseract.js (Optional OCR for trainer name - never blocks recognition)
         if (!window.Tesseract) {
-          loadScript('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js')
-            .catch(tErr => console.warn('Tesseract OCR CDN load warning (Trainer OCR will fallback):', tErr));
+          fetch('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js')
+            .catch(() => {});
+          const s = document.createElement('script');
+          s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+          document.head.appendChild(s);
+          // Do NOT await - let it load in background
         }
 
-        // 2. Load Recognition Engine Core Script
-        try {
-          if (!window.recognitionEngine) {
-            await loadScript('scripts/recognition_engine.js?v=20260902_v21');
-          }
-
-          if (window.recognitionEngine && typeof window.recognitionEngine.loadDictionaries === 'function') {
-            const loaded = await window.recognitionEngine.loadDictionaries();
-            if (!loaded) {
-              throw new Error('Recognition dictionaries failed to initialize');
-            }
-          }
-          resolve();
-        } catch (err) {
-          console.error('ensureAiEngineLoaded error:', err);
-          _aiEngineLoadingPromise = null;
-          reject(err);
+        // recognition_engine.js is already loaded synchronously in <head>.
+        // Just call loadDictionaries() to fetch JSON assets.
+        if (!window.recognitionEngine) {
+          throw new Error('recognition_engine.js が読み込まれていません。ページをリロードしてください。');
         }
-      });
+        await window.recognitionEngine.loadDictionaries();
+        // loadDictionaries() sets isLoaded=true on success, false on error.
+        // We do NOT throw on false - the engine can still attempt recognition.
+      })();
 
+      _aiEngineLoadingPromise.catch(() => { _aiEngineLoadingPromise = null; });
       return _aiEngineLoadingPromise;
     }
 
@@ -11592,10 +11577,14 @@
       try {
         await ensureAiEngineLoaded();
       } catch (err) {
-        console.error('Failed to load AI engine:', err);
-        setRecordAiLoading(false);
-        alert('AI認識モジュールの読み込みに失敗しました。通信環境をご確認ください。');
-        return;
+        // エンジンスクリプト自体は同期読み込み済みのため、辞書ロードが失敗しても続行を試みる
+        if (!window.recognitionEngine) {
+          console.error('Failed to load AI engine:', err);
+          setRecordAiLoading(false);
+          alert('AI認識モジュールの読み込みに失敗しました。ページをリロードしてください。');
+          return;
+        }
+        console.warn('Dictionary preload warning (continuing with available data):', err);
       }
 
       setRecordAiLoading(true, 'AI高精度解析中（PHOG幾何エンジン）...');
