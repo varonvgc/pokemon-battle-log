@@ -110,17 +110,17 @@ class PokemonRecognitionEngine {
     for (const [tName, tb] of Object.entries(dict)) {
       let diff = 0.0;
       let tbR = 0, tbG = 0, tbB = 0;
-      let idx3 = 0;
 
-      for (let k = 0; k < 1600; k += 4) {
-        const dr = imgData[k] - tb[idx3];
-        const dg = imgData[k + 1] - tb[idx3 + 1];
-        const db = imgData[k + 2] - tb[idx3 + 2];
+      for (let p = 0; p < 400; p++) {
+        const k = p * 4;   // RGBA stride in imgData
+        const t = p * 3;   // RGB stride in tb
+        const dr = imgData[k] - tb[t];
+        const dg = imgData[k + 1] - tb[t + 1];
+        const db = imgData[k + 2] - tb[t + 2];
         diff += (dr * dr + dg * dg + db * db);
-        tbR += tb[idx3];
-        tbG += tb[idx3 + 1];
-        tbB += tb[idx3 + 2];
-        idx3 += 3;
+        tbR += tb[t];
+        tbG += tb[t + 1];
+        tbB += tb[t + 2];
       }
       const tbMeanR = tbR / 400.0;
       const tbMeanG = tbG / 400.0;
