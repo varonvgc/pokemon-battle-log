@@ -11536,6 +11536,7 @@
         reader.readAsDataURL(file);
       });
     }
+    let _aiEngineLoadingPromise = null;
     function ensureAiEngineLoaded() {
       if (window.recognitionEngine && window.recognitionEngine.isLoaded) {
         return Promise.resolve();
