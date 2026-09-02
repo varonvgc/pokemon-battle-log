@@ -4226,14 +4226,44 @@
       }
     }
 
-    // Google Drive認証トークン要求 (GIS)
+    // Google Drive認証トークン永続化 & 要求 (GIS)
     window._googleDriveAccessToken = null;
     window._googleDriveTokenExpiresAt = 0;
 
+    function loadStoredDriveToken() {
+      try {
+        const tok = localStorage.getItem('gdrive_access_token');
+        const exp = parseInt(localStorage.getItem('gdrive_token_expires_at') || '0', 10);
+        if (tok && Date.now() < exp) {
+          window._googleDriveAccessToken = tok;
+          window._googleDriveTokenExpiresAt = exp;
+          return tok;
+        }
+      } catch(e) {}
+      window._googleDriveAccessToken = null;
+      window._googleDriveTokenExpiresAt = 0;
+      return null;
+    }
+
+    function saveStoredDriveToken(token, expiresInSec) {
+      try {
+        const exp = Date.now() + (parseInt(expiresInSec, 10) - 60) * 1000;
+        localStorage.setItem('gdrive_access_token', token);
+        localStorage.setItem('gdrive_token_expires_at', exp.toString());
+        window._googleDriveAccessToken = token;
+        window._googleDriveTokenExpiresAt = exp;
+      } catch(e) {}
+    }
+
+    // 初期ロード時にローカルストレージからトークン復元
+    loadStoredDriveToken();
+
     function requestGoogleDriveAccessToken(interactive = true) {
       return new Promise((resolve, reject) => {
-        if (window._googleDriveAccessToken && Date.now() < window._googleDriveTokenExpiresAt) {
-          resolve(window._googleDriveAccessToken);
+        const cached = loadStoredDriveToken();
+        if (cached) {
+          updateDriveSettingsUI();
+          resolve(cached);
           return;
         }
         const cId = getDriveClientId();
@@ -4256,16 +4286,15 @@
             scope: 'https://www.googleapis.com/auth/drive.file',
             callback: (response) => {
               if (response.error) {
-                console.error('Google OAuth error:', response);
+                console.warn('Google OAuth response error:', response);
                 reject(new Error(response.error_description || response.error));
                 return;
               }
-              window._googleDriveAccessToken = response.access_token;
-              window._googleDriveTokenExpiresAt = Date.now() + (parseInt(response.expires_in, 10) - 60) * 1000;
+              saveStoredDriveToken(response.access_token, response.expires_in);
               updateDriveSettingsUI();
               // 認証成功後にアップロードキューを開始
               setTimeout(() => startUploadQueue(), 500);
-              resolve(window._googleDriveAccessToken);
+              resolve(response.access_token);
             }
           });
           client.requestAccessToken({ prompt: interactive ? 'select_account' : '' });
@@ -7581,7 +7610,47 @@
       }
     }
 
+    function showActionUploadPill(text, onClick) {
+      const pill = document.getElementById('upload-pill');
+      const pillText = document.getElementById('upload-pill-text');
+      const pillBar = document.getElementById('upload-pill-bar');
+      const pillPercent = document.getElementById('upload-pill-percent');
+      if (!pill) return;
+      clearTimeout(_uploadPillTimer);
+      pill.style.display = 'flex';
+      pill.style.cursor = 'pointer';
+      pill.onclick = onClick;
+      if (pillText) pillText.textContent = text;
+      if (pillBar) pillBar.style.width = '0%';
+      if (pillPercent) pillPercent.textContent = '👆';
+    }
+
+    function showActionUploadPill(text, onClick) {
+      const pill = document.getElementById('upload-pill');
+      const pillText = document.getElementById('upload-pill-text');
+      const pillBar = document.getElementById('upload-pill-bar');
+      const pillPercent = document.getElementById('upload-pill-percent');
+      if (!pill) return;
+      clearTimeout(_uploadPillTimer);
+      pill.style.display = 'flex';
+      pill.style.cursor = 'pointer';
+      pill.onclick = onClick;
+      if (pillText) pillText.textContent = text;
+      if (pillBar) pillBar.style.width = '0%';
+      if (pillPercent) pillPercent.textContent = '👆';
+    }
+
     function showUploadPill(text, percent) {
+      const pill = document.getElementById('upload-pill');
+      if (pill) {
+        pill.onclick = null;
+        pill.style.cursor = 'default';
+      }
+      const pill = document.getElementById('upload-pill');
+      if (pill) {
+        pill.onclick = null;
+        pill.style.cursor = 'default';
+      }
       const pill = document.getElementById('upload-pill');
       const pillText = document.getElementById('upload-pill-text');
       const pillBar = document.getElementById('upload-pill-bar');
@@ -11799,18 +11868,38 @@
         }
       });
     }
-    // アプリ起動時にサイレント再認証を試行し、完了後にアップロードキューを確認
+    // アプリ起動時にトークン有効性を確認し、必要ならサイレント認証やキューを実行
     setTimeout(async () => {
-      if (getDriveClientId()) {
+      // 1. ローカルストレージに有効なトークンがあるか確認
+      const validToken = loadStoredDriveToken();
+      updateDriveSettingsUI();
+
+      const pendingCount = (records || []).filter(r => r.sync_status === 'local_pending').length;
+
+      if (validToken) {
+        // トークン有効なら即座にアップロードキューを実行
+        startUploadQueue();
+      } else if (getDriveClientId()) {
+        // トークン切れまたは未取得の場合、サイレント再認証を試行
+        if (pendingCount > 0) {
+          showUploadPill('☁️ Google Drive接続確認中...', 0);
+        }
         try {
           await requestGoogleDriveAccessToken(false);
-          console.log('Google Drive silent auth succeeded on startup');
+          if (pendingCount > 0) {
+            hideUploadPill();
+          }
+          startUploadQueue();
         } catch (e) {
-          console.log('Google Drive silent auth failed (user interaction needed):', e);
+          // サイレント認証失敗（ユーザーのタップ操作が必要）
+          if (pendingCount > 0) {
+            showActionUploadPill(⚠️ 動画件が未送信 (タップして連携), () => {
+              requestGoogleDriveAccessToken(true);
+            });
+          }
         }
       }
-      startUploadQueue();
-    }, 1500);
+    }, 1200);
   </script>
 
   <!-- アップロード進捗ピル（画面右下固定浮遊） -->
