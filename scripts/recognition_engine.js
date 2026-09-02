@@ -715,8 +715,8 @@ class PokemonRecognitionEngine {
         const slotY = slot0Y + i * slotPitch;
         const res1 = this._matchTypeTemplate(sCtx, t1X, slotY + t1YOff, tW, tH, this.typeFeaturesAfter);
         const res2 = this._matchTypeTemplate(sCtx, t2X, slotY + t2YOff, tW, tH, this.typeFeaturesAfter);
-        const t1 = res1.score < 8000000 ? res1.type : 'none';
-        const t2 = res2.score < 8000000 ? res2.type : 'none';
+        const t1 = res1.score < 15000000 ? res1.type : 'none';
+        const t2 = res2.score < 15000000 ? res2.type : 'none';
 
         const candidates = this._getCandidates(t1, t2);
         const pName = this._matchPokemonGeoPHOG(sCtx, iconX, slotY + iconYOff, iconW, iconH, candidates);
