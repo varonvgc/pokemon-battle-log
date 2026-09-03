@@ -7097,14 +7097,18 @@
       // 動画バッジのHTML
       let videoBadgeHtml = '';
       if (r.sync_status === 'local_pending') {
-        videoBadgeHtml = `<span style="font-size:10px;padding:1px 5px;background:var(--accent);color:#fff;border-radius:4px;font-weight:700" title="WiFi接続待ち">📱 待機中</span>`;
+        videoBadgeHtml = `<span style="font-size:10px;padding:1px 5px;background:var(--accent);color:#fff;border-radius:4px;font-weight:700" title="端末内に保存中 (タップでアプリ内再生)">📱 ローカル</span>`;
       } else if (r.video_url || r.drive_file_id || r.youtube_video_id) {
         const isUploaded = r.sync_status === 'yt_uploaded' || r.sync_status === 'uploaded' ||
                            (r.video_url && r.video_url.includes('youtu'));
         if (isUploaded) {
           videoBadgeHtml = `<span style="font-size:10px;padding:1px 5px;background:#dc2626;color:#fff;border-radius:4px;font-weight:700" title="YouTube録画あり">▶️ 動画</span>`;
         } else {
+          const isWithin30Min = r.drive_uploaded_at && (Date.now() - r.drive_uploaded_at < 30 * 60 * 1000);
           videoBadgeHtml = `<span style="font-size:10px;padding:1px 5px;background:#22c55e;color:#fff;border-radius:4px;font-weight:700" title="Google Drive保存済 (YouTube転送待ち)">☁️ Drive</span>`;
+          if (isWithin30Min) {
+            videoBadgeHtml += ` <span style="font-size:10px;padding:1px 5px;background:var(--accent);color:#fff;border-radius:4px;font-weight:700" title="端末内にも保存中 (30分間保持)">📱 ローカル</span>`;
+          }
         }
       }
 
@@ -7477,6 +7481,73 @@
              (videoUrl && videoUrl.includes('youtu'));
     }
 
+    // ---- LOCAL VIDEO PLAYER & CLEANUP (30分間ローカル保持) ----
+    let _currentPlayingObjectUrl = null;
+
+    async function playLocalVideoInDetail(recordId, containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      try {
+        container.innerHTML = '<div style="font-size:12px;color:var(--text-muted);padding:8px">⏳ 動画を読み込み中...</div>';
+        const file = await VideoStore.get(recordId);
+        if (!file) {
+          container.innerHTML = '<div style="font-size:12px;color:#ef4444;padding:8px">⚠️ この端末にはローカル動画がありません（別の端末で記録されたか、30分以上経過して自動消去されました）</div>';
+          return;
+        }
+        if (_currentPlayingObjectUrl) {
+          URL.revokeObjectURL(_currentPlayingObjectUrl);
+          _currentPlayingObjectUrl = null;
+        }
+        _currentPlayingObjectUrl = URL.createObjectURL(file);
+        container.innerHTML = `
+          <div style="margin-top:6px;position:relative">
+            <video src="${_currentPlayingObjectUrl}" controls playsinline autoplay style="width:100%;max-height:360px;border-radius:8px;background:#000;display:block"></video>
+            <div style="font-size:10.5px;color:var(--text-muted);margin-top:4px;display:flex;justify-content:space-between;align-items:center">
+              <span>📱 端末内動画再生中 (通信量ゼロ)</span>
+              <button type="button" onclick="stopLocalVideoPlayer('${containerId}', '${recordId}')" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:11px">プレイヤーを閉じる ✕</button>
+            </div>
+          </div>
+        `;
+      } catch (e) {
+        console.error('Failed to play local video:', e);
+        container.innerHTML = `<div style="font-size:12px;color:#ef4444;padding:8px">⚠️ 動画の読み込みに失敗しました: ${e.message}</div>`;
+      }
+    }
+
+    function stopLocalVideoPlayer(containerId, recordId) {
+      if (_currentPlayingObjectUrl) {
+        URL.revokeObjectURL(_currentPlayingObjectUrl);
+        _currentPlayingObjectUrl = null;
+      }
+      const container = document.getElementById(containerId);
+      if (container) {
+        const rId = recordId || container.dataset.recordId;
+        container.innerHTML = `
+          <button type="button" onclick="playLocalVideoInDetail('${rId}', '${containerId}')" style="display:inline-flex;align-items:center;gap:6px;color:#ffffff;background:var(--accent);padding:8px 14px;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;box-shadow:0 2px 8px rgba(108,99,255,0.3)">
+            <span>▶️ 端末内の動画を再生</span>
+          </button>
+        `;
+      }
+    }
+
+    // Driveアップロード完了後30分経過した動画をIndexedDBから安全に消去
+    async function cleanupOldLocalVideos() {
+      try {
+        const now = Date.now();
+        const THIRTY_MINUTES = 30 * 60 * 1000;
+        for (const r of (records || [])) {
+          // YouTube移行済みは即削除
+          if (r.sync_status === 'yt_uploaded' || r.sync_status === 'uploaded') {
+            await VideoStore.delete(r.id).catch(() => {});
+          } else if (r.sync_status === 'drive_pending' && r.drive_uploaded_at && (now - r.drive_uploaded_at > THIRTY_MINUTES)) {
+            await VideoStore.delete(r.id).catch(() => {});
+          }
+        }
+      } catch (e) {
+        console.warn('cleanupOldLocalVideos error:', e);
+      }
+    }
+
     function togglePauseVideoUpload() {
       if (!_currentVideoUploader) return;
       const btn = document.getElementById('rec-video-pause-btn');
@@ -7603,8 +7674,9 @@
               rec.drive_file_id = existingFile.id;
               rec.video_url = existingFile.webViewLink || `https://drive.google.com/file/d/${existingFile.id}/preview`;
               rec.sync_status = 'drive_pending';
+              if (!rec.drive_uploaded_at) rec.drive_uploaded_at = Date.now();
               await saveData();
-              try { await VideoStore.delete(rec.id); } catch(e) {}
+              cleanupOldLocalVideos(); // 30分経過した古い動画のみ安全に消去
               renderHistory(); // 1件修復ごとに即座に画面更新
               successCount++;
               processedAnyInThisPass = true;
@@ -7637,10 +7709,11 @@
               rec.drive_file_id = result.id;
               rec.video_url = `https://drive.google.com/file/d/${result.id}/preview`;
               rec.sync_status = 'drive_pending';
+              rec.drive_uploaded_at = Date.now(); // アップロード完了時刻を記録
               await saveData();
 
-              // Firestoreへの保存成功後にIndexedDBから安全に削除
-              try { await VideoStore.delete(rec.id); } catch(e) {}
+              // Drive処理中の30分間は端末からも動画を再生できるよう残し、30分超過した過去動画のみ消去
+              cleanupOldLocalVideos();
 
               renderHistory(); // 1件完了ごとに即座に画面更新
               successCount++;
@@ -7897,10 +7970,22 @@
         }
       }
 
-      // 動画録画リンク（YouTube または Google Drive）
+      // 動画録画リンク（YouTube、Google Drive、または端末内ローカル）
       let videoLinkHtml = '';
-      if (r.video_url || r.drive_file_id || r.youtube_video_id) {
-        const isUploaded = r.sync_status === 'uploaded' || (r.video_url && r.video_url.includes('youtu'));
+      if (r.sync_status === 'local_pending') {
+        videoLinkHtml = `
+          <div class="detail-section">
+            <h4>🎥 対戦録画 (端末内保存)</h4>
+            <div id="local-video-player-box" data-record-id="${r.id}">
+              <button type="button" onclick="playLocalVideoInDetail('${r.id}', 'local-video-player-box')" style="display:inline-flex;align-items:center;gap:6px;color:#ffffff;background:var(--accent);padding:8px 14px;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;box-shadow:0 2px 8px rgba(108,99,255,0.3)">
+                <span>▶️ 端末内の動画を再生</span>
+              </button>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:6px">⏳ WiFi接続時にGoogle Driveへ自動アップロードされます</div>
+            </div>
+          </div>
+        `;
+      } else if (r.video_url || r.drive_file_id || r.youtube_video_id) {
+        const isUploaded = r.sync_status === 'uploaded' || r.sync_status === 'yt_uploaded' || (r.video_url && r.video_url.includes('youtu'));
         const url = r.video_url || (r.youtube_video_id ? `https://youtu.be/${r.youtube_video_id}` : (r.drive_file_id ? `https://drive.google.com/file/d/${r.drive_file_id}/preview` : ''));
         
         if (url) {
@@ -7915,12 +8000,20 @@
               </div>
             `;
           } else {
+            const isWithin30Min = r.drive_uploaded_at && (Date.now() - r.drive_uploaded_at < 30 * 60 * 1000);
             videoLinkHtml = `
               <div class="detail-section">
                 <h4>🎥 対戦録画 (Google Drive一時保存)</h4>
-                <div style="display:flex;flex-direction:column;gap:6px">
-                  <a href="${url}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;color:#ffffff;background:var(--accent);padding:8px 14px;border-radius:8px;font-weight:600;font-size:13px;text-decoration:none;width:fit-content;box-shadow:0 2px 8px rgba(108,99,255,0.3)">
-                    <span>📁 Google Driveでプレビュー</span>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  ${isWithin30Min ? `
+                  <div id="local-video-player-box" data-record-id="${r.id}">
+                    <button type="button" onclick="playLocalVideoInDetail('${r.id}', 'local-video-player-box')" style="display:inline-flex;align-items:center;gap:6px;color:#ffffff;background:var(--accent);padding:8px 14px;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;width:fit-content;box-shadow:0 2px 8px rgba(108,99,255,0.3)">
+                      <span>📱 端末内の動画を再生 (処理待ちなし)</span>
+                    </button>
+                    <div style="font-size:11px;color:#a78bfa;margin-top:4px">💡 Drive処理中も端末から即座に快適再生できます（送信後30分間保持）</div>
+                  </div>` : ''}
+                  <a href="${url}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;color:#ffffff;background:#22c55e;padding:8px 14px;border-radius:8px;font-weight:600;font-size:13px;text-decoration:none;width:fit-content;box-shadow:0 2px 8px rgba(34,197,94,0.3)">
+                    <span>📁 Google Driveで開く</span>
                   </a>
                   <span style="font-size:11px;color:var(--text-muted)">⏳ 本日夜間の定期バッチでYouTubeへ自動転送されます</span>
                 </div>
@@ -7980,6 +8073,10 @@
     }
 
     function closeDetailModal() {
+      if (_currentPlayingObjectUrl) {
+        URL.revokeObjectURL(_currentPlayingObjectUrl);
+        _currentPlayingObjectUrl = null;
+      }
       document.getElementById('detail-modal').classList.remove('open');
     }
 
@@ -11800,6 +11897,7 @@
     // アプリ起動時に未送信動画があればピルを表示（認証済みならキュー実行、未認証ならタップ連携を促す）
     setTimeout(async () => {
       initDraggableUploadPill();
+      cleanupOldLocalVideos(); // 30分経過した過去のローカル動画を安全にクリーンアップ
       const validToken = loadStoredDriveToken();
       updateDriveSettingsUI();
 
