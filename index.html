@@ -7596,7 +7596,7 @@
             const pillText = `${i + 1}/${pendingRecords.length}件: ${rec.video_original_name || 'video'}`;
             showUploadPill(pillText, 0);
 
-            // 【自己修復】まずGoogle Driveにすでにアップロード済みファイルが存在するか確認
+              // 【自己修復】まずGoogle Driveにすでにアップロード済みファイルが存在するか確認
             const existingFile = await findDriveVideoFile(token, folderId, rec.id);
             if (existingFile) {
               console.log(`Record ${rec.id} is already uploaded to Drive as ${existingFile.id}. Restoring link...`);
@@ -7605,6 +7605,7 @@
               rec.sync_status = 'drive_pending';
               await saveData();
               try { await VideoStore.delete(rec.id); } catch(e) {}
+              renderHistory(); // 1件修復ごとに即座に画面更新
               successCount++;
               processedAnyInThisPass = true;
               continue;
@@ -7641,6 +7642,7 @@
               // Firestoreへの保存成功後にIndexedDBから安全に削除
               try { await VideoStore.delete(rec.id); } catch(e) {}
 
+              renderHistory(); // 1件完了ごとに即座に画面更新
               successCount++;
               processedAnyInThisPass = true;
             } catch(e) {
