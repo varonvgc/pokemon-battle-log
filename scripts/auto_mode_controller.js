@@ -577,10 +577,15 @@
       console.log('[AutoMode] My party Pokémon pool:', this.myPartyNames);
     }
 
-    // ポケモン名の正規化（パーティ管理の「ベース名(フォルム名)」から画面表記のベース名を抽出）
+    // ポケモン名の正規化（フォルムに「メガ」または「ゲンシ」がある場合のみベース名を抽出）
     _normalizeBasePokeName(name) {
       if (!name) return '';
-      return String(name).split('(')[0].split('（')[0].trim();
+      const s = String(name).trim();
+      // 括弧があり、かつその中に「メガ」または「ゲンシ」が含まれている場合のみベース名を抽出
+      if ((s.includes('(') || s.includes('（')) && (s.includes('メガ') || s.includes('ゲンシ'))) {
+        return s.split('(')[0].split('（')[0].trim();
+      }
+      return s;
     }
 
     // --- 試合中: 出撃ポケモンの検知 (カタカナ特化OCR) ---
