@@ -279,19 +279,35 @@ class PokemonRecognitionEngine {
 
     const otsuT = this._computeOtsuThreshold(diffs);
 
-    let minX = w, maxX = 0, minY = h, maxY = 0;
+    const rowFg = new Int32Array(h);
+    const colFg = new Int32Array(w);
     let fgCount = 0;
-    idx = 0;
     for (let cy = 0; cy < h; cy++) {
       for (let cx = 0; cx < w; cx++) {
-        if (diffs[idx++] >= otsuT) {
+        if (diffs[cy * w + cx] >= otsuT) {
           fgCount++;
-          if (cx < minX) minX = cx;
-          if (cx > maxX) maxX = cx;
-          if (cy < minY) minY = cy;
-          if (cy > maxY) maxY = cy;
+          rowFg[cy]++;
+          colFg[cx]++;
         }
       }
+    }
+
+    // Projection profile noise trimming: ignore stray 1-3 isolated pixels on edges
+    const noiseColThresh = 4;
+    const noiseRowThresh = 4;
+
+    let minX = 0, maxX = w - 1, minY = 0, maxY = h - 1;
+    for (let cx = 0; cx < w; cx++) {
+      if (colFg[cx] >= noiseColThresh) { minX = cx; break; }
+    }
+    for (let cx = w - 1; cx >= 0; cx--) {
+      if (colFg[cx] >= noiseColThresh) { maxX = cx; break; }
+    }
+    for (let cy = 0; cy < h; cy++) {
+      if (rowFg[cy] >= noiseRowThresh) { minY = cy; break; }
+    }
+    for (let cy = h - 1; cy >= 0; cy--) {
+      if (rowFg[cy] >= noiseRowThresh) { maxY = cy; break; }
     }
 
     if (fgCount === 0 || minX >= maxX || minY >= maxY) {
@@ -304,11 +320,14 @@ class PokemonRecognitionEngine {
     const liveExtent = boxArea > 0 ? (fgCount / boxArea) : 0.5;
     const liveAspect = bw / bh;
 
-    // Normalize to 32x32 canvas
+    // Normalize to 32x32 canvas - fill background color first to avoid transparent black padding
     const t32Canvas = document.createElement('canvas');
     t32Canvas.width = 32;
     t32Canvas.height = 32;
     const t32Ctx = t32Canvas.getContext('2d', { willReadFrequently: true });
+    t32Ctx.fillStyle = `rgb(${Math.round(bgR)}, ${Math.round(bgG)}, ${Math.round(bgB)})`;
+    t32Ctx.fillRect(0, 0, 32, 32);
+
     t32Ctx.imageSmoothingEnabled = true;
     t32Ctx.imageSmoothingQuality = 'high';
 
@@ -328,6 +347,14 @@ class PokemonRecognitionEngine {
 
     for (let cy = 0; cy < 32; cy++) {
       for (let cx = 0; cx < 32; cx++) {
+        const inBox = (cx >= tx && cx < tx + tw && cy >= ty && cy < ty + th);
+        if (!inBox) {
+          mask[idx] = 0;
+          gray[idx] = (bgR * 0.299 + bgG * 0.587 + bgB * 0.114);
+          idx++;
+          continue;
+        }
+
         const pIdx = (cy * 32 + cx) * 4;
         const r = t32Data[pIdx];
         const g = t32Data[pIdx + 1];
@@ -698,7 +725,7 @@ class PokemonRecognitionEngine {
     if (detectedMode === 'BEFORE') {
       const slot0Y = 137;
       const slotPitch = 137;
-      const iconX = 1955, iconW = 130, iconYOff = 5, iconH = 105;
+      const iconX = 1955, iconW = 130, iconYOff = 2, iconH = 118;
       const t1X = 2117, t1YOff = 12, t2X = 2173, t2YOff = 12, tW = 45, tH = 45;
 
       const opponent = [];
@@ -725,7 +752,7 @@ class PokemonRecognitionEngine {
       // AFTER Mode
       const slot0Y = 160;
       const slotPitch = 137;
-      const iconX = 1765, iconW = 115, iconYOff = 10, iconH = 95;
+      const iconX = 1760, iconW = 120, iconYOff = 2, iconH = 118;
       const t1X = 1912, t1YOff = 12, t2X = 1970, t2YOff = 12, tW = 45, tH = 45;
 
       const opponent = [];
