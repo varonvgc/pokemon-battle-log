@@ -577,21 +577,45 @@
       console.log('[AutoMode] My party Pokémon pool:', this.myPartyNames);
     }
 
-    // ポケモン名の正規化（メガシンカ、フォルム名、括弧を除去してベース名を抽出）
+    // ポケモン名の正規化（メガシンカ、ゲンシカイキ、フォルム名、括弧を除去して画面上のベース名を抽出）
     _normalizeBasePokeName(name) {
       if (!name) return '';
-      return String(name)
-        .replace(/\(.*?\)/g, '')
-        .replace(/（.*?）/g, '')
-        .replace(/^メガ/, '')
-        .replace(/[XYＸＹ]$/, '')
-        .replace(/の.*$/, '')
-        .trim();
+      let s = String(name).trim();
+
+      // 1. 括弧と中身の除去（例: "オーガポン(かまどのめん)" -> "オーガポン", "ロトム(ウォッシュ)" -> "ロトム"）
+      s = s.replace(/\(.*?\)/g, '').replace(/（.*?）/g, '').trim();
+
+      // 2. 「メガメガニウム」「メガメガヤンマ」等のメガシンカ対応
+      // ※ 元から「メガ」で始まる通常ポケモン（メガニウム、メガヤンマ）は単体ならメガを削らない！
+      if (s === 'メガメガニウム') return 'メガニウム';
+      if (s === 'メガメガヤンマ') return 'メガヤンマ';
+      if (s === 'メガニウム' || s === 'メガヤンマ') return s;
+
+      // 3. 一般メガシンカ・ゲンシカイキ・キョダイマックス等の接頭辞除去
+      s = s.replace(/^メガ/, '').replace(/^ゲンシ/, '').replace(/^キョダイ/, '').trim();
+
+      // 4. 接尾辞 X / Y / Z / フォルム表記等の除去（例: "ガブリアスZ" -> "ガブリアス", "リザードンY" -> "リザードン"）
+      s = s.replace(/[\s\-_]?[XYZＸＹＺ]$/i, '').replace(/の.*$/, '').trim();
+
+      return s;
     }
 
     // --- 試合中: 出撃ポケモンの検知 (カタカナ特化OCR) ---
     async _detectDispatchedPokemons(ctx) {
       if (!this.katakanaWorker) return;
+
+      // ユーザーが選出画面や試合中にフォームで手動修正した相手パーティ入力を常時同期！
+      const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
+      if (oppInputs && oppInputs.length > 0) {
+        const liveOppNames = Array.from(oppInputs).map(inp => inp.value.trim()).filter(Boolean);
+        if (liveOppNames.length > 0) {
+          this.rivalPartyNames = liveOppNames;
+        }
+      }
+      if (!this.myPartyNames || this.myPartyNames.length === 0) {
+        this._extractMyPartyNames();
+      }
+
       const targets = this.battleMode === 'single' ? COORDS.DISPATCH_SINGLE : COORDS.DISPATCH_DOUBLE;
 
       for (const target of targets) {
@@ -616,7 +640,7 @@
             if (!candidate) continue;
             // 1. そのままの文字列との比較
             const distFull = levenshteinDistance(rawText, candidate);
-            // 2. ベース名（例: メガリザードンY -> リザードン）との比較
+            // 2. ベース名（例: メガリザードンY -> リザードン, メガガブリアスZ -> ガブリアス）との比較
             const baseCand = this._normalizeBasePokeName(candidate);
             const distBase = baseCand ? levenshteinDistance(rawText, baseCand) : 999;
             const dist = Math.min(distFull, distBase);
@@ -665,13 +689,11 @@
         // 1. 右下 VS バーの更新 (モンスターボールからポケモンアイコン・名前に変身！)
         this.updateVsBarSlot(role, list.length - 1, pokemonName);
 
-        // 2. 左側記録フォームの選出スロットに即時反映！
+        // 2. 左側記録フォームの選出スロットに即時反映！（BO1 & BO3 Game1双方に確実に適用）
         if (typeof window.setSelectionFromNames === 'function') {
-          if (role === 'me') {
-            window.setSelectionFromNames('my', this.detectedDispatchedMe, 0);
-          } else {
-            window.setSelectionFromNames('opp', this.detectedDispatchedRival, 0);
-          }
+          const roleKey = role === 'me' ? 'my' : 'opp';
+          window.setSelectionFromNames(roleKey, list, null);
+          window.setSelectionFromNames(roleKey, list, 0);
         }
       }
     }
