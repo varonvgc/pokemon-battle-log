@@ -4998,9 +4998,19 @@
 
     // ---- NAVIGATION ----
     function showPage(name, btn) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      if (typeof isAutoModeActive !== 'undefined' && isAutoModeActive && name !== 'record_internal') {
+        exitAutoMode(false);
+      }
+      document.querySelectorAll('.page').forEach(p => {
+        p.classList.remove('active');
+        p.style.display = '';
+      });
       document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-      document.getElementById('page-' + name).classList.add('active');
+      const targetPage = document.getElementById('page-' + name);
+      if (targetPage) {
+        targetPage.classList.add('active');
+        targetPage.style.display = '';
+      }
       if (btn) btn.classList.add('active');
       else if (event && event.target) event.target.classList.add('active');
       // 記録・履歴・データ管理への遷移時はコピーボードを消去
@@ -12342,7 +12352,7 @@
     // オートモード切り替え
     async function toggleAutoMode(btn) {
       if (isAutoModeActive) {
-        exitAutoMode();
+        exitAutoMode(true);
       } else {
         enterAutoMode(btn);
       }
@@ -12359,15 +12369,25 @@
       if (!container || !leftCol || !recordPage) return;
 
       // 既存の recordPage を左カラムへ退避・マウント
-      originalRecordParent = recordPage.parentNode;
-      originalRecordNextSibling = recordPage.nextSibling;
-      leftCol.appendChild(recordPage);
-      recordPage.style.display = 'block';
+      if (recordPage.parentNode !== leftCol) {
+        originalRecordParent = recordPage.parentNode;
+        originalRecordNextSibling = recordPage.nextSibling;
+        leftCol.appendChild(recordPage);
+      }
+      recordPage.style.display = '';
       recordPage.classList.add('active');
 
-      // 他のフルページを非表示にし、コンテナを有効化
+      // ナビバーの全ボタンから active を解除
+      document.querySelectorAll('nav button').forEach(b => {
+        if (b !== btn) b.classList.remove('active');
+      });
+
+      // 他のフルページは非表示（クラスのみで管理し、インラインdisplayは汚さない）
       document.querySelectorAll('.page').forEach(p => {
-        if (p !== recordPage) p.style.display = 'none';
+        if (p !== recordPage) {
+          p.classList.remove('active');
+          p.style.display = '';
+        }
       });
       container.classList.add('active');
 
@@ -12403,7 +12423,7 @@
       console.log('[AutoMode] Entered PC Auto Mode (Champions Ranked BO1)');
     }
 
-    function exitAutoMode() {
+    function exitAutoMode(doShowRecord = true) {
       isAutoModeActive = false;
       const btn = document.getElementById('btn-toggle-auto-mode');
       if (btn) btn.classList.remove('active');
@@ -12420,7 +12440,14 @@
         } else {
           originalRecordParent.appendChild(recordPage);
         }
+        originalRecordParent = null;
+        originalRecordNextSibling = null;
       }
+
+      // 全ページのインラインスタイルを確実にクリア
+      document.querySelectorAll('.page').forEach(p => {
+        p.style.display = '';
+      });
 
       // オートモード処理・カメラを停止
       if (window.autoModeController) {
@@ -12436,8 +12463,10 @@
       const overlay = document.getElementById('auto-mode-setup-overlay');
       if (overlay) overlay.classList.remove('hidden');
 
-      // 通常の記録画面へ復帰
-      showPage('record', document.querySelector('nav button:nth-child(3)'));
+      if (doShowRecord) {
+        // 通常の記録画面へ復帰
+        showPage('record', document.querySelector('nav button:nth-child(3)'));
+      }
       console.log('[AutoMode] Exited PC Auto Mode');
     }
 

@@ -95,12 +95,29 @@
       this.detectedDispatchedMe = [];
       this.detectedDispatchedRival = [];
       this.rivalPartyNames = [];
-      this.myPartyNames = [];
-
-      this._initWorkers();
+      this.isWorkersReady = false;
+      this.isInitializingWorkers = false;
     }
 
-    // --- ワーカー & アセット初期化 ---
+    // --- ワーカー & アセットのオンデマンド初期化 (オートモード開始時のみ実行) ---
+    async ensureWorkersReady() {
+      if (this.isWorkersReady) return true;
+      if (this.isInitializingWorkers) return false;
+      this.isInitializingWorkers = true;
+      try {
+        await this._initWorkers();
+        await this._initTesseract();
+        this.isWorkersReady = true;
+        console.log('[AutoMode] All workers and templates ready!');
+        return true;
+      } catch (err) {
+        console.warn('[AutoMode] Worker init error:', err);
+        return false;
+      } finally {
+        this.isInitializingWorkers = false;
+      }
+    }
+
     async _initWorkers() {
       // 1. OpenCV テンプレートマッチングワーカー
       try {
@@ -145,10 +162,6 @@
           console.warn(`[AutoMode] Failed to load template ${path}:`, e);
         }
       }
-      console.log('[AutoMode] Templates preloaded successfully');
-
-      // 3. Tesseract.js の遅延初期化
-      this._initTesseract();
     }
 
     async _initTesseract() {
@@ -277,9 +290,11 @@
     }
 
     // --- オートモードの開始・停止 ---
-    startAutoMode() {
+    async startAutoMode() {
       this.isAutoRunning = true;
       this.phase = 'WAITING_MATCHING';
+      this.updateStatusBadge('ワーカー初期化中...');
+      await this.ensureWorkersReady();
       this.updateStatusBadge('自動モード稼働中 (対戦待ち)');
       this._startLoop();
     }
