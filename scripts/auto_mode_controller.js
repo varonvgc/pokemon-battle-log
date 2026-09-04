@@ -216,9 +216,27 @@
     }
 
     // --- カメラ操作 ---
-    async getCameraDevices() {
+    async requestPermission() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error('ブラウザがカメラAPIに対応していません (HTTPSまたはlocalhostでアクセスしてください)');
+      }
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+        // 許可が得られたら即座にトラックを解放
+        stream.getTracks().forEach(t => t.stop());
+        return true;
+      } catch (err) {
+        console.warn('[AutoMode] Camera permission denied or failed:', err);
+        return false;
+      }
+    }
+
+    async getCameraDevices(requestPerm = false) {
       if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
         return [];
+      }
+      if (requestPerm) {
+        await this.requestPermission();
       }
       try {
         const devices = await navigator.mediaDevices.enumerateDevices();
@@ -234,32 +252,46 @@
         this.stopCamera();
       }
 
+      // 1080p 60fps を目指しつつ、OBS仮想カメラ等の仕様に合わせて柔軟に接続
       const constraints = {
         audio: false,
         video: deviceId ? {
           deviceId: { exact: deviceId },
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
-          frameRate: { ideal: 60 }
+          width: { ideal: 1920, min: 1280 },
+          height: { ideal: 1080, min: 720 },
+          frameRate: { ideal: 60, min: 30 }
         } : {
-          width: { ideal: 1920 },
-          height: { ideal: 1080 },
-          frameRate: { ideal: 60 }
+          width: { ideal: 1920, min: 1280 },
+          height: { ideal: 1080, min: 720 }
         }
       };
 
       try {
         this.stream = await navigator.mediaDevices.getUserMedia(constraints);
-        if (this.videoElement) {
-          this.videoElement.srcObject = this.stream;
-          await this.videoElement.play();
+      } catch (e1) {
+        console.warn('[AutoMode] Strict camera constraints failed, falling back to basic deviceId:', e1);
+        try {
+          // フォールバック: 解像度制約なしでデバイスに直結
+          this.stream = await navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: deviceId ? { deviceId: { exact: deviceId } } : true
+          });
+        } catch (e2) {
+          console.error('[AutoMode] Failed to start camera stream:', e2);
+          return false;
         }
-        console.log('[AutoMode] Camera stream started at 1080p 60fps');
-        return true;
-      } catch (err) {
-        console.error('[AutoMode] Failed to start camera stream:', err);
-        return false;
       }
+
+      if (this.videoElement && this.stream) {
+        this.videoElement.srcObject = this.stream;
+        try {
+          await this.videoElement.play();
+        } catch (playErr) {
+          console.warn('[AutoMode] Video play error (handling autoplay):', playErr);
+        }
+      }
+      console.log('[AutoMode] Camera stream started successfully');
+      return true;
     }
 
     stopCamera() {

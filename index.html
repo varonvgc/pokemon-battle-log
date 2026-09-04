@@ -4035,6 +4035,11 @@
             <span>自動モードをスタート!!</span>
           </button>
 
+          <div id="auto-setup-permission-hint" style="display:none;margin-top:14px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);border-radius:10px;padding:10px 14px;font-size:12px;color:#fca5a5;line-height:1.6;text-align:left">
+            ⚠️ <b>カメラの許可が必要です</b><br>
+            ブラウザのURL欄左にある 🔒（鍵アイコンや設定マーク）をクリックし、<b>カメラを「許可」</b>に切り替えてから、もう一度「セットアップを開始する」を押してください。
+          </div>
+
           <div style="margin-top:20px;font-size:12px;color:var(--text-muted);line-height:1.6">
             ※ OBS の「仮想カメラ開始」をクリックし、1920×1080 (16:9) でSwitchの対戦画面を取り込んでください。
           </div>
@@ -12598,16 +12603,23 @@
     // カメラデバイス一覧の更新
     async function refreshAutoCameraDevices() {
       const select = document.getElementById('auto-camera-select');
-      if (!select || !window.autoModeController) return;
+      if (!select || !window.autoModeController) return null;
 
       const devices = await window.autoModeController.getCameraDevices();
       select.innerHTML = '<option value="">カメラデバイスを選択...</option>';
 
       let obsDevice = null;
+      let hasRealLabels = false;
+
       devices.forEach((d, idx) => {
         const opt = document.createElement('option');
         opt.value = d.deviceId;
-        opt.textContent = d.label || `カメラ ${idx + 1}`;
+        if (d.label) {
+          hasRealLabels = true;
+          opt.textContent = d.label;
+        } else {
+          opt.textContent = `カメラ ${idx + 1}`;
+        }
         if (d.label && d.label.toLowerCase().includes('obs')) {
           obsDevice = d;
         }
@@ -12617,7 +12629,11 @@
       // OBS Virtual Camera が見つかれば自動選択
       if (obsDevice) {
         select.value = obsDevice.deviceId;
+      } else if (devices.length === 1 && devices[0].deviceId) {
+        select.value = devices[0].deviceId;
       }
+
+      return { devices, obsDevice, hasRealLabels };
     }
 
     // セットアップ開始ボタンクリック
@@ -12625,12 +12641,23 @@
       const select = document.getElementById('auto-camera-select');
       const startBtn = document.getElementById('btn-auto-setup-start');
       const runBtn = document.getElementById('btn-auto-mode-start');
+      const hint = document.getElementById('auto-setup-permission-hint');
 
-      await refreshAutoCameraDevices();
+      if (hint) hint.style.display = 'none';
+
+      // 1. まずブラウザにカメラ利用許可を要求 (ブラウザの「カメラの使用を許可しますか？」ダイアログを起動)
+      const permitted = await window.autoModeController.requestPermission();
+      if (!permitted) {
+        if (hint) hint.style.display = 'block';
+        return;
+      }
+
+      // 2. 許可された状態でデバイス一覧を再取得（本物のデバイス名 OBS Virtual Camera 等が確実に取れる）
+      const res = await refreshAutoCameraDevices();
       if (select) select.style.display = 'block';
       if (startBtn) startBtn.style.display = 'none';
 
-      // 既に選択肢があればカメラ起動
+      // 3. OBSデバイスまたは選択可能なカメラがあれば直ちに映像開始
       if (select && select.value) {
         await onAutoCameraSelectChange(select.value);
       }
