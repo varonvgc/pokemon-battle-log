@@ -577,26 +577,36 @@
       console.log('[AutoMode] My party Pokémon pool:', this.myPartyNames);
     }
 
-    // ポケモン名の正規化（メガシンカ、ゲンシカイキ、フォルム名、括弧を除去して画面上のベース名を抽出）
+    // ポケモン名の正規化（メガシンカ・ゲンシカイキのフォルム名のみベース名に変換、ポリゴンZ等は一切不変）
     _normalizeBasePokeName(name) {
       if (!name) return '';
-      let s = String(name).trim();
+      const s = String(name).trim();
 
-      // 1. 括弧と中身の除去（例: "オーガポン(かまどのめん)" -> "オーガポン", "ロトム(ウォッシュ)" -> "ロトム"）
-      s = s.replace(/\(.*?\)/g, '').replace(/（.*?）/g, '').trim();
+      // 1. 括弧表記がある場合（例: "リザードン(メガリザードンY)" -> "リザードン", "グラードン(ゲンシグラードン)" -> "グラードン"）
+      // メガやゲンシのフォルムを含む場合のみ、括弧の前（ベース名）を抽出
+      if (s.includes('(') || s.includes('（')) {
+        const base = s.split('(')[0].split('（')[0].trim();
+        if (s.includes('メガ') || s.includes('ゲンシ')) {
+          return base;
+        }
+        return base || s;
+      }
 
-      // 2. 「メガメガニウム」「メガメガヤンマ」等のメガシンカ対応
-      // ※ 元から「メガ」で始まる通常ポケモン（メガニウム、メガヤンマ）は単体ならメガを削らない！
+      // 2. 「メガメガニウム」「メガメガヤンマ」等の特殊ケース
       if (s === 'メガメガニウム') return 'メガニウム';
       if (s === 'メガメガヤンマ') return 'メガヤンマ';
-      if (s === 'メガニウム' || s === 'メガヤンマ') return s;
+      // 通常の「メガニウム」「メガヤンマ」「ポリゴンZ」等は一切削らずそのまま保護！
+      if (s === 'メガニウム' || s === 'メガヤンマ' || s.startsWith('ポリゴン')) return s;
 
-      // 3. 一般メガシンカ・ゲンシカイキ・キョダイマックス等の接頭辞除去
-      s = s.replace(/^メガ/, '').replace(/^ゲンシ/, '').replace(/^キョダイ/, '').trim();
+      // 3. 先頭が「メガ」または「ゲンシ」で始まるメガシンカ名（例: "メガリザードンY" -> "リザードン", "メガガブリアスZ" -> "ガブリアス"）
+      if (s.startsWith('メガ') || s.startsWith('ゲンシ')) {
+        let base = s.replace(/^メガ/, '').replace(/^ゲンシ/, '').trim();
+        // 末尾の枝分かれ記号 X / Y / Z があれば除去
+        base = base.replace(/[\s\-_]?[XYZＸＹＺ]$/i, '').trim();
+        return base || s;
+      }
 
-      // 4. 接尾辞 X / Y / Z / フォルム表記等の除去（例: "ガブリアスZ" -> "ガブリアス", "リザードンY" -> "リザードン"）
-      s = s.replace(/[\s\-_]?[XYZＸＹＺ]$/i, '').replace(/の.*$/, '').trim();
-
+      // それ以外（ポリゴンZ、ロトム、ウーラオス等）は一切不変でそのまま返す
       return s;
     }
 
@@ -604,7 +614,21 @@
     async _detectDispatchedPokemons(ctx) {
       if (!this.katakanaWorker) return;
 
-      // ユーザーが選出画面や試合中にフォームで手動修正した相手パーティ入力を常時同期！
+      const maxSlots = this.battleMode === 'single' ? 3 : 4;
+
+      // 1. 自分・相手ともに出撃枠が上限（4匹/3匹）に達している場合はOCRを完全に停止して超軽量化！
+      if (this.detectedDispatchedMe.length >= maxSlots && this.detectedDispatchedRival.length >= maxSlots) {
+        return;
+      }
+
+      // 2. OCRの実行間隔を最短1000ms（1秒）に制限してCPU負荷を激減
+      const now = Date.now();
+      if (this.lastOcrTimestamp && (now - this.lastOcrTimestamp < 1000)) {
+        return;
+      }
+      this.lastOcrTimestamp = now;
+
+      // 3. ユーザーが選出画面等で手動修正した相手パーティ入力を常時同期！
       const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
       if (oppInputs && oppInputs.length > 0) {
         const liveOppNames = Array.from(oppInputs).map(inp => inp.value.trim()).filter(Boolean);
@@ -619,6 +643,10 @@
       const targets = this.battleMode === 'single' ? COORDS.DISPATCH_SINGLE : COORDS.DISPATCH_DOUBLE;
 
       for (const target of targets) {
+        // すでに該当陣営が上限に達していれば無駄なOCRはスキップ
+        const currentList = target.role === 'rival' ? this.detectedDispatchedRival : this.detectedDispatchedMe;
+        if (currentList.length >= maxSlots) continue;
+
         try {
           const cropBase64 = this.cropToBase64(ctx, target);
           const ocrRes = await this.katakanaWorker.recognize(cropBase64);
@@ -627,7 +655,6 @@
 
           // 照合候補リスト (相手なら rivalPartyNames, 自分なら myPartyNames)
           let candidatePool = target.role === 'rival' ? this.rivalPartyNames : this.myPartyNames;
-          // もし候補が空ならマスタから照合可能にフォールバック
           if (!candidatePool || candidatePool.length === 0) {
             const masterList = (window.POKEMON_LIST && window.POKEMON_LIST.length) ? window.POKEMON_LIST : (window.masterPokemonList || []);
             candidatePool = masterList.map(p => typeof p === 'string' ? p : (p && (p.name || p.display) || '')).filter(Boolean);
@@ -689,11 +716,10 @@
         // 1. 右下 VS バーの更新 (モンスターボールからポケモンアイコン・名前に変身！)
         this.updateVsBarSlot(role, list.length - 1, pokemonName);
 
-        // 2. 左側記録フォームの選出スロットに即時反映！（BO1 & BO3 Game1双方に確実に適用）
+        // 2. 左側記録フォームの選出スロットに即時反映（BO1専用）
         if (typeof window.setSelectionFromNames === 'function') {
           const roleKey = role === 'me' ? 'my' : 'opp';
-          window.setSelectionFromNames(roleKey, list, null);
-          window.setSelectionFromNames(roleKey, list, 0);
+          window.setSelectionFromNames(roleKey, list);
         }
       }
     }
