@@ -651,15 +651,15 @@
       if (!slotEl) return;
 
       if (!pokemonName) {
-        // 初期状態: モンスターボール表示
-        slotEl.innerHTML = `<img src="assets/templates/monsterball.png" alt="ball" style="width:36px;height:36px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5))">`;
+        // 初期状態: モンスターボール表示 (52pxに大型化)
+        slotEl.innerHTML = `<img src="assets/templates/monsterball.png" alt="ball" style="width:52px;height:52px;filter:drop-shadow(0 3px 6px rgba(0,0,0,0.6))">`;
       } else {
-        // ポケモン特定後: ポケモンアイコン + 名前アニメーション
+        // ポケモン特定後: ポケモンアイコン + 名前アニメーション (56pxに大型化)
         const iconUrl = window.getPokemonIconUrl ? window.getPokemonIconUrl(pokemonName) : 'assets/templates/monsterball.png';
         slotEl.innerHTML = `
           <div style="display:flex;flex-direction:column;align-items:center;animation:popIn 0.3s ease-out">
-            <img src="${iconUrl}" alt="${pokemonName}" style="width:42px;height:42px;object-fit:contain;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.7))">
-            <span style="font-size:10px;font-weight:700;color:#fff;white-space:nowrap;margin-top:2px;text-shadow:0 1px 3px #000">${pokemonName}</span>
+            <img src="${iconUrl}" alt="${pokemonName}" style="width:56px;height:56px;object-fit:contain;filter:drop-shadow(0 3px 8px rgba(0,0,0,0.8))">
+            <span style="font-size:11px;font-weight:800;color:#fff;white-space:nowrap;margin-top:2px;text-shadow:0 1px 4px #000;max-width:78px;overflow:hidden;text-overflow:ellipsis">${pokemonName}</span>
           </div>
         `;
       }
