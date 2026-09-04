@@ -4998,7 +4998,7 @@
 
     // ---- NAVIGATION ----
     function showPage(name, btn) {
-      if (typeof isAutoModeActive !== 'undefined' && isAutoModeActive && name !== 'record_internal') {
+      if (typeof isAutoModeActive !== 'undefined' && isAutoModeActive && name !== 'record_internal' && typeof exitAutoMode === 'function') {
         exitAutoMode(false);
       }
       document.querySelectorAll('.page').forEach(p => {
@@ -12321,6 +12321,8 @@
         showActionUploadPill('⚠️ 動画' + pendingCount + '件が未送信 (タップして連携)', () => {
           requestGoogleDriveAccessToken(true);
         });
+      }
+    }, 800);
     </script>
 
   <!-- AUTO MODE CONTROLLER & PC UI LOGIC -->
