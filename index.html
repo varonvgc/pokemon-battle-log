@@ -2874,11 +2874,320 @@
       border-color: var(--accent);
       color: var(--text);
     }
-    .filter-tag-chip.active {
-      background: var(--accent);
-      border-color: var(--accent);
+    /* ============================================================
+       AUTO MODE (PC限定) LAYOUT STYLES - バトメモ準拠
+       ============================================================ */
+    .btn-auto-mode {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      margin-left: 10px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
       color: #fff;
-      box-shadow: 0 2px 6px rgba(108, 99, 255, 0.3);
+      font-weight: 700;
+      border: none;
+      border-radius: 8px;
+      padding: 6px 14px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: all .2s ease;
+      box-shadow: 0 2px 10px rgba(99, 102, 241, 0.35);
+    }
+    .btn-auto-mode:hover {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.5);
+      transform: translateY(-1px);
+    }
+    .btn-auto-mode.active {
+      background: linear-gradient(135deg, #ec4899, #ef4444);
+      box-shadow: 0 0 16px rgba(236, 72, 153, 0.6);
+    }
+
+    #auto-mode-container {
+      display: none;
+      width: 100vw;
+      height: calc(100vh - 56px);
+      overflow: hidden;
+      background: #0b0d14;
+    }
+    #auto-mode-container.active {
+      display: flex !important;
+    }
+
+    /* 左カラム: アプリ機能 (28% 幅 / スマホ相当) */
+    #auto-mode-left-col {
+      width: 28%;
+      min-width: 360px;
+      max-width: 440px;
+      height: 100%;
+      overflow-y: auto;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 16px 12px;
+      box-sizing: border-box;
+      flex-shrink: 0;
+    }
+
+    /* 右カラム: 画面取り込み + VSバー (72% 幅) */
+    #auto-mode-right-col {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: #000;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    /* 右上: 16:9 画面取り込み (高さ約 82%) */
+    #auto-mode-video-wrapper {
+      flex: 1;
+      position: relative;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    #auto-mode-video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+    }
+
+    /* セットアップ用オーバーレイ (バトメモ完全再現) */
+    #auto-mode-setup-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(11, 13, 20, 0.88);
+      backdrop-filter: blur(10px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 20;
+      padding: 20px;
+      box-sizing: border-box;
+      transition: opacity .3s ease;
+    }
+    #auto-mode-setup-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .auto-setup-card {
+      background: rgba(26, 29, 46, 0.95);
+      border: 1px solid rgba(139, 92, 246, 0.4);
+      border-radius: 16px;
+      padding: 24px 32px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.8), 0 0 20px rgba(99, 102, 241, 0.2);
+      text-align: center;
+    }
+
+    .auto-setup-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 20px;
+      letter-spacing: 1px;
+      text-shadow: 0 2px 10px rgba(99, 102, 241, 0.5);
+    }
+
+    .auto-setup-btn {
+      width: 100%;
+      padding: 12px 20px;
+      border-radius: 24px;
+      border: none;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 12px;
+      transition: all .2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .auto-setup-btn-blue {
+      background: #3b82f6;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);
+    }
+    .auto-setup-btn-blue:hover {
+      background: #2563eb;
+    }
+
+    .auto-setup-select {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 24px;
+      background: #2563eb;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      border: none;
+      outline: none;
+      margin-bottom: 12px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.4);
+    }
+    .auto-setup-select option {
+      background: #1e293b;
+      color: #fff;
+    }
+
+    .auto-setup-checkbox-btn {
+      width: 100%;
+      padding: 12px 20px;
+      border-radius: 24px;
+      border: 1px solid rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all .2s;
+    }
+    .auto-setup-checkbox-btn:hover {
+      background: rgba(255,255,255,0.12);
+    }
+    .auto-setup-checkbox-btn.running {
+      background: #22c55e;
+      border-color: #22c55e;
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
+    }
+
+    /* ビデオ下部のステータスバー */
+    #auto-mode-video-controls {
+      position: absolute;
+      bottom: 10px;
+      left: 16px;
+      right: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .auto-mode-status-badge {
+      pointer-events: auto;
+      background: rgba(15, 17, 23, 0.85);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    }
+    .auto-mode-status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #22c55e;
+      animation: statusPulse 1.5s infinite;
+    }
+    @keyframes statusPulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.3); opacity: 0.5; }
+    }
+
+    .auto-mode-icon-buttons {
+      pointer-events: auto;
+      display: flex;
+      gap: 8px;
+    }
+    .auto-ctrl-btn {
+      background: rgba(15, 17, 23, 0.85);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #cbd5e1;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 14px;
+      backdrop-filter: blur(8px);
+      transition: all .2s;
+    }
+    .auto-ctrl-btn:hover {
+      background: var(--surface2);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
+    /* 右下: バトメモ風グラデーション「VS バー」 (高さ約 100px) */
+    #auto-mode-vs-bar {
+      height: 100px;
+      background: linear-gradient(90deg, #ea580c 0%, #7c3aed 50%, #2563eb 100%);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 32px;
+      box-sizing: border-box;
+      box-shadow: inset 0 2px 10px rgba(255,255,255,0.15), 0 -4px 20px rgba(0,0,0,0.5);
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .vs-side-group {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex: 1;
+    }
+    .vs-side-group.me {
+      justify-content: flex-start;
+    }
+    .vs-side-group.rival {
+      justify-content: flex-end;
+    }
+
+    .vs-slot-item {
+      width: 60px;
+      height: 60px;
+      background: rgba(0, 0, 0, 0.35);
+      border: 1.5px solid rgba(255, 255, 255, 0.25);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+      transition: all .25s ease;
+      position: relative;
+    }
+
+    .vs-center-badge {
+      font-size: 32px;
+      font-weight: 900;
+      font-style: italic;
+      color: #fff;
+      letter-spacing: 2px;
+      text-shadow: 0 2px 12px rgba(0,0,0,0.7), 0 0 20px rgba(255,255,255,0.4);
+      margin: 0 24px;
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.5); opacity: 0; }
+      70% { transform: scale(1.15); }
+      100% { transform: scale(1); opacity: 1; }
     }
   </style>
 </head>
@@ -2898,11 +3207,103 @@
     <button onclick="showPage('record',this)">記録する</button>
     <button onclick="showPage('history',this)">履歴</button>
     <button onclick="showPage('datamanage',this)">データ管理</button>
+    <button id="btn-toggle-auto-mode" class="btn-auto-mode" onclick="toggleAutoMode(this)">⚡ オートモード</button>
     <div id="auth-area" style="margin-left:auto;display:flex;align-items:center;gap:8px">
       <span id="user-name" style="font-size:12px;color:var(--text-muted)"></span>
       <button id="auth-btn" class="btn btn-ghost btn-sm" onclick="toggleAuth()">ログイン</button>
     </div>
   </nav>
+
+  <!-- AUTO MODE CONTAINER (PC限定 / バトメモ準拠レイアウト) -->
+  <div id="auto-mode-container">
+    <!-- 左カラム: 既存アプリ機能 (28% / 約380px) -->
+    <div id="auto-mode-left-col">
+      <!-- 記録画面を動的にここへホスト -->
+    </div>
+
+    <!-- 右カラム: 画面取り込み (82%) + VSバー (18%) (72%) -->
+    <div id="auto-mode-right-col">
+      <!-- 右上: 画面取り込みエリア -->
+      <div id="auto-mode-video-wrapper">
+        <video id="auto-mode-video" autoplay playsinline muted></video>
+
+        <!-- セットアップ用オーバーレイ (バトメモ完全再現) -->
+        <div id="auto-mode-setup-overlay">
+          <div class="auto-setup-card">
+            <div class="auto-setup-title">自動メモで快適にプレイ！</div>
+            
+            <button type="button" class="auto-setup-btn auto-setup-btn-blue" id="btn-auto-setup-start" onclick="onAutoSetupStartClick()">
+              <span>📸 セットアップを開始する</span>
+            </button>
+
+            <select id="auto-camera-select" class="auto-setup-select" onchange="onAutoCameraSelectChange(this.value)" style="display:none">
+              <option value="">カメラデバイスを選択...</option>
+            </select>
+
+            <button type="button" class="auto-setup-checkbox-btn" id="btn-auto-mode-start" onclick="toggleAutoModeCapture()" style="display:none">
+              <input type="checkbox" id="chk-auto-mode-run" style="width:18px;height:18px;cursor:pointer;accent-color:#22c55e" onclick="event.stopPropagation();toggleAutoModeCapture()">
+              <span>自動モードをスタート!!</span>
+            </button>
+
+            <div style="margin-top:20px;font-size:12px;color:var(--text-muted);line-height:1.6">
+              ※ OBS の「仮想カメラ開始」をクリックし、1920×1080 (16:9) でSwitchの対戦画面を取り込んでください。
+            </div>
+          </div>
+        </div>
+
+        <!-- 下部ステータス＆コントロールバー -->
+        <div id="auto-mode-video-controls">
+          <div class="auto-mode-status-badge">
+            <span class="auto-mode-status-dot"></span>
+            <span id="auto-mode-status-badge">自動モード待機中</span>
+          </div>
+          <div class="auto-mode-icon-buttons">
+            <button type="button" class="auto-ctrl-btn" onclick="refreshAutoCameraDevices()" title="カメラ再検索">🔄</button>
+            <button type="button" class="auto-ctrl-btn" onclick="toggleAutoSetupOverlay()" title="設定表示/非表示">⚙️</button>
+            <button type="button" class="auto-ctrl-btn" onclick="toggleAutoVideoFullscreen()" title="全画面表示">⛶</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右下: バトメモ風グラデーション VSバー -->
+      <div id="auto-mode-vs-bar">
+        <!-- 自分側 (YOU) -->
+        <div class="vs-side-group me">
+          <div class="vs-slot-item" id="vs-slot-me-0">
+            <img src="assets/templates/monsterball.png" alt="ball" style="width:36px;height:36px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5))">
+          </div>
+          <div class="vs-slot-item" id="vs-slot-me-1">
+            <img src="assets/templates/monsterball.png" alt="ball" style="width:36px;height:36px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5))">
+          </div>
+          <div class="vs-slot-item" id="vs-slot-me-2">
+            <img src="assets/templates/monsterball.png" alt="ball" style="width:36px;height:36px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5))">
+          </div>
+          <div class="vs-slot-item" id="vs-slot-me-3">
+            <img src="assets/templates/monsterball.png" alt="ball" style="width:36px;height:36px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5))">
+          </div>
+        </div>
+
+        <!-- 中央 VS -->
+        <div class="vs-center-badge">VS</div>
+
+        <!-- 相手側 (RIVAL) -->
+        <div class="vs-side-group rival">
+          <div class="vs-slot-item" id="vs-slot-rival-0">
+            <img src="assets/templates/monsterball.png" alt="ball" style="width:36px;height:36px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5))">
+          </div>
+          <div class="vs-slot-item" id="vs-slot-rival-1">
+            <img src="assets/templates/monsterball.png" alt="ball" style="width:36px;height:36px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5))">
+          </div>
+          <div class="vs-slot-item" id="vs-slot-rival-2">
+            <img src="assets/templates/monsterball.png" alt="ball" style="width:36px;height:36px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5))">
+          </div>
+          <div class="vs-slot-item" id="vs-slot-rival-3">
+            <img src="assets/templates/monsterball.png" alt="ball" style="width:36px;height:36px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5))">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <!-- ログインバナー -->
   <div id="login-banner"
     style="background:var(--surface);border-bottom:1px solid var(--border);padding:12px 20px;text-align:center;display:none">
@@ -11910,9 +12311,224 @@
         showActionUploadPill('⚠️ 動画' + pendingCount + '件が未送信 (タップして連携)', () => {
           requestGoogleDriveAccessToken(true);
         });
-      }
-    }, 800);
     </script>
+
+  <!-- AUTO MODE CONTROLLER & PC UI LOGIC -->
+  <script src="scripts/auto_mode_controller.js"></script>
+  <script>
+    let isAutoModeActive = false;
+    let originalRecordParent = null;
+    let originalRecordNextSibling = null;
+
+    // PC環境判定 & オートモードボタンの表示制御
+    function checkPcAutoModeAvailability() {
+      const btn = document.getElementById('btn-toggle-auto-mode');
+      if (!btn) return;
+      const isMobileDevice = /Android|iPhone|iPad|iPod|webOS|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      const isPcWidth = window.innerWidth >= 1024;
+      if (isPcWidth && !isMobileDevice) {
+        btn.style.display = 'inline-flex';
+      } else {
+        btn.style.display = 'none';
+        if (isAutoModeActive) {
+          exitAutoMode();
+        }
+      }
+    }
+    window.addEventListener('resize', checkPcAutoModeAvailability);
+    document.addEventListener('DOMContentLoaded', checkPcAutoModeAvailability);
+    setTimeout(checkPcAutoModeAvailability, 500);
+
+    // オートモード切り替え
+    async function toggleAutoMode(btn) {
+      if (isAutoModeActive) {
+        exitAutoMode();
+      } else {
+        enterAutoMode(btn);
+      }
+    }
+
+    async function enterAutoMode(btn) {
+      isAutoModeActive = true;
+      if (btn) btn.classList.add('active');
+
+      const container = document.getElementById('auto-mode-container');
+      const leftCol = document.getElementById('auto-mode-left-col');
+      const recordPage = document.getElementById('page-record');
+
+      if (!container || !leftCol || !recordPage) return;
+
+      // 既存の recordPage を左カラムへ退避・マウント
+      originalRecordParent = recordPage.parentNode;
+      originalRecordNextSibling = recordPage.nextSibling;
+      leftCol.appendChild(recordPage);
+      recordPage.style.display = 'block';
+      recordPage.classList.add('active');
+
+      // 他のフルページを非表示にし、コンテナを有効化
+      document.querySelectorAll('.page').forEach(p => {
+        if (p !== recordPage) p.style.display = 'none';
+      });
+      container.classList.add('active');
+
+      // コントローラーに video 要素をセット
+      const videoEl = document.getElementById('auto-mode-video');
+      if (window.autoModeController) {
+        window.autoModeController.videoElement = videoEl;
+      }
+
+      // 1. 🏆 チャンピオンズ モードを自動選択
+      if (typeof setRecordMode === 'function') {
+        setRecordMode('champions');
+      }
+
+      // 2. 形式: ランクマ / BO1
+      if (typeof setRecordMatchType === 'function') {
+        setRecordMatchType('ranked');
+      }
+      if (typeof setRecordMatchBo === 'function') {
+        setRecordMatchBo(1);
+      }
+
+      // 3. 一番上のパーティを自動選択
+      const partySelect = document.getElementById('rec-party-select');
+      if (partySelect && partySelect.options.length > 1) {
+        partySelect.selectedIndex = 1;
+        partySelect.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+
+      // カメラ一覧をロード
+      await refreshAutoCameraDevices();
+
+      console.log('[AutoMode] Entered PC Auto Mode (Champions Ranked BO1)');
+    }
+
+    function exitAutoMode() {
+      isAutoModeActive = false;
+      const btn = document.getElementById('btn-toggle-auto-mode');
+      if (btn) btn.classList.remove('active');
+
+      const container = document.getElementById('auto-mode-container');
+      const recordPage = document.getElementById('page-record');
+
+      if (container) container.classList.remove('active');
+
+      // 記録画面を元の DOM 位置へ復元
+      if (recordPage && originalRecordParent) {
+        if (originalRecordNextSibling) {
+          originalRecordParent.insertBefore(recordPage, originalRecordNextSibling);
+        } else {
+          originalRecordParent.appendChild(recordPage);
+        }
+      }
+
+      // オートモード処理・カメラを停止
+      if (window.autoModeController) {
+        window.autoModeController.stopAutoMode();
+        window.autoModeController.stopCamera();
+      }
+
+      // セットアップUIを初期状態にリセット
+      const chk = document.getElementById('chk-auto-mode-run');
+      if (chk) chk.checked = false;
+      const btnRun = document.getElementById('btn-auto-mode-start');
+      if (btnRun) btnRun.classList.remove('running');
+      const overlay = document.getElementById('auto-mode-setup-overlay');
+      if (overlay) overlay.classList.remove('hidden');
+
+      // 通常の記録画面へ復帰
+      showPage('record', document.querySelector('nav button:nth-child(3)'));
+      console.log('[AutoMode] Exited PC Auto Mode');
+    }
+
+    // カメラデバイス一覧の更新
+    async function refreshAutoCameraDevices() {
+      const select = document.getElementById('auto-camera-select');
+      if (!select || !window.autoModeController) return;
+
+      const devices = await window.autoModeController.getCameraDevices();
+      select.innerHTML = '<option value="">カメラデバイスを選択...</option>';
+
+      let obsDevice = null;
+      devices.forEach((d, idx) => {
+        const opt = document.createElement('option');
+        opt.value = d.deviceId;
+        opt.textContent = d.label || `カメラ ${idx + 1}`;
+        if (d.label && d.label.toLowerCase().includes('obs')) {
+          obsDevice = d;
+        }
+        select.appendChild(opt);
+      });
+
+      // OBS Virtual Camera が見つかれば自動選択
+      if (obsDevice) {
+        select.value = obsDevice.deviceId;
+      }
+    }
+
+    // セットアップ開始ボタンクリック
+    async function onAutoSetupStartClick() {
+      const select = document.getElementById('auto-camera-select');
+      const startBtn = document.getElementById('btn-auto-setup-start');
+      const runBtn = document.getElementById('btn-auto-mode-start');
+
+      await refreshAutoCameraDevices();
+      if (select) select.style.display = 'block';
+      if (startBtn) startBtn.style.display = 'none';
+
+      // 既に選択肢があればカメラ起動
+      if (select && select.value) {
+        await onAutoCameraSelectChange(select.value);
+      }
+    }
+
+    // カメラ選択変更
+    async function onAutoCameraSelectChange(deviceId) {
+      if (!deviceId || !window.autoModeController) return;
+      const ok = await window.autoModeController.startCamera(deviceId);
+      const runBtn = document.getElementById('btn-auto-mode-start');
+      if (ok && runBtn) {
+        runBtn.style.display = 'flex';
+      }
+    }
+
+    // 自動モードのスタート/ストップ
+    function toggleAutoModeCapture() {
+      const chk = document.getElementById('chk-auto-mode-run');
+      const runBtn = document.getElementById('btn-auto-mode-start');
+      const overlay = document.getElementById('auto-mode-setup-overlay');
+      if (!chk || !window.autoModeController) return;
+
+      chk.checked = !chk.checked;
+      if (chk.checked) {
+        if (runBtn) runBtn.classList.add('running');
+        window.autoModeController.startAutoMode();
+        // 1.2秒後にオーバーレイをフェードアウトしてゲーム画面を全表示
+        setTimeout(() => {
+          if (overlay) overlay.classList.add('hidden');
+        }, 800);
+      } else {
+        if (runBtn) runBtn.classList.remove('running');
+        window.autoModeController.stopAutoMode();
+        if (overlay) overlay.classList.remove('hidden');
+      }
+    }
+
+    function toggleAutoSetupOverlay() {
+      const overlay = document.getElementById('auto-mode-setup-overlay');
+      if (overlay) overlay.classList.toggle('hidden');
+    }
+
+    function toggleAutoVideoFullscreen() {
+      const wrapper = document.getElementById('auto-mode-video-wrapper');
+      if (!wrapper) return;
+      if (!document.fullscreenElement) {
+        wrapper.requestFullscreen().catch(err => console.warn(err));
+      } else {
+        document.exitFullscreen();
+      }
+    }
+  </script>
 
   <!-- アップロード進捗ピル（ドラッグ移動可能・✕ボタン付き） -->
   <div id="upload-pill" style="display:none;position:fixed;bottom:72px;right:12px;z-index:99999;flex-direction:column;background:rgba(15,15,30,0.96);border:1px solid rgba(139,92,246,0.5);border-radius:12px;padding:10px 12px;min-width:220px;max-width:280px;box-shadow:0 6px 28px rgba(0,0,0,0.7);backdrop-filter:blur(10px);gap:6px;user-select:none;touch-action:none">
