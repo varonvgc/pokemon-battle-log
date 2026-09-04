@@ -504,7 +504,7 @@
     _setupRecordFormForNewBattle() {
       // 1. 記録タブへ切り替え
       if (typeof window.showPage === 'function') {
-        const recordBtn = document.querySelector('nav button:nth-child(3)') || document.querySelector('nav button[onclick*="record"]');
+        const recordBtn = document.querySelector('nav button[onclick*="record"]') || document.querySelector('nav button:nth-child(3)');
         window.showPage('record', recordBtn);
       }
 
@@ -689,7 +689,7 @@
         setTimeout(() => {
           console.log('[AutoMode] Switching to history view...');
           if (typeof window.showPage === 'function') {
-            const histBtn = document.querySelector('nav button:nth-child(4)') || document.querySelector('nav button[onclick*="history"]');
+            const histBtn = document.querySelector('nav button[onclick*="history"]') || document.querySelector('nav button:nth-child(4)');
             window.showPage('history', histBtn);
           }
           // 次の対戦に向けて待機状態へループ
