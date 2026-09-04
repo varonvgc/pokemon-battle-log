@@ -577,37 +577,10 @@
       console.log('[AutoMode] My party Pokémon pool:', this.myPartyNames);
     }
 
-    // ポケモン名の正規化（メガシンカ・ゲンシカイキのフォルム名のみベース名に変換、ポリゴンZ等は一切不変）
+    // ポケモン名の正規化（パーティ管理の「ベース名(フォルム名)」から画面表記のベース名を抽出）
     _normalizeBasePokeName(name) {
       if (!name) return '';
-      const s = String(name).trim();
-
-      // 1. 括弧表記がある場合（例: "リザードン(メガリザードンY)" -> "リザードン", "グラードン(ゲンシグラードン)" -> "グラードン"）
-      // メガやゲンシのフォルムを含む場合のみ、括弧の前（ベース名）を抽出
-      if (s.includes('(') || s.includes('（')) {
-        const base = s.split('(')[0].split('（')[0].trim();
-        if (s.includes('メガ') || s.includes('ゲンシ')) {
-          return base;
-        }
-        return base || s;
-      }
-
-      // 2. 「メガメガニウム」「メガメガヤンマ」等の特殊ケース
-      if (s === 'メガメガニウム') return 'メガニウム';
-      if (s === 'メガメガヤンマ') return 'メガヤンマ';
-      // 通常の「メガニウム」「メガヤンマ」「ポリゴンZ」等は一切削らずそのまま保護！
-      if (s === 'メガニウム' || s === 'メガヤンマ' || s.startsWith('ポリゴン')) return s;
-
-      // 3. 先頭が「メガ」または「ゲンシ」で始まるメガシンカ名（例: "メガリザードンY" -> "リザードン", "メガガブリアスZ" -> "ガブリアス"）
-      if (s.startsWith('メガ') || s.startsWith('ゲンシ')) {
-        let base = s.replace(/^メガ/, '').replace(/^ゲンシ/, '').trim();
-        // 末尾の枝分かれ記号 X / Y / Z があれば除去
-        base = base.replace(/[\s\-_]?[XYZＸＹＺ]$/i, '').trim();
-        return base || s;
-      }
-
-      // それ以外（ポリゴンZ、ロトム、ウーラオス等）は一切不変でそのまま返す
-      return s;
+      return String(name).split('(')[0].split('（')[0].trim();
     }
 
     // --- 試合中: 出撃ポケモンの検知 (カタカナ特化OCR) ---
