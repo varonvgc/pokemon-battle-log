@@ -1,3 +1,4 @@
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 Add-Type -AssemblyName System.Drawing
 
 # -------------------------------------------------------------
@@ -69,7 +70,7 @@ function Match-TypeTemplate($bmp, $x, $y, $w, $h, $dict) {
     for ($cy = 0; $cy -lt 20; $cy++) {
         for ($cx = 0; $cx -lt 20; $cx++) {
             $p = $t20.GetPixel($cx, $cy)
-            $b[$i++] = [byte]$p.R; $b[$i++] = [byte]$p.G; $b[$i++] = [byte]$p.A; $b[$i++] = [byte]$p.A
+            $b[$i++] = [byte]$p.R; $b[$i++] = [byte]$p.G; $b[$i++] = [byte]$p.B; $b[$i++] = [byte]$p.A
             $rSum += $p.R; $gSum += $p.G; $bSum += $p.B
         }
     }
@@ -297,12 +298,28 @@ function Match-PokemonGeoPHOGUniversal($bmp, $x, $y, $w, $h, $candidateEntries) 
             $distPhog += [Math]::Abs([int]$livePhog[$k] - [int]$refPhog[$k])
         }
 
-        # 2. Geometric Shape Penalties (Aspect Ratio, Extent/Solidity, Normalized Area)
+        # 2. Geometric Shape Penalties with Dynamic Candidate Weighting (Solution B)
+        $numCandidates = $candidateEntries.Count
+        $weightAspect = 380.0
+        $weightExtent = 420.0
+        $weightArea = 250.0
+
+        if ($numCandidates -le 4) {
+            # 少数候補（リキキリン/アヤシシ/ヤレユータン等）: 隙間充填率(extent)とアスペクト比を強化
+            $weightAspect = 500.0
+            $weightExtent = 850.0
+            $weightArea = 250.0
+        } elseif ($numCandidates -le 8) {
+            $weightAspect = 450.0
+            $weightExtent = 550.0
+            $weightArea = 250.0
+        }
+
         $aspectRatioDiff = [Math]::Abs($liveAspect - $refAspect)
         $extentDiff = [Math]::Abs($liveExtent - $refExtent)
         $areaDiff = [Math]::Abs($liveArea - $refArea)
 
-        $totalDist = $distPhog + (380.0 * $aspectRatioDiff) + (420.0 * $extentDiff) + (250.0 * $areaDiff)
+        $totalDist = $distPhog + ($weightAspect * $aspectRatioDiff) + ($weightExtent * $extentDiff) + ($weightArea * $areaDiff)
 
         if ($totalDist -lt $bestDist) {
             $bestDist = $totalDist

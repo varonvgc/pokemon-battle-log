@@ -361,6 +361,24 @@ class PokemonRecognitionEngine {
     const live = this._extractLiveGeoPHOG(ctx, x, y, w, h);
     if (!live) return candidateEntries[0].display;
 
+    // 候補数に応じた動的ペナルティ重み付け（解決策B）
+    // 候補が少数（<= 4体）の場合はシルエット全体の幾何形状（extent, areaRatio, aspectRatio）を強化
+    const numCandidates = candidateEntries.length;
+    let weightAspect = 380.0;
+    let weightExtent = 420.0;
+    let weightArea = 250.0;
+
+    if (numCandidates <= 4) {
+      // 少数候補（リキキリン/アヤシシ/ヤレユータン等）: 隙間充填率(extent)とアスペクト比を強化
+      weightAspect = 500.0;
+      weightExtent = 850.0;
+      weightArea = 250.0;
+    } else if (numCandidates <= 8) {
+      weightAspect = 450.0;
+      weightExtent = 550.0;
+      weightArea = 250.0;
+    }
+
     let bestDisplay = '';
     let bestDist = 999999999.0;
 
@@ -377,7 +395,7 @@ class PokemonRecognitionEngine {
       const extentDiff = Math.abs(live.extent - ref.extent);
       const areaDiff = Math.abs(live.areaRatio - ref.areaRatio);
 
-      const totalDist = distPhog + (380.0 * aspectRatioDiff) + (420.0 * extentDiff) + (250.0 * areaDiff);
+      const totalDist = distPhog + (weightAspect * aspectRatioDiff) + (weightExtent * extentDiff) + (weightArea * areaDiff);
 
       if (totalDist < bestDist) {
         bestDist = totalDist;
