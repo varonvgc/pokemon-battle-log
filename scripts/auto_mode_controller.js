@@ -446,16 +446,7 @@
           const res = await window.recognitionEngine.recognize(ctx.canvas, myTeamList, 'BEFORE');
           console.log('[AutoMode] Recognition Engine Result:', res);
 
-          // 3-1. 相手トレーナー名のセット
-          if (res && res.trainerName) {
-            const oppTrainerInput = document.getElementById('rec-opp-trainer');
-            if (oppTrainerInput) {
-              oppTrainerInput.value = res.trainerName;
-              oppTrainerInput.dispatchEvent(new Event('input', { bubbles: true }));
-            }
-          }
-
-          // 3-2. 相手パーティ 6 匹のセット
+          // 3-1. 相手パーティ 6 匹のセット
           if (res && res.opponent && res.opponent.length) {
             const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
             res.opponent.forEach((pName, idx) => {
@@ -471,25 +462,33 @@
               window.rebuildOppSelectionDropdowns();
             }
           }
+
+          // 3-2. 相手トレーナー名のセット (16:9補正エンジン結果 + 直接切り出しOCRの相互補正)
+          let finalTrainerName = (res && res.trainerName) ? res.trainerName.trim() : '';
+
+          if (this.tesseractWorker) {
+            try {
+              const nameCrop = this.cropToBase64(ctx, COORDS.TRAINER_NAME);
+              const nameRes = await this.tesseractWorker.recognize(nameCrop);
+              const directText = (nameRes && nameRes.data && nameRes.data.text || '').replace(/[\r\n\t]/g, ' ').trim();
+              if (directText && (!finalTrainerName || directText.length <= 12)) {
+                finalTrainerName = directText;
+              }
+            } catch (e) {
+              console.warn('[AutoMode] Direct trainer OCR error:', e);
+            }
+          }
+
+          if (finalTrainerName) {
+            const oppTrainerInput = document.getElementById('rec-opp-trainer');
+            if (oppTrainerInput) {
+              oppTrainerInput.value = finalTrainerName;
+              oppTrainerInput.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+          }
         }
       } catch (e) {
         console.warn('[AutoMode] Recognition engine error:', e);
-      }
-
-      // 4. トレーナー名が取れていなければ Tesseract でバックアップ取得
-      const oppTrainerInput = document.getElementById('rec-opp-trainer');
-      if (oppTrainerInput && !oppTrainerInput.value.trim() && this.tesseractWorker) {
-        try {
-          const nameCrop = this.cropToBase64(ctx, COORDS.TRAINER_NAME);
-          const nameRes = await this.tesseractWorker.recognize(nameCrop);
-          const trainerName = (nameRes.data.text || '').trim();
-          if (trainerName) {
-            oppTrainerInput.value = trainerName;
-            oppTrainerInput.dispatchEvent(new Event('input', { bubbles: true }));
-          }
-        } catch (e) {
-          console.warn('[AutoMode] Fallback trainer OCR error:', e);
-        }
       }
 
       // 自分の登録パーティ名一覧を確実に取得
@@ -578,6 +577,18 @@
       console.log('[AutoMode] My party Pokémon pool:', this.myPartyNames);
     }
 
+    // ポケモン名の正規化（メガシンカ、フォルム名、括弧を除去してベース名を抽出）
+    _normalizeBasePokeName(name) {
+      if (!name) return '';
+      return String(name)
+        .replace(/\(.*?\)/g, '')
+        .replace(/（.*?）/g, '')
+        .replace(/^メガ/, '')
+        .replace(/[XYＸＹ]$/, '')
+        .replace(/の.*$/, '')
+        .trim();
+    }
+
     // --- 試合中: 出撃ポケモンの検知 (カタカナ特化OCR) ---
     async _detectDispatchedPokemons(ctx) {
       if (!this.katakanaWorker) return;
@@ -603,10 +614,32 @@
 
           for (const candidate of candidatePool) {
             if (!candidate) continue;
-            const dist = levenshteinDistance(rawText, candidate);
+            // 1. そのままの文字列との比較
+            const distFull = levenshteinDistance(rawText, candidate);
+            // 2. ベース名（例: メガリザードンY -> リザードン）との比較
+            const baseCand = this._normalizeBasePokeName(candidate);
+            const distBase = baseCand ? levenshteinDistance(rawText, baseCand) : 999;
+            const dist = Math.min(distFull, distBase);
+
             if (dist < minDistance) {
               minDistance = dist;
               bestMatch = candidate;
+            }
+          }
+
+          // 相手側で手持ちと一致しなかった場合、マスタ全体から追加探索（ニックネームや認識漏れ対応）
+          if ((!bestMatch || minDistance > 2) && target.role === 'rival' && window.POKEMON_LIST && window.POKEMON_LIST.length) {
+            for (const p of window.POKEMON_LIST) {
+              const pName = typeof p === 'string' ? p : (p && (p.name || p.display) || '');
+              if (!pName) continue;
+              const distFull = levenshteinDistance(rawText, pName);
+              const baseCand = this._normalizeBasePokeName(pName);
+              const distBase = baseCand ? levenshteinDistance(rawText, baseCand) : 999;
+              const dist = Math.min(distFull, distBase);
+              if (dist < minDistance) {
+                minDistance = dist;
+                bestMatch = pName;
+              }
             }
           }
 

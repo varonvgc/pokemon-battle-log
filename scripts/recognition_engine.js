@@ -704,7 +704,21 @@ class PokemonRecognitionEngine {
     const sCtx = standardCanvas.getContext('2d', { willReadFrequently: true });
     sCtx.imageSmoothingEnabled = true;
     sCtx.imageSmoothingQuality = 'high';
-    sCtx.drawImage(imageSource, 0, 0, 2532, 1170);
+
+    const srcW = imageSource.videoWidth || imageSource.naturalWidth || imageSource.width || 2532;
+    const srcH = imageSource.videoHeight || imageSource.naturalHeight || imageSource.height || 1170;
+    const aspect = srcW / srcH;
+
+    // Switch等の16:9映像 (1920x1080, 1280x720) の場合は、アスペクト比を維持して中央(幅2080, オフセットX=226)に配置！
+    if (Math.abs(aspect - (16 / 9)) < 0.1 || Math.abs(srcW - 1920) < 15) {
+      const drawW = Math.round(1170 * (16 / 9)); // 2080
+      const offsetX = Math.round((2532 - drawW) / 2); // 226
+      sCtx.fillStyle = '#000';
+      sCtx.fillRect(0, 0, 2532, 1170);
+      sCtx.drawImage(imageSource, offsetX, 0, drawW, 1170);
+    } else {
+      sCtx.drawImage(imageSource, 0, 0, 2532, 1170);
+    }
 
     // 1. Detect Mode: BEFORE (Selection screen) vs AFTER (Battle preparation screen)
     let detectedMode;
