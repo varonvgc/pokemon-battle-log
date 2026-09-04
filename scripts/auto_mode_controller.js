@@ -326,6 +326,8 @@
       this.isAutoRunning = true;
       this.phase = 'WAITING_MATCHING';
       this.updateStatusBadge('ワーカー初期化中...');
+      // フォームを即座に初期化・表示して待機
+      this._setupRecordFormForNewBattle();
       await this.ensureWorkersReady();
       this.updateStatusBadge('自動モード稼働中 (対戦待ち)');
       this._startLoop();
@@ -429,59 +431,68 @@
         console.warn('[AutoMode] Battle format digit OCR error:', e);
       }
 
-      // 3. 相手トレーナー名 OCR
+      // 3. 高精度認識エンジン (window.recognitionEngine) で相手パーティ6匹 & トレーナー名を自動特定！
+      this.rivalPartyNames = [];
       try {
-        if (this.tesseractWorker) {
+        if (window.recognitionEngine) {
+          if (!window.recognitionEngine.isLoaded && typeof window.recognitionEngine.loadDictionaries === 'function') {
+            await window.recognitionEngine.loadDictionaries();
+          }
+
+          // 自分のパーティ一覧
+          let myTeamList = this.myPartyNames || [];
+
+          // 画面全体 (1920x1080) を認識エンジンへ渡す
+          const res = await window.recognitionEngine.recognize(ctx.canvas, myTeamList, 'BEFORE');
+          console.log('[AutoMode] Recognition Engine Result:', res);
+
+          // 3-1. 相手トレーナー名のセット
+          if (res && res.trainerName) {
+            const oppTrainerInput = document.getElementById('rec-opp-trainer');
+            if (oppTrainerInput) {
+              oppTrainerInput.value = res.trainerName;
+              oppTrainerInput.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+          }
+
+          // 3-2. 相手パーティ 6 匹のセット
+          if (res && res.opponent && res.opponent.length) {
+            const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
+            res.opponent.forEach((pName, idx) => {
+              if (idx < 6 && oppInputs[idx] && pName && pName !== '???') {
+                oppInputs[idx].value = pName;
+                if (typeof window.updateSlotIcon === 'function') {
+                  window.updateSlotIcon(oppInputs[idx], pName);
+                }
+                this.rivalPartyNames.push(pName);
+              }
+            });
+            if (typeof window.rebuildOppSelectionDropdowns === 'function') {
+              window.rebuildOppSelectionDropdowns();
+            }
+          }
+        }
+      } catch (e) {
+        console.warn('[AutoMode] Recognition engine error:', e);
+      }
+
+      // 4. トレーナー名が取れていなければ Tesseract でバックアップ取得
+      const oppTrainerInput = document.getElementById('rec-opp-trainer');
+      if (oppTrainerInput && !oppTrainerInput.value.trim() && this.tesseractWorker) {
+        try {
           const nameCrop = this.cropToBase64(ctx, COORDS.TRAINER_NAME);
           const nameRes = await this.tesseractWorker.recognize(nameCrop);
           const trainerName = (nameRes.data.text || '').trim();
           if (trainerName) {
-            console.log('[AutoMode] Opponent trainer name:', trainerName);
-            const inputEl = document.getElementById('rec-opponent-name');
-            if (inputEl) {
-              inputEl.value = trainerName;
-              inputEl.dispatchEvent(new Event('input', { bubbles: true }));
-            }
+            oppTrainerInput.value = trainerName;
+            oppTrainerInput.dispatchEvent(new Event('input', { bubbles: true }));
           }
+        } catch (e) {
+          console.warn('[AutoMode] Fallback trainer OCR error:', e);
         }
-      } catch (e) {
-        console.warn('[AutoMode] Trainer name OCR error:', e);
       }
 
-      // 4. 相手パーティ 6 匹の特定
-      this.rivalPartyNames = [];
-      try {
-        if (window.pokemonRecognitionEngine && window.pokemonRecognitionEngine.isLoaded) {
-          const matchedIds = [];
-          for (let i = 0; i < 6; i++) {
-            const rect = COORDS.RIVAL_ICON(i);
-            const cropCanvas = document.createElement('canvas');
-            cropCanvas.width = Math.round(rect.w);
-            cropCanvas.height = Math.round(rect.h);
-            const cropCtx = cropCanvas.getContext('2d');
-            cropCtx.drawImage(ctx.canvas, rect.x, rect.y, rect.w, rect.h, 0, 0, rect.w, rect.h);
-
-            // 既存の認識エンジンで照合
-            const res = await window.pokemonRecognitionEngine.recognizeSlot(cropCtx, 0, 0, rect.w, rect.h);
-            if (res && res.pokemon) {
-              matchedIds.push(res.pokemon.name);
-              this.rivalPartyNames.push(res.pokemon.name);
-            }
-          }
-          console.log('[AutoMode] Opponent party recognized:', matchedIds);
-
-          // 左側フォームの相手パーティスロットに自動セット
-          matchedIds.forEach((name, idx) => {
-            if (typeof window.setOpponentPokemonSlot === 'function') {
-              window.setOpponentPokemonSlot(idx, name);
-            }
-          });
-        }
-      } catch (e) {
-        console.warn('[AutoMode] Opponent party recognition error:', e);
-      }
-
-      // 自分の登録パーティ名一覧を取得
+      // 自分の登録パーティ名一覧を確実に取得
       this._extractMyPartyNames();
 
       this.waitingStartTimestamp = Date.now();
@@ -492,8 +503,9 @@
     // 記録画面の自動初期化 (チャンピオンズ / ランクマ / BO1 / 一番上のパーティ)
     _setupRecordFormForNewBattle() {
       // 1. 記録タブへ切り替え
-      if (typeof window.switchPage === 'function') {
-        window.switchPage('record');
+      if (typeof window.showPage === 'function') {
+        const recordBtn = document.querySelector('nav button:nth-child(3)') || document.querySelector('nav button[onclick*="record"]');
+        window.showPage('record', recordBtn);
       }
 
       // 2. 🏆 チャンピオンズ モードに切り替え
@@ -502,38 +514,68 @@
       }
 
       // 3. 形式: ランクマ / BO1
-      const matchTypeBtn = document.querySelector('.match-type-btn[data-type="ranked"]');
-      if (matchTypeBtn && typeof window.setRecordMatchType === 'function') {
+      if (typeof window.setRecordMatchType === 'function') {
         window.setRecordMatchType('ranked');
       }
       if (typeof window.setRecordMatchBo === 'function') {
         window.setRecordMatchBo(1);
       }
 
-      // 4. パーティ管理の一番上のパーティを選択
-      const partySelect = document.getElementById('rec-party-select');
-      if (partySelect && partySelect.options.length > 1) {
-        partySelect.selectedIndex = 1; // 0番目は空欄などのため1番目を選択
-        partySelect.dispatchEvent(new Event('change', { bubbles: true }));
+      // 4. パーティ管理の一番上のパーティを選択してフォームを確実に開く
+      const allParties = (window.autoModeBridge && window.autoModeBridge.getParties && window.autoModeBridge.getParties()) ||
+                         window.parties ||
+                         JSON.parse(localStorage.getItem('pkm_parties') || '[]');
+
+      if (allParties && allParties.length > 0) {
+        const firstParty = allParties[0];
+        if (typeof window.selectPartyForRecord === 'function') {
+          window.selectPartyForRecord(firstParty.id);
+        } else if (typeof window.onPartyDropdownChange === 'function') {
+          window.onPartyDropdownChange(firstParty.id);
+        }
+        const partySelect = document.getElementById('party-select-dropdown');
+        if (partySelect) {
+          partySelect.value = firstParty.id;
+        }
+        if (typeof window.showRecordForm === 'function') {
+          window.showRecordForm();
+        }
+      } else {
+        const partySelect = document.getElementById('party-select-dropdown');
+        if (partySelect && partySelect.options.length > 1) {
+          partySelect.selectedIndex = 1;
+          partySelect.dispatchEvent(new Event('change', { bubbles: true }));
+        }
       }
 
-      console.log('[AutoMode] Record form auto-configured for Champions Ranked BO1');
+      console.log('[AutoMode] Record form fully auto-configured for Champions Ranked BO1');
     }
 
     // 自分のパーティのポケモン名一覧を取得
     _extractMyPartyNames() {
       this.myPartyNames = [];
-      const slots = document.querySelectorAll('.my-team-slot, .party-poke-tag');
-      slots.forEach(s => {
-        const name = s.getAttribute('data-name') || s.textContent.trim();
-        if (name && !this.myPartyNames.includes(name)) {
-          this.myPartyNames.push(name);
+      const allParties = (window.autoModeBridge && window.autoModeBridge.getParties && window.autoModeBridge.getParties()) ||
+                         window.parties ||
+                         JSON.parse(localStorage.getItem('pkm_parties') || '[]');
+      const selId = (window.autoModeBridge && window.autoModeBridge.getSelectedPartyId && window.autoModeBridge.getSelectedPartyId()) ||
+                    window.selectedPartyId ||
+                    (allParties[0] && allParties[0].id);
+
+      if (allParties && allParties.length > 0) {
+        const party = allParties.find(p => p.id === selId) || allParties[0];
+        if (party && party.pokemon) {
+          this.myPartyNames = party.pokemon.map(pk => typeof pk === 'string' ? pk : (pk && pk.name || '')).filter(Boolean);
         }
-      });
-      // 取得できない場合はデフォルト
-      if (this.myPartyNames.length === 0 && window.masterPokemonList) {
-        this.myPartyNames = window.masterPokemonList.slice(0, 6).map(p => p.name);
       }
+      // スロットDOMからバックアップ取得
+      if (this.myPartyNames.length === 0) {
+        const myIcons = document.querySelectorAll('#my-party-icons img, #my-party-icons .poke-tag, .my-team-slot');
+        myIcons.forEach(el => {
+          const alt = el.getAttribute('alt') || el.getAttribute('data-name') || el.textContent.trim();
+          if (alt && !this.myPartyNames.includes(alt)) this.myPartyNames.push(alt);
+        });
+      }
+      console.log('[AutoMode] My party Pokémon pool:', this.myPartyNames);
     }
 
     // --- 試合中: 出撃ポケモンの検知 (カタカナ特化OCR) ---
@@ -549,12 +591,18 @@
           if (!rawText || rawText.length < 2) continue;
 
           // 照合候補リスト (相手なら rivalPartyNames, 自分なら myPartyNames)
-          const candidatePool = target.role === 'rival' ? this.rivalPartyNames : this.myPartyNames;
+          let candidatePool = target.role === 'rival' ? this.rivalPartyNames : this.myPartyNames;
+          // もし候補が空ならマスタから照合可能にフォールバック
+          if (!candidatePool || candidatePool.length === 0) {
+            const masterList = (window.POKEMON_LIST && window.POKEMON_LIST.length) ? window.POKEMON_LIST : (window.masterPokemonList || []);
+            candidatePool = masterList.map(p => typeof p === 'string' ? p : (p && (p.name || p.display) || '')).filter(Boolean);
+          }
 
           let bestMatch = null;
           let minDistance = 999;
 
           for (const candidate of candidatePool) {
+            if (!candidate) continue;
             const dist = levenshteinDistance(rawText, candidate);
             if (dist < minDistance) {
               minDistance = dist;
@@ -567,7 +615,7 @@
             this._handleDispatchedPokemonFound(target.role, bestMatch);
           }
         } catch (e) {
-          // OCRスキップ
+          // スキップ
         }
       }
     }
@@ -581,33 +629,17 @@
         list.push(pokemonName);
         console.log(`[AutoMode] Dispatched Pokémon confirmed! [${role}] #${list.length}: ${pokemonName}`);
 
-        // 1. 右下 VS バーの更新
+        // 1. 右下 VS バーの更新 (モンスターボールからポケモンアイコン・名前に変身！)
         this.updateVsBarSlot(role, list.length - 1, pokemonName);
 
-        // 2. 左側記録フォームの選出チェックを自動ON
-        this._autoCheckSelectionInForm(role, pokemonName, list.length);
-      }
-    }
-
-    _autoCheckSelectionInForm(role, pokemonName, order) {
-      if (role === 'me') {
-        // 自分の選出チェックボックス/スロットをON
-        const checkboxes = document.querySelectorAll(`input[name="my-pick"][value="${pokemonName}"], .my-slot-check[data-name="${pokemonName}"]`);
-        checkboxes.forEach(cb => {
-          if (!cb.checked) {
-            cb.checked = true;
-            cb.dispatchEvent(new Event('change', { bubbles: true }));
+        // 2. 左側記録フォームの選出スロットに即時反映！
+        if (typeof window.setSelectionFromNames === 'function') {
+          if (role === 'me') {
+            window.setSelectionFromNames('my', this.detectedDispatchedMe, 0);
+          } else {
+            window.setSelectionFromNames('opp', this.detectedDispatchedRival, 0);
           }
-        });
-      } else {
-        // 相手の選出チェックボックス/スロットをON
-        const checkboxes = document.querySelectorAll(`input[name="opp-pick"][value="${pokemonName}"], .opp-slot-check[data-name="${pokemonName}"]`);
-        checkboxes.forEach(cb => {
-          if (!cb.checked) {
-            cb.checked = true;
-            cb.dispatchEvent(new Event('change', { bubbles: true }));
-          }
-        });
+        }
       }
     }
 
@@ -634,26 +666,31 @@
     }
 
     async _handleGameFinished(isWin) {
+      console.log(`[AutoMode] Handling game finish: ${isWin ? 'WIN' : 'LOSE'}`);
       // 1. 左側フォームの勝敗ボタンをセット
-      if (typeof window.setRecordResult === 'function') {
-        window.setRecordResult(isWin ? 'win' : 'lose');
+      if (typeof window.setResult === 'function') {
+        window.setResult(isWin ? 'win' : 'lose');
       } else {
-        const winBtn = document.getElementById(isWin ? 'btn-result-win' : 'btn-result-lose');
+        const winBtn = document.getElementById(isWin ? 'btn-win' : 'btn-lose');
         if (winBtn) winBtn.click();
       }
 
       // 2. 自動保存を実行
       setTimeout(() => {
-        const saveBtn = document.getElementById('btn-save-record');
-        if (saveBtn) {
-          console.log('[AutoMode] Auto-saving battle log...');
-          saveBtn.click();
+        console.log('[AutoMode] Triggering battle log save via saveRecord()...');
+        if (typeof window.saveRecord === 'function') {
+          window.saveRecord();
+        } else {
+          const saveBtn = document.getElementById('record-save-btn');
+          if (saveBtn) saveBtn.click();
         }
 
         // 3. 履歴画面へ自動遷移
         setTimeout(() => {
-          if (typeof window.switchPage === 'function') {
-            window.switchPage('history');
+          console.log('[AutoMode] Switching to history view...');
+          if (typeof window.showPage === 'function') {
+            const histBtn = document.querySelector('nav button:nth-child(4)') || document.querySelector('nav button[onclick*="history"]');
+            window.showPage('history', histBtn);
           }
           // 次の対戦に向けて待機状態へループ
           this.phase = 'WAITING_MATCHING';
@@ -686,12 +723,22 @@
         // 初期状態: モンスターボール表示 (52pxに大型化)
         slotEl.innerHTML = `<img src="assets/templates/monsterball.png" alt="ball" style="width:52px;height:52px;filter:drop-shadow(0 3px 6px rgba(0,0,0,0.6))">`;
       } else {
-        // ポケモン特定後: ポケモンアイコン + 名前アニメーション (56pxに大型化)
-        const iconUrl = window.getPokemonIconUrl ? window.getPokemonIconUrl(pokemonName) : 'assets/templates/monsterball.png';
+        // ポケモン特定後: ポケモンスプライトアイコン + 名前アニメーション
+        let spriteHtml = '';
+        if (typeof window.getPokeSpriteHTMLByDisplay === 'function') {
+          spriteHtml = window.getPokeSpriteHTMLByDisplay(pokemonName);
+        }
+        if (!spriteHtml) {
+          spriteHtml = `<div style="font-size:24px;line-height:1">⚡</div>`;
+        }
         slotEl.innerHTML = `
-          <div style="display:flex;flex-direction:column;align-items:center;animation:popIn 0.3s ease-out">
-            <img src="${iconUrl}" alt="${pokemonName}" style="width:56px;height:56px;object-fit:contain;filter:drop-shadow(0 3px 8px rgba(0,0,0,0.8))">
-            <span style="font-size:11px;font-weight:800;color:#fff;white-space:nowrap;margin-top:2px;text-shadow:0 1px 4px #000;max-width:78px;overflow:hidden;text-overflow:ellipsis">${pokemonName}</span>
+          <div style="display:flex;flex-direction:column;align-items:center;animation:popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)">
+            <div style="transform:scale(1.55);transform-origin:center;margin:6px 0;filter:drop-shadow(0 3px 8px rgba(0,0,0,0.8))">
+              ${spriteHtml}
+            </div>
+            <span style="font-size:11.5px;font-weight:800;color:#fff;white-space:nowrap;margin-top:4px;text-shadow:0 1px 4px #000;max-width:82px;overflow:hidden;text-overflow:ellipsis">
+              ${pokemonName}
+            </span>
           </div>
         `;
       }

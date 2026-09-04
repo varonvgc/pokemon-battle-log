@@ -12558,11 +12558,19 @@
         setRecordMatchBo(1);
       }
 
-      // 4. 一番上のパーティを自動選択
-      const partySelect = document.getElementById('rec-party-select');
-      if (partySelect && partySelect.options.length > 1) {
-        partySelect.selectedIndex = 1;
-        partySelect.dispatchEvent(new Event('change', { bubbles: true }));
+      // 4. 一番上のパーティを自動選択してフォームを開く
+      if (typeof parties !== 'undefined' && parties && parties.length > 0) {
+        selectPartyForRecord(parties[0].id);
+        const partySelect = document.getElementById('party-select-dropdown');
+        if (partySelect) {
+          partySelect.value = parties[0].id;
+        }
+      } else {
+        const partySelect = document.getElementById('party-select-dropdown');
+        if (partySelect && partySelect.options.length > 1) {
+          partySelect.selectedIndex = 1;
+          partySelect.dispatchEvent(new Event('change', { bubbles: true }));
+        }
       }
 
       // コントローラーに video 要素をセット
@@ -12709,6 +12717,35 @@
         document.exitFullscreen();
       }
     }
+
+    // オートモード用グローバルAPIブリッジ
+    window.autoModeBridge = {
+      getParties: () => parties,
+      getSelectedPartyId: () => selectedPartyId,
+      selectPartyForRecord: (id) => selectPartyForRecord(id),
+      onPartyDropdownChange: (id) => onPartyDropdownChange(id),
+      showRecordForm: () => showRecordForm(),
+      setSelectionFromNames: (type, names, gameIdx) => setSelectionFromNames(type, names, gameIdx),
+      setResult: (res) => setResult(res),
+      saveRecord: () => saveRecord(),
+      showPage: (name, btn) => showPage(name, btn),
+      updateSlotIcon: (input, name) => updateSlotIcon(input, name),
+      rebuildOppSelectionDropdowns: () => rebuildOppSelectionDropdowns(),
+      getPokeSpriteHTMLByDisplay: (disp) => getPokeSpriteHTMLByDisplay(disp),
+      findPokemon: (q) => findPokemon(q)
+    };
+    window.parties = parties;
+    window.selectPartyForRecord = selectPartyForRecord;
+    window.onPartyDropdownChange = onPartyDropdownChange;
+    window.showRecordForm = showRecordForm;
+    window.setSelectionFromNames = setSelectionFromNames;
+    window.setResult = setResult;
+    window.saveRecord = saveRecord;
+    window.showPage = showPage;
+    window.updateSlotIcon = updateSlotIcon;
+    window.rebuildOppSelectionDropdowns = rebuildOppSelectionDropdowns;
+    window.getPokeSpriteHTMLByDisplay = getPokeSpriteHTMLByDisplay;
+    window.findPokemon = findPokemon;
   </script>
 
   <!-- アップロード進捗ピル（ドラッグ移動可能・✕ボタン付き） -->
