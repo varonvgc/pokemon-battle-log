@@ -321,6 +321,51 @@
       return cropCanvas.toDataURL('image/png');
     }
 
+    // pamo3 完全準拠: 出撃ネームプレート用前処理 (19.3度回転補正 + 2x拡大 + 閾値180二値化)
+    cropForDispatchOcr(ctx, rect) {
+      const { x, y, w, h } = rect;
+      const angleRad = 19.3 * Math.PI / 180;
+
+      // 1. 原寸切り出し
+      const srcCanvas = document.createElement('canvas');
+      srcCanvas.width = Math.round(w);
+      srcCanvas.height = Math.round(h);
+      const srcCtx = srcCanvas.getContext('2d', { willReadFrequently: true });
+      srcCtx.drawImage(ctx.canvas, x, y, w, h, 0, 0, w, h);
+
+      // 2. 19.3度回転 (Deskew) + 2x拡大で水平な大文字に補正
+      const ocrCanvas = document.createElement('canvas');
+      ocrCanvas.width = Math.round(w * 2);
+      ocrCanvas.height = Math.round(h * 2);
+      const ocrCtx = ocrCanvas.getContext('2d', { willReadFrequently: true });
+
+      ocrCtx.fillStyle = '#FFFFFF';
+      ocrCtx.fillRect(0, 0, ocrCanvas.width, ocrCanvas.height);
+
+      ocrCtx.save();
+      ocrCtx.translate(ocrCanvas.width / 2, ocrCanvas.height / 2);
+      ocrCtx.rotate(angleRad);
+      ocrCtx.drawImage(srcCanvas, -srcCanvas.width, -srcCanvas.height, srcCanvas.width * 2, srcCanvas.height * 2);
+      ocrCtx.restore();
+
+      // 3. 閾値 175〜180 による白文字二値化 (文字=黒 0, 背景=白 255)
+      const imgData = ocrCtx.getImageData(0, 0, ocrCanvas.width, ocrCanvas.height);
+      const d = imgData.data;
+      for (let i = 0; i < d.length; i += 4) {
+        const r = d[i], g = d[i + 1], b = d[i + 2];
+        const bright = 0.299 * r + 0.587 * g + 0.114 * b;
+        const isText = (bright >= 175) || (r > 165 && g > 165 && b > 165);
+        const val = isText ? 0 : 255;
+        d[i] = val;
+        d[i + 1] = val;
+        d[i + 2] = val;
+        d[i + 3] = 255;
+      }
+      ocrCtx.putImageData(imgData, 0, 0);
+
+      return ocrCanvas.toDataURL('image/png');
+    }
+
     // --- オートモードの開始・停止 ---
     async startAutoMode() {
       this.isAutoRunning = true;
@@ -605,12 +650,15 @@
         return;
       }
 
-      // 2. OCRの実行間隔を最短1000ms（1秒）に制限してCPU負荷を激減
+      // 2. OCRの実行間隔を最短400msに調整して先発出撃演出の数秒間に確実に全匹拾い切る！
       const now = Date.now();
-      if (this.lastOcrTimestamp && (now - this.lastOcrTimestamp < 1000)) {
+      if (this.lastOcrTimestamp && (now - this.lastOcrTimestamp < 400)) {
         return;
       }
       this.lastOcrTimestamp = now;
+
+      if (!this.dispatchedSlotsMe) this.dispatchedSlotsMe = {};
+      if (!this.dispatchedSlotsRival) this.dispatchedSlotsRival = {};
 
       // 3. ユーザーが選出画面等で手動修正した相手パーティ入力を常時同期！
       const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
@@ -627,12 +675,17 @@
       const targets = this.battleMode === 'single' ? COORDS.DISPATCH_SINGLE : COORDS.DISPATCH_DOUBLE;
 
       for (const target of targets) {
-        // すでに該当陣営が上限に達していれば無駄なOCRはスキップ
+        // すでに該当陣営が上限に達していればスキップ
         const currentList = target.role === 'rival' ? this.detectedDispatchedRival : this.detectedDispatchedMe;
         if (currentList.length >= maxSlots) continue;
 
+        // すでに先発スロットで検知済みの座標は再OCRをスキップして高速化！
+        const slotTracker = target.role === 'rival' ? this.dispatchedSlotsRival : this.dispatchedSlotsMe;
+        if (slotTracker[target.index]) continue;
+
         try {
-          const cropBase64 = this.cropToBase64(ctx, target);
+          // ★ pamo3 完全準拠: 19.3度回転Deskew + 白文字2倍二値化
+          const cropBase64 = this.cropForDispatchOcr(ctx, target);
           const ocrRes = await this.katakanaWorker.recognize(cropBase64);
           const rawText = (ocrRes.data.text || '').replace(/[\s\r\n]/g, '');
           if (!rawText || rawText.length < 2) continue;
@@ -680,6 +733,7 @@
 
           // 2文字以内の差なら一致と判定 (pamo3準拠)
           if (bestMatch && minDistance <= 2) {
+            slotTracker[target.index] = bestMatch;
             this._handleDispatchedPokemonFound(target.role, bestMatch);
           }
         } catch (e) {
@@ -799,6 +853,8 @@
     resetVsBar() {
       this.detectedDispatchedMe = [];
       this.detectedDispatchedRival = [];
+      this.dispatchedSlotsMe = {};
+      this.dispatchedSlotsRival = {};
       for (let i = 0; i < 4; i++) {
         this.updateVsBarSlot('me', i, null);
         this.updateVsBarSlot('rival', i, null);
