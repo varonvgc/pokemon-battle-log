@@ -20,15 +20,23 @@ class PokemonRecognitionEngine {
     this.typeTemplCanvas = null;
   }
 
+  _getBasePath() {
+    if (typeof window !== 'undefined' && window.location.pathname.includes('/test/')) {
+      return '../';
+    }
+    return '';
+  }
+
   async loadDictionaries() {
     if (this.isLoaded) return true;
+    const base = this._getBasePath();
     try {
       const [rosterRes, geoRes, typeAfterRes, typeBeforeRes, badgeRes] = await Promise.all([
-        fetch('assets/clean_roster.json'),
-        fetch('assets/pokemon_geo_phog_features.json'),
-        fetch('assets/type_features.json'),
-        fetch('assets/type_features_before.json'),
-        fetch('assets/badge_features.json')
+        fetch(`${base}assets/clean_roster.json`),
+        fetch(`${base}assets/pokemon_geo_phog_features.json`),
+        fetch(`${base}assets/type_features.json`),
+        fetch(`${base}assets/type_features_before.json`),
+        fetch(`${base}assets/badge_features.json`)
       ]);
 
       this.roster = await rosterRes.json();
@@ -403,7 +411,7 @@ class PokemonRecognitionEngine {
         this.typeIconCache.set(typeName, null);
         resolve(null);
       };
-      img.src = `assets/type_icons/template_${typeName}.png`;
+      img.src = `${this._getBasePath()}assets/type_icons/template_${typeName}.png`;
     });
   }
 
@@ -430,13 +438,21 @@ class PokemonRecognitionEngine {
     cCtx.drawImage(ctx.canvas, x, y, w, h, 0, 0, 40, 40);
     const cropData = cCtx.getImageData(0, 0, 40, 40).data;
 
-    // 画面切り出し領域の平均輝度をチェック（暗い無アイコン背景なら即 none）
+    // 画面切り出し領域の平均輝度および彩度をチェック（暗い背景や無彩色のグレー背景なら即 none）
     let totalBright = 0;
+    let totalColorDiff = 0;
     for (let i = 0; i < cropData.length; i += 4) {
-      totalBright += (cropData[i] + cropData[i + 1] + cropData[i + 2]) / 3;
+      const r = cropData[i];
+      const g = cropData[i + 1];
+      const b = cropData[i + 2];
+      totalBright += (r + g + b) / 3;
+      totalColorDiff += Math.abs(r - g) + Math.abs(g - b) + Math.abs(b - r);
     }
     const avgBright = totalBright / (40 * 40);
-    if (avgBright < 45) {
+    const avgColorDiff = totalColorDiff / (40 * 40);
+
+    // 暗い画面 (avgBright < 50) または 無彩色のグレー/黒背景 (avgColorDiff < 15) は属性アイコンではないため即 none
+    if (avgBright < 50 || avgColorDiff < 15) {
       return { type: 'none', score: 999999 };
     }
 
@@ -478,8 +494,8 @@ class PokemonRecognitionEngine {
       }
     }
 
-    // 属性アイコンと似ていない場合（単タイプ時の空スロットなど）は none
-    if (minDiff > 5500) {
+    // 属性アイコンと似ていない場合（単タイプ時の空スロットなど）は none (閾値を4500に厳格化してグレー誤認を防止)
+    if (minDiff > 4500) {
       return { type: 'none', score: minDiff };
     }
 
@@ -502,15 +518,93 @@ class PokemonRecognitionEngine {
         this.iconCache.set(fileName, null);
         resolve(null);
       };
-      img.src = 'assets/pokemon_icons/' + fileName;
+      img.src = `${this._getBasePath()}assets/pokemon_icons/` + fileName;
     });
+  }
+
+  async _loadPokemonIconBase64(fileName, targetW = 96, targetH = 96) {
+    if (!fileName) return null;
+    const cacheKey = `${fileName}_${targetW}x${targetH}`;
+    if (!this.iconBase64Cache) this.iconBase64Cache = new Map();
+    if (this.iconBase64Cache.has(cacheKey)) {
+      return this.iconBase64Cache.get(cacheKey);
+    }
+    const img = await this._loadPokemonIcon(fileName);
+    if (!img) return null;
+    const c = document.createElement('canvas');
+    c.width = targetW;
+    c.height = targetH;
+    const cCtx = c.getContext('2d');
+    cCtx.drawImage(img, 0, 0, targetW, targetH);
+    const b64 = c.toDataURL('image/png');
+    this.iconBase64Cache.set(cacheKey, b64);
+    return b64;
   }
 
   async _matchPokemonTemplate(ctx, x, y, w, h, candidateEntries) {
     if (!candidateEntries || candidateEntries.length === 0) return '???';
     if (candidateEntries.length === 1) return candidateEntries[0].display;
 
-    // キャンバス初期化（64x64 に正規化して高速・安定照合）
+    // ★ pamo3 完全再現: OpenCV matchTemplate (TM_CCOEFF_NORMED with alpha mask)
+    // pamo3原典: cDx (Line 279603)
+    const controller = (typeof window !== 'undefined') ? window.autoModeController : null;
+    if (controller && typeof controller.matchTemplate === 'function' && controller.pawmiWorker) {
+      const cropW = Math.max(105, Math.round(w));
+      const cropH = Math.max(105, Math.round(h));
+      const cropC = document.createElement('canvas');
+      cropC.width = cropW;
+      cropC.height = cropH;
+      const cropCtx = cropC.getContext('2d');
+      cropCtx.drawImage(ctx.canvas, x, y, w, h, 0, 0, cropW, cropH);
+      const cropB64 = cropC.toDataURL('image/png');
+
+      let bestScore = -Infinity;
+      let bestDisplay = candidateEntries[0].display;
+      const scoredCandidates = [];
+
+      // 候補が絞り込まれている（10体以下）場合のみ 0.65 早期確定を許可
+      const allowEarlyBreak = candidateEntries.length <= 10;
+
+      for (const entry of candidateEntries) {
+        if (!entry.file) continue;
+        // pamo3 原典 Line 279624 準拠: テンプレートを切り出しサイズにリサイズしてマッチング
+        const templB64 = await this._loadPokemonIconBase64(entry.file, 96, 96);
+        if (!templB64) continue;
+
+        // pamo3 原典完全準拠パラメータ: useAlphaMask: true, alphaThreshold: 8
+        const score = await controller.matchTemplate(cropB64, templB64, {
+          useAlphaMask: true,
+          alphaThreshold: 8
+        });
+
+        scoredCandidates.push({ display: entry.display, score });
+        if (score > bestScore) {
+          bestScore = score;
+          bestDisplay = entry.display;
+        }
+
+        // pamo3 原典早期確定ロジック (Line 279631: if (d >= 0.65) break;)
+        if (allowEarlyBreak && score >= 0.65) {
+          break;
+        }
+      }
+
+      if (scoredCandidates.length > 1) {
+        scoredCandidates.sort((a, b) => b.score - a.score);
+        const topStr = scoredCandidates.slice(0, 3).map(c => `${c.display}(${c.score.toFixed(3)})`).join(', ');
+        console.log(`[RecognitionEngine:pamo3-OpenCV] 候補相関スコア上位: ${topStr} ➔ 特定: ${bestDisplay}`);
+      }
+
+      // 暗い画面や非見せ合い画面で誤マッチした場合のガード (スコアが極端に低ければ ??? を返す)
+      if (bestScore < 0.40 && candidateEntries.length > 5) {
+        console.warn(`[RecognitionEngine] 相関スコアが低すぎるため未確定と判定 (bestScore=${bestScore.toFixed(3)} < 0.40)`);
+        return '???';
+      }
+
+      return bestDisplay;
+    }
+
+    // --- フォールバック: OpenCV Worker が非利用の場合 (MSE) ---
     const matchSize = 64;
     if (!this.cropCanvas) {
       this.cropCanvas = document.createElement('canvas');
@@ -532,6 +626,7 @@ class PokemonRecognitionEngine {
 
     let bestDisplay = candidateEntries[0].display;
     let minDiff = Infinity;
+    const scoredCandidates = [];
 
     for (const entry of candidateEntries) {
       if (!entry.file) continue;
@@ -563,11 +658,18 @@ class PokemonRecognitionEngine {
 
       if (pixelWeight > 0) {
         const avgDiff = sumDiff / pixelWeight;
+        scoredCandidates.push({ display: entry.display, score: avgDiff });
         if (avgDiff < minDiff) {
           minDiff = avgDiff;
           bestDisplay = entry.display;
         }
       }
+    }
+
+    if (scoredCandidates.length > 1) {
+      scoredCandidates.sort((a, b) => a.score - b.score);
+      const topStr = scoredCandidates.slice(0, 3).map(c => `${c.display}(${Math.round(c.score)})`).join(', ');
+      console.log(`[RecognitionEngine:IconScore] 候補スコア上位: ${topStr}`);
     }
 
     // 全画像のロードに失敗した場合は幾何特徴量 (GeoPHOG) にフォールバック
@@ -978,6 +1080,12 @@ class PokemonRecognitionEngine {
           const candidates = this._getCandidates(t1, t2);
           const pName = await this._matchPokemonTemplate(sCtx, iconX, iconY, iconW, iconH, candidates);
           opponent.push(pName);
+
+          const slotLog = `スロット${i + 1}: t1=${t1}(差${Math.round(res1.score)}), t2=${t2}(差${Math.round(res2.score)}) ➔ 候補${candidates.length}体 ➔ 特定: ${pName}`;
+          console.log('[RecognitionEngine]', slotLog);
+          if (typeof window.logEngineStep === 'function') {
+            window.logEngineStep(i, t1, t2, pName, slotLog);
+          }
         }
       } else {
         // iPhoneスクショ互換座標 (2532x1170)

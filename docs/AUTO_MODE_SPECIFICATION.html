@@ -596,13 +596,13 @@
           <pre class="mermaid">
 stateDiagram-v2
     [*] --> WAITING_MATCHING: オートモードON
-    WAITING_MATCHING --> MATCHING: 見せ合いボールマーク検知 (score > 0.42 / 選出ボタン有)
+    WAITING_MATCHING --> MATCHING: 見せ合いボールマーク検知 (score >= 0.60 / 試合後8秒クールダウン)
     MATCHING --> MATCHING: 見せ合い画面継続中 (ボールマーク存在 / 相手6体&名前取得)
-    MATCHING --> WAITING_GAME_START: ボールマーク&選出ボタン消滅 (画面暗転 / 連続3フレーム判定)
-    WAITING_GAME_START --> IN_GAME: VS画面検知 (score > 0.38) または 7秒経過
+    MATCHING --> WAITING_GAME_START: ボールマーク消滅 (画面暗転 / 連続3フレーム判定)
+    WAITING_GAME_START --> IN_GAME: VS画面検知 (score > 0.40) または 8秒経過
     IN_GAME --> IN_GAME: 出撃&HPバー検知 (先発2体 + 交代2体 = 最大4体)
     IN_GAME --> FINISHED: 勝敗ボール検知 (Win/Lose確定)
-    FINISHED --> WAITING_MATCHING: ログ自動保存完了 / 次の対戦待ち
+    FINISHED --> WAITING_MATCHING: ログ自動保存完了 / 次の対戦待ち (8秒待機ガード)
           </pre>
         </div>
 
@@ -672,15 +672,15 @@ stateDiagram-v2
               <tr>
                 <td><strong><code>WAITING_MATCHING</code></strong><br><span style="font-size:0.78rem;color:var(--text-muted)">マッチング待機中</span></td>
                 <td>対戦相手の検索中 / ロビー画面</td>
-                <td>画面左下の選出完了ボタンボールマーク<br><code>COORDS.MATCHING_BALL</code><br>および選出完了ボタンの黄緑色</td>
-                <td><code>matching_phase_ball.png</code> との一致度<br><strong style="color:#38bdf8">score &gt; 0.42</strong> または 選出完了ボタン検出</td>
+                <td>画面左下の選出完了ボタンボールマーク<br><code>COORDS.MATCHING_BALL</code><br><span style="color:#f59e0b;font-size:0.8rem">※試合終了後8秒間はクールダウン待機</span></td>
+                <td><code>matching_phase_ball.png</code> との一致度<br><strong style="color:#10b981">score &ge; 0.60</strong><br><span style="font-size:0.78rem;color:var(--text-dim)">(pamo3原典 gbhe() 完全準拠。誤検知原因の緑ボタン判定は完全撤廃)</span></td>
                 <td>
                   <ol style="padding-left:1.1rem;margin:0;font-size:0.83rem;line-height:1.6">
-                    <li>バッジを「見せ合い画面検知: 相手情報取得中...」に更新。</li>
+                    <li>バッジを「見せ合い画面検知: 画面安定待ち (3秒ウェイト)...」に更新。</li>
                     <li>前回の選出リストとVSバーを初期化 (<code>resetVsBar</code>)。</li>
                     <li>画面を「記録する」タブへ切替 (<code>showPage('record')</code>)。</li>
                     <li>ルールをダブルバトルに固定し、手持ちパーティを選択・展開。</li>
-                    <li>画面全体キャプチャを認識エンジンへ渡し、相手6体とトレーナー名を自動取得してフォームへ入力。</li>
+                    <li><strong>【pamo3原典①③準拠】</strong> 3秒待機後に相手トレーナー名OCR、さらに1秒待機後に最新フレームで相手6体（OpenCV TM_CCOEFF_NORMED）を高精度特定してフォーム入力。</li>
                   </ol>
                 </td>
                 <td><span class="badge badge-primary">MATCHING</span></td>
@@ -689,8 +689,8 @@ stateDiagram-v2
               <tr>
                 <td rowspan="3"><strong><code>MATCHING</code></strong><br><span style="font-size:0.78rem;color:var(--text-muted)">見せ合い画面中</span></td>
                 <td rowspan="3">手持ち6体と選出選択画面<br>(カウントダウン中)</td>
-                <td><strong>[A]</strong> 画面左下の選出完了ボタンボールマークまたは選出完了ボタン</td>
-                <td>一致度 <strong style="color:#10b981">score &ge; 0.32</strong> または 選出ボタン検出中<br>(マークが継続表示中)</td>
+                <td><strong>[A]</strong> 画面左下の選出完了ボタンボールマーク</td>
+                <td>一致度 <strong style="color:#10b981">score &ge; 0.40</strong><br>(マークが継続表示中)</td>
                 <td>
                   本フェーズ（<code>MATCHING</code>）を維持。<br>
                   <span style="font-size:0.8rem;color:var(--text-dim)">※相手認識は突入時の初回1回のみ実行し、ループ再実行による手入力上書きは行わない。</span>
@@ -699,8 +699,8 @@ stateDiagram-v2
                 <td rowspan="3"><code>matching</code><br>(<code>B.ms</code>)</td>
               </tr>
               <tr>
-                <td><strong>[B]</strong> 画面左下の選出完了ボタンボールマークおよび選出完了ボタン</td>
-                <td>一致度 <strong style="color:#f43f5e">score &lt; 0.32</strong> かつ 選出ボタン消失が<strong style="color:#f59e0b">連続3フレーム (約1秒) 継続</strong><br>(ノイズや一時的な明度変化によるフライング遷移を完全防止)</td>
+                <td><strong>[B]</strong> 画面左下の選出完了ボタンボールマーク</td>
+                <td>一致度 <strong style="color:#f43f5e">score &lt; 0.40</strong> が<strong style="color:#f59e0b">連続3フレーム (約1秒) 継続</strong><br>(ノイズや一時的な明度変化によるフライング遷移を完全防止)</td>
                 <td>
                   <ol style="padding-left:1.1rem;margin:0;font-size:0.83rem;line-height:1.6">
                     <li>見せ合い終了タイムスタンプを記録 (<code>waitingStartTimestamp = Date.now()</code>)。</li>
@@ -725,7 +725,7 @@ stateDiagram-v2
                 <td rowspan="2"><strong><code>WAITING_GAME_START</code></strong><br><span style="font-size:0.78rem;color:var(--text-muted)">対戦開始待機中</span></td>
                 <td rowspan="2">見せ合い終了後の画面暗転〜VS画面演出中</td>
                 <td><strong>[A]</strong> 画面中央VSロゴ領域<br><code>COORDS.VS_SCREEN</code></td>
-                <td><code>vs_v.png</code> との一致度<br><strong style="color:#38bdf8">vsScore &gt; 0.38</strong></td>
+                <td><code>vs_v.png</code> との一致度<br><strong style="color:#38bdf8">vsScore &gt; 0.40</strong></td>
                 <td>
                   <ol style="padding-left:1.1rem;margin:0;font-size:0.83rem;line-height:1.6">
                     <li>バッジを「試合中: 出撃ポケモン検知中...」に更新。</li>
@@ -738,7 +738,7 @@ stateDiagram-v2
               </tr>
               <tr>
                 <td><strong>[B]</strong> 暗転からの経過時間タイマー<br><code>Date.now() - waitingStartTimestamp</code></td>
-                <td>暗転後 <strong style="color:#f59e0b">elapsed &gt; 7000ms</strong><br>(VS演出アニメ等の認識漏れフォールバック)</td>
+                <td>暗転後 <strong style="color:#f59e0b">elapsed &gt; 8000ms</strong><br>(先発ポケモンの出撃演出見逃しを完全防止する高速フォールバック)</td>
                 <td>
                   <ol style="padding-left:1.1rem;margin:0;font-size:0.83rem;line-height:1.6">
                     <li>バッジを「試合中: 出撃ポケモン検知中...」に更新。</li>
@@ -842,7 +842,7 @@ stateDiagram-v2
                 <td class="coord-val">46.0</td>
                 <td class="coord-val">46.0</td>
                 <td><code>assets/.../matching_phase_ball.png</code></td>
-                <td><code>&gt; 0.42</code> または選出ボタン有 開始<br><code>&lt; 0.32</code> かつ選出ボタン無（3連続）終了</td>
+                <td><code>&ge; 0.60</code> 開始 (pamo3準拠 / 試合後8秒待機ガード)<br><code>&lt; 0.40</code> (3連続) 終了</td>
               </tr>
               <tr>
                 <td><code>VS_SCREEN</code> (VS画面中央ロゴ)</td>
@@ -851,7 +851,7 @@ stateDiagram-v2
                 <td class="coord-val">200.0</td>
                 <td class="coord-val">80.0</td>
                 <td><code>assets/.../vs_v.png</code></td>
-                <td><code>&gt; 0.38</code> で対戦開始</td>
+                <td><code>&gt; 0.40</code> または 暗転後8秒経過 で対戦開始</td>
               </tr>
               <tr>
                 <td><code>WIN_BALL_ME</code> (自分側勝利ボール)</td>
@@ -906,7 +906,7 @@ stateDiagram-v2
                 <td class="coord-val">40.0</td>
                 <td class="coord-val">40.0</td>
                 <td>実画像MSE照合 (<code>template_*.png</code>)</td>
-                <td>pamo3 <code>byN.aoK</code> 完全準拠 (間隔126.0)</td>
+                <td>彩度チェック（無彩色/低彩度ならnone）、MSE &gt; 4500ならnone</td>
               </tr>
               <tr>
                 <td><strong>属性アイコン2 (タイプ2)</strong></td>
@@ -915,7 +915,7 @@ stateDiagram-v2
                 <td class="coord-val">40.0</td>
                 <td class="coord-val">40.0</td>
                 <td>実画像MSE照合 (<code>template_*.png</code>)</td>
-                <td>MSE &gt; 5500 または暗背景なら none</td>
+                <td>彩度チェック（無彩色/低彩度ならnone）、MSE &gt; 4500ならnone</td>
               </tr>
               <tr>
                 <td><strong>相手トレーナー名</strong></td>

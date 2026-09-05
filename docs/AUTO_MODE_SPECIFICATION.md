@@ -49,12 +49,12 @@ stateDiagram-v2
 
 | フェーズ名 (`this.phase`) | 画面の状態 | ① 監視対象 (What) | ② トリガー条件 (Condition) | ③ 発火時に起こる動作 (Action & Behavior) | 遷移先 | pamo3 内部対応 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **`WAITING_MATCHING`**<br>(マッチング待機中) | 対戦相手の検索中 / ロビー画面 | 画面左下の選出完了ボタンボールマーク (`COORDS.MATCHING_BALL`) および選出完了ボタンの黄緑色 (`isSelectionButtonPresent`) | `matching_phase_ball.png` との一致度 `score > 0.42` または 選出完了ボタン検出 | ① バッジを「見せ合い画面検知: 相手情報取得中...」に更新。<br>② 前回の選出リストとVSバーを初期化 (`resetVsBar`)。<br>③ 画面を「記録する」タブへ切替 (`showPage('record')`)。<br>④ ルールをダブルバトルに固定し、手持ちパーティを選択・展開。<br>⑤ 画面全体キャプチャを認識エンジンへ渡し、相手6体とトレーナー名を自動取得してフォームへ入力。 | `MATCHING` | `waitingMatching`<br>(`B.xO`) |
-| **`MATCHING`**<br>(見せ合い画面中) | 手持ち6体と選出選択画面 (カウントダウン中) | **[A]** 画面左下の選出完了ボタンボールマーク (`COORDS.MATCHING_BALL`) または選出完了ボタン | 一致度 `score >= 0.32` または 選出完了ボタン検出中 | 本フェーズ（`MATCHING`）を維持。<br>※相手認識は突入時の初回1回のみ実行し、ループ再実行による手入力上書きは行わない。 | (維持) | `matching`<br>(`B.ms`) |
-| ^ | ^ | **[B]** 画面左下の選出完了ボタンボールマーク (`COORDS.MATCHING_BALL`) および選出完了ボタン | 一致度 `score < 0.32` かつ 選出完了ボタン消失が**連続3フレーム (約1秒) 継続**<br>(ノイズや一時的な明度変化によるフライング遷移を完全防止) | ① 見せ合い終了タイムスタンプを記録 (`waitingStartTimestamp = Date.now()`)。<br>② バッジを「対戦開始待ち (VS画面待機中...)」に更新。<br>③ 次の対戦開始待ちへフェーズを切り替える。 | `WAITING_GAME_START` | ^ |
+| **`WAITING_MATCHING`**<br>(マッチング待機中) | 対戦相手の検索中 / ロビー画面 | 画面左下の選出完了ボタンボールマーク (`COORDS.MATCHING_BALL`)<br>※試合終了後8秒間はクールダウン待機 | `matching_phase_ball.png` との一致度 **`score >= 0.60`** (pamo3 原典 `gbhe()` 完全準拠)<br>※誤検知原因の緑ボタン判定は完全撤廃 | ① バッジを「見せ合い画面検知: 画面安定待ち (3秒ウェイト)...」に更新。<br>② 前回の選出リストとVSバーを初期化 (`resetVsBar`)。<br>③ 画面を「記録する」タブへ切替 (`showPage('record')`)。<br>④ ルールをダブルバトルに固定し、手持ちパーティを選択・展開。<br>⑤ **【pamo3原典①③完全準拠】** 3秒待機後に二値化閾値150で相手トレーナー名OCR、さらに1秒待機後に最新フレームで相手6体（OpenCV TM_CCOEFF_NORMED）を高精度特定してフォーム入力。 | `MATCHING` | `waitingMatching`<br>(`B.xO`) |
+| **`MATCHING`**<br>(見せ合い画面中) | 手持ち6体と選出選択画面 (カウントダウン中) | **[A]** 画面左下の選出完了ボタンボールマーク (`COORDS.MATCHING_BALL`) | 一致度 `score >= 0.40`<br>(マークが継続表示中) | 本フェーズ（`MATCHING`）を維持。<br>※相手認識は突入時の初回1回のみ実行し、ループ再実行による手入力上書きは行わない。 | (維持) | `matching`<br>(`B.ms`) |
+| ^ | ^ | **[B]** 画面左下の選出完了ボタンボールマーク (`COORDS.MATCHING_BALL`) | 一致度 `score < 0.40` が**連続3フレーム (約1秒) 継続**<br>(ノイズや一時的な明度変化によるフライング遷移を完全防止) | ① 見せ合い終了タイムスタンプを記録 (`waitingStartTimestamp = Date.now()`)。<br>② バッジを「対戦開始待ち (VS画面待機中...)」に更新。<br>③ 次の対戦開始待ちへフェーズを切り替える。 | `WAITING_GAME_START` | ^ |
 | ^ | ^ | **[C]** ユーザーによる相手パーティ修正 / 手動選出タップ | フォームへの `input`/`change` イベント、または選出カードのクリック | ① 相手パーティ入力時: 照合候補リスト（`rivalPartyNames`）を即時更新し、相手選出グリッドを再描画。<br>② 手動選出時: `mySelectionOrder` からポケモン名を取り込み、右下VSバーのモンスターボールを該当ポケモンアイコンに変身させる。 | (維持) | - |
-| **`WAITING_GAME_START`**<br>(対戦開始待機中) | 見せ合い終了後の画面暗転〜VS画面演出中 | **[A]** 画面中央VSロゴ領域 (`COORDS.VS_SCREEN`) | `vs_v.png` との一致度 `vsScore > 0.38` | ① バッジを「試合中: 出撃ポケモン検知中...」に更新。<br>② 見せ合い中に入力された手動選出を保持したまま内部リスト・VSバーを同期。<br>③ 出撃ネームプレート検知を開始。 | `IN_GAME` | `waitingGameStart`<br>(`B.i3`) |
-| ^ | ^ | **[B]** 暗転からの経過時間タイマー (`Date.now() - waitingStartTimestamp`) | 暗転後 `elapsed > 7000ms`<br>(VSアニメーション演出等の認識漏れフォールバック) | ① バッジを「試合中: 出撃ポケモン検知中...」に更新。<br>② 手動選出を保持したまま内部リスト・VSバーを同期。<br>③ 先発ポケモンの出撃演出を見逃さないよう直ちに出撃検知を開始。 | `IN_GAME` | ^ |
+| **`WAITING_GAME_START`**<br>(対戦開始待機中) | 見せ合い終了後の画面暗転〜VS画面演出中 | **[A]** 画面中央VSロゴ領域 (`COORDS.VS_SCREEN`) | `vs_v.png` との一致度 `vsScore > 0.40` | ① バッジを「試合中: 出撃ポケモン検知中...」に更新。<br>② 見せ合い中に入力された手動選出を保持したまま内部リスト・VSバーを同期。<br>③ 出撃ネームプレート検知を開始。 | `IN_GAME` | `waitingGameStart`<br>(`B.i3`) |
+| ^ | ^ | **[B]** 暗転からの経過時間タイマー (`Date.now() - waitingStartTimestamp`) | 暗転後 **`elapsed > 8000ms`**<br>(出撃演出の見逃しを完全に防ぐ高速フォールバック) | ① バッジを「試合中: 出撃ポケモン検知中...」に更新。<br>② 手動選出を保持したまま内部リスト・VSバーを同期。<br>③ 先発ポケモンの出撃演出を見逃さないよう直ちに出撃検知を開始。 | `IN_GAME` | ^ |
 | **`IN_GAME`**<br>(試合中) | 出撃演出、コマンド画面、技アニメーション、交代 | **[A]** 出撃ネームプレート、対戦中HPバー、様子を見るパネル (`COORDS.DISPATCH_DOUBLE` 等) | 白文字OCR結果とパーティ候補（`rivalPartyNames` / `myPartyNames`）との編集距離 `dist <= 2` | ① まだ選出リストに含まれていない場合、空き枠（最大4枠）にそのポケモン名を追加（手動確定枠は保護）。<br>② 右下VSバーのモンスターボールを検知されたポケモンアイコン・名前に変身させる（初回出撃時のみ1回 `popIn` アニメーション再生）。<br>③ フォームの選出スロット（`setSelectionFromNames`）に自動反映。<br>④ 4枠確定した陣営はOCRを自動停止。 | (維持) | `inGame`<br>(`B.i2`) |
 | ^ | ^ | **[B]** 画面右上の勝利ボール領域 (`COORDS.WIN_BALL_ME`, `WIN_BALL_RIVAL`) | `win_ball.png` との一致度 `myScore > 0.45` または `rivalScore > 0.45` | ① 勝者を判定 (`isWin = myScore > rivalScore`)。<br>② バッジを「試合終了: 🎉 勝利」または「試合終了: 破れたり...」に更新。<br>③ `_handleGameFinished(isWin)` を呼び出して終了処理を開始。 | `FINISHED` | ^ |
 | ^ | ^ | **[C]** 通信エラー（回線切断）・スタック時の手動強制リセット | ユーザーによる「待機へリセット」ボタン押下 (`forceResetAutoModePhase()`) | ① 入力フォーム側の相手パーティ・選出・メモなどの入力内容は**一切消去せず保持**。<br>② ステートマシンを強制的に `WAITING_MATCHING`（対戦待ち）へ復帰。<br>③ 右下VSバーを初期化。<br>④ トースト通知を表示。ユーザーはその試合の勝敗を手動選択して通常通り保存可能。 | `WAITING_MATCHING` | - |
@@ -68,8 +68,8 @@ stateDiagram-v2
 
 | 項目名 | X | Y | Width | Height | 使用テンプレート画像 | 判定しきい値 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `MATCHING_BALL` (見せ合いボールマーク) | 139.0 | 923.0 | 46.0 | 46.0 | `assets/images/opencv/champions/template_ui/matching_phase_ball.png` | `> 0.42` または選出ボタン有で見せ合い開始<br>`< 0.32` かつ選出ボタン無（3連続）で見せ合い終了 |
-| `VS_SCREEN` (VS画面中央ロゴ) | 860.0 | 565.0 | 200.0 | 80.0 | `assets/images/opencv/champions/template_ui/vs_v.png` | `> 0.38` で対戦開始 |
+| `MATCHING_BALL` (見せ合いボールマーク) | 139.0 | 923.0 | 46.0 | 46.0 | `assets/images/opencv/champions/template_ui/matching_phase_ball.png` | **`>= 0.60`** で見せ合い開始 (pamo3 `gbhe()` 原典完全再現)<br>`< 0.40`（3連続）で見せ合い終了 |
+| `VS_SCREEN` (VS画面中央ロゴ) | 860.0 | 565.0 | 200.0 | 80.0 | `assets/images/opencv/champions/template_ui/vs_v.png` | `> 0.40` または 8秒経過で対戦開始 |
 | `WIN_BALL_ME` (自分側勝利ボール) | 445.3 | 771.0 | 72.0 | 72.0 | `assets/images/opencv/champions/template_ui/win_ball.png` | `> 0.50` で勝ち判定 |
 | `WIN_BALL_RIVAL` (相手側勝利ボール) | 1405.0 | 771.0 | 72.0 | 72.0 | `assets/images/opencv/champions/template_ui/win_ball.png` | `> 0.50` で負け判定 |
 
@@ -77,10 +77,10 @@ stateDiagram-v2
 
 | 項目名 | X | Y | Width | Height | 照合アルゴリズム | 備考 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **相手アイコン (スロット $i=0..5$)** | 1620.8 | $159.5 + 125.9 \times i$ | 104.6 | 104.6 | `assets/pokemon_icons/*.png` の実画像透過マスクMSE照合 | pamo3 `aBO.cKJ` 完全準拠 (間隔125.9) |
-| **属性アイコン1 (タイプ1)** | 1750.2 | $172.0 + 126.0 \times i$ | 40.0 | 40.0 | `assets/type_icons/template_*.png` (40×40) 実画像MSE照合 | pamo3 `byN.aoK` 完全準拠 (間隔126.0) |
-| **属性アイコン2 (タイプ2)** | 1801.0 | $172.0 + 126.0 \times i$ | 40.0 | 40.0 | `assets/type_icons/template_*.png` (40×40) 実画像MSE照合 | MSE > 5500 または暗背景なら `none` |
-| **相手トレーナー名** | 1562.0 | 95.4 | 280.0 | 47.6 | Tesseract OCR (白文字二値化 + 2x拡大) | 多言語対応 (`jpn+eng+...`) |
+| **相手アイコン (スロット $i=0..5$)** | 1620.8 | $159.5 + 125.9 \times i$ | 104.6 | 104.6 | **OpenCV `TM_CCOEFF_NORMED`** (透過マスク付きテンプレートマッチング)<br>スコア `0.65` 以上で早期確定 (pamo3 `cDx` 原典完全再現) | pamo3 `aBO.cKJ` 完全準拠 (間隔125.9) |
+| **属性アイコン1 (タイプ1)** | 1750.2 | $172.0 + 126.0 \times i$ | 40.0 | 40.0 | `assets/type_icons/template_*.png` (40×40) 実画像MSE照合 (彩度チェック付) | pamo3 `byN.aoK` 完全準拠 (間隔126.0) |
+| **属性アイコン2 (タイプ2)** | 1801.0 | $172.0 + 126.0 \times i$ | 40.0 | 40.0 | `assets/type_icons/template_*.png` (40×40) 実画像MSE照合 (彩度チェック付) | MSE > 4500 または無彩色なら `none` |
+| **相手トレーナー名** | 1562.0 | 95.4 | 280.0 | 47.6 | **Tesseract OCR (二値化閾値150 + 2x拡大)** (pamo3 `d.yv(f, !0, 150)` 完全再現) | 多言語対応 (`jpn+eng+...`) |
 
 > **Y座標間隔（125.9 vs 126.0）に関する補足 (pamo3 原典仕様)**:
 > 相手アイコンの間隔が `125.9` に対し属性アイコンが `126.0` となっているのは、**pamo3 の原典ソースコード（`aBO.cKJ` および `byN.aoK`）と全く同一の実装仕様**です。

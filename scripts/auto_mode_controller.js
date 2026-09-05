@@ -41,12 +41,12 @@
       { role: 'me',    index: 0, x: 960,  y: 532, w: 190, h: 50, isHorizontal: true }, // 自分1
       { role: 'me',    index: 1, x: 1330, y: 532, w: 190, h: 50, isHorizontal: true }  // 自分2
     ],
-    // 対戦中 (通常コマンド画面) のHPバー上のポケモン名領域 (常時表示領域)
+    // 対戦中 (通常コマンド画面) のHPバー上のポケモン名領域 (pamo3準拠ネイティブ座標)
     BATTLE_HP_DOUBLE: [
       { role: 'rival', index: 0, x: 1140, y: 35,  w: 240, h: 55, isHorizontal: true }, // 相手1 (上段左)
       { role: 'rival', index: 1, x: 1510, y: 35,  w: 240, h: 55, isHorizontal: true }, // 相手2 (上段右)
-      { role: 'me',    index: 0, x: 180,  y: 905, w: 240, h: 48, isHorizontal: true }, // 自分1 (下段左: リザードン等)
-      { role: 'me',    index: 1, x: 530,  y: 905, w: 240, h: 48, isHorizontal: true }  // 自分2 (下段右: オーロンゲ等)
+      { role: 'me',    index: 0, x: 154.9, y: 933, w: 220, h: 46, isHorizontal: true }, // 自分1 (pamo3準拠)
+      { role: 'me',    index: 1, x: 554.6, y: 933, w: 220, h: 46, isHorizontal: true }  // 自分2 (pamo3準拠)
     ],
     // 勝敗ボール (Win / Lose 判定)
     WIN_BALL_ME:    { x: 445.3, y: 771, w: 72, h: 72 },
@@ -132,10 +132,18 @@
       }
     }
 
+    _getBasePath() {
+      if (typeof window !== 'undefined' && window.location.pathname.includes('/test/')) {
+        return '../';
+      }
+      return '';
+    }
+
     async _initWorkers() {
+      const base = this._getBasePath();
       // 1. OpenCV テンプレートマッチングワーカー
       try {
-        this.pawmiWorker = new Worker('scripts/pawmi_worker.js');
+        this.pawmiWorker = new Worker(`${base}scripts/pawmi_worker.js`);
         this.pawmiWorker.onmessage = (e) => {
           const data = e.data || {};
           const cb = this.callbacks.get(data.id);
@@ -155,9 +163,9 @@
 
       // 2. テンプレート画像のロード (Base64 キャッシュ)
       const templatePaths = {
-        matchingBall: 'assets/templates/matching_phase_ball.png',
-        winBall:      'assets/templates/win_ball.png',
-        vsLogo:       'assets/templates/vs_v.png'
+        matchingBall: `${base}assets/templates/matching_phase_ball.png`,
+        winBall:      `${base}assets/templates/win_ball.png`,
+        vsLogo:       `${base}assets/templates/vs_v.png`
       };
 
       for (const [key, path] of Object.entries(templatePaths)) {
@@ -179,17 +187,18 @@
     }
 
     async _initTesseract() {
+      const base = this._getBasePath();
       if (typeof Tesseract === 'undefined') {
         const script = document.createElement('script');
-        script.src = 'scripts/tesseract/tesseract.min.js';
+        script.src = `${base}scripts/tesseract/tesseract.min.js`;
         document.head.appendChild(script);
         await new Promise(r => script.onload = r);
       }
       try {
         const TESSERACT_OPTS = {
-          workerPath: 'scripts/tesseract/worker.min.js',
-          corePath: 'scripts/tesseract/tesseract-core-simd-lstm.wasm.js',
-          langPath: 'scripts/tesseract/lang-data'
+          workerPath: `${base}scripts/tesseract/worker.min.js`,
+          corePath: `${base}scripts/tesseract/tesseract-core-simd-lstm.wasm.js`,
+          langPath: `${base}scripts/tesseract/lang-data`
         };
 
         // カタカナ特化ワーカー (出撃ポケモン名用)
@@ -335,6 +344,27 @@
       return cropCanvas.toDataURL('image/png');
     }
 
+    // ★ pamo3 原典完全準拠: 白黒二値化処理 (閾値150: d.yv(f, !0, 150))
+    cropBinarizedToBase64(ctx, rect, threshold = 150) {
+      const { x, y, w, h } = rect;
+      const cropCanvas = document.createElement('canvas');
+      cropCanvas.width = Math.round(w);
+      cropCanvas.height = Math.round(h);
+      const cropCtx = cropCanvas.getContext('2d', { willReadFrequently: true });
+      cropCtx.drawImage(ctx.canvas, x, y, w, h, 0, 0, cropCanvas.width, cropCanvas.height);
+      const imgData = cropCtx.getImageData(0, 0, cropCanvas.width, cropCanvas.height);
+      const data = imgData.data;
+      for (let i = 0; i < data.length; i += 4) {
+        const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+        const v = gray >= threshold ? 255 : 0;
+        data[i] = v;
+        data[i + 1] = v;
+        data[i + 2] = v;
+      }
+      cropCtx.putImageData(imgData, 0, 0);
+      return cropCanvas.toDataURL('image/png');
+    }
+
     // 選出画面（見せ合い）の「選出完了」ボタン（鮮やかな黄緑色）の存在判定
     isSelectionButtonPresent(ctx) {
       if (!ctx || !ctx.canvas) return false;
@@ -471,30 +501,37 @@
       switch (this.phase) {
         // 1. 見せ合い画面待ち
         case 'WAITING_MATCHING': {
+          // ★ pamo3 原典完全準拠: 試合終了後のクールダウンガード (試合終了後8秒間は新対戦検知をスキップ)
+          const timeSinceFinish = Date.now() - (this.lastGameFinishTimestamp || 0);
+          if (timeSinceFinish < 8000) {
+            return;
+          }
+
           const ballCrop = this.cropToBase64(ctx, COORDS.MATCHING_BALL);
           const score = await this.matchTemplate(ballCrop, this.templates.matchingBall, { useAlphaMask: true });
-          const hasBtn = this.isSelectionButtonPresent(ctx);
-          if (score > 0.42 || hasBtn) {
-            console.log(`[AutoMode] MATCHING PHASE DETECTED! score=${score}, hasBtn=${hasBtn}`);
+
+          // ★ pamo3 原典完全再現: ボールスコア >= 0.60 (gbhe: this.a >= 0.6 || this.b >= 0.6)
+          // 誤検知の原因となる緑色ボタン判定(hasBtn)は完全撤廃！
+          if (score >= 0.60) {
+            console.log(`[AutoMode] MATCHING PHASE DETECTED! score=${score.toFixed(3)} >= 0.60 (pamo3 gbhe compliant)`);
             this.phase = 'MATCHING';
             this.matchingExitCount = 0;
-            this.updateStatusBadge('見せ合い画面検知: 相手情報取得中...');
+            // pamo3 原典完全再現シーケンスを _handleMatchingPhase 内で実行
             await this._handleMatchingPhase(ctx);
           }
           break;
         }
 
-        // 見せ合い画面継続中 (ボールマークおよび選出ボタンが消えるまで留まる)
+        // 見せ合い画面継続中 (ボールマークが消えるまで留まる)
         case 'MATCHING': {
           this._syncManualSelections();
           const ballCrop = this.cropToBase64(ctx, COORDS.MATCHING_BALL);
           const score = await this.matchTemplate(ballCrop, this.templates.matchingBall, { useAlphaMask: true });
-          const hasBtn = this.isSelectionButtonPresent(ctx);
 
-          // ボールマークも選出ボタンも両方消灯した場合のみ離脱カウントを進める
-          if (score < 0.32 && !hasBtn) {
+          // ボールマーク消灯 (score < 0.40)
+          if (score < 0.40) {
             this.matchingExitCount = (this.matchingExitCount || 0) + 1;
-            // 連続3フレーム (約1秒) 連続で消灯した場合のみ見せ合い終了と判定 (フライング遷移を完全防止)
+            // 連続3フレーム (約1秒) 連続で消灯した場合のみ見せ合い終了と判定
             if (this.matchingExitCount >= 3) {
               console.log('[AutoMode] MATCHING FINISHED! Transition to WAITING_GAME_START');
               this.waitingStartTimestamp = Date.now();
@@ -514,9 +551,10 @@
           const vsScore = await this.matchTemplate(vsCrop, this.templates.vsLogo, { useAlphaMask: true });
           const elapsed = Date.now() - (this.waitingStartTimestamp || Date.now());
 
-          // VS検知 (vsScore > 0.38) or 見せ合い終了後 7秒フォールバック (出撃演出の開始を確実キャッチ)
-          if (vsScore > 0.38 || elapsed > 7000) {
-            console.log(`[AutoMode] GAME START DETECTED! (vsScore=${vsScore}, elapsed=${elapsed}ms)`);
+          // ★ 出撃見逃し防止: VSロゴ検知 (vsScore > 0.40) または 暗転から8秒経過で直ちに試合中へ！
+          // (VSロゴ演出は1〜2秒で終了し、直後の暗転〜10秒後から先発出撃演出が始まるため、40秒待機では先発を100%見失う)
+          if (vsScore > 0.40 || elapsed > 8000) {
+            console.log(`[AutoMode] GAME START DETECTED! (vsScore=${vsScore.toFixed(3)}, elapsed=${elapsed}ms)`);
             this.phase = 'IN_GAME';
             this.updateStatusBadge('試合中: 出撃ポケモン検知中...');
             // 手動選出を保持したままVSバーと内部リストを同期
@@ -537,8 +575,8 @@
       }
     }
 
-    // --- 見せ合い画面突入時の処理 ---
-    async _handleMatchingPhase(ctx) {
+    // --- 見せ合い画面突入時の処理 (pamo3 原典完全再現シーケンス) ---
+    async _handleMatchingPhase(initialCtx) {
       // 0. 新しい対戦開始時に選出管理・VSバーを初期化し、手入力リスナーを登録
       this.resetVsBar();
       this._setupManualInputListeners();
@@ -550,9 +588,47 @@
       // 2. ダブルバトル専用 (選出4匹) に固定
       this.battleMode = 'double';
       console.log('[AutoMode] Battle mode fixed to Double Battle (4 slots)');
-
-      // 3. 高精度認識エンジン (window.recognitionEngine) で相手パーティ6匹 & トレーナー名を自動特定！
       this.rivalPartyNames = [];
+
+      // ★ pamo3 原典完全再現 ①: 暗転・フェードイン完了待ち (3.0秒 / 3000ms: B.jZ = 3e6 us)
+      this.updateStatusBadge('見せ合い画面検知: 画面安定待ち (3秒ウェイト)...');
+      await new Promise(resolve => setTimeout(resolve, 3000));
+
+      // ★ pamo3 原典完全再現 ③: 最新安定フレームから相手トレーナー名OCR (二値化閾値 150)
+      const trainerCtx = this.captureFrame() || initialCtx;
+      let finalTrainerName = '';
+      if (this.tesseractWorker) {
+        try {
+          // pamo3 原典 Line 58-61 準拠: 二値化閾値 150 で前処理
+          const nameCropB64 = this.cropBinarizedToBase64(trainerCtx, COORDS.TRAINER_NAME, 150);
+          const nameRes = await this.tesseractWorker.recognize(nameCropB64);
+          const directText = (nameRes && nameRes.data && nameRes.data.text || '').replace(/[\r\n\t]/g, ' ').trim();
+          if (directText) {
+            finalTrainerName = directText;
+            console.log(`[AutoMode:pamo3-OCR] Opponent Trainer Name (Binarized 150): "${finalTrainerName}"`);
+          }
+        } catch (e) {
+          console.warn('[AutoMode] Direct trainer OCR error:', e);
+        }
+      }
+
+      if (finalTrainerName) {
+        this.oppTrainerName = finalTrainerName;
+        const oppTrainerInput = document.getElementById('rec-opp-trainer');
+        if (oppTrainerInput) {
+          oppTrainerInput.value = finalTrainerName;
+          oppTrainerInput.dispatchEvent(new Event('input', { bubbles: true }));
+          oppTrainerInput.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      }
+
+      // ★ pamo3 原典完全再現 ①: 相手6匹取得前の安定待機 (1.0秒 / 1000ms: B.ce = 1e6 us)
+      this.updateStatusBadge('見せ合い画面検知: 相手6匹認識中 (1秒ウェイト)...');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // 完全に明るく安定した最新フレームを再キャプチャして相手6匹認識へ！
+      const partyCtx = this.captureFrame() || trainerCtx;
+
       try {
         if (window.recognitionEngine) {
           if (!window.recognitionEngine.isLoaded && typeof window.recognitionEngine.loadDictionaries === 'function') {
@@ -562,23 +638,25 @@
           // 自分のパーティ一覧
           let myTeamList = this.myPartyNames || [];
 
-          // 画面全体 (1920x1080) を認識エンジンへ渡す (isSwitch1080p = true を明示！)
-          const res = await window.recognitionEngine.recognize(ctx.canvas, myTeamList, 'BEFORE', true);
+          // 画面全体 (1920x1080) を認識エンジンへ渡し、相手6匹を OpenCV TM_CCOEFF_NORMED で高精度特定！
+          const res = await window.recognitionEngine.recognize(partyCtx.canvas, myTeamList, 'BEFORE', true);
           console.log('[AutoMode] Recognition Engine Result:', res);
 
-          // 3-1. 相手パーティ 6 匹のセット
+          // 相手パーティ 6 匹のセット
           if (res && res.opponent && res.opponent.length) {
             console.log('[AutoMode] Detected Opponent Party:', res.opponent);
             const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
             res.opponent.forEach((pName, idx) => {
-              if (idx < 6 && oppInputs[idx] && pName && pName !== '???') {
-                oppInputs[idx].value = pName;
-                oppInputs[idx].dispatchEvent(new Event('input', { bubbles: true }));
-                oppInputs[idx].dispatchEvent(new Event('change', { bubbles: true }));
-                if (typeof window.updateSlotIcon === 'function') {
-                  window.updateSlotIcon(oppInputs[idx], pName);
-                }
+              if (idx < 6 && pName && pName !== '???') {
                 this.rivalPartyNames.push(pName);
+                if (oppInputs && oppInputs[idx]) {
+                  oppInputs[idx].value = pName;
+                  oppInputs[idx].dispatchEvent(new Event('input', { bubbles: true }));
+                  oppInputs[idx].dispatchEvent(new Event('change', { bubbles: true }));
+                  if (typeof window.updateSlotIcon === 'function') {
+                    window.updateSlotIcon(oppInputs[idx], pName);
+                  }
+                }
               }
             });
             if (typeof window.rebuildOppSelectionDropdowns === 'function') {
@@ -586,31 +664,6 @@
             }
           } else {
             console.warn('[AutoMode] Recognition engine returned empty or invalid opponent:', res);
-          }
-
-          // 3-2. 相手トレーナー名のセット (16:9補正エンジン結果 + 直接切り出しOCRの相互補正)
-          let finalTrainerName = (res && res.trainerName) ? res.trainerName.trim() : '';
-
-          if (this.tesseractWorker) {
-            try {
-              const nameCrop = this.cropToBase64(ctx, COORDS.TRAINER_NAME);
-              const nameRes = await this.tesseractWorker.recognize(nameCrop);
-              const directText = (nameRes && nameRes.data && nameRes.data.text || '').replace(/[\r\n\t]/g, ' ').trim();
-              if (directText && (!finalTrainerName || directText.length <= 12)) {
-                finalTrainerName = directText;
-              }
-            } catch (e) {
-              console.warn('[AutoMode] Direct trainer OCR error:', e);
-            }
-          }
-
-          if (finalTrainerName) {
-            const oppTrainerInput = document.getElementById('rec-opp-trainer');
-            if (oppTrainerInput) {
-              oppTrainerInput.value = finalTrainerName;
-              oppTrainerInput.dispatchEvent(new Event('input', { bubbles: true }));
-              oppTrainerInput.dispatchEvent(new Event('change', { bubbles: true }));
-            }
           }
         }
       } catch (e) {
@@ -717,21 +770,22 @@
       return s;
     }
 
-    // --- 試合中: 出撃ポケモンの検知 (ダブルバトル4匹特化・カタカナ特化OCR) ---
+    // --- 試合中: 出撃ポケモンの検知 (ダブルバトル先発2匹ガード & 対戦中リカバリー pamo3完全準拠) ---
     async _detectDispatchedPokemons(ctx) {
       if (!this.katakanaWorker) return;
 
-      // 手動選出があれば常に最新状態を取り込み・VSバーに反映
+      // 手動選出があれば常に最新状態を取り込み
       this._syncManualSelections();
 
-      const maxSlots = 4; // ダブルバトル固定 (選出4匹)
+      const meCount = this.detectedDispatchedMe.length;
+      const rivalCount = this.detectedDispatchedRival.length;
 
-      // 1. 自分・相手ともに出撃枠が上限（4匹）に達している場合はOCRを完全に停止して超軽量化！
-      if (this.detectedDispatchedMe.length >= maxSlots && this.detectedDispatchedRival.length >= maxSlots) {
+      // ★ pamo3 原典完全再現 ⑥: 先発2匹が両陣営とも確定していればOCRを完全スキップ（ピコピコ完全防止）
+      if (meCount >= 2 && rivalCount >= 2) {
         return;
       }
 
-      // 2. OCRの実行間隔を最短400msに調整して先発出撃演出の数秒間に確実に全匹拾い切る！
+      // OCRの実行間隔を最短400msに調整
       const now = Date.now();
       if (this.lastOcrTimestamp && (now - this.lastOcrTimestamp < 400)) {
         return;
@@ -741,7 +795,7 @@
       if (!this.dispatchedSlotsMe) this.dispatchedSlotsMe = {};
       if (!this.dispatchedSlotsRival) this.dispatchedSlotsRival = {};
 
-      // 3. ユーザーが選出画面等で手動修正した相手パーティ入力を常時同期！
+      // ユーザーが手入力修正した相手パーティ入力を同期
       const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
       if (oppInputs && oppInputs.length > 0) {
         const liveOppNames = Array.from(oppInputs).map(inp => inp.value.trim()).filter(Boolean);
@@ -753,23 +807,37 @@
         this._extractMyPartyNames();
       }
 
-      let targets = [...COORDS.DISPATCH_DOUBLE, ...COORDS.BATTLE_HP_DOUBLE];
-      // 先発が未確定の場合 (me < 2 または rival < 2) は、様子を見る画面のパネル領域も追加監視！
-      if (this.detectedDispatchedMe.length < 2 || this.detectedDispatchedRival.length < 2) {
-        targets = targets.concat(COORDS.TARGET_SELECT_DOUBLE);
+      // 対象スロットの動的選定 (2体確定済みの陣営はOCR対象から完全に除外)
+      let targets = [];
+
+      // 1. 先発出撃演出 (DISPATCH_DOUBLE)
+      for (const t of COORDS.DISPATCH_DOUBLE) {
+        if (t.role === 'me' && meCount >= 2) continue;
+        if (t.role === 'rival' && rivalCount >= 2) continue;
+        targets.push(t);
+      }
+
+      // ★ pamo3 原典完全再現 ⑦: 出撃演出で未確定枠がある場合 (me < 2 または rival < 2) のみ、
+      // 通常コマンド画面HPバー (BATTLE_HP_DOUBLE) & 様子を見る画面 (TARGET_SELECT_DOUBLE) からリカバリー！
+      if (meCount < 2 || rivalCount < 2) {
+        for (const t of COORDS.BATTLE_HP_DOUBLE) {
+          if (t.role === 'me' && meCount >= 2) continue;
+          if (t.role === 'rival' && rivalCount >= 2) continue;
+          targets.push(t);
+        }
+        for (const t of COORDS.TARGET_SELECT_DOUBLE) {
+          if (t.role === 'me' && meCount >= 2) continue;
+          if (t.role === 'rival' && rivalCount >= 2) continue;
+          targets.push(t);
+        }
       }
 
       for (const target of targets) {
-        // すでに該当陣営が上限に達していればスキップ
-        const currentList = target.role === 'rival' ? this.detectedDispatchedRival : this.detectedDispatchedMe;
-        if (currentList.length >= maxSlots) continue;
+        // すでに該当陣営が2匹に達していればスキップ
+        const currentCount = target.role === 'rival' ? this.detectedDispatchedRival.length : this.detectedDispatchedMe.length;
+        if (currentCount >= 2) continue;
 
-        // すでにそのスロットで直前に確認済みの場合は高速スキップ
         const slotTracker = target.role === 'rival' ? this.dispatchedSlotsRival : this.dispatchedSlotsMe;
-        if (slotTracker[target.index] && currentList.includes(slotTracker[target.index]) && currentList.length < 2) {
-          // 先発特定中は別スロット（未検知の相方）の検知を最優先
-          continue;
-        }
 
         try {
           // ★ pamo3 完全準拠: 19.3度回転Deskew + 白文字2倍二値化
@@ -803,8 +871,8 @@
             }
           }
 
-          // 相手側で手持ちと一致しなかった場合、マスタ全体から追加探索（ニックネームや認識漏れ対応）
-          if ((!bestMatch || minDistance > 2) && target.role === 'rival' && window.POKEMON_LIST && window.POKEMON_LIST.length) {
+          // 手持ち・登録パーティと一致しなかった場合、マスタ全体から追加探索（認識ブレ・ニックネーム・パーティ不整合救済）
+          if ((!bestMatch || minDistance > 2) && window.POKEMON_LIST && window.POKEMON_LIST.length) {
             for (const p of window.POKEMON_LIST) {
               const pName = typeof p === 'string' ? p : (p && (p.name || p.display) || '');
               if (!pName) continue;
@@ -820,6 +888,10 @@
           }
 
           // 2文字以内の差なら一致と判定 (pamo3準拠)
+          if (typeof this.onOcrSlotResult === 'function') {
+            this.onOcrSlotResult(target.role, target.index, rawText, bestMatch, minDistance);
+          }
+
           if (bestMatch && minDistance <= 2) {
             slotTracker[target.index] = bestMatch;
             this._handleDispatchedPokemonFound(target.role, bestMatch);
@@ -877,6 +949,7 @@
 
     async _handleGameFinished(isWin) {
       console.log(`[AutoMode] Handling game finish: ${isWin ? 'WIN' : 'LOSE'}`);
+      this.lastGameFinishTimestamp = Date.now();
 
       // 0. 保存前に相手パーティがもし未入力なら、出撃検知した相手ポケモン等で自動補完！
       const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
@@ -937,9 +1010,10 @@
             const histBtn = document.querySelector('nav button[onclick*="history"]') || document.querySelector('nav button:nth-child(4)');
             window.showPage('history', histBtn);
           }
-          // 次の対戦に向けて待機状態へループ
+          // 次の対戦に向けて待機状態へループ (8秒クールダウンを付与)
+          this.lastGameFinishTimestamp = Date.now();
           this.phase = 'WAITING_MATCHING';
-          this.updateStatusBadge('記録保存完了: 次の対戦待ち');
+          this.updateStatusBadge('記録保存完了: 次の対戦待ち (待機中)');
         }, 1200);
       }, 800);
     }
@@ -1141,7 +1215,9 @@
   }
 
   // グローバル公開
+  window.COORDS = COORDS;
   window.AutoModeController = AutoModeController;
+  AutoModeController.COORDS = COORDS;
   window.autoModeController = new AutoModeController();
   window.forceResetAutoModePhase = () => {
     if (window.autoModeController) {
