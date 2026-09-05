@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>オートモード詳細仕様定義書 | Pokemon Battle Log</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg-base: #0b0f19;
+      --bg-surface: #111827;
+      --bg-surface-elevated: #1f2937;
+      --bg-card: rgba(31, 41, 55, 0.7);
+      --border-color: rgba(255, 255, 255, 0.1);
+      --border-color-focus: #6366f1;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
+      --primary: #6366f1;
+      --primary-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
+      --accent-cyan: #38bdf8;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --code-bg: #030712;
+      --sidebar-width: 280px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      line-height: 1.7;
+      scroll-behavior: smooth;
+      background-image: 
+        radial-gradient(circle at 15% 10%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 85% 60%, rgba(217, 70, 239, 0.08) 0%, transparent 45%);
+      background-attachment: fixed;
+    }
+
+    /* ヘッダー */
+    header.spec-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(16px);
+      background: rgba(11, 15, 25, 0.82);
+      border-bottom: 1px solid var(--border-color);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-title-area {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .header-logo {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--primary-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+    }
+
+    .header-title-area h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: #fff;
+    }
+
+    .header-badges {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      letter-spacing: 0.02em;
+    }
+
+    .badge-primary {
+      background: rgba(99, 102, 241, 0.2);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, 0.4);
+    }
+
+    .badge-green {
+      background: rgba(16, 185, 129, 0.18);
+      color: #6ee7b7;
+      border: 1px solid rgba(16, 185, 129, 0.35);
+    }
+
+    .header-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      border: 1px solid var(--border-color);
+    }
+
+    .header-links a:hover {
+      color: #fff;
+      background: var(--bg-surface-elevated);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* レイアウト */
+    .layout-container {
+      display: flex;
+      max-width: 1540px;
+      margin: 0 auto;
+      padding: 2rem;
+      gap: 2.5rem;
+    }
+
+    /* サイドバー目次 */
+    aside.sidebar {
+      width: var(--sidebar-width);
+      flex-shrink: 0;
+      position: sticky;
+      top: 5.5rem;
+      height: calc(100vh - 7rem);
+      overflow-y: auto;
+      padding-right: 0.5rem;
+    }
+
+    aside.sidebar::-webkit-scrollbar {
+      width: 4px;
+    }
+    aside.sidebar::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 2px;
+    }
+
+    .toc-title {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-dim);
+      margin-bottom: 0.75rem;
+      padding-left: 0.75rem;
+    }
+
+    .toc-nav {
+      list-style: none;
+    }
+
+    .toc-nav li {
+      margin-bottom: 0.25rem;
+    }
+
+    .toc-nav a {
+      display: block;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 0.45rem 0.75rem;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      border-left: 2px solid transparent;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .toc-nav a:hover {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .toc-nav a.active {
+      color: #fff;
+      font-weight: 600;
+      background: rgba(99, 102, 241, 0.12);
+      border-left-color: var(--primary);
+    }
+
+    /* メインコンテンツ */
+    main.content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .spec-banner {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(217, 70, 239, 0.1) 100%);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .spec-banner::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .spec-banner h2 {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.6rem;
+      background: linear-gradient(135deg, #ffffff 30%, #c7d2fe 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .spec-banner p {
+      font-size: 0.95rem;
+      color: #cbd5e1;
+      max-width: 860px;
+    }
+
+    /* アラートブロック */
+    .alert-box {
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+      margin: 1.5rem 0;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      border: 1px solid;
+    }
+
+    .alert-box.important {
+      background: rgba(245, 158, 11, 0.08);
+      border-color: rgba(245, 158, 11, 0.35);
+      color: #fde68a;
+    }
+
+    .alert-box.important .alert-icon {
+      color: var(--accent-amber);
+      font-size: 1.4rem;
+      line-height: 1;
+    }
+
+    .alert-box.note {
+      background: rgba(99, 102, 241, 0.08);
+      border-color: rgba(99, 102, 241, 0.35);
+      color: #c7d2fe;
+    }
+
+    .alert-box.success {
+      background: rgba(16, 185, 129, 0.08);
+      border-color: rgba(16, 185, 129, 0.35);
+      color: #a7f3d0;
+    }
+
+    .alert-title {
+      font-weight: 700;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .alert-content {
+      font-size: 0.88rem;
+      line-height: 1.6;
+    }
+
+    /* セクション共通 */
+    section.spec-section {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .section-num {
+      background: rgba(99, 102, 241, 0.2);
+      color: #a5b4fc;
+      font-weight: 800;
+      font-size: 0.85rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    h3.section-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.01em;
+    }
+
+    h4.subsection-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      margin: 1.5rem 0 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    h4.subsection-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 14px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+
+    p.section-desc {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      margin-bottom: 1.25rem;
+    }
+
+    /* Mermaid コンテナ */
+    .mermaid-container {
+      background: rgba(3, 7, 18, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      display: flex;
+      justify-content: center;
+      overflow-x: auto;
+    }
+
+    /* テーブルデザイン */
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      margin: 1.25rem 0;
+      background: rgba(3, 7, 18, 0.4);
+    }
+
+    table.spec-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+
+    table.spec-table th {
+      background: rgba(31, 41, 55, 0.8);
+      color: #cbd5e1;
+      font-weight: 600;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      white-space: nowrap;
+    }
+
+    table.spec-table td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: #e2e8f0;
+      vertical-align: middle;
+    }
+
+    table.spec-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    table.spec-table tr:hover td {
+      background: rgba(99, 102, 241, 0.04);
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      background: var(--code-bg);
+      color: #38bdf8;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .coord-val {
+      font-family: 'JetBrains Mono', monospace;
+      color: #a5b4fc;
+      font-weight: 500;
+    }
+
+    /* リスト */
+    ul.spec-list, ol.spec-list {
+      padding-left: 1.5rem;
+      margin: 0.85rem 0;
+      color: #cbd5e1;
+      font-size: 0.92rem;
+    }
+
+    ul.spec-list li, ol.spec-list li {
+      margin-bottom: 0.5rem;
+      line-height: 1.6;
+    }
+
+    ul.spec-list li strong, ol.spec-list li strong {
+      color: #fff;
+    }
+
+    /* カードグリッド */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1rem;
+      margin: 1.25rem 0;
+    }
+
+    .info-card {
+      background: rgba(17, 24, 39, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 1.25rem;
+      transition: all 0.2s ease;
+    }
+
+    .info-card:hover {
+      border-color: rgba(99, 102, 241, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+    }
+
+    .info-card-header {
+      font-weight: 700;
+      color: #fff;
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .info-card-body {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* スクロールトップボタン */
+    #back-to-top {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--bg-surface-elevated);
+      border: 1px solid var(--border-color);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      cursor: pointer;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      z-index: 99;
+    }
+
+    #back-to-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    #back-to-top:hover {
+      background: var(--primary);
+      transform: translateY(-3px);
+    }
+
+    @media (max-width: 1024px) {
+      .layout-container {
+        flex-direction: column;
+        padding: 1rem;
+      }
+      aside.sidebar {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ヘッダー -->
+  <header class="spec-header">
+    <div class="header-title-area">
+      <div class="header-logo">⚡</div>
+      <div>
+        <h1>オートモード詳細仕様定義書</h1>
+        <div class="header-badges">
+          <span class="badge badge-primary">Switch 1080p 対応</span>
+          <span class="badge badge-green">公式完全定義書 v2.1</span>
+        </div>
+      </div>
+    </div>
+    <div class="header-links">
+      <a href="../index.html">← アプリへ戻る</a>
+      <a href="AUTO_MODE_SPECIFICATION.md" target="_blank">📄 Markdown版</a>
+    </div>
+  </header>
+
+  <div class="layout-container">
+    <!-- サイドバー目次 -->
+    <aside class="sidebar">
+      <div class="toc-title">目次 (Contents)</div>
+      <ul class="toc-nav" id="toc-list">
+        <li><a href="#sec-overview">概要と基本原則</a></li>
+        <li><a href="#sec-1">1. 全体アーキテクチャ</a></li>
+        <li><a href="#sec-2">2. 状態遷移詳細定義</a></li>
+        <li><a href="#sec-3">3. 認識座標パラメータ</a></li>
+        <li><a href="#sec-4">4. 前処理・OCR照合ロジック</a></li>
+        <li><a href="#sec-5">5. 見せ合いボールマーク詳細</a></li>
+        <li><a href="#sec-6">6. UI連携・画面遷移仕様</a></li>
+        <li><a href="#sec-7">7. 手入力修正の対応仕様</a></li>
+        <li><a href="#sec-8">8. 改修・保守ルール</a></li>
+      </ul>
+    </aside>
+
+    <!-- メインコンテンツ -->
+    <main class="content">
+
+      <!-- バナー -->
+      <div class="spec-banner" id="sec-overview">
+        <h2>Auto Mode Specification</h2>
+        <p>
+          本書は、ポケモン対戦ログ（Pokemon Battle Log）における「オートモード（Switch実機映像の全自動対戦検知・選出追跡・自動記録システム）」の完全なアーキテクチャ、状態遷移、認識座標パラメータ、およびアルゴリズムを定義する公式仕様書です。
+        </p>
+      </div>
+
+      <!-- 運用ルール重要アラート -->
+      <div class="alert-box important">
+        <div class="alert-icon">⚠️</div>
+        <div>
+          <div class="alert-title">運用ルール（重要）: 仕様書とコードの完全同期義務</div>
+          <div class="alert-content">
+            今後オートモードのコード（<code>scripts/auto_mode_controller.js</code>, <code>scripts/recognition_engine.js</code> 等）を修正・改修する場合は、<strong>必ず本仕様書（Markdown版および本HTML版）を同時に更新</strong>してください。コードとドキュメントの乖離は一切認められません。
+          </div>
+        </div>
+      </div>
+
+      <!-- 1. 全体アーキテクチャ -->
+      <section class="spec-section" id="sec-1">
+        <div class="section-header">
+          <span class="section-num">01</span>
+          <h3 class="section-title">全体アーキテクチャと処理フロー</h3>
+        </div>
+        <p class="section-desc">
+          Switch実機映像（1920×1080、16:9）を毎秒約2〜3回（350ms間隔）キャプチャし、ステートマシンによって現在のゲーム画面のフェーズを判定しながら、相手パーティ、相手トレーナー名、自分・相手の選出（4体）、勝敗を自動取得して記録フォームに入力します。
+        </p>
+
+        <div class="mermaid-container">
+          <pre class="mermaid">
+stateDiagram-v2
+    [*] --> WAITING_MATCHING: オートモードON
+    WAITING_MATCHING --> MATCHING: 見せ合いボールマーク検知 (score > 0.45)
+    MATCHING --> MATCHING: 見せ合い画面継続中 (ボールマーク存在 / 相手6体&名前取得)
+    MATCHING --> WAITING_GAME_START: ボールマーク消滅 (画面暗転 / 選出完了)
+    WAITING_GAME_START --> IN_GAME: VS画面検知 (score > 0.38) または 7秒経過
+    IN_GAME --> IN_GAME: 出撃&HPバー検知 (先発2体 + 交代2体 = 最大4体)
+    IN_GAME --> FINISHED: 勝敗ボール検知 (Win/Lose確定)
+    FINISHED --> WAITING_MATCHING: ログ自動保存完了 / 次の対戦待ち
+          </pre>
+        </div>
+      </section>
+
+      <!-- 2. 状態遷移詳細定義 -->
+      <section class="spec-section" id="sec-2">
+        <div class="section-header">
+          <span class="section-num">02</span>
+          <h3 class="section-title">状態遷移 (ステートマシン) 詳細定義</h3>
+        </div>
+        <p class="section-desc">
+          オートモードの内部状態（<code>this.phase</code>）と画面の状態、トリガー、および pamo3 内部実装との対応一覧です。
+        </p>
+
+        <div class="table-wrapper">
+          <table class="spec-table">
+            <thead>
+              <tr>
+                <th>フェーズ名 (<code>this.phase</code>)</th>
+                <th>画面の状態</th>
+                <th>監視対象・トリガー</th>
+                <th>UI画面遷移・データ入力動作</th>
+                <th>遷移先</th>
+                <th>pamo3 内部対応</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong><code>WAITING_MATCHING</code></strong></td>
+                <td>対戦マッチング待機中</td>
+                <td>画面左下の選出ボタンボールマーク (<code>COORDS.MATCHING_BALL</code>) の一致度 &gt; 0.45</td>
+                <td>オートモード開始時に「記録する」タブへ自動切替。<br>フォームを初期化（ルール=ダブル、手持ち読込）</td>
+                <td><code>MATCHING</code></td>
+                <td><code>waitingMatching</code> (<code>B.xO</code>)</td>
+              </tr>
+              <tr>
+                <td><strong><code>MATCHING</code></strong></td>
+                <td>見せ合い画面（手持ち6体と選出選択）</td>
+                <td>初回フレームで相手6体・トレーナー名を自動取得。<br>その後ボールマークの一致度 &lt; 0.35 になるまで本フェーズを維持</td>
+                <td>① 画面を「記録する」画面へ確実に維持。<br>② 相手パーティ6体を <code>#opp-party-slots</code> へ自動入力しアイコン更新。<br>③ 相手トレーナー名を <code>#rec-opp-trainer</code> へ自動入力。<br>④ 相手選出ドロップダウンを再構築。</td>
+                <td><code>WAITING_GAME_START</code></td>
+                <td><code>matching</code> (<code>B.ms</code>)</td>
+              </tr>
+              <tr>
+                <td><strong><code>WAITING_GAME_START</code></strong></td>
+                <td>見せ合い終了〜対戦開始演出</td>
+                <td>中央VSロゴ (<code>COORDS.VS_SCREEN</code>) 一致度 &gt; 0.38、または見せ合い終了から 7000ms 経過</td>
+                <td>ユーザーの手動修正があればリアルタイム同期。<br>出撃演出の監視準備</td>
+                <td><code>IN_GAME</code></td>
+                <td><code>waitingGameStart</code> (<code>B.i3</code>)</td>
+              </tr>
+              <tr>
+                <td><strong><code>IN_GAME</code></strong></td>
+                <td>対戦中（出撃演出、コマンド画面、交代）</td>
+                <td>出撃ネームプレート、常時表示HPバー、様子を見るパネルを監視して自分・相手の選出（最大4体）を取得。<br>勝敗ボール検知で試合終了判定</td>
+                <td>① 検知された自分選出（最大4体）をバッジ・ボールへ反映。<br>② 検知された相手選出（最大4体）をドロップダウン・ボールへ反映。<br>③ 勝敗ボール検知で勝敗（勝ち/負け）ボタンを自動セット。</td>
+                <td><code>FINISHED</code></td>
+                <td><code>inGame</code> (<code>B.i2</code>)</td>
+              </tr>
+              <tr>
+                <td><strong><code>FINISHED</code></strong></td>
+                <td>勝敗確定画面</td>
+                <td>勝敗確定後、ログ保存処理を実行</td>
+                <td>① <code>saveRecord()</code> を実行して対戦ログを自動保存。<br>② <strong>保存完了後、自動的に「履歴 (<code>history</code>)」タブへ画面遷移</strong>。<br>③ 次の対戦へ向けて待機状態へリセット。</td>
+                <td><code>WAITING_MATCHING</code></td>
+                <td><code>endGame</code> (<code>B.FZ</code>)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- 3. 認識座標パラメータ -->
+      <section class="spec-section" id="sec-3">
+        <div class="section-header">
+          <span class="section-num">03</span>
+          <h3 class="section-title">認識座標パラメータ一覧 (1920 × 1080 基準)</h3>
+        </div>
+        <p class="section-desc">
+          Switch実機映像の基準解像度（1920×1080、16:9）における全認識エリアの幾何座標および照合アルゴリズムです。
+        </p>
+
+        <h4 class="subsection-title">3.1 フェーズ検知用座標</h4>
+        <div class="table-wrapper">
+          <table class="spec-table">
+            <thead>
+              <tr>
+                <th>項目名</th>
+                <th>X</th>
+                <th>Y</th>
+                <th>Width</th>
+                <th>Height</th>
+                <th>使用テンプレート画像</th>
+                <th>判定しきい値</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>MATCHING_BALL</code> (見せ合いボールマーク)</td>
+                <td class="coord-val">139.0</td>
+                <td class="coord-val">923.0</td>
+                <td class="coord-val">46.0</td>
+                <td class="coord-val">46.0</td>
+                <td><code>assets/.../matching_phase_ball.png</code></td>
+                <td><code>&gt; 0.45</code> 開始 / <code>&lt; 0.35</code> 終了</td>
+              </tr>
+              <tr>
+                <td><code>VS_SCREEN</code> (VS画面中央ロゴ)</td>
+                <td class="coord-val">860.0</td>
+                <td class="coord-val">565.0</td>
+                <td class="coord-val">200.0</td>
+                <td class="coord-val">80.0</td>
+                <td><code>assets/.../vs_v.png</code></td>
+                <td><code>&gt; 0.38</code> で対戦開始</td>
+              </tr>
+              <tr>
+                <td><code>WIN_BALL_ME</code> (自分側勝利ボール)</td>
+                <td class="coord-val">445.3</td>
+                <td class="coord-val">771.0</td>
+                <td class="coord-val">72.0</td>
+                <td class="coord-val">72.0</td>
+                <td><code>assets/.../win_ball.png</code></td>
+                <td><code>&gt; 0.50</code> で勝ち判定</td>
+              </tr>
+              <tr>
+                <td><code>WIN_BALL_RIVAL</code> (相手側勝利ボール)</td>
+                <td class="coord-val">1405.0</td>
+                <td class="coord-val">771.0</td>
+                <td class="coord-val">72.0</td>
+                <td class="coord-val">72.0</td>
+                <td><code>assets/.../win_ball.png</code></td>
+                <td><code>&gt; 0.50</code> で負け判定</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4 class="subsection-title">3.2 見せ合い画面認識用座標 (MATCHING)</h4>
+        <div class="table-wrapper">
+          <table class="spec-table">
+            <thead>
+              <tr>
+                <th>項目名</th>
+                <th>X</th>
+                <th>Y</th>
+                <th>Width</th>
+                <th>Height</th>
+                <th>照合アルゴリズム</th>
+                <th>備考</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>相手アイコン (スロット $i=0..5$)</strong></td>
+                <td class="coord-val">1620.8</td>
+                <td class="coord-val">159.5 + 125.9 × i</td>
+                <td class="coord-val">104.6</td>
+                <td class="coord-val">104.6</td>
+                <td>実画像透過マスクMSE照合 (40×40)</td>
+                <td>タイプ絞り込み後の候補から最小差分を特定</td>
+              </tr>
+              <tr>
+                <td><strong>属性アイコン1 (タイプ1)</strong></td>
+                <td class="coord-val">1750.2</td>
+                <td class="coord-val">172.0 + 126.0 × i</td>
+                <td class="coord-val">40.0</td>
+                <td class="coord-val">40.0</td>
+                <td>実画像MSE照合 (<code>template_*.png</code>)</td>
+                <td>18属性から最小差分タイプを特定</td>
+              </tr>
+              <tr>
+                <td><strong>属性アイコン2 (タイプ2)</strong></td>
+                <td class="coord-val">1801.0</td>
+                <td class="coord-val">172.0 + 126.0 × i</td>
+                <td class="coord-val">40.0</td>
+                <td class="coord-val">40.0</td>
+                <td>実画像MSE照合 (<code>template_*.png</code>)</td>
+                <td>MSE &gt; 5500 または暗背景なら none</td>
+              </tr>
+              <tr>
+                <td><strong>相手トレーナー名</strong></td>
+                <td class="coord-val">1562.0</td>
+                <td class="coord-val">95.4</td>
+                <td class="coord-val">280.0</td>
+                <td class="coord-val">47.6</td>
+                <td>Tesseract OCR (白文字二値化 + 2x拡大)</td>
+                <td>多言語対応 (<code>jpn+eng+...</code>)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h4 class="subsection-title">3.3 選出・出撃・交代検知用座標 (IN_GAME)</h4>
+        <div class="card-grid">
+          <div class="info-card">
+            <div class="info-card-header">① 出撃演出時ネームプレート</div>
+            <div class="info-card-body">
+              <ul>
+                <li>相手先発1: <code>X: 1196.7, Y: 50.0, W: 220, H: 46</code></li>
+                <li>相手先発2: <code>X: 1599.8, Y: 50.0, W: 220, H: 46</code></li>
+                <li>自分先発1: <code>X: 154.9, Y: 933.0, W: 220, H: 46</code></li>
+                <li>自分先発2: <code>X: 554.6, Y: 933.0, W: 220, H: 46</code></li>
+              </ul>
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-header">② 対戦中常時表示HPバー</div>
+            <div class="info-card-body">
+              <ul>
+                <li>相手左: <code>X: 1140.0, Y: 35.0, W: 240, H: 55</code></li>
+                <li>相手右: <code>X: 1510.0, Y: 35.0, W: 240, H: 55</code></li>
+                <li>自分左: <code>X: 180.0, Y: 860.0, W: 240, H: 55</code></li>
+                <li>自分右: <code>X: 530.0, Y: 860.0, W: 240, H: 55</code></li>
+              </ul>
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-header">③ 様子を見る画面ネームプレート</div>
+            <div class="info-card-body">
+              <ul>
+                <li>相手左上: <code>X: 960.0, Y: 225.0, W: 190, H: 50</code></li>
+                <li>相手右上: <code>X: 1330.0, Y: 225.0, W: 190, H: 50</code></li>
+                <li>自分左下: <code>X: 960.0, Y: 532.0, W: 190, H: 50</code></li>
+                <li>自分右下: <code>X: 1330.0, Y: 532.0, W: 190, H: 50</code></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. 前処理とOCR・照合アルゴリズム -->
+      <section class="spec-section" id="sec-4">
+        <div class="section-header">
+          <span class="section-num">04</span>
+          <h3 class="section-title">前処理とOCR・照合アルゴリズム</h3>
+        </div>
+        
+        <h4 class="subsection-title">4.1 ネームプレートOCR前処理 (cropForDispatchOcr)</h4>
+        <ol class="spec-list">
+          <li><strong>原寸切り出し</strong>: 指定座標 <code>(x, y, w, h)</code> を Canvas に切り出し。</li>
+          <li><strong>2倍拡大描画</strong>: Tesseract の認識精度を最大化するため 2x に拡大。</li>
+          <li><strong>高コントラスト白文字二値化</strong>:
+            輝度 <code>Y = 0.299R + 0.587G + 0.114B</code>。<code>Y &ge; 170</code> または <code>(R &gt; 165 &and; G &gt; 165 &and; B &gt; 165)</code> のピクセルを文字（黒 0）、その他を背景（白 255）へ変換。
+          </li>
+          <li><strong>Tesseract.js OCR</strong>: カタカナ・ひらがな辞書を用いて高速認識を実行。</li>
+        </ol>
+
+        <h4 class="subsection-title">4.2 ポケモン名ファジーマッチング</h4>
+        <ul class="spec-list">
+          <li>OCR結果テキストから空白・改行を除去。</li>
+          <li>照合プール（相手なら <code>rivalPartyNames</code>、自分なら <code>myPartyNames</code>）とレーベンシュタイン編集距離を計算。</li>
+          <li>フォルム名（メガ、原種等）の正規化ベース名とも比較。</li>
+          <li><strong>編集距離 &le; 2</strong> の場合、一致として採用。</li>
+          <li>相手側で手持ちと一致しなかった場合、全体マスタ（<code>POKEMON_LIST</code>）からフォールバック検索。</li>
+        </ul>
+
+        <h4 class="subsection-title">4.3 交代・繰り出し追跡ロジック (ダブルバトル4枠)</h4>
+        <ul class="spec-list">
+          <li>各陣営の選出リスト（<code>detectedDispatchedMe</code>, <code>detectedDispatchedRival</code>）は配列として管理。</li>
+          <li>出撃・HPバー検知で新しいポケモン名が認識された場合、まだリストに含まれていなければ次のスロット（3体目、4体目）として自動追加。</li>
+          <li>上限（4体）に達した陣営はOCR監視を自動停止し、CPU負荷を最小化。</li>
+        </ul>
+      </section>
+
+      <!-- 5. 見せ合い画面の「ボールマーク」詳細 -->
+      <section class="spec-section" id="sec-5">
+        <div class="section-header">
+          <span class="section-num">05</span>
+          <h3 class="section-title">見せ合い画面の「ボールマーク」詳細</h3>
+        </div>
+        <p class="section-desc">
+          Switch 1920×1080 画面において、<strong>左下の選出完了ボタン（「[ &gt; ◓ 4/4 選出完了 ]」）の緑色フレームの左端にある、モンスターボールの丸いアイコン</strong>です。
+        </p>
+
+        <div class="card-grid">
+          <div class="info-card">
+            <div class="info-card-header">📍 座標とサイズ</div>
+            <div class="info-card-body">
+              <code>X: 139.0, Y: 923.0, W: 46.0, H: 46.0</code><br>
+              見せ合い画面（選出思考時間・カウントダウン中）の間、常時表示されます。
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-header">⚡ フェーズ判定の役割</div>
+            <div class="info-card-body">
+              <ul>
+                <li><code>score &gt; 0.45</code>: 見せ合い出現判定（相手情報取得）</li>
+                <li><code>score &ge; 0.35</code>: 見せ合い継続中（試合中に移行しない）</li>
+                <li><code>score &lt; 0.35</code>: 見せ合い終了（対戦開始待機へ移行）</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. UI画面遷移および入力フォーム連携仕様 -->
+      <section class="spec-section" id="sec-6">
+        <div class="section-header">
+          <span class="section-num">06</span>
+          <h3 class="section-title">UI画面遷移および入力フォーム連携仕様</h3>
+        </div>
+        <ul class="spec-list">
+          <li><strong>オートモード開始時</strong>: <code>window.showPage('record')</code> を呼び出し「記録する」タブへ自動切替。対戦ルールをダブルバトル（選出4体）に固定。</li>
+          <li><strong>見せ合い画面検知時 (MATCHING)</strong>: 相手6体をスロットへ入力しアイコン更新。相手トレーナー名を入力。相手選出ドロップダウンを再構築。</li>
+          <li><strong>対戦中 (IN_GAME)</strong>: 出撃・HPバー検知で自分・相手の選出（最大4体）をバッジ・ドロップダウン・下部VSバーへ自動反映。</li>
+          <li><strong>試合終了時 (FINISHED)</strong>: 勝敗ボール検知に基づき勝ち/負けボタンを自動選択。<code>saveRecord()</code> で自動保存。<strong>保存完了の約1.2秒後に自動的に「履歴 (history)」タブへ画面遷移</strong>。</li>
+        </ul>
+      </section>
+
+      <!-- 7. 手入力修正への対応仕様 -->
+      <section class="spec-section" id="sec-7">
+        <div class="section-header">
+          <span class="section-num">07</span>
+          <h3 class="section-title">手入力修正（マニュアルオーバーライド）への対応仕様（各フェーズ別）</h3>
+        </div>
+        <p class="section-desc">
+          オートモード稼働中、ユーザーがUIフォームや選出バッジを手動操作（修正・先行入力）した場合の、システム各フェーズでの詳細対応仕様です。
+        </p>
+
+        <div class="alert-box success">
+          <div class="alert-icon">🛡️</div>
+          <div>
+            <div class="alert-title">3大全体基本原則 (Core Principles)</div>
+            <div class="alert-content">
+              <strong>1. ユーザー操作の絶対優先</strong>: 自動画像検知の結果よりも、ユーザーが直接入力・選択した内容が常に最優先。<br>
+              <strong>2. 手動確定枠の保護 (Non-Destructive)</strong>: ユーザーが確定させた値を自動検知ループが勝手に上書き・消去することは固く禁止。<br>
+              <strong>3. 部分的手動入力の協調補完</strong>: 先発2体のみ手動入力した場合、自動検知は未確定の空きスロット（3体目・4体目）にのみ補完。
+            </div>
+          </div>
+        </div>
+
+        <div class="mermaid-container">
+          <pre class="mermaid">
+flowchart TD
+    subgraph P1[WAITING_MATCHING: マッチング待機中]
+      P1_Manual[手動操作: 手持ちパーティ切替 / メモ入力] --> P1_Sync[同期: 出撃照合プールを即時再取得 / VSバー初期化]
+    end
+
+    subgraph P2[MATCHING: 見せ合い画面中 60〜90s]
+      P2_Auto[自動検知: 相手6体 & トレーナー名取得 ※初回1回のみ]
+      P2_Manual1[手動修正: 相手パーティ6体の誤認識修正] --> P2_Sync1[同期: 照合プール更新 & 相手選出グリッド再描画]
+      P2_Manual2[手動入力: 自分の選出 1〜4 タップ] --> P2_Sync2[同期: 内部出撃リスト更新 & VSバー即時変身]
+      P2_Protect[保護: ボールマーク継続中も自動認識は再実行されない ※上書きなし]
+    end
+
+    subgraph P3[WAITING_GAME_START: 対戦開始待機中]
+      P3_Maintain[同期: 見せ合い中の手入力選出を維持 ※リセット廃止]
+      P3_Pool[確定: 最新の手入力パーティ名を出撃OCR照合プールに固定]
+    end
+
+    subgraph P4[IN_GAME: 対戦中 出撃・コマンド・HPバー]
+      P4_Manual[手動修正: 相手パーティ遅延修正 / 選出追加・変更]
+      P4_Merge[同期: 手動選出枠を保護し、未確定空きスロットにのみ自動検知を補完]
+      P4_VS[VSバー: 手動・自動の最新合算4枠をリアルタイム表示]
+    end
+
+    subgraph P5[FINISHED: 試合終了 勝敗確定〜保存]
+      P5_ManualResult[手動操作: 勝敗ボタン 勝ち/負け 手動選択] --> P5_ResultProtect[保護: 自動勝敗判定での上書きをブロック]
+      P5_AutoSave[自動保存: 手入力・自動検知を反映した最新フォーム値を保存]
+      P5_Nav[画面遷移: 保存後、自動的に「履歴」タブへ移動]
+    end
+
+    P1 --> P2 --> P3 --> P4 --> P5 --> P1
+          </pre>
+        </div>
+
+        <h4 class="subsection-title">各フェーズでの詳細挙動</h4>
+        <div class="card-grid">
+          <div class="info-card">
+            <div class="info-card-header">① マッチング待機 (WAITING_MATCHING)</div>
+            <div class="info-card-body">
+              自分のパーティ切り替え時、<code>this.myPartyNames</code> を即座に再取得。VSバーおよび出撃管理リストは初期状態を維持。
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-header">② 見せ合い (MATCHING)</div>
+            <div class="info-card-body">
+              <strong>相手パーティ修正</strong>: 入力検知で照合候補を即時更新し、選出グリッドを再描画。<br>
+              <strong>自分の選出先行入力</strong>: 1〜4タップで <code>detectedDispatchedMe</code> へ即時同期し、VSバーのボールがポケモンアイコンに変身。<br>
+              <strong>自動上書き防止</strong>: 相手認識は突入時の1回のみ。ループで手入力を上書きしない。
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-header">③ 対戦開始待機 (WAITING_GAME_START)</div>
+            <div class="info-card-body">
+              見せ合い中に入力された手動選出をそのまま維持（対戦開始時のリセット廃止）。最新手入力値を照合辞書に固定。
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-header">④ 対戦中 (IN_GAME)</div>
+            <div class="info-card-body">
+              <strong>遅延手入力修正</strong>: 対戦中の相手パーティ変更も即座に照合プールへ反映。<br>
+              <strong>手動選出保護</strong>: 手動選択された枠は自動検知で消去・上書きされない。空きスロットのみに自動検知結果を補完。
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-header">⑤ 試合終了 (FINISHED)</div>
+            <div class="info-card-body">
+              <strong>勝敗手動選択優先</strong>: ユーザーが手動で押した勝ち/負けを最優先し、画像認識の自動判定での上書きをブロック。空枠のみ自動補完。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. 改修・保守ルール -->
+      <section class="spec-section" id="sec-8">
+        <div class="section-header">
+          <span class="section-num">08</span>
+          <h3 class="section-title">改修・保守ルール</h3>
+        </div>
+        <ol class="spec-list">
+          <li><strong>引数ルールの遵守</strong>:
+            <code>recognitionEngine.recognize</code> をオートモードから呼び出す際は、必ず <strong>第4引数に <code>true</code> (<code>isSwitch1080p</code>)</strong> を渡すこと。渡さないと iPhone 用座標系（X=1955等）が使用され認識が全滅します。
+          </li>
+          <li><strong>ステートマシンのフライング防止</strong>:
+            画面認識結果以外の安易な短い固定タイマーだけでフェーズを強制遷移させてはならない。必ずゲーム画面のUIマーク（ボールマーク、VSロゴ、HPバー等）の有無を基準にすること。
+          </li>
+          <li><strong>手入力値の非破壊原則</strong>:
+            いかなる自動認識・自動更新処理も、ユーザーが明示的に手入力したフォーム値や選出状態を消去・上書きしてはならない。必ず手動入力値をベースとして協調動作させること。
+          </li>
+          <li><strong>本仕様書の両ファイル同期更新ルール (必須)</strong>:
+            今後オートモードの仕様に変更が入った際は、<strong><code>docs/AUTO_MODE_SPECIFICATION.md</code> と <code>docs/AUTO_MODE_SPECIFICATION.html</code> の両方を必ず同時に修正・更新</strong>すること。
+          </li>
+        </ol>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- スクロールトップボタン -->
+  <button id="back-to-top" title="トップへ戻る">↑</button>
+
+  <script>
+    // Mermaid 初期化
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'dark',
+      themeVariables: {
+        darkMode: true,
+        background: '#030712',
+        primaryColor: '#6366f1',
+        primaryBorderColor: '#818cf8',
+        primaryTextColor: '#f3f4f6',
+        lineColor: '#94a3b8',
+        secondaryColor: '#38bdf8',
+        tertiaryColor: '#1e293b'
+      }
+    });
+
+    // スクロールトップ
+    const topBtn = document.getElementById('back-to-top');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 400) {
+        topBtn.classList.add('visible');
+      } else {
+        topBtn.classList.remove('visible');
+      }
+    });
+    topBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // 目次アクティブ追従
+    const sections = document.querySelectorAll('section.spec-section, div.spec-banner');
+    const navLinks = document.querySelectorAll('#toc-list a');
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.getAttribute('id');
+          navLinks.forEach(link => {
+            if (link.getAttribute('href') === `#${id}`) {
+              link.classList.add('active');
+            } else {
+              link.classList.remove('active');
+            }
+          });
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+
+    sections.forEach(sec => observer.observe(sec));
+  </script>
+</body>
+</html>
