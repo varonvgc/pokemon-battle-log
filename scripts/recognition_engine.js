@@ -449,10 +449,10 @@ class PokemonRecognitionEngine {
       totalColorDiff += Math.abs(r - g) + Math.abs(g - b) + Math.abs(b - r);
     }
     const avgBright = totalBright / (40 * 40);
-    const avgColorDiff = totalColorDiff / (40 * 40);
 
-    // 暗い画面 (avgBright < 50) または 無彩色のグレー/黒背景 (avgColorDiff < 15) は属性アイコンではないため即 none
-    if (avgBright < 50 || avgColorDiff < 15) {
+    // 暗い画面 (avgBright < 60) は属性アイコンではないため即 none (空スロット対策)
+    // ※無彩色判定(avgColorDiff)はノーマルやはがねタイプを誤って弾くおそれがあるため撤廃
+    if (avgBright < 60) {
       return { type: 'none', score: 999999 };
     }
 

@@ -1,0 +1,105 @@
+﻿q===$&&A.b()
+q=q.play()
+q.toString
+A.eK(q,t.z)}catch(p){r=A.aj(p)
+$.ad().jO(0,"resume precheck mirror after precheck: "+A.i(r))}$.ap.rx$.push(new A.d0P(o))},
+WY(){var s=0,r=A.o(t.H),q,p=this,o,n
+var $async$WY=A.k(function(a,b){if(a===1)return A.l(b,r)
+for(;;)switch(s){case 0:n=p.x1
+if(n==null){s=1
+break}o=new A.eW(new A.ey(A.N(t.N,t.lu)))
+s=3
+return A.d(o.a6X(n),$async$WY)
+case 3:n=b
+p.x1=n
+n.toString
+s=4
+return A.d(o.t0(n),$async$WY)
+case 4:p.to=b
+case 1:return A.m(q,r)}})
+return A.n($async$WY,r)},
+aaN(a){var s
+if(a.length===0)return"\u2014"
+s=A.TL(a)
+if(s==null)return"?"
+return""+s.ge4(0)+"x"+s.gbx(0)},
+b0W(){var s,r,q,p=this.x1
+if(p==null){$.ad().jO(0,"[DBG-PHASE] hdFrame: gameScreenImage=null")
+A.egp("hdFrame: gameScreenImage=null")
+return}s=$.ad()
+r=p.b
+r===$&&A.b()
+r=r.a
+r===$&&A.b()
+r=J.b7(r.a.width())
+q=p.b.a
+q===$&&A.b()
+s.a8("[DBG-PHASE] hdFrame: "+r+"x"+J.b7(q.a.height()))
+q=p.b.a
+q===$&&A.b()
+q=J.b7(q.a.width())
+r=p.b.a
+r===$&&A.b()
+A.ps("hdFrame: "+q+"x"+J.b7(r.a.height())+", videoDevice="+A.i(this.RG))},
+B_(){var s=0,r=A.o(t.Rs),q,p=2,o=[],n=this,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1,a2,a3,a4,a5,a6,a7,a8
+var $async$B_=A.k(function(a9,b0){if(a9===1){o.push(b0)
+s=p}for(;;)switch(s){case 0:s=3
+return A.d(n.UJ(),$async$B_)
+case 3:s=4
+return A.d(n.WY(),$async$B_)
+case 4:m=B.kv
+l=n.hL
+k="init"
+p=6
+n.b0W()
+c=n.x1
+s=c!=null?9:10
+break
+case 9:k="computeBallCropsAndScores"
+b=n.iT
+s=11
+return A.d(b.a0h(c,n.fy),$async$B_)
+case 11:j=b0
+n.jK=j.c
+c=j.c
+Math.max(c.a,c.b)
+j.toString
+s=l===B.i3?12:14
+break
+case 12:s=j.c.gbhe()?15:17
+break
+case 15:if(n.j9)m=B.i3
+else m=B.ms
+s=16
+break
+case 17:k="matchGameStartVsTemplateScore"
+c=n.x1
+c.toString
+s=18
+return A.d(b.YL(c,n.fy),$async$B_)
+case 18:i=b0
+$.ad().a8("[DBG-PHASE] waitingGameStart: gameStartVsScore="+A.i(i))
+s=i>0.5?19:21
+break
+case 19:m=B.i2
+s=20
+break
+case 21:k="isInGameVal(waitingGameStart)"
+s=22
+return A.d(n.NI(!n.j9),$async$B_)
+case 22:h=b0
+$.ad().a8("[DBG-PHASE] waitingGameStart: battlePhaseRes: "+A.i(h))
+if(h>0.5)m=B.i2
+else m=B.i3
+case 20:case 16:s=13
+break
+case 14:s=j.c.gbhe()?23:25
+break
+case 23:m=B.ms
+s=24
+break
+case 25:k="isInGameVal(phaseDecide)"
+s=26
+return A.d(n.NI(l!==B.i2&&!n.j9),$async$B_)
+case 26:g=b0
+$.ad().a8("[DBG-PHASE] battlePhaseRes: "+A.i(g))

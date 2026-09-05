@@ -510,14 +510,19 @@
           const ballCrop = this.cropToBase64(ctx, COORDS.MATCHING_BALL);
           const score = await this.matchTemplate(ballCrop, this.templates.matchingBall, { useAlphaMask: true });
 
-          // ★ pamo3 原典完全再現: ボールスコア >= 0.60 (gbhe: this.a >= 0.6 || this.b >= 0.6)
-          // 誤検知の原因となる緑色ボタン判定(hasBtn)は完全撤廃！
-          if (score >= 0.60) {
-            console.log(`[AutoMode] MATCHING PHASE DETECTED! score=${score.toFixed(3)} >= 0.60 (pamo3 gbhe compliant)`);
-            this.phase = 'MATCHING';
-            this.matchingExitCount = 0;
-            // pamo3 原典完全再現シーケンスを _handleMatchingPhase 内で実行
-            await this._handleMatchingPhase(ctx);
+          // ★ 誤検知防止: 閾値を0.85に引き上げ、2連続フレーム一致を要求
+          if (score >= 0.85) {
+            this.matchingEnterCount = (this.matchingEnterCount || 0) + 1;
+            if (this.matchingEnterCount >= 2) {
+              console.log(`[AutoMode] MATCHING PHASE DETECTED! score=${score.toFixed(3)} >= 0.85`);
+              this.phase = 'MATCHING';
+              this.matchingEnterCount = 0;
+              this.matchingExitCount = 0;
+              // pamo3 原典完全再現シーケンスを _handleMatchingPhase 内で実行
+              await this._handleMatchingPhase(ctx);
+            }
+          } else {
+            this.matchingEnterCount = 0;
           }
           break;
         }

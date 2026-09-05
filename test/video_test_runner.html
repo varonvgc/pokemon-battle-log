@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>実機動画オートモード検証テストランナー</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+JP:wght@400;600;700&display=swap" rel="stylesheet">
+  <script src="../scripts/recognition_engine.js"></script>
+  <script src="../scripts/auto_mode_controller.js"></script>
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --surface: #111827;
+      --surface2: #1f2937;
+      --border: rgba(255, 255, 255, 0.1);
+      --accent: #6366f1;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-rose: #f43f5e;
+      --accent-cyan: #38bdf8;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 1.5rem;
+      min-height: 100vh;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    h1 { font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+    .badge { font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 999px; background: rgba(99, 102, 241, 0.2); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.4); font-weight: 600; }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 480px;
+      gap: 1.5rem;
+    }
+
+    .video-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    video {
+      width: 100%;
+      max-height: 520px;
+      background: #000;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .control-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    button.btn {
+      background: var(--surface2);
+      color: #fff;
+      border: 1px solid var(--border);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.85rem;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    button.btn:hover { background: #374151; border-color: rgba(255, 255, 255, 0.2); }
+    button.btn-primary { background: var(--accent); border-color: var(--accent); }
+    button.btn-primary:hover { background: #4f46e5; }
+    button.btn-success { background: var(--accent-green); border-color: var(--accent-green); }
+    button.btn-success:hover { background: #059669; }
+
+    .dash-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 0.35rem 0.85rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .slot-preview-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+
+    .slot-crop-box {
+      background: #030712;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem;
+      text-align: center;
+    }
+    .slot-crop-box .crop-title { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem; font-weight: 600; }
+    .slot-crop-box img, .slot-crop-box canvas { max-width: 100%; height: 32px; border: 1px solid rgba(255, 255, 255, 0.1); background: #000; object-fit: contain; }
+    .slot-crop-box .ocr-result { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent-cyan); margin-top: 0.25rem; font-weight: 700; min-height: 1.2rem; }
+
+    /* 下部VSバー（本番と同一） */
+    .vs-bar-container {
+      background: rgba(17, 24, 39, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .vs-side { display: flex; gap: 0.5rem; align-items: center; }
+    .vs-slot {
+      width: 44px;
+      height: 44px;
+      background: #030712;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .vs-slot img { width: 32px; height: 32px; }
+
+    /* ログコンソール */
+    .log-terminal {
+      background: #030712;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem;
+      height: 220px;
+      overflow-y: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      line-height: 1.5;
+      color: #cbd5e1;
+    }
+    .log-line { margin-bottom: 2px; }
+    .log-line.info { color: #38bdf8; }
+    .log-line.success { color: #34d399; font-weight: 700; }
+    .log-line.warn { color: #fbbf24; }
+    .log-line.error { color: #f87171; }
+
+    @keyframes popIn {
+      0% { transform: scale(0.6); opacity: 0; }
+      70% { transform: scale(1.15); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <h1>⚡ 実機キャプチャ動画 オートモードテストランナー</h1>
+      <span class="badge">動画: 2026-08-25 23-06-53.mp4</span>
+    </div>
+    <div>
+      <a href="../index.html" class="btn" style="text-decoration:none;">← アプリへ戻る</a>
+      <a href="../docs/AUTO_MODE_SPECIFICATION.html" target="_blank" class="btn" style="text-decoration:none;">📄 仕様書</a>
+    </div>
+  </header>
+
+  <div class="main-grid">
+    <!-- 左側: 動画プレーヤー & コントロール -->
+    <div class="video-card">
+      <video id="test-video" src="video/2026-08-25 23-06-53.mp4" controls playsinline></video>
+      
+      <div class="control-row">
+        <button id="btn-toggle-loop" class="btn btn-primary" onclick="toggleTestLoop()">
+          ▶️ オートモード検知ループ開始
+        </button>
+        <button class="btn" onclick="captureAndAnalyzeSingleFrame()">
+          📸 現フレームを手動1回解析
+        </button>
+        <button class="btn btn-success" onclick="forceTriggerMatchingPhase()">
+          🎯 相手6体取得を直接実行
+        </button>
+        <button class="btn" onclick="seekVideo(10)">
+          ⏱️ 10s
+        </button>
+        <button class="btn" onclick="seekVideo(21)">
+          ⏱️ 見せ合い開始 (21s)
+        </button>
+        <button class="btn" onclick="seekVideo(41.3)">
+          ⏱️ 見せ合い画面 (41s)
+        </button>
+        <button class="btn" onclick="seekVideo(60)">
+          ⚔️ VS演出 (60s)
+        </button>
+        <button class="btn" onclick="seekVideo(72)">
+          💥 初手出撃演出 (72s)
+        </button>
+        <button class="btn" onclick="seekVideo(85)">
+          📜 コマンド画面 (85s)
+        </button>
+        <button class="btn" onclick="stepVideo(-1)">⏮️ -1秒</button>
+        <button class="btn" onclick="stepVideo(1)">⏭️ +1秒</button>
+        <button class="btn" onclick="changePlaybackRate(1)">1x</button>
+        <button class="btn" onclick="changePlaybackRate(2)">2x</button>
+      </div>
+
+      <div style="display:flex;gap:1rem;font-size:0.85rem;color:var(--text-muted);align-items:center;">
+        <span>動画再生位置: <strong id="video-time" style="color:#fff;">0.00s</strong> / <span id="video-dur">0.00s</span></span>
+        <span>実効解像度: <strong id="video-dim" style="color:#fff;">未ロード</strong></span>
+      </div>
+
+      <!-- リアルタイム座標切り出しプレビュー (pamo3 Native) -->
+      <div>
+        <h3 style="font-size:0.9rem;margin-bottom:0.5rem;color:#fff;">出撃ネームプレート座標切り出しプレビュー (pamo3 Native座標)</h3>
+        <div class="slot-preview-grid">
+          <div class="slot-crop-box">
+            <div class="crop-title">自分1 [154.9, 933, 220, 46]</div>
+            <canvas id="crop-canvas-me-0" width="220" height="46"></canvas>
+            <div id="ocr-res-me-0" class="ocr-result">-</div>
+          </div>
+          <div class="slot-crop-box">
+            <div class="crop-title">自分2 [554.6, 933, 220, 46]</div>
+            <canvas id="crop-canvas-me-1" width="220" height="46"></canvas>
+            <div id="ocr-res-me-1" class="ocr-result">-</div>
+          </div>
+          <div class="slot-crop-box">
+            <div class="crop-title">相手1 [1196.7, 50, 220, 46]</div>
+            <canvas id="crop-canvas-rival-0" width="220" height="46"></canvas>
+            <div id="ocr-res-rival-0" class="ocr-result">-</div>
+          </div>
+          <div class="slot-crop-box">
+            <div class="crop-title">相手2 [1599.8, 50, 220, 46]</div>
+            <canvas id="crop-canvas-rival-1" width="220" height="46"></canvas>
+            <div id="ocr-res-rival-1" class="ocr-result">-</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右側: オートモード認識ステータス & ログ -->
+    <div class="dash-card">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+          <h2 style="font-size:1rem;color:#fff;">オートモード認識状態</h2>
+          <span id="auto-mode-status-badge" class="status-badge">WAITING_MATCHING (マッチング待機中)</span>
+        </div>
+        <div style="font-size:0.8rem;color:var(--text-muted);display:flex;gap:1rem;flex-wrap:wrap;">
+          <span>フェーズ: <strong id="phase-name" style="color:#a5b4fc;">WAITING_MATCHING</strong></span>
+          <span>見せ合いボール: <strong id="ball-score" style="color:#cbd5e1;">-</strong></span>
+          <span>VSロゴ: <strong id="vs-score" style="color:#cbd5e1;">-</strong></span>
+        </div>
+      </div>
+
+      <!-- 相手パーティ認識結果 (6体) -->
+      <div>
+        <h3 style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.4rem;">相手パーティ (見せ合い取得) & トレーナー名</h3>
+        <div id="opp-trainer-display" style="font-size:0.85rem;color:#fff;font-weight:700;margin-bottom:0.4rem;">
+          トレーナー名: <span style="color:#38bdf8;">(未取得)</span>
+        </div>
+        <div id="opp-party-display" style="display:grid;grid-template-columns:repeat(3, 1fr);gap:0.4rem;font-size:0.75rem;">
+          <div style="background:#030712;padding:0.4rem;border-radius:4px;border:1px solid var(--border);">1. -</div>
+          <div style="background:#030712;padding:0.4rem;border-radius:4px;border:1px solid var(--border);">2. -</div>
+          <div style="background:#030712;padding:0.4rem;border-radius:4px;border:1px solid var(--border);">3. -</div>
+          <div style="background:#030712;padding:0.4rem;border-radius:4px;border:1px solid var(--border);">4. -</div>
+          <div style="background:#030712;padding:0.4rem;border-radius:4px;border:1px solid var(--border);">5. -</div>
+          <div style="background:#030712;padding:0.4rem;border-radius:4px;border:1px solid var(--border);">6. -</div>
+        </div>
+      </div>
+
+      <!-- 相手6枠の切り出しプレビュー (pamo3 Native) -->
+      <div>
+        <h3 style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.4rem;">相手6枠の切り出し目視プレビュー (アイコン & 属性1・2)</h3>
+        <div id="opp-crop-preview-list" style="display:grid;grid-template-columns:repeat(3, 1fr);gap:0.4rem;font-size:0.75rem;">
+          <div style="background:#030712;padding:0.3rem;border-radius:6px;border:1px solid var(--border);text-align:center;">
+            <div style="color:#94a3b8;font-size:0.7rem;margin-bottom:2px;">#1</div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
+              <canvas id="crop-opp-icon-0" width="40" height="40" style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-t1-0" width="24" height="24" style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-t2-0" width="24" height="24" style="border:1px solid #334155;background:#000;"></canvas>
+            </div>
+            <div id="crop-opp-label-0" style="color:#a5b4fc;margin-top:2px;font-size:0.7rem;">-</div>
+          </div>
+          <div style="background:#030712;padding:0.3rem;border-radius:6px;border:1px solid var(--border);text-align:center;">
+            <div style="color:#94a3b8;font-size:0.7rem;margin-bottom:2px;">#2</div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
+              <canvas id="crop-opp-icon-1" width="40" height="40" style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-t1-1" width="24" height="24" style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-t2-1" width="24" height="24" style="border:1px solid #334155;background:#000;"></canvas>
+            </div>
+            <div id="crop-opp-label-1" style="color:#a5b4fc;margin-top:2px;font-size:0.7rem;">-</div>
+          </div>
+          <div style="background:#030712;padding:0.3rem;border-radius:6px;border:1px solid var(--border);text-align:center;">
+            <div style="color:#94a3b8;font-size:0.7rem;margin-bottom:2px;">#3</div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
+              <canvas id="crop-opp-icon-2" width="40" height="40" style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-t1-2" width="24" height="24" style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-t2-2" width="24" height="24" style="border:1px solid #334155;background:#000;"></canvas>
+            </div>
+            <div id="crop-opp-label-2" style="color:#a5b4fc;margin-top:2px;font-size:0.7rem;">-</div>
+          </div>
+          <div style="background:#030712;padding:0.3rem;border-radius:6px;border:1px solid var(--border);text-align:center;">
+            <div style="color:#94a3b8;font-size:0.7rem;margin-bottom:2px;">#4</div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
+              <canvas id="crop-opp-icon-3" width="40" height="40" style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-t1-3" width="24" height="24" style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-t2-3" width="24" height="24" style="border:1px solid #334155;background:#000;"></canvas>
+            </div>
+            <div id="crop-opp-label-3" style="color:#a5b4fc;margin-top:2px;font-size:0.7rem;">-</div>
+          </div>
+          <div style="background:#030712;padding:0.3rem;border-radius:6px;border:1px solid var(--border);text-align:center;">
+            <div style="color:#94a3b8;font-size:0.7rem;margin-bottom:2px;">#5</div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
+              <canvas id="crop-opp-icon-4" width="40" height="40" style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-t1-4" width="24" height="24" style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-t2-4" width="24" height="24" style="border:1px solid #334155;background:#000;"></canvas>
+            </div>
+            <div id="crop-opp-label-4" style="color:#a5b4fc;margin-top:2px;font-size:0.7rem;">-</div>
+          </div>
+          <div style="background:#030712;padding:0.3rem;border-radius:6px;border:1px solid var(--border);text-align:center;">
+            <div style="color:#94a3b8;font-size:0.7rem;margin-bottom:2px;">#6</div>
+            <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
+              <canvas id="crop-opp-icon-5" width="40" height="40" style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-t1-5" width="24" height="24" style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-t2-5" width="24" height="24" style="border:1px solid #334155;background:#000;"></canvas>
+            </div>
+            <div id="crop-opp-label-5" style="color:#a5b4fc;margin-top:2px;font-size:0.7rem;">-</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 下部VSバープレビュー -->
+      <div>
+        <h3 style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.4rem;">出撃VSバー (リアルタイム表示)</h3>
+        <div class="vs-bar-container">
+          <div class="vs-side">
+            <span style="font-size:0.75rem;font-weight:700;color:#f97316;">自分</span>
+            <div id="vs-slot-me-0" class="vs-slot"><img src="../assets/templates/monsterball.png"></div>
+            <div id="vs-slot-me-1" class="vs-slot"><img src="../assets/templates/monsterball.png"></div>
+            <div id="vs-slot-me-2" class="vs-slot"><img src="../assets/templates/monsterball.png"></div>
+            <div id="vs-slot-me-3" class="vs-slot"><img src="../assets/templates/monsterball.png"></div>
+          </div>
+          <span style="font-weight:800;font-size:0.9rem;color:#a855f7;">VS</span>
+          <div class="vs-side">
+            <div id="vs-slot-rival-0" class="vs-slot"><img src="../assets/templates/monsterball.png"></div>
+            <div id="vs-slot-rival-1" class="vs-slot"><img src="../assets/templates/monsterball.png"></div>
+            <div id="vs-slot-rival-2" class="vs-slot"><img src="../assets/templates/monsterball.png"></div>
+            <div id="vs-slot-rival-3" class="vs-slot"><img src="../assets/templates/monsterball.png"></div>
+            <span style="font-size:0.75rem;font-weight:700;color:#3b82f6;">相手</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ログターミナル -->
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
+          <h3 style="font-size:0.85rem;color:var(--text-muted);">実行ログ (Console Output)</h3>
+          <button onclick="clearLogs()" style="background:none;border:none;color:#94a3b8;font-size:0.75rem;cursor:pointer;">クリア</button>
+        </div>
+        <div id="log-terminal" class="log-terminal"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let isLoopRunning = false;
+    let loopTimer = null;
+    const video = document.getElementById('test-video');
+    const logTerm = document.getElementById('log-terminal');
+
+    function log(msg, type = 'normal') {
+      const line = document.createElement('div');
+      line.className = `log-line ${type}`;
+      const time = new Date().toLocaleTimeString();
+      line.textContent = `[${time}] ${msg}`;
+      logTerm.appendChild(line);
+      logTerm.scrollTop = logTerm.scrollHeight;
+    }
+    function clearLogs() { logTerm.innerHTML = ''; }
+
+    // 動画のメタデータロード時
+    video.addEventListener('loadedmetadata', () => {
+      document.getElementById('video-dim').textContent = `${video.videoWidth} x ${video.videoHeight}`;
+      document.getElementById('video-dur').textContent = `${video.duration.toFixed(1)}s`;
+      log(`動画メタデータロード完了: ${video.videoWidth}x${video.videoHeight}, 長さ: ${video.duration.toFixed(1)}s`, 'info');
+    });
+
+    video.addEventListener('timeupdate', () => {
+      document.getElementById('video-time').textContent = `${video.currentTime.toFixed(2)}s`;
+    });
+
+    function seekVideo(sec) { video.currentTime = sec; }
+    function stepVideo(delta) { video.currentTime = Math.max(0, video.currentTime + delta); }
+    function changePlaybackRate(rate) { video.playbackRate = rate; log(`再生速度変更: ${rate}x`, 'info'); }
+
+    // オートモードコントローラーの初期化
+    window.addEventListener('DOMContentLoaded', async () => {
+      log('認識エンジン辞書およびワーカー初期化中...', 'info');
+      try {
+        if (window.recognitionEngine) {
+          await window.recognitionEngine.loadDictionaries();
+          log('認識エンジン (Rooster, Geo, Type) ロード完了！', 'success');
+        }
+        if (window.autoModeController) {
+          window.autoModeController.videoElement = video;
+          // 動画の登録パーティ（動画内の自分パーティ: フラエッテ, エルフーン, ドドゲザン, ウインディ, イダイトウ, カイリュー）
+          window.autoModeController.myPartyNames = ['フラエッテ', 'エルフーン', 'ドドゲザン', 'ウインディ', 'イダイトウ', 'カイリュー'];
+          window.autoModeController.phase = 'WAITING_MATCHING';
+          await window.autoModeController.ensureWorkersReady();
+          log('AutoModeController ワーカー & テンプレート画像 初期化完了！ 待機中: WAITING_MATCHING', 'success');
+
+          // 出撃通知をフックしてプレビュー下に表示
+          if (typeof window.autoModeController._handleDispatchedPokemonFound === 'function') {
+            const origDispatchHandler = window.autoModeController._handleDispatchedPokemonFound.bind(window.autoModeController);
+            window.autoModeController._handleDispatchedPokemonFound = function(side, pName) {
+              origDispatchHandler(side, pName);
+              log(`🎯 出撃検知: [${side === 'me' ? '自分' : '相手'}] ${pName}`, 'success');
+            };
+          }
+
+          // OCR文字読み取り結果をリアルタイム表示
+          window.autoModeController.onOcrSlotResult = function(role, idx, rawText, bestMatch, dist) {
+            const resEl = document.getElementById(`ocr-res-${role}-${idx}`);
+            if (resEl) {
+              if (bestMatch && dist <= 2) {
+                resEl.style.color = '#34d399';
+                resEl.textContent = `⭕ "${rawText}" ➔ ${bestMatch}`;
+              } else {
+                resEl.style.color = '#94a3b8';
+                resEl.textContent = rawText ? `"${rawText}" (${bestMatch || 'なし'}, 差${dist})` : '-';
+              }
+            }
+          };
+
+          // 認識エンジンのスロット別詳細ログを表示
+          window.logEngineStep = function(slotIdx, t1, t2, pName, msg) {
+            log(msg, 'info');
+            const labelEl = document.getElementById(`crop-opp-label-${slotIdx}`);
+            if (labelEl) {
+              labelEl.textContent = `${t1}/${t2} ➔ ${pName}`;
+            }
+          };
+        }
+      } catch (err) {
+        log(`初期化エラー: ${err.message}`, 'error');
+      }
+    });
+
+    // テストループ
+    function toggleTestLoop() {
+      const btn = document.getElementById('btn-toggle-loop');
+      if (isLoopRunning) {
+        isLoopRunning = false;
+        clearInterval(loopTimer);
+        video.pause();
+        btn.textContent = '▶️ オートモード検知ループ開始';
+        btn.className = 'btn btn-primary';
+        log('オートモード検知ループ停止', 'warn');
+      } else {
+        isLoopRunning = true;
+        video.play();
+        btn.textContent = '⏹️ 検知ループ停止';
+        btn.className = 'btn btn-success';
+        log('オートモード検知ループ開始！(350ms間隔)', 'success');
+        loopTimer = setInterval(async () => {
+          await runDetectionStep();
+        }, 350);
+      }
+    }
+
+    // 1フレーム手動実行
+    async function captureAndAnalyzeSingleFrame() {
+      log(`手動解析実行: 動画時刻 ${video.currentTime.toFixed(2)}s`, 'info');
+      await runDetectionStep();
+    }
+
+    // 見せ合い解析を直接呼び出し
+    async function forceTriggerMatchingPhase() {
+      if (!window.autoModeController) return;
+      const ctx = window.autoModeController.captureFrame();
+      if (!ctx) {
+        log('フレームキャプチャ失敗', 'error');
+        return;
+      }
+      log(`🎯 相手6体取得を直接実行中... (動画時刻: ${video.currentTime.toFixed(2)}s)`, 'info');
+      window.autoModeController.phase = 'MATCHING';
+      document.getElementById('phase-name').textContent = 'MATCHING';
+      document.getElementById('auto-mode-status-badge').textContent = 'MATCHING (相手情報解析中)';
+      try {
+        await window.autoModeController._handleMatchingPhase(ctx);
+        log('✅ 相手6体取得処理 完了！', 'success');
+        // 結果表示
+        if (window.autoModeController.rivalPartyNames && window.autoModeController.rivalPartyNames.length > 0) {
+          const pList = window.autoModeController.rivalPartyNames;
+          const disp = document.getElementById('opp-party-display');
+          disp.innerHTML = pList.map((p, idx) => `<div style="background:#1e1b4b;color:#c7d2fe;padding:0.4rem;border-radius:4px;border:1px solid #4338ca;font-weight:700;">${idx + 1}. ${p}</div>`).join('');
+          log(`相手パーティ: ${pList.join(', ')}`, 'success');
+        }
+        if (window.autoModeController.oppTrainerName) {
+          document.getElementById('opp-trainer-display').innerHTML = `トレーナー名: <span style="color:#38bdf8;">${window.autoModeController.oppTrainerName}</span>`;
+          log(`相手トレーナー名: ${window.autoModeController.oppTrainerName}`, 'success');
+        }
+      } catch (err) {
+        log(`相手情報取得エラー: ${err.message}`, 'error');
+      }
+    }
+
+    async function runDetectionStep() {
+      if (!window.autoModeController) return;
+      try {
+        const ctx = window.autoModeController.captureFrame();
+        if (!ctx) return;
+
+        // プレビューの4枠（pamo3 Native）を描画
+        updatePreviewCrops(ctx);
+
+        const coords = window.COORDS || (window.AutoModeController && window.AutoModeController.COORDS);
+
+        // マッチング判定スコアを可視化計算
+        let ballScore = 0;
+        let hasBtn = false;
+        if (coords && coords.MATCHING_BALL && window.autoModeController.templates && window.autoModeController.templates.matchingBall) {
+          const ballCrop = window.autoModeController.cropToBase64(ctx, coords.MATCHING_BALL);
+          ballScore = await window.autoModeController.matchTemplate(ballCrop, window.autoModeController.templates.matchingBall, { useAlphaMask: true });
+          hasBtn = window.autoModeController.isSelectionButtonPresent(ctx);
+          document.getElementById('ball-score').textContent = `${ballScore.toFixed(3)} (ボタン: ${hasBtn ? '検出' : '無'})`;
+        }
+        if (coords && coords.VS_SCREEN && window.autoModeController.templates && window.autoModeController.templates.vsLogo) {
+          const vsCrop = window.autoModeController.cropToBase64(ctx, coords.VS_SCREEN);
+          const vsScore = await window.autoModeController.matchTemplate(vsCrop, window.autoModeController.templates.vsLogo, { useAlphaMask: true });
+          document.getElementById('vs-score').textContent = vsScore.toFixed(3);
+        }
+
+        // コントローラーのステートマシンを1ステップ進める
+        const prevPhase = window.autoModeController.phase;
+        await window.autoModeController.stepDetection(ctx);
+
+        // UI同期
+        document.getElementById('phase-name').textContent = window.autoModeController.phase;
+        document.getElementById('auto-mode-status-badge').textContent = window.autoModeController.phase;
+
+        if (prevPhase !== window.autoModeController.phase) {
+          log(`✨ フェーズ遷移: ${prevPhase} ➔ ${window.autoModeController.phase}`, 'success');
+        }
+
+        // 相手パーティが取得された場合
+        if (window.autoModeController.rivalPartyNames && window.autoModeController.rivalPartyNames.length > 0) {
+          const pList = window.autoModeController.rivalPartyNames;
+          const disp = document.getElementById('opp-party-display');
+          disp.innerHTML = pList.map((p, idx) => `<div style="background:#1e1b4b;color:#c7d2fe;padding:0.4rem;border-radius:4px;border:1px solid #4338ca;font-weight:700;">${idx + 1}. ${p}</div>`).join('');
+        }
+
+        // 相手トレーナー名
+        if (window.autoModeController.oppTrainerName) {
+          document.getElementById('opp-trainer-display').innerHTML = `トレーナー名: <span style="color:#38bdf8;">${window.autoModeController.oppTrainerName}</span>`;
+        }
+      } catch (loopErr) {
+        log(`検知ステップエラー: ${loopErr.message}`, 'error');
+      }
+    }
+
+    // プレビューキャンバスへの切り出し描画
+    function updatePreviewCrops(ctx) {
+      const crops = [
+        { id: 'crop-canvas-me-0', rect: { x: 154.9, y: 933, w: 220, h: 46 } },
+        { id: 'crop-canvas-me-1', rect: { x: 554.6, y: 933, w: 220, h: 46 } },
+        { id: 'crop-canvas-rival-0', rect: { x: 1196.7, y: 50, w: 220, h: 46 } },
+        { id: 'crop-canvas-rival-1', rect: { x: 1599.8, y: 50, w: 220, h: 46 } }
+      ];
+
+      crops.forEach(c => {
+        const canvas = document.getElementById(c.id);
+        if (!canvas) return;
+        const cCtx = canvas.getContext('2d');
+        cCtx.drawImage(ctx.canvas, c.rect.x, c.rect.y, c.rect.w, c.rect.h, 0, 0, canvas.width, canvas.height);
+      });
+
+      // 相手6枠の目視プレビューもリアルタイム描画 (pamo3 Native)
+      updateOppSlotPreviews(ctx);
+    }
+
+    function updateOppSlotPreviews(ctx) {
+      for (let i = 0; i < 6; i++) {
+        const iconX = 1620.8;
+        const iconY = 159.5 + 125.9 * i;
+        const iconW = 104.6;
+        const iconH = 104.6;
+
+        const t1X = 1750.2;
+        const t2X = 1801.0;
+        const typeY = 172.0 + 126.0 * i;
+        const tW = 40.0;
+        const tH = 40.0;
+
+        const iconC = document.getElementById(`crop-opp-icon-${i}`);
+        const t1C = document.getElementById(`crop-opp-t1-${i}`);
+        const t2C = document.getElementById(`crop-opp-t2-${i}`);
+
+        if (iconC) iconC.getContext('2d').drawImage(ctx.canvas, iconX, iconY, iconW, iconH, 0, 0, 40, 40);
+        if (t1C) t1C.getContext('2d').drawImage(ctx.canvas, t1X, typeY, tW, tH, 0, 0, 24, 24);
+        if (t2C) t2C.getContext('2d').drawImage(ctx.canvas, t2X, typeY, tW, tH, 0, 0, 24, 24);
+      }
+    }
+
+    // コントローラー内部の stepDetection を _processCurrentPhase にバインド
+    if (window.AutoModeController) {
+      window.AutoModeController.prototype.stepDetection = async function(ctx) {
+        await this._processCurrentPhase();
+      };
+    }
+  </script>
+</body>
+</html>

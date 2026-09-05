@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
@@ -673,7 +673,7 @@ stateDiagram-v2
                 <td><strong><code>WAITING_MATCHING</code></strong><br><span style="font-size:0.78rem;color:var(--text-muted)">マッチング待機中</span></td>
                 <td>対戦相手の検索中 / ロビー画面</td>
                 <td>画面左下の選出完了ボタンボールマーク<br><code>COORDS.MATCHING_BALL</code><br><span style="color:#f59e0b;font-size:0.8rem">※試合終了後8秒間はクールダウン待機</span></td>
-                <td><code>matching_phase_ball.png</code> との一致度<br><strong style="color:#10b981">score &ge; 0.60</strong><br><span style="font-size:0.78rem;color:var(--text-dim)">(pamo3原典 gbhe() 完全準拠。誤検知原因の緑ボタン判定は完全撤廃)</span></td>
+                <td><code>matching_phase_ball.png</code> との一致度<br><strong style="color:#10b981">score &ge; 0.85 が2連続</strong><br><span style="font-size:0.78rem;color:var(--text-dim)">(pamo3原典 gbhe() 完全準拠。誤検知原因の緑ボタン判定は完全撤廃)</span></td>
                 <td>
                   <ol style="padding-left:1.1rem;margin:0;font-size:0.83rem;line-height:1.6">
                     <li>バッジを「見せ合い画面検知: 画面安定待ち (3秒ウェイト)...」に更新。</li>
@@ -860,7 +860,7 @@ stateDiagram-v2
                 <td class="coord-val">72.0</td>
                 <td class="coord-val">72.0</td>
                 <td><code>assets/.../win_ball.png</code></td>
-                <td><code>&gt; 0.50</code> で勝ち判定</td>
+                <td><code>&gt; 0.55</code> (3連続) で勝ち判定</td>
               </tr>
               <tr>
                 <td><code>WIN_BALL_RIVAL</code> (相手側勝利ボール)</td>
@@ -869,7 +869,7 @@ stateDiagram-v2
                 <td class="coord-val">72.0</td>
                 <td class="coord-val">72.0</td>
                 <td><code>assets/.../win_ball.png</code></td>
-                <td><code>&gt; 0.50</code> で負け判定</td>
+                <td><code>&gt; 0.55</code> (3連続) で負け判定</td>
               </tr>
             </tbody>
           </table>
@@ -1358,3 +1358,4 @@ flowchart TD
   </script>
 </body>
 </html>
+

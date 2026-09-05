@@ -1,0 +1,165 @@
+﻿s=1
+break}else{n.ahu()
+$.ad().a8("[DBG] is matching phase, is first time, do process")}A.ps("handleMatching ENTER currentPhase="+n.hL.j(0))
+p=4
+$.ad().a8("[DBG] start detect rival pokemon images")
+s=7
+return A.d(n.UJ(),$async$pE)
+case 7:s=8
+return A.d(n.WY(),$async$pE)
+case 8:c2=n.iT
+b0=n.x1
+b0.toString
+s=9
+return A.d(c2.a0h(b0,n.fy),$async$pE)
+case 9:m=c8
+n.jK=m.c
+l=A.eCj(m.c)
+b0=n.x1
+b0.toString
+s=10
+return A.d(n.a_O(b0),$async$pE)
+case 10:k=c8
+b1=k
+j=b1==null?l:b1
+n.hU=j
+$.ad().a8("[DBG] matching battleMode: balls="+A.i(l)+" ocr(3/4)="+A.i(k)+" -> use "+A.i(j))
+A.ps("handleMatching battleMode: balls="+A.i(l)+" ocr="+A.i(k)+" -> "+A.i(j)+", ballS="+A.i(m.c.a)+", ballD="+A.i(m.c.b))
+b0=j
+$.vy().SJ(new A.tn(B.FN,0,0,"",b0,B.jF,B.jE,!0,B.f6))
+b0=t.z
+s=11
+return A.d(A.dW(B.jZ,null,b0),$async$pE)
+case 11:n.bjk(0,1)
+s=k==null?12:13
+break
+case 12:b2=n.x1
+b2.toString
+s=14
+return A.d(n.a_O(b2),$async$pE)
+case 14:i=c8
+if(i!=null){if(i!==j)$.ad().a8("[DBG] battle mode from 3/4 OCR (retry before trainer trim): "+A.i(j)+" -> "+A.i(i))
+j=i
+n.hU=i}case 13:h=""
+p=16
+J.t(j,1)
+g=B.ani
+b2=t.N
+b3=t.lu
+b4=n.x1
+b4.toString
+b5=g
+b6=b5.a
+b7=b5.b
+s=19
+return A.d(new A.eW(new A.ey(A.N(b2,b3))).hg(b4,new A.a4(b6,b7,b6+b5.c,b7+b5.d)),$async$pE)
+case 19:f=c8
+J.t(j,1)
+e=150
+d=new A.byM(new A.eW(new A.ey(A.N(b2,b3))),new A.is())
+s=20
+return A.d(d.yv(f,!0,e),$async$pE)
+case 20:c=c8
+h=c.a
+p=4
+s=18
+break
+case 16:p=15
+c3=o.pop()
+b=A.aj(c3)
+a=A.aX(c3)
+$.ad().hi(0,"[DBG] opponent trainer name OCR (Champions): "+A.i(b))
+A.dMy(null,null,a)
+A.dGE("trainer name OCR failed",b,a)
+s=18
+break
+case 15:s=4
+break
+case 18:A.ps("handleMatching trainerName len="+J.aq(h))
+s=21
+return A.d(A.dW(B.ce,null,b0),$async$pE)
+case 21:a0=j
+s=k==null?22:23
+break
+case 22:b2=n.x1
+b2.toString
+s=24
+return A.d(n.a_O(b2),$async$pE)
+case 24:a1=c8
+if(a1!=null&&a1!==a0){$.ad().a8("[DBG] battle mode refined after trainer OCR: "+A.i(a0)+" -> "+A.i(a1)+" (updateBattleMemoStep)")
+a0=a1
+j=a1
+n.hU=a1}case 23:b2=h
+b3=a0
+$.vy().SJ(new A.tn(B.rx,1,0,b2,b3,B.jF,B.jE,!0,B.f6))
+A.ps("handleMatching rival6 START battleMode="+A.i(j))
+b9=new A.tc()
+$.xH()
+b9.iK(0)
+a2=b9
+b3=n.x1
+b3.toString
+s=25
+return A.d(c2.a7y(b3,j),$async$pE)
+case 25:a3=c8
+b3=a2
+if(b3.b==null)b3.b=$.Fv.$0()
+A.ps("handleMatching rival6 DONE "+a2.gvM()+"ms appDexIds="+A.i(a3.a)+" scores="+A.i(a3.b))
+a4=A.a([],t.XE)
+c2=a3.c,b2=c2.length,b3=t.N,b4=t.lu,c0=0
+case 26:if(!(c0<c2.length)){s=28
+break}a5=c2[c0]
+c5=J
+c6=a4
+s=29
+return A.d(new A.eW(new A.ey(A.N(b3,b4))).ahv(a5),$async$pE)
+case 29:c5.ek(c6,c8)
+case 27:c2.length===b2||(0,A.U)(c2),++c0
+s=26
+break
+case 28:n.J(new A.d2w(n,a3,a4))
+a6=0
+case 30:if(!(a6<a3.a.length)){s=32
+break}a7=a3.a[a6]
+s=J.t(a7,470)?33:34
+break
+case 33:c2=J.u(a4,a6)
+b2=J.u(a4,a6)
+c1=A.e54(b2)
+b2=(c1==null?null:c1.rO(0,b2,null)).a
+b3=b2==null
+b4=b3?null:b2.a
+if(b4==null)b4=0
+b2=b3?null:b2.b
+s=35
+return A.d(n.a69(c2,new A.ab(b4,b2==null?0:b2)),$async$pE)
+case 35:n.y2=c8
+case 34:c2=a6
+b2=a7
+b3=b2===470?n.y2:null
+$.vy().SJ(new A.tn(B.rx,2,0,"",1,new A.amP(c2,b2,b3),B.jE,!0,B.f6))
+A.ps("operationAddRivalPokemon index="+A.i(c2)+" appDexId="+A.i(b2))
+s=36
+return A.d(A.dW(B.ce,null,b0),$async$pE)
+case 36:case 31:++a6
+s=30
+break
+case 32:n.bjj(3)
+n.j9=!0
+A.ps("handleMatching EXIT matchingMemoPipelineDone=true")
+p=2
+s=6
+break
+case 4:p=3
+c4=o.pop()
+a8=A.aj(c4)
+a9=A.aX(c4)
+A.dGE("handleMatching failed",a8,a9)
+throw c4
+s=6
+break
+case 3:s=2
+break
+case 6:case 1:return A.m(q,r)
+case 2:return A.l(o.at(-1),r)}})
+return A.n($async$pE,r)},

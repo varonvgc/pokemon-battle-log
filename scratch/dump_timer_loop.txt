@@ -1,0 +1,100 @@
+﻿case 25:k="isInGameVal(phaseDecide)"
+s=26
+return A.d(n.NI(l!==B.i2&&!n.j9),$async$B_)
+case 26:g=b0
+$.ad().a8("[DBG-PHASE] battlePhaseRes: "+A.i(g))
+if(g>0.5)m=B.i2
+case 24:case 13:case 10:s=l===B.i2?27:28
+break
+case 27:k="handleGameFinishOperation"
+s=29
+return A.d(n.arG(),$async$B_)
+case 29:f=b0
+if(f)m=B.FZ
+case 28:p=2
+s=8
+break
+case 6:p=5
+a8=o.pop()
+e=A.aj(a8)
+d=A.aX(a8)
+n.b0W()
+$.ad().aeQ(0,"[DBG-PHASE] stage="+A.i(k)+" error="+A.i(e),e,d)
+A.dGE("fetchPhase stage="+A.i(k),e,d)
+s=8
+break
+case 5:s=2
+break
+case 8:s=l===B.ms&&m!==B.ms?30:32
+break
+case 30:c=n.x1
+s=c!=null?33:35
+break
+case 33:s=36
+return A.d(n.iT.YL(c,n.fy),$async$B_)
+case 36:i=b0
+$.ad().a8("[DBG-PHASE] matching\u2192leave: gameStartVsScore="+A.i(i)+", rawResult="+A.i(m))
+if(i>0.5)m=B.i2
+else m=B.i3
+s=34
+break
+case 35:m=B.i3
+case 34:s=31
+break
+case 32:if(l===B.i2&&m===B.ms)m=B.FZ
+case 31:if(l===B.i2&&m===B.kv)m=B.i2
+if(m===B.kv)if(l===B.xO||l===B.kv)++n.go
+else n.go=0
+if(m===B.i3){if(l===B.i3){a0=n.k1
+if(a0!=null&&new A.bE(Date.now(),0,!1).kt(a0).a>=4e7){m=B.i2
+n.k1=null
+$.ad().a8("[DBG-PHASE] waitingGameStart: force inGame after 40s (detection miss rescue)")}}}else n.k1=null
+if(m===B.i3&&l!==B.i3)n.k1=new A.bE(Date.now(),0,!1)
+a1=n.jK
+c=$.ad()
+b=n.fy.j(0)
+a2=A.i(m)
+a3=A.i(l)
+a4=n.go
+a5=a1==null
+a6=a5?null:a1.a
+a7=a5?null:a1.b
+c.a8("[DBG-PHASE] fetchPhase: "+b+", "+a2+", "+a3+", "+a4+", ballS="+A.i(a6)+", ballD="+A.i(a7))
+a7=A.i(l)
+a6=A.i(m)
+a4=n.fy.j(0)
+a3=n.hU
+a2=n.j9
+c=a5?null:a1.a
+b=a5?null:a1.b
+A.ps("fetchPhase: "+a7+" -> "+a6+", gameRom="+a4+", battleMode="+a3+", matchingMemoDone="+a2+", ballS="+A.i(c)+", ballD="+A.i(b)+", invalidCount="+n.go)
+q=m
+s=1
+break
+case 1:return A.m(q,r)
+case 2:return A.l(o.at(-1),r)}})
+return A.n($async$B_,r)},
+NI(a){return this.cBi(a)},
+cBi(a){var s=0,r=A.o(t.i),q,p=this,o,n,m,l,k,j,i,h,g,f,e,d,c,b
+var $async$NI=A.k(function(a0,a1){if(a0===1)return A.l(a1,r)
+for(;;)switch(s){case 0:if(p.to==null){q=0
+s=1
+break}o=new A.eW(new A.ey(A.N(t.N,t.lu)))
+n=p.es
+if(n==null){q=0
+s=1
+break}m=p.x1
+m.toString
+s=3
+return A.d(o.hg(m,B.bzx),$async$NI)
+case 3:l=a1
+m=p.x1
+m.toString
+s=4
+return A.d(o.hg(m,B.bzz),$async$NI)
+case 4:k=a1
+s=5
+return A.d(A.vJ(o,l,n),$async$NI)
+case 5:j=a1
+s=6
+return A.d(A.vJ(o,k,n),$async$NI)
