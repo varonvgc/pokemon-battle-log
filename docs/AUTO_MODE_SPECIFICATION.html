@@ -604,6 +604,31 @@ stateDiagram-v2
     FINISHED --> WAITING_MATCHING: ログ自動保存完了 / 次の対戦待ち
           </pre>
         </div>
+
+        <h4 class="subsection-title">1.1 オートモード起動・停止とリソース管理</h4>
+        <div class="card-grid">
+          <div class="info-card">
+            <div class="info-card-header">▶️ 起動シーケンス (startAutoMode)</div>
+            <div class="info-card-body">
+              <ol style="padding-left:1.1rem;margin:0;font-size:0.83rem;line-height:1.6">
+                <li><code>navigator.mediaDevices.getDisplayMedia</code> でSwitchキャプチャ映像ストリームを取得。</li>
+                <li><code>&lt;video&gt;</code> にストリームをバインドし、1920&times;1080バッファキャンバスを準備。</li>
+                <li>Web Worker群（OpenCVワーカー、カタカナOCR、汎用OCR）をオンデマンドで初期化。</li>
+                <li>ステートマシンを <code>WAITING_MATCHING</code> に設定し、350ms間隔の検知ループを開始。</li>
+              </ol>
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-header">⏹️ 停止シーケンス (stopAutoMode)</div>
+            <div class="info-card-body">
+              <ol style="padding-left:1.1rem;margin:0;font-size:0.83rem;line-height:1.6">
+                <li><code>isAutoRunning = false</code> をセットし、定期ループタイマーを破棄。</li>
+                <li>映像ストリームの全トラックを停止 (<code>track.stop()</code>) してキャプチャ権限を解放。</li>
+                <li>ステートマシンを <code>IDLE</code> に戻し、右下VSバーを初期化。</li>
+              </ol>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- 2. 状態遷移詳細定義 -->
@@ -958,6 +983,41 @@ stateDiagram-v2
           <li>各陣営の選出リスト（<code>detectedDispatchedMe</code>, <code>detectedDispatchedRival</code>）は配列として管理。</li>
           <li>出撃・HPバー検知で新しいポケモン名が認識された場合、まだリストに含まれていなければ次のスロット（3体目、4体目）として自動追加。</li>
           <li>上限（4体）に達した陣営はOCR監視を自動停止し、CPU負荷を最小化。</li>
+        </ul>
+
+        <h4 class="subsection-title">4.4 先発 (1・2枠) と後発 (3・4枠) のスロット決定規則</h4>
+        <div class="card-grid">
+          <div class="info-card">
+            <div class="info-card-header">⚔️ 出撃演出検知時 (先発スロット0, 1)</div>
+            <div class="info-card-body">
+              出撃演出（<code>DISPATCH_DOUBLE</code> のインデックス 0, 1）で検知された2体は、確定で<strong>「先発1」「先発2」</strong>のスロットに割り当てられます。
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-header">🔄 対戦中HPバー・交代時 (後発スロット2, 3)</div>
+            <div class="info-card-body">
+              先発枠が埋まっている状態で新しく検知されたポケモンは、順次<strong>「後発1 (スロット2)」「後発2 (スロット3)」</strong>へと割り当てられます。
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-header">👆 手動選出時</div>
+            <div class="info-card-body">
+              ユーザーがタップした順序（1〜2番目が先発、3〜4番目が後発）がそのままスロットへ反映されます。
+            </div>
+          </div>
+        </div>
+
+        <h4 class="subsection-title">4.5 フォルム違い・メガシンカ・リージョンフォームの照合規則</h4>
+        <ul class="spec-list">
+          <li><strong>実機ネームプレートの特性</strong>: 実機の出撃ネームプレートにはフォルム名やメガシンカの文字は表示されず、ベース名（例:「リザードン」「オーガポン」「キュウコン」）のみが表示されます。</li>
+          <li><strong>正規化ベース名照合 (<code>_normalizeBasePokeName</code>)</strong>: ポケモン名に含まれる括弧情報（例:「リザードン(メガX)」「オーガポン(かまど)」「キュウコン(アローラ)」）を除去し、ベース名同士で一致判定を行います。</li>
+          <li><strong>手持ち内特定フォルムとの自動紐付け</strong>: 見せ合いで見つかった特定フォルム（例: オーガポン(かまど)）が相手手持ちにあれば、OCRで「オーガポン」が読まれた際に自動的に「オーガポン(かまど)」と特定して選出スロットへ反映します。</li>
+        </ul>
+
+        <h4 class="subsection-title">4.6 マスタリストフォールバック照合（手持ち外の自動救済）</h4>
+        <ul class="spec-list">
+          <li>相手の出撃OCR結果が見せ合いで取得された手持ち6体と一致しなかった場合（見せ合いの誤認識や手持ち欠落時）、<code>window.POKEMON_LIST</code>（全ポケモンマスタ）全体を対象にレーベンシュタイン距離照合を実行します。</li>
+          <li>レーベンシュタイン距離 &le; 2 の一致候補が見つかった場合、そのポケモン名を採用して選出スロットに自動登録します。</li>
         </ul>
       </section>
 
