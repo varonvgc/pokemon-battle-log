@@ -41,6 +41,13 @@
       { role: 'me',    index: 0, x: 960,  y: 532, w: 190, h: 50, isHorizontal: true }, // 自分1
       { role: 'me',    index: 1, x: 1330, y: 532, w: 190, h: 50, isHorizontal: true }  // 自分2
     ],
+    // 対戦中 (通常コマンド画面) のHPバー上のポケモン名領域 (常時表示領域)
+    BATTLE_HP_DOUBLE: [
+      { role: 'rival', index: 0, x: 1140, y: 35,  w: 240, h: 55, isHorizontal: true }, // 相手1 (上段左)
+      { role: 'rival', index: 1, x: 1510, y: 35,  w: 240, h: 55, isHorizontal: true }, // 相手2 (上段右)
+      { role: 'me',    index: 0, x: 180,  y: 860, w: 240, h: 55, isHorizontal: true }, // 自分1 (下段左)
+      { role: 'me',    index: 1, x: 530,  y: 860, w: 240, h: 55, isHorizontal: true }  // 自分2 (下段右)
+    ],
     // 勝敗ボール (Win / Lose 判定)
     WIN_BALL_ME:    { x: 445.3, y: 771, w: 72, h: 72 },
     WIN_BALL_RIVAL: { x: 1405,  y: 771, w: 72, h: 72 }
@@ -437,14 +444,28 @@
           break;
         }
 
+        // 見せ合い画面継続中 (ボールマークが消えるまで留まる)
+        case 'MATCHING': {
+          const ballCrop = this.cropToBase64(ctx, COORDS.MATCHING_BALL);
+          const score = await this.matchTemplate(ballCrop, this.templates.matchingBall, { useAlphaMask: true });
+          if (score < 0.35) {
+            // 見せ合いボールマークが消えた -> 画面暗転 / 対戦開始へ移行！
+            console.log('[AutoMode] MATCHING FINISHED! Transition to WAITING_GAME_START');
+            this.waitingStartTimestamp = Date.now();
+            this.phase = 'WAITING_GAME_START';
+            this.updateStatusBadge('対戦開始待ち (VS画面待機中...)');
+          }
+          break;
+        }
+
         // 2. 対戦開始 (VS画面) 待ち
         case 'WAITING_GAME_START': {
           const vsCrop = this.cropToBase64(ctx, COORDS.VS_SCREEN);
           const vsScore = await this.matchTemplate(vsCrop, this.templates.vsLogo, { useAlphaMask: true });
           const elapsed = Date.now() - (this.waitingStartTimestamp || Date.now());
 
-          // VS検知 (vsScore > 0.38) or 10秒フォールバック (出撃演出の開始を絶対に見逃さない)
-          if (vsScore > 0.38 || elapsed > 10000) {
+          // VS検知 (vsScore > 0.38) or 見せ合い終了後 7秒フォールバック (出撃演出の開始を確実キャッチ)
+          if (vsScore > 0.38 || elapsed > 7000) {
             console.log(`[AutoMode] GAME START DETECTED! (vsScore=${vsScore}, elapsed=${elapsed}ms)`);
             this.phase = 'IN_GAME';
             this.updateStatusBadge('試合中: 出撃ポケモン検知中...');
@@ -485,8 +506,8 @@
           // 自分のパーティ一覧
           let myTeamList = this.myPartyNames || [];
 
-          // 画面全体 (1920x1080) を認識エンジンへ渡す
-          const res = await window.recognitionEngine.recognize(ctx.canvas, myTeamList, 'BEFORE');
+          // 画面全体 (1920x1080) を認識エンジンへ渡す (isSwitch1080p = true を明示！)
+          const res = await window.recognitionEngine.recognize(ctx.canvas, myTeamList, 'BEFORE', true);
           console.log('[AutoMode] Recognition Engine Result:', res);
 
           // 3-1. 相手パーティ 6 匹のセット
@@ -543,12 +564,11 @@
       // 自分の登録パーティ名一覧を確実に取得
       this._extractMyPartyNames();
 
-      this.waitingStartTimestamp = Date.now();
-      this.phase = 'WAITING_GAME_START';
+      // 見せ合い画面中は MATCHING フェーズを維持 (画面のボールマークが消えるまで留まる)
       if (this.rivalPartyNames && this.rivalPartyNames.length > 0) {
         this.updateStatusBadge(`見せ合い: 相手6匹取得完了 (${this.rivalPartyNames.slice(0, 3).join('/')}...)`);
       } else {
-        this.updateStatusBadge('対戦開始待ち (VS画面待機中...)');
+        this.updateStatusBadge('見せ合い画面: 相手情報取得完了');
       }
     }
 
@@ -674,7 +694,7 @@
         this._extractMyPartyNames();
       }
 
-      let targets = [...COORDS.DISPATCH_DOUBLE];
+      let targets = [...COORDS.DISPATCH_DOUBLE, ...COORDS.BATTLE_HP_DOUBLE];
       // 先発が未確定の場合 (me < 2 または rival < 2) は、様子を見る画面のパネル領域も追加監視！
       if (this.detectedDispatchedMe.length < 2 || this.detectedDispatchedRival.length < 2) {
         targets = targets.concat(COORDS.TARGET_SELECT_DOUBLE);
