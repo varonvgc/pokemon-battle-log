@@ -446,6 +446,7 @@
 
         // 見せ合い画面継続中 (ボールマークが消えるまで留まる)
         case 'MATCHING': {
+          this._syncManualSelections();
           const ballCrop = this.cropToBase64(ctx, COORDS.MATCHING_BALL);
           const score = await this.matchTemplate(ballCrop, this.templates.matchingBall, { useAlphaMask: true });
           if (score < 0.35) {
@@ -460,6 +461,7 @@
 
         // 2. 対戦開始 (VS画面) 待ち
         case 'WAITING_GAME_START': {
+          this._syncManualSelections();
           const vsCrop = this.cropToBase64(ctx, COORDS.VS_SCREEN);
           const vsScore = await this.matchTemplate(vsCrop, this.templates.vsLogo, { useAlphaMask: true });
           const elapsed = Date.now() - (this.waitingStartTimestamp || Date.now());
@@ -469,7 +471,8 @@
             console.log(`[AutoMode] GAME START DETECTED! (vsScore=${vsScore}, elapsed=${elapsed}ms)`);
             this.phase = 'IN_GAME';
             this.updateStatusBadge('試合中: 出撃ポケモン検知中...');
-            this.resetVsBar();
+            // 手動選出を保持したままVSバーと内部リストを同期
+            this._syncManualSelections();
           }
           break;
         }
@@ -488,6 +491,11 @@
 
     // --- 見せ合い画面突入時の処理 ---
     async _handleMatchingPhase(ctx) {
+      // 0. 新しい対戦開始時に選出管理・VSバーを初期化し、手入力リスナーを登録
+      this.resetVsBar();
+      this._setupManualInputListeners();
+      this._setupSelectionClickListeners();
+
       // 1. 左側フォームのセットアップ
       this._setupRecordFormForNewBattle();
 
@@ -665,6 +673,9 @@
     async _detectDispatchedPokemons(ctx) {
       if (!this.katakanaWorker) return;
 
+      // 手動選出があれば常に最新状態を取り込み・VSバーに反映
+      this._syncManualSelections();
+
       const maxSlots = 4; // ダブルバトル固定 (選出4匹)
 
       // 1. 自分・相手ともに出撃枠が上限（4匹）に達している場合はOCRを完全に停止して超軽量化！
@@ -773,6 +784,9 @@
 
     // 出撃ポケモンが検知されたときの反映
     _handleDispatchedPokemonFound(role, pokemonName) {
+      // 最新の手動選出状態を取り込み
+      this._syncManualSelections();
+
       const list = role === 'rival' ? this.detectedDispatchedRival : this.detectedDispatchedMe;
       const maxSlots = this.battleMode === 'single' ? 3 : 4;
 
@@ -841,12 +855,21 @@
         }
       }
 
-      // 1. 左側フォームの勝敗ボタンをセット
-      if (typeof window.setResult === 'function') {
-        window.setResult(isWin ? 'win' : 'lose');
+      // 1. 左側フォームの勝敗ボタンをセット (ユーザーの手動選択があればそれを最優先！)
+      const winBtn = document.getElementById('btn-win');
+      const loseBtn = document.getElementById('btn-lose');
+      const hasManualWin = winBtn && (winBtn.classList.contains('active') || winBtn.classList.contains('selected'));
+      const hasManualLose = loseBtn && (loseBtn.classList.contains('active') || loseBtn.classList.contains('selected'));
+
+      if (!hasManualWin && !hasManualLose) {
+        if (typeof window.setResult === 'function') {
+          window.setResult(isWin ? 'win' : 'lose');
+        } else {
+          const targetBtn = document.getElementById(isWin ? 'btn-win' : 'btn-lose');
+          if (targetBtn) targetBtn.click();
+        }
       } else {
-        const winBtn = document.getElementById(isWin ? 'btn-win' : 'btn-lose');
-        if (winBtn) winBtn.click();
+        console.log('[AutoMode] User already manually selected result. Preserving manual result.');
       }
 
       // 2. 自動保存を実行
@@ -871,6 +894,146 @@
           this.updateStatusBadge('記録保存完了: 次の対戦待ち');
         }, 1200);
       }, 800);
+    }
+
+    // --- 手入力修正・手動選出の同期 & リスナー管理 ---
+
+    // 画面上の現在の選出ポケモン名配列を取得（手動選出の最優先取得）
+    _getLiveSelectedPokemonNames(role) {
+      const isMe = role === 'me';
+      const names = [];
+
+      // 1. グローバル配列 (mySelectionOrder / oppSelectionOrder) から取得
+      const orderArr = isMe ? window.mySelectionOrder : window.oppSelectionOrder;
+      if (Array.isArray(orderArr) && orderArr.length > 0) {
+        if (isMe) {
+          const allParties = (window.autoModeBridge && window.autoModeBridge.getParties && window.autoModeBridge.getParties()) ||
+                             window.parties ||
+                             JSON.parse(localStorage.getItem('pkm_parties') || '[]');
+          const selId = (window.autoModeBridge && window.autoModeBridge.getSelectedPartyId && window.autoModeBridge.getSelectedPartyId()) ||
+                        window.selectedPartyId ||
+                        (allParties[0] && allParties[0].id);
+          const party = allParties.find(p => p.id === selId) || allParties[0];
+          const myPokemon = party ? party.pokemon : [];
+          orderArr.forEach(idx => {
+            const pk = myPokemon[idx];
+            const pName = typeof pk === 'string' ? pk : (pk && pk.name || '');
+            if (pName && !names.includes(pName)) names.push(pName);
+          });
+        } else {
+          const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
+          orderArr.forEach(idx => {
+            if (oppInputs[idx]) {
+              const val = oppInputs[idx].value.trim();
+              if (val && !names.includes(val)) names.push(val);
+            }
+          });
+        }
+      }
+
+      // 2. DOM (.selection-poke-card.selected) からのフォールバック取得
+      if (names.length === 0) {
+        const containerId = isMe ? 'my-selection-slots' : 'opp-selection-slots';
+        const container = document.getElementById(containerId);
+        if (container) {
+          const cards = container.querySelectorAll('.selection-poke-card.selected');
+          const cardList = Array.from(cards).map(card => {
+            const badge = card.querySelector('.selection-order-badge');
+            const order = badge ? parseInt(badge.textContent.trim(), 10) : 99;
+            const name = card.getAttribute('title') || '';
+            return { order, name };
+          }).filter(c => c.name && !isNaN(c.order));
+          cardList.sort((a, b) => a.order - b.order);
+          cardList.forEach(c => {
+            if (!names.includes(c.name)) names.push(c.name);
+          });
+        }
+      }
+
+      return names;
+    }
+
+    // 手動選出（1〜4のバッジタップ）をオートモードの内部管理および下部VSバーへ即座に反映
+    _syncManualSelections() {
+      const manualMe = this._getLiveSelectedPokemonNames('me');
+      const manualRival = this._getLiveSelectedPokemonNames('rival');
+
+      // 1. 自分選出: 手動選出があれば手動選出を基底とし、自動検知ポケモンがあれば空き枠に追加
+      if (manualMe.length > 0) {
+        const mergedMe = [...manualMe];
+        for (const p of this.detectedDispatchedMe) {
+          if (!mergedMe.includes(p) && mergedMe.length < 4) {
+            mergedMe.push(p);
+          }
+        }
+        this.detectedDispatchedMe = mergedMe;
+      }
+
+      // 2. 相手選出: 手動選出があれば手動選出を基底とし、自動検知ポケモンがあれば空き枠に追加
+      if (manualRival.length > 0) {
+        const mergedRival = [...manualRival];
+        for (const p of this.detectedDispatchedRival) {
+          if (!mergedRival.includes(p) && mergedRival.length < 4) {
+            mergedRival.push(p);
+          }
+        }
+        this.detectedDispatchedRival = mergedRival;
+      }
+
+      // 3. 下部VSバーのスロット（0〜3）をリアルタイム更新
+      for (let i = 0; i < 4; i++) {
+        this.updateVsBarSlot('me', i, this.detectedDispatchedMe[i] || null);
+        this.updateVsBarSlot('rival', i, this.detectedDispatchedRival[i] || null);
+      }
+    }
+
+    // 見せ合い中の相手パーティ手入力修正イベントリスナー登録
+    _setupManualInputListeners() {
+      const oppSlotsContainer = document.getElementById('opp-party-slots');
+      if (oppSlotsContainer && !this._hasOppSlotsListener) {
+        this._hasOppSlotsListener = true;
+        const handler = () => this._onOppPartyManualChange();
+        oppSlotsContainer.addEventListener('input', handler);
+        oppSlotsContainer.addEventListener('change', handler);
+      }
+    }
+
+    // 相手パーティが手入力修正されたときの即時同期ハンドラ
+    _onOppPartyManualChange() {
+      const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
+      if (oppInputs && oppInputs.length > 0) {
+        const liveOppNames = Array.from(oppInputs).map(inp => inp.value.trim()).filter(Boolean);
+        if (liveOppNames.length > 0) {
+          this.rivalPartyNames = liveOppNames;
+          console.log('[AutoMode] Live updated rivalPartyNames from manual input:', this.rivalPartyNames);
+        }
+      }
+      // 相手選出グリッドの再描画（修正された名前とアイコンを表示）
+      if (typeof window.renderSelectionSlots === 'function') {
+        window.renderSelectionSlots('opp');
+      }
+      if (typeof window.rebuildOppSelectionDropdowns === 'function') {
+        window.rebuildOppSelectionDropdowns();
+      }
+      this._syncManualSelections();
+    }
+
+    // 選出グリッドの手動クリックイベントリスナー登録
+    _setupSelectionClickListeners() {
+      const mySel = document.getElementById('my-selection-slots');
+      if (mySel && !this._hasMySelListener) {
+        this._hasMySelListener = true;
+        mySel.addEventListener('click', () => {
+          setTimeout(() => this._syncManualSelections(), 50);
+        });
+      }
+      const oppSel = document.getElementById('opp-selection-slots');
+      if (oppSel && !this._hasOppSelListener) {
+        this._hasOppSelListener = true;
+        oppSel.addEventListener('click', () => {
+          setTimeout(() => this._syncManualSelections(), 50);
+        });
+      }
     }
 
     // --- UI 更新ヘルパー ---
