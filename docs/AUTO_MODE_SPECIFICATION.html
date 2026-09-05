@@ -629,6 +629,19 @@ stateDiagram-v2
             </div>
           </div>
         </div>
+
+        <h4 class="subsection-title">1.2 対戦形式とBO3モードの扱い (BO1専用固定仕様)</h4>
+        <div class="alert-box note" style="margin-top:0.75rem">
+          <div class="alert-icon">📌</div>
+          <div>
+            <div class="alert-title">ランクバトル (BO1) 専用の完全自動フロー</div>
+            <div class="alert-content">
+              オートモードは、Nintendo Switch のランクバトル（1試合完結型：BO1）専用として動作仕様が確定・固定されています。<br>
+              1試合が終了して勝敗が確定すると、即座に対戦ログが1件として自動保存され、履歴画面へ自動遷移します。<br>
+              <strong>※BO3 (3本勝負) 大会等で対戦ログをつける場合</strong>: アプリの通常モード（手動記録画面のBO3機能）をご利用ください。
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- 2. 状態遷移詳細定義 -->
@@ -748,7 +761,7 @@ stateDiagram-v2
                   </ol>
                 </td>
                 <td><span style="color:var(--text-dim)">(維持)</span></td>
-                <td rowspan="2"><code>inGame</code><br>(<code>B.i2</code>)</td>
+                <td rowspan="3"><code>inGame</code><br>(<code>B.i2</code>)</td>
               </tr>
               <tr>
                 <td><strong>[B]</strong> 画面右上の勝利ボール領域<br><code>COORDS.WIN_BALL_ME / RIVAL</code></td>
@@ -761,6 +774,19 @@ stateDiagram-v2
                   </ol>
                 </td>
                 <td><span class="badge badge-primary">FINISHED</span></td>
+              </tr>
+              <tr>
+                <td><strong>[C]</strong> 通信エラー（回線切断）・スタック時の手動強制リセット</td>
+                <td>ユーザーによる「待機へリセット」ボタン押下<br>(<code>forceResetAutoModePhase()</code>)</td>
+                <td>
+                  <ol style="padding-left:1.1rem;margin:0;font-size:0.83rem;line-height:1.6">
+                    <li>入力フォーム側の相手パーティ・選出・メモなどの入力内容は<strong>一切消去せず保持</strong>。</li>
+                    <li>ステートマシンを強制的に <code>WAITING_MATCHING</code>（対戦待ち）へ復帰。</li>
+                    <li>右下VSバーをモンスターボール初期状態へリセット。</li>
+                    <li>トースト通知を表示。ユーザーはその試合の勝敗を手動選択して通常通り保存可能。</li>
+                  </ol>
+                </td>
+                <td><span class="badge badge-green">WAITING_MATCHING</span></td>
               </tr>
               <tr>
                 <td><strong><code>FINISHED</code></strong><br><span style="font-size:0.78rem;color:var(--text-muted)">試合終了〜保存</span></td>
@@ -1012,6 +1038,7 @@ stateDiagram-v2
           <li><strong>実機ネームプレートの特性</strong>: 実機の出撃ネームプレートにはフォルム名やメガシンカの文字は表示されず、ベース名（例:「リザードン」「オーガポン」「キュウコン」）のみが表示されます。</li>
           <li><strong>正規化ベース名照合 (<code>_normalizeBasePokeName</code>)</strong>: ポケモン名に含まれる括弧情報（例:「リザードン(メガX)」「オーガポン(かまど)」「キュウコン(アローラ)」）を除去し、ベース名同士で一致判定を行います。</li>
           <li><strong>手持ち内特定フォルムとの自動紐付け</strong>: 見せ合いで見つかった特定フォルム（例: オーガポン(かまど)）が相手手持ちにあれば、OCRで「オーガポン」が読まれた際に自動的に「オーガポン(かまど)」と特定して選出スロットへ反映します。</li>
+          <li><strong>同種族ポケモンの別フォルム存在時の扱い (公式ランクバトル規約準拠)</strong>: 公式ダブルバトル（ランクバトル/公式大会）のレギュレーション上、全国図鑑番号が同一のポケモンの重複登録・選出は禁止されています。したがって、相手パーティ内に同一種族の別フォルム（例: 原種キュウコンとアローラキュウコン）が同時に重複登録されるケースの例外処理は不要（ランクバトル規約準拠）として仕様を固定しています。</li>
         </ul>
 
         <h4 class="subsection-title">4.6 マスタリストフォールバック照合（手持ち外の自動救済）</h4>
@@ -1199,6 +1226,18 @@ flowchart TD
                 <li><strong>対戦突入時の維持</strong>: 試合開始（暗転・VS演出）時も<strong>選出データは破棄されず完全に維持</strong>。</li>
                 <li><strong>自動検知連動</strong>: 出撃演出やHPバー検知結果を、手動選出枠を壊さず空き枠にのみ追加。</li>
               </ul>
+            </div>
+          </div>
+        </div>
+
+        <h4 class="subsection-title">7.4 通信エラー・回線切断時の手動リカバリー仕様 (案B)</h4>
+        <div class="alert-box note">
+          <div class="alert-icon">🔄</div>
+          <div>
+            <div class="alert-title">ワンクリック手動リセットと入力データ保護</div>
+            <div class="alert-content">
+              対戦相手の回線切断、自身の通信エラー、相手の降参による即時終了等により、勝敗ボール（<code>WIN_BALL</code>）が表示されずロビーへ戻った場合は、<strong>右下VSバー中央の「待機へリセット」ボタン</strong>または<strong>映像下部バーの「🔄」ボタン</strong>を押すことで、即座に <code>WAITING_MATCHING</code> へフェーズを復帰できます。<br>
+              リセット時も、見せ合いや対戦中に取得・入力された相手パーティや選出データは<strong>一切消去されずそのまま保持</strong>されるため、ユーザーは手動で勝敗ボタンを選択し、「対戦ログを保存」を押すことで安全に記録を保存完了できます。
             </div>
           </div>
         </div>

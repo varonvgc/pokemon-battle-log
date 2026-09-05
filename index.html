@@ -3352,15 +3352,42 @@
     }
 
     .vs-center-badge {
-      font-size: 38px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin: 0 16px;
+      flex-shrink: 0;
+      user-select: none;
+    }
+    .vs-center-text {
+      font-size: 36px;
       font-weight: 900;
       font-style: italic;
       color: #fff;
       letter-spacing: 3px;
       text-shadow: 0 2px 14px rgba(0,0,0,0.8), 0 0 24px rgba(255,255,255,0.5);
-      margin: 0 20px;
-      flex-shrink: 0;
-      user-select: none;
+      line-height: 1;
+    }
+    .vs-reset-btn {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: #cbd5e1;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    }
+    .vs-reset-btn:hover {
+      background: rgba(239, 68, 68, 0.85);
+      border-color: #ef4444;
+      color: #fff;
+      transform: scale(1.05);
     }
 
     @keyframes popIn {
@@ -4053,7 +4080,8 @@
           <span id="auto-mode-status-badge">自動モード待機中</span>
         </div>
         <div class="auto-mode-icon-buttons">
-          <button type="button" class="auto-ctrl-btn" onclick="refreshAutoCameraDevices()" title="カメラ再検索">🔄</button>
+          <button type="button" class="auto-ctrl-btn" onclick="forceResetAutoModePhase()" title="対戦待ちへ強制リセット (通信切断・スタック時)">🔄</button>
+          <button type="button" class="auto-ctrl-btn" onclick="refreshAutoCameraDevices()" title="カメラ再検索">📷</button>
           <button type="button" class="auto-ctrl-btn" onclick="toggleAutoSetupOverlay()" title="設定表示/非表示">⚙️</button>
           <button type="button" class="auto-ctrl-btn" onclick="toggleAutoVideoFullscreen()" title="全画面表示">⛶</button>
         </div>
@@ -4079,8 +4107,11 @@
         </div>
       </div>
 
-      <!-- 中央 VS -->
-      <div class="vs-center-badge">VS</div>
+      <!-- 中央 VS & 切断時強制リセットボタン -->
+      <div class="vs-center-badge">
+        <div class="vs-center-text">VS</div>
+        <button type="button" class="vs-reset-btn" onclick="forceResetAutoModePhase()" title="回線切断時などにオートモードを対戦待ちへ強制復帰">待機へリセット</button>
+      </div>
 
       <!-- 相手側 (RIVAL) -->
       <div class="vs-side-group rival">

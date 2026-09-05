@@ -406,6 +406,21 @@
       }
     }
 
+    // --- 通信切断・スタック時の手動フェーズ強制リセット (案B仕様) ---
+    forceResetPhase() {
+      console.log(`[AutoMode] Force resetting phase from ${this.phase} to WAITING_MATCHING`);
+      this.phase = 'WAITING_MATCHING';
+      this.waitingStartTimestamp = null;
+      this.updateStatusBadge('自動モード稼働中 (手動リセット完了/待機中)');
+      this.resetVsBar();
+      // 入力フォーム側の相手パーティや選出は保持し、ユーザーが手動で勝敗選択および保存を行えるようにする
+      if (typeof window.showRecordToast === 'function') {
+        window.showRecordToast('🔄 オートモードを対戦待ちへリセットしました。現在の記録は手動で結果選択・保存できます。');
+      } else {
+        alert('オートモードを対戦待ちへリセットしました。\n現在の試合記録は手動で結果選択・保存を行ってください。');
+      }
+    }
+
     // --- メイン解析ループ (ステートマシン) ---
     _startLoop() {
       const loop = async () => {
@@ -1087,5 +1102,10 @@
   // グローバル公開
   window.AutoModeController = AutoModeController;
   window.autoModeController = new AutoModeController();
+  window.forceResetAutoModePhase = () => {
+    if (window.autoModeController) {
+      window.autoModeController.forceResetPhase();
+    }
+  };
 
 })(window);
