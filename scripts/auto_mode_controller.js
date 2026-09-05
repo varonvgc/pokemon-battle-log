@@ -459,22 +459,9 @@
       // 1. 左側フォームのセットアップ
       this._setupRecordFormForNewBattle();
 
-      // 2. 選出数 (3/4) OCR によるシングル/ダブル判定
-      try {
-        if (this.tesseractWorker) {
-          const digitCrop = this.cropToBase64(ctx, COORDS.BATTLE_FORMAT_DIGIT);
-          const digitRes = await this.tesseractWorker.recognize(digitCrop);
-          const text = (digitRes.data.text || '').trim();
-          if (text.includes('3')) {
-            this.battleMode = 'single';
-          } else if (text.includes('4')) {
-            this.battleMode = 'double';
-          }
-          console.log(`[AutoMode] Battle mode detected: ${this.battleMode} (OCR: "${text}")`);
-        }
-      } catch (e) {
-        console.warn('[AutoMode] Battle format digit OCR error:', e);
-      }
+      // 2. ダブルバトル専用 (選出4匹) に固定
+      this.battleMode = 'double';
+      console.log('[AutoMode] Battle mode fixed to Double Battle (4 slots)');
 
       // 3. 高精度認識エンジン (window.recognitionEngine) で相手パーティ6匹 & トレーナー名を自動特定！
       this.rivalPartyNames = [];
@@ -639,13 +626,13 @@
       return s;
     }
 
-    // --- 試合中: 出撃ポケモンの検知 (カタカナ特化OCR) ---
+    // --- 試合中: 出撃ポケモンの検知 (ダブルバトル4匹特化・カタカナ特化OCR) ---
     async _detectDispatchedPokemons(ctx) {
       if (!this.katakanaWorker) return;
 
-      const maxSlots = this.battleMode === 'single' ? 3 : 4;
+      const maxSlots = 4; // ダブルバトル固定 (選出4匹)
 
-      // 1. 自分・相手ともに出撃枠が上限（4匹/3匹）に達している場合はOCRを完全に停止して超軽量化！
+      // 1. 自分・相手ともに出撃枠が上限（4匹）に達している場合はOCRを完全に停止して超軽量化！
       if (this.detectedDispatchedMe.length >= maxSlots && this.detectedDispatchedRival.length >= maxSlots) {
         return;
       }
@@ -672,16 +659,19 @@
         this._extractMyPartyNames();
       }
 
-      const targets = this.battleMode === 'single' ? COORDS.DISPATCH_SINGLE : COORDS.DISPATCH_DOUBLE;
+      const targets = COORDS.DISPATCH_DOUBLE; // ダブルバトル 4箇所固定
 
       for (const target of targets) {
         // すでに該当陣営が上限に達していればスキップ
         const currentList = target.role === 'rival' ? this.detectedDispatchedRival : this.detectedDispatchedMe;
         if (currentList.length >= maxSlots) continue;
 
-        // すでに先発スロットで検知済みの座標は再OCRをスキップして高速化！
+        // すでにそのスロットで直前に確認済みの場合は高速スキップ
         const slotTracker = target.role === 'rival' ? this.dispatchedSlotsRival : this.dispatchedSlotsMe;
-        if (slotTracker[target.index]) continue;
+        if (slotTracker[target.index] && currentList.includes(slotTracker[target.index]) && currentList.length < 2) {
+          // 先発特定中は別スロット（未検知の相方）の検知を最優先
+          continue;
+        }
 
         try {
           // ★ pamo3 完全準拠: 19.3度回転Deskew + 白文字2倍二値化
