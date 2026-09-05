@@ -621,18 +621,33 @@ class PokemonRecognitionEngine {
     return resultSelection;
   }
 
-  async _extractTrainerName(sCtx, mode) {
+  async _extractTrainerName(sCtx, mode, isSwitch1080p = false) {
     try {
       if (typeof Tesseract === 'undefined') {
         console.warn('Tesseract.js is not loaded. Skipping trainer name OCR.');
         return '';
       }
 
-      // Crop coordinates (2532 x 1170 space)
-      const cropX = (mode === 'BEFORE') ? 1800 : 1650;
-      const cropY = (mode === 'BEFORE') ? 50 : 80;
-      const cropW = (mode === 'BEFORE') ? 550 : 450;
-      const cropH = (mode === 'BEFORE') ? 80 : 70;
+      // Crop coordinates
+      let cropX, cropY, cropW, cropH;
+      if (isSwitch1080p) {
+        // ★ pamo3 完全準拠ネイティブ座標 (1920x1080)
+        cropX = 1562;
+        cropY = 95.4;
+        cropW = 280;
+        cropH = 47.6;
+      } else {
+        // iPhoneスクショ用座標 (2532x1170 space)
+        cropX = (mode === 'BEFORE') ? 1800 : 1650;
+        cropY = (mode === 'BEFORE') ? 50 : 80;
+        cropW = (mode === 'BEFORE') ? 550 : 450;
+        cropH = (mode === 'BEFORE') ? 80 : 70;
+      }
+
+      cropX = Math.round(cropX);
+      cropY = Math.round(cropY);
+      cropW = Math.round(cropW);
+      cropH = Math.round(cropH);
 
       // Extract and binarize
       const tempCanvas = document.createElement('canvas');
@@ -709,16 +724,24 @@ class PokemonRecognitionEngine {
     const srcH = imageSource.videoHeight || imageSource.naturalHeight || imageSource.height || 1170;
     const aspect = srcW / srcH;
 
-    // Switch等の16:9映像 (1920x1080, 1280x720) の場合は、アスペクト比を維持して中央(幅2080, オフセットX=226)に配置！
-    if (Math.abs(aspect - (16 / 9)) < 0.1 || Math.abs(srcW - 1920) < 15) {
-      const drawW = Math.round(1170 * (16 / 9)); // 2080
-      const offsetX = Math.round((2532 - drawW) / 2); // 226
-      sCtx.fillStyle = '#000';
-      sCtx.fillRect(0, 0, 2532, 1170);
-      sCtx.drawImage(imageSource, offsetX, 0, drawW, 1170);
+    // Switch 16:9 (1920x1080 / 1280x720) かどうか判定
+    const isSwitch1080p = (Math.abs(aspect - (16 / 9)) < 0.05 || (Math.abs(srcW - 1920) < 15 && Math.abs(srcH - 1080) < 15));
+
+    // Standardize to Canvas
+    const standardCanvas = document.createElement('canvas');
+    if (isSwitch1080p) {
+      // 1920x1080 ネイティブ空間 (pamo3 完全準拠)
+      standardCanvas.width = 1920;
+      standardCanvas.height = 1080;
     } else {
-      sCtx.drawImage(imageSource, 0, 0, 2532, 1170);
+      // 2532x1170 空間 (iPhone手動スクショ用)
+      standardCanvas.width = 2532;
+      standardCanvas.height = 1170;
     }
+    const sCtx = standardCanvas.getContext('2d', { willReadFrequently: true });
+    sCtx.imageSmoothingEnabled = true;
+    sCtx.imageSmoothingQuality = 'high';
+    sCtx.drawImage(imageSource, 0, 0, standardCanvas.width, standardCanvas.height);
 
     // 1. Detect Mode: BEFORE (Selection screen) vs AFTER (Battle preparation screen)
     let detectedMode;
@@ -727,32 +750,65 @@ class PokemonRecognitionEngine {
     } else if (forcedMode === 'selected' || forcedMode === 'AFTER') {
       detectedMode = 'AFTER';
     } else {
-      const testBefore = this._matchTypeTemplate(sCtx, 2117, 137 + 12, 45, 45, this.typeFeaturesBefore);
-      const testAfter = this._matchTypeTemplate(sCtx, 1912, 160 + 12, 45, 45, this.typeFeaturesAfter);
-      const isBefore = (testBefore.score < testAfter.score) || (testBefore.score < 10000000);
-      detectedMode = isBefore ? 'BEFORE' : 'AFTER';
+      if (isSwitch1080p) {
+        // 1080p 判定 (pamo3: 1750.2, 172.0)
+        const testBefore = this._matchTypeTemplate(sCtx, 1750, 172, 40, 40, this.typeFeaturesBefore);
+        detectedMode = (testBefore.score < 10000000) ? 'BEFORE' : 'AFTER';
+      } else {
+        const testBefore = this._matchTypeTemplate(sCtx, 2117, 137 + 12, 45, 45, this.typeFeaturesBefore);
+        const testAfter = this._matchTypeTemplate(sCtx, 1912, 160 + 12, 45, 45, this.typeFeaturesAfter);
+        const isBefore = (testBefore.score < testAfter.score) || (testBefore.score < 10000000);
+        detectedMode = isBefore ? 'BEFORE' : 'AFTER';
+      }
     }
 
     // OCR Trainer Name in parallel / background
-    const trainerNamePromise = this._extractTrainerName(sCtx, detectedMode);
+    const trainerNamePromise = this._extractTrainerName(sCtx, detectedMode, isSwitch1080p);
 
     if (detectedMode === 'BEFORE') {
-      const slot0Y = 137;
-      const slotPitch = 137;
-      const iconX = 1955, iconW = 130, iconYOff = 2, iconH = 118;
-      const t1X = 2117, t1YOff = 12, t2X = 2173, t2YOff = 12, tW = 45, tH = 45;
-
       const opponent = [];
-      for (let i = 0; i < 6; i++) {
-        const slotY = slot0Y + i * slotPitch;
-        const res1 = this._matchTypeTemplate(sCtx, t1X, slotY + t1YOff, tW, tH, this.typeFeaturesBefore);
-        const res2 = this._matchTypeTemplate(sCtx, t2X, slotY + t2YOff, tW, tH, this.typeFeaturesBefore);
-        const t1 = res1.score < 8000000 ? res1.type : 'none';
-        const t2 = res2.score < 8000000 ? res2.type : 'none';
 
-        const candidates = this._getCandidates(t1, t2);
-        const pName = this._matchPokemonGeoPHOG(sCtx, iconX, slotY + iconYOff, iconW, iconH, candidates);
-        opponent.push(pName);
+      if (isSwitch1080p) {
+        // ★ pamo3 完全一致ネイティブ座標 (1920x1080)
+        for (let i = 0; i < 6; i++) {
+          const iconX = 1620.8;
+          const iconY = 159.5 + 125.9 * i;
+          const iconW = 104.6;
+          const iconH = 104.6;
+
+          const t1X = 1750.2;
+          const t2X = 1801.0;
+          const typeY = 172.0 + 126.0 * i;
+          const tW = 40.0;
+          const tH = 40.0;
+
+          const res1 = this._matchTypeTemplate(sCtx, t1X, typeY, tW, tH, this.typeFeaturesBefore);
+          const res2 = this._matchTypeTemplate(sCtx, t2X, typeY, tW, tH, this.typeFeaturesBefore);
+          const t1 = res1.score < 8000000 ? res1.type : 'none';
+          const t2 = res2.score < 8000000 ? res2.type : 'none';
+
+          const candidates = this._getCandidates(t1, t2);
+          const pName = this._matchPokemonGeoPHOG(sCtx, iconX, iconY, iconW, iconH, candidates);
+          opponent.push(pName);
+        }
+      } else {
+        // iPhoneスクショ互換座標 (2532x1170)
+        const slot0Y = 137;
+        const slotPitch = 137;
+        const iconX = 1955, iconW = 130, iconYOff = 2, iconH = 118;
+        const t1X = 2117, t1YOff = 12, t2X = 2173, t2YOff = 12, tW = 45, tH = 45;
+
+        for (let i = 0; i < 6; i++) {
+          const slotY = slot0Y + i * slotPitch;
+          const res1 = this._matchTypeTemplate(sCtx, t1X, slotY + t1YOff, tW, tH, this.typeFeaturesBefore);
+          const res2 = this._matchTypeTemplate(sCtx, t2X, slotY + t2YOff, tW, tH, this.typeFeaturesBefore);
+          const t1 = res1.score < 8000000 ? res1.type : 'none';
+          const t2 = res2.score < 8000000 ? res2.type : 'none';
+
+          const candidates = this._getCandidates(t1, t2);
+          const pName = this._matchPokemonGeoPHOG(sCtx, iconX, slotY + iconYOff, iconW, iconH, candidates);
+          opponent.push(pName);
+        }
       }
 
       const trainerName = await trainerNamePromise;
