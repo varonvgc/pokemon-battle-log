@@ -448,10 +448,13 @@
 
           // 3-1. 相手パーティ 6 匹のセット
           if (res && res.opponent && res.opponent.length) {
+            console.log('[AutoMode] Detected Opponent Party:', res.opponent);
             const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
             res.opponent.forEach((pName, idx) => {
               if (idx < 6 && oppInputs[idx] && pName && pName !== '???') {
                 oppInputs[idx].value = pName;
+                oppInputs[idx].dispatchEvent(new Event('input', { bubbles: true }));
+                oppInputs[idx].dispatchEvent(new Event('change', { bubbles: true }));
                 if (typeof window.updateSlotIcon === 'function') {
                   window.updateSlotIcon(oppInputs[idx], pName);
                 }
@@ -461,6 +464,8 @@
             if (typeof window.rebuildOppSelectionDropdowns === 'function') {
               window.rebuildOppSelectionDropdowns();
             }
+          } else {
+            console.warn('[AutoMode] Recognition engine returned empty or invalid opponent:', res);
           }
 
           // 3-2. 相手トレーナー名のセット (16:9補正エンジン結果 + 直接切り出しOCRの相互補正)
@@ -484,11 +489,12 @@
             if (oppTrainerInput) {
               oppTrainerInput.value = finalTrainerName;
               oppTrainerInput.dispatchEvent(new Event('input', { bubbles: true }));
+              oppTrainerInput.dispatchEvent(new Event('change', { bubbles: true }));
             }
           }
         }
       } catch (e) {
-        console.warn('[AutoMode] Recognition engine error:', e);
+        console.error('[AutoMode] Recognition engine error:', e);
       }
 
       // 自分の登録パーティ名一覧を確実に取得
@@ -726,6 +732,32 @@
 
     async _handleGameFinished(isWin) {
       console.log(`[AutoMode] Handling game finish: ${isWin ? 'WIN' : 'LOSE'}`);
+
+      // 0. 保存前に相手パーティがもし未入力なら、出撃検知した相手ポケモン等で自動補完！
+      const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
+      if (oppInputs) {
+        const currentOppVals = Array.from(oppInputs).map(inp => inp.value.trim()).filter(Boolean);
+        if (currentOppVals.length === 0) {
+          const fallbackPool = this.detectedDispatchedRival.length > 0 ? this.detectedDispatchedRival : this.rivalPartyNames;
+          if (fallbackPool.length > 0) {
+            console.log('[AutoMode] Auto-filling empty opp party before saving record:', fallbackPool);
+            fallbackPool.forEach((pName, idx) => {
+              if (idx < 6 && oppInputs[idx] && pName) {
+                oppInputs[idx].value = pName;
+                oppInputs[idx].dispatchEvent(new Event('input', { bubbles: true }));
+                oppInputs[idx].dispatchEvent(new Event('change', { bubbles: true }));
+                if (typeof window.updateSlotIcon === 'function') {
+                  window.updateSlotIcon(oppInputs[idx], pName);
+                }
+              }
+            });
+            if (typeof window.rebuildOppSelectionDropdowns === 'function') {
+              window.rebuildOppSelectionDropdowns();
+            }
+          }
+        }
+      }
+
       // 1. 左側フォームの勝敗ボタンをセット
       if (typeof window.setResult === 'function') {
         window.setResult(isWin ? 'win' : 'lose');

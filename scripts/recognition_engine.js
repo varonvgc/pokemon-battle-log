@@ -712,14 +712,6 @@ class PokemonRecognitionEngine {
   async recognize(imageSource, myTeam = [], forcedMode = 'auto') {
     await this.loadDictionaries();
 
-    // Standardize to Canvas (Exact 2532 x 1170 Coordinate Space)
-    const standardCanvas = document.createElement('canvas');
-    standardCanvas.width = 2532;
-    standardCanvas.height = 1170;
-    const sCtx = standardCanvas.getContext('2d', { willReadFrequently: true });
-    sCtx.imageSmoothingEnabled = true;
-    sCtx.imageSmoothingQuality = 'high';
-
     const srcW = imageSource.videoWidth || imageSource.naturalWidth || imageSource.width || 2532;
     const srcH = imageSource.videoHeight || imageSource.naturalHeight || imageSource.height || 1170;
     const aspect = srcW / srcH;
