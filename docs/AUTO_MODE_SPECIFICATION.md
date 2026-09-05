@@ -266,6 +266,45 @@ flowchart TD
 
 ---
 
+### 7.3 内部データ変数構造と手入力同期のライフサイクル (Data Model & State Lifecycle)
+
+オートモードが1試合を通じて保持する内部データ変数と、UI/手入力との相互同期構造は以下の通りです。
+
+```
+[UI / DOM 状態]                                    [オートモード内部変数 (AutoModeController)]
+1. 相手パーティ入力欄 ───────────────────────────► this.rivalPartyNames (配列: 6体)
+   #opp-party-slots input[type=text] (双方向同期)  ※出撃ネームプレートOCRの照合候補辞書
+
+2. 自分の手持ちパーティ ────────────────────────► this.myPartyNames (配列: 6体)
+   parties[selectedPartyId].pokemon                ※自分側出撃OCRの照合候補辞書
+
+3. 画面の選出バッジ (手動タップ) ──────────────► this.detectedDispatchedMe (配列: 最大4体)
+   window.mySelectionOrder                         this.detectedDispatchedRival (配列: 最大4体)
+   window.oppSelectionOrder          (相互マージ)   ※下部VSバーのモンスターボール/アイコン表示
+                                                   ※試合終了時のログ保存データ (my/oppSelection)
+```
+
+#### ① 相手パーティ6体の情報取得状態 (`this.rivalPartyNames`)
+* **格納変数**: `this.rivalPartyNames` (文字列の配列, 最大6要素)
+* **ライフサイクル**:
+  1. `MATCHING` 突入時に `recognitionEngine.recognize` の認識結果で初回生成され、フォーム `#opp-party-slots` へ入力。
+  2. ユーザーが見せ合い中または対戦中に手入力修正した場合、`_onOppPartyManualChange` ハンドラが即座に最新値を読み取って `this.rivalPartyNames` を上書き更新。
+  3. 毎フレームの出撃検知ループの先頭でも `#opp-party-slots` の値を取り込んで同期（二重保護）。
+  4. 試合終了（`FINISHED`）まで維持され、次の対戦待ち（`WAITING_MATCHING` -> `MATCHING`）に遷移した瞬間にリセットされます。
+
+#### ② 選出の取得状態 (`this.detectedDispatchedMe`, `this.detectedDispatchedRival`)
+* **格納変数**:
+  - `this.detectedDispatchedMe`: 自分側出撃ポケモン名配列（確定順, 最大4要素）
+  - `this.detectedDispatchedRival`: 相手側出撃ポケモン名配列（確定順, 最大4要素）
+* **ライフサイクルと手入力同期**:
+  1. **初期化**: マッチング検知（`MATCHING` 突入時）に `resetVsBar()` により空配列 `[]` にクリアされ、VSバーはモンスターボール4個状態になります。
+  2. **見せ合い中の手動選出連動**: ユーザーが画面上で選出バッジ（1〜4）をタップした場合、`_syncManualSelections()` が即座に `window.mySelectionOrder` からポケモン名を取り込み、`this.detectedDispatchedMe` に格納。VSバーのボールが該当ポケモンのアイコンに即時変身します。
+  3. **対戦突入時の維持**: `WAITING_GAME_START` から `IN_GAME` への遷移時にも**変数はクリアされず維持**されます。
+  4. **対戦中の自動検知連動**: 画面の出撃演出・HPバーから検知されたポケモンは、手動選出枠を保護した上で空きスロット（3体目・4体目など）にのみ追加されます。
+  5. **ログ保存**: `FINISHED` フェーズで勝敗確定後、この確定した選出データがそのまま `saveRecord()` によって対戦ログとして永続化されます。
+
+---
+
 ## 8. 改修・保守ルール
 
 1. **引数ルールの遵守**:

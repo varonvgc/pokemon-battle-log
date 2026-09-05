@@ -1099,6 +1099,49 @@ flowchart TD
             </div>
           </div>
         </div>
+
+        <h4 class="subsection-title">7.3 内部データ変数構造と手入力同期のライフサイクル (Data Model & State Lifecycle)</h4>
+        <p class="section-desc">
+          オートモードが1試合を通じて保持する内部データ変数と、UIフォーム/手動操作との双方向同期構造です。
+        </p>
+
+        <div style="background:var(--code-bg);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:1.25rem;font-family:'JetBrains Mono',monospace;font-size:0.8rem;line-height:1.7;color:#93c5fd;overflow-x:auto;margin:1rem 0">
+[UI / DOM 状態]                                    [オートモード内部変数 (AutoModeController)]<br>
+1. 相手パーティ入力欄 ───────────────────────────► <span style="color:#fcd34d">this.rivalPartyNames</span> (配列: 6体)<br>
+   #opp-party-slots input[type=text] (双方向同期)  ※出撃ネームプレートOCRの照合候補辞書<br>
+<br>
+2. 自分の手持ちパーティ ────────────────────────► <span style="color:#fcd34d">this.myPartyNames</span> (配列: 6体)<br>
+   parties[selectedPartyId].pokemon                ※自分側出撃OCRの照合候補辞書<br>
+<br>
+3. 画面の選出バッジ (手動タップ) ──────────────► <span style="color:#fcd34d">this.detectedDispatchedMe</span> (配列: 最大4体)<br>
+   window.mySelectionOrder                         <span style="color:#fcd34d">this.detectedDispatchedRival</span> (配列: 最大4体)<br>
+   window.oppSelectionOrder          (相互マージ)   ※下部VSバーのモンスターボール/アイコン表示<br>
+                                                   ※試合終了時のログ保存データ (my/oppSelection)
+        </div>
+
+        <div class="card-grid">
+          <div class="info-card">
+            <div class="info-card-header">① 相手パーティ6体の管理 (this.rivalPartyNames)</div>
+            <div class="info-card-body">
+              <ul>
+                <li><strong>初期化・生成</strong>: <code>MATCHING</code> 突入時に画像認識で初回生成され、フォームへ入力。</li>
+                <li><strong>手入力同期</strong>: 見せ合い中や対戦中に修正された場合、入力イベントで直ちに <code>this.rivalPartyNames</code> を上書き更新。</li>
+                <li><strong>維持期間</strong>: 試合終了（<code>FINISHED</code>）の保存完了まで維持され、次の対戦マッチング時にリセット。</li>
+              </ul>
+            </div>
+          </div>
+          <div class="info-card">
+            <div class="info-card-header">② 選出の管理 (this.detectedDispatchedMe / Rival)</div>
+            <div class="info-card-body">
+              <ul>
+                <li><strong>初期化</strong>: マッチング検知時に <code>resetVsBar()</code> により空配列 <code>[]</code> にクリア。</li>
+                <li><strong>手動選出連動</strong>: 見せ合い中や対戦中にタップされた枠を即座に取り込み、VSバーのボールを変身。</li>
+                <li><strong>対戦突入時の維持</strong>: 試合開始（暗転・VS演出）時も<strong>選出データは破棄されず完全に維持</strong>。</li>
+                <li><strong>自動検知連動</strong>: 出撃演出やHPバー検知結果を、手動選出枠を壊さず空き枠にのみ追加。</li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </section>
 
       <!-- 8. 改修・保守ルール -->
