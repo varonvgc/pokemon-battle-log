@@ -534,7 +534,11 @@
 
       this.waitingStartTimestamp = Date.now();
       this.phase = 'WAITING_GAME_START';
-      this.updateStatusBadge('対戦開始待ち (VS画面待機中...)');
+      if (this.rivalPartyNames && this.rivalPartyNames.length > 0) {
+        this.updateStatusBadge(`見せ合い: 相手6匹取得完了 (${this.rivalPartyNames.slice(0, 3).join('/')}...)`);
+      } else {
+        this.updateStatusBadge('対戦開始待ち (VS画面待機中...)');
+      }
     }
 
     // 記録画面の自動初期化 (チャンピオンズ / ランクマ / BO1 / 一番上のパーティ)
