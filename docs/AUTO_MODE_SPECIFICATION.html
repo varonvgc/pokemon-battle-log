@@ -845,7 +845,7 @@ stateDiagram-v2
                 <td class="coord-val">104.6</td>
                 <td class="coord-val">104.6</td>
                 <td>実画像透過マスクMSE照合 (40×40)</td>
-                <td>タイプ絞り込み後の候補から最小差分を特定</td>
+                <td>pamo3 <code>aBO.cKJ</code> 完全準拠 (間隔125.9)</td>
               </tr>
               <tr>
                 <td><strong>属性アイコン1 (タイプ1)</strong></td>
@@ -854,7 +854,7 @@ stateDiagram-v2
                 <td class="coord-val">40.0</td>
                 <td class="coord-val">40.0</td>
                 <td>実画像MSE照合 (<code>template_*.png</code>)</td>
-                <td>18属性から最小差分タイプを特定</td>
+                <td>pamo3 <code>byN.aoK</code> 完全準拠 (間隔126.0)</td>
               </tr>
               <tr>
                 <td><strong>属性アイコン2 (タイプ2)</strong></td>
@@ -876,6 +876,17 @@ stateDiagram-v2
               </tr>
             </tbody>
           </table>
+        </div>
+
+        <div class="alert-box note">
+          <div class="alert-icon">💡</div>
+          <div>
+            <div class="alert-title">Y座標間隔（125.9 vs 126.0）に関する補足 (pamo3 原典仕様)</div>
+            <div class="alert-content">
+              相手アイコンの間隔が <code>125.9</code> に対し属性アイコンが <code>126.0</code> となっているのは、<strong>pamo3 の原典ソースコード（<code>aBO.cKJ</code> および <code>byN.aoK</code>）と全く同一の実装仕様</strong>です。<br>
+              pamo3 ではポケモンアイコンは実数フィッティング（<code>159.5 + 125.9 * a</code>）、属性アイコンは整数のピクセル間隔（<code>172 + 126 * s</code>）で実装されており、最下段（スロット5）でも累積差はわずか <code>0.1px &times; 5 = 0.5px</code>（1ピクセル未満）です。40&times;40の領域に対して0.5pxのズレは認識率に一切影響しないため、原典の高精度パラメータを完全再現しています。
+            </div>
+          </div>
         </div>
 
         <h4 class="subsection-title">3.3 選出・出撃・交代検知用座標 (IN_GAME)</h4>
