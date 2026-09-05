@@ -893,7 +893,7 @@ class PokemonRecognitionEngine {
           const t2 = res2.score < 8000000 ? res2.type : 'none';
 
           const candidates = this._getCandidates(t1, t2);
-          const pName = await this._matchPokemonTemplate(sCtx, iconX, slotY + iconYOff, iconW, iconH, candidates);
+          const pName = this._matchPokemonGeoPHOG(sCtx, iconX, slotY + iconYOff, iconW, iconH, candidates);
           opponent.push(pName);
         }
       }
@@ -921,7 +921,7 @@ class PokemonRecognitionEngine {
         const t2 = res2.score < 15000000 ? res2.type : 'none';
 
         const candidates = this._getCandidates(t1, t2);
-        const pName = await this._matchPokemonTemplate(sCtx, iconX, slotY + iconYOff, iconW, iconH, candidates);
+        const pName = this._matchPokemonGeoPHOG(sCtx, iconX, slotY + iconYOff, iconW, iconH, candidates);
         opponent.push(pName);
       }
 
