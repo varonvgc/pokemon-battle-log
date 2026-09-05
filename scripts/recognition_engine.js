@@ -52,7 +52,11 @@ class PokemonRecognitionEngine {
           phog: this._base64ToUint8(val.phog),
           extent: Number(val.extent),
           aspectRatio: Number(val.aspectRatio),
-          areaRatio: Number(val.areaRatio)
+          areaRatio: Number(val.areaRatio),
+          normR: Number(val.normR !== undefined ? val.normR : 0.3333),
+          normG: Number(val.normG !== undefined ? val.normG : 0.3333),
+          normB: Number(val.normB !== undefined ? val.normB : 0.3333),
+          redRatio: Number(val.redRatio !== undefined ? val.redRatio : 0.0)
         };
       }
 
@@ -296,12 +300,18 @@ class PokemonRecognitionEngine {
     const rowFg = new Int32Array(h);
     const colFg = new Int32Array(w);
     let fgCount = 0;
+    let rSum = 0.0, gSum = 0.0, bSum = 0.0;
+    let reddish = 0;
     for (let cy = 0; cy < h; cy++) {
       for (let cx = 0; cx < w; cx++) {
         if (diffs[cy * w + cx] >= otsuT) {
           fgCount++;
           rowFg[cy]++;
           colFg[cx]++;
+          const pIdx = (cy * w + cx) * 4;
+          const r = imgData[pIdx], g = imgData[pIdx + 1], b = imgData[pIdx + 2];
+          rSum += r; gSum += g; bSum += b;
+          if (r > g + 15 && r > b + 15) reddish++;
         }
       }
     }
@@ -387,11 +397,16 @@ class PokemonRecognitionEngine {
     }
 
     const livePhog = this._computePHOG680(gray, mask);
+    const totalColor = rSum + gSum + bSum + 0.0001;
     return {
       phog: livePhog,
       extent: liveExtent,
       aspectRatio: liveAspect,
-      areaRatio: (mass32 / 1024.0)
+      areaRatio: (mass32 / 1024.0),
+      normR: rSum / totalColor,
+      normG: gSum / totalColor,
+      normB: bSum / totalColor,
+      redRatio: fgCount > 0 ? (reddish / fgCount) : 0.0
     };
   }
 
@@ -721,7 +736,17 @@ class PokemonRecognitionEngine {
       const extentDiff = Math.abs(live.extent - ref.extent);
       const areaDiff = Math.abs(live.areaRatio - ref.areaRatio);
 
-      const totalDist = distPhog + (weightAspect * aspectRatioDiff) + (weightExtent * extentDiff) + (weightArea * areaDiff);
+      // 色情報ペナルティ（正規化RGBマンハッタン距離 ＋ 赤み比率差分）
+      let colorPenalty = 0.0;
+      if (ref.normR !== undefined && live.normR !== undefined) {
+        const colorDistNorm = Math.abs(live.normR - ref.normR) + Math.abs(live.normG - ref.normG) + Math.abs(live.normB - ref.normB);
+        const colorDistRed = Math.abs(live.redRatio - ref.redRatio);
+        const weightColorNorm = (numCandidates <= 6) ? 1800.0 : 600.0;
+        const weightColorRed = (numCandidates <= 6) ? 1500.0 : 600.0;
+        colorPenalty = (weightColorNorm * colorDistNorm) + (weightColorRed * colorDistRed);
+      }
+
+      const totalDist = distPhog + (weightAspect * aspectRatioDiff) + (weightExtent * extentDiff) + (weightArea * areaDiff) + colorPenalty;
 
       if (totalDist < bestDist) {
         bestDist = totalDist;

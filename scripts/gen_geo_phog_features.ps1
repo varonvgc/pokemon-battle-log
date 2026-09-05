@@ -123,6 +123,8 @@ function Extract-GeoPHOGFromIcon($srcPath) {
 
     $minX = $w; $maxX = 0; $minY = $h; $maxY = 0
     $fgCount = 0
+    $rSum = 0.0; $gSum = 0.0; $bSum = 0.0
+    $reddish = 0
 
     if ($isTransparentPng) {
         for ($y = 0; $y -lt $h; $y++) {
@@ -130,6 +132,8 @@ function Extract-GeoPHOGFromIcon($srcPath) {
                 $p = $bmp.GetPixel($x, $y)
                 if ($p.A -gt 50) {
                     $fgCount++
+                    $rSum += $p.R; $gSum += $p.G; $bSum += $p.B
+                    if ($p.R -gt ($p.G + 15) -and $p.R -gt ($p.B + 15)) { $reddish++ }
                     if ($x -lt $minX) { $minX = $x }
                     if ($x -gt $maxX) { $maxX = $x }
                     if ($y -lt $minY) { $minY = $y }
@@ -158,8 +162,11 @@ function Extract-GeoPHOGFromIcon($srcPath) {
         $idx = 0
         for ($y = 0; $y -lt $h; $y++) {
             for ($x = 0; $x -lt $w; $x++) {
+                $p = $bmp.GetPixel($x, $y)
                 if ($diffs[$idx++] -ge $otsuT) {
                     $fgCount++
+                    $rSum += $p.R; $gSum += $p.G; $bSum += $p.B
+                    if ($p.R -gt ($p.G + 15) -and $p.R -gt ($p.B + 15)) { $reddish++ }
                     if ($x -lt $minX) { $minX = $x }
                     if ($x -gt $maxX) { $maxX = $x }
                     if ($y -lt $minY) { $minY = $y }
@@ -212,11 +219,16 @@ function Extract-GeoPHOGFromIcon($srcPath) {
     $t32.Dispose()
 
     $phogBytes = Compute-PHOG680 $gray $mask
+    $totalColor = $rSum + $gSum + $bSum + 0.0001
     return @{
         phog = [Convert]::ToBase64String($phogBytes)
         extent = [math]::Round($extent, 4)
         aspectRatio = [math]::Round($aspectRatio, 4)
         areaRatio = [math]::Round(($mass32 / 1024.0), 4)
+        normR = [math]::Round(($rSum / $totalColor), 4)
+        normG = [math]::Round(($gSum / $totalColor), 4)
+        normB = [math]::Round(($bSum / $totalColor), 4)
+        redRatio = if ($fgCount -gt 0) { [math]::Round(($reddish / [double]$fgCount), 4) } else { 0.0 }
     }
 }
 
