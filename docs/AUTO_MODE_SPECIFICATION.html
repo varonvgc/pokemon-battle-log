@@ -610,10 +610,10 @@ stateDiagram-v2
       <section class="spec-section" id="sec-2">
         <div class="section-header">
           <span class="section-num">02</span>
-          <h3 class="section-title">状態遷移 (ステートマシン) 詳細定義</h3>
+          <h3 class="section-title">状態遷移 (ステートマシン) 詳細定義 (1:1:1 対応仕様)</h3>
         </div>
         <p class="section-desc">
-          オートモードの内部状態（<code>this.phase</code>）と画面の状態、トリガー、および pamo3 内部実装との対応一覧です。
+          各フェーズにおいて、システムが<strong>「何を監視し (監視対象)」「どういう条件で発火し (トリガー条件)」「発火時に何を実行してどこへ遷移するか (動作と遷移)」</strong>を 1:1:1 で厳密に対応づけて定義しています。
         </p>
 
         <div class="table-wrapper">
@@ -622,52 +622,136 @@ stateDiagram-v2
               <tr>
                 <th>フェーズ名 (<code>this.phase</code>)</th>
                 <th>画面の状態</th>
-                <th>監視対象・トリガー</th>
-                <th>UI画面遷移・データ入力動作</th>
+                <th>① 監視対象 (What)</th>
+                <th>② トリガー条件 (Condition)</th>
+                <th>③ 発火時に起こる動作 (Action & Behavior)</th>
                 <th>遷移先</th>
                 <th>pamo3 内部対応</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td><strong><code>WAITING_MATCHING</code></strong></td>
-                <td>対戦マッチング待機中</td>
-                <td>画面左下の選出ボタンボールマーク (<code>COORDS.MATCHING_BALL</code>) の一致度 &gt; 0.45</td>
-                <td>オートモード開始時に「記録する」タブへ自動切替。<br>フォームを初期化（ルール=ダブル、手持ち読込）</td>
-                <td><code>MATCHING</code></td>
-                <td><code>waitingMatching</code> (<code>B.xO</code>)</td>
+                <td><strong><code>WAITING_MATCHING</code></strong><br><span style="font-size:0.78rem;color:var(--text-muted)">マッチング待機中</span></td>
+                <td>対戦相手の検索中 / ロビー画面</td>
+                <td>画面左下の選出完了ボタンボールマーク<br><code>COORDS.MATCHING_BALL</code></td>
+                <td><code>matching_phase_ball.png</code> との一致度<br><strong style="color:#38bdf8">score &gt; 0.45</strong></td>
+                <td>
+                  <ol style="padding-left:1.1rem;margin:0;font-size:0.83rem;line-height:1.6">
+                    <li>バッジを「見せ合い画面検知: 相手情報取得中...」に更新。</li>
+                    <li>前回の選出リストとVSバーを初期化 (<code>resetVsBar</code>)。</li>
+                    <li>画面を「記録する」タブへ切替 (<code>showPage('record')</code>)。</li>
+                    <li>ルールをダブルバトルに固定し、手持ちパーティを選択・展開。</li>
+                    <li>画面全体キャプチャを認識エンジンへ渡し、相手6体とトレーナー名を自動取得してフォームへ入力。</li>
+                  </ol>
+                </td>
+                <td><span class="badge badge-primary">MATCHING</span></td>
+                <td><code>waitingMatching</code><br>(<code>B.xO</code>)</td>
               </tr>
               <tr>
-                <td><strong><code>MATCHING</code></strong></td>
-                <td>見せ合い画面（手持ち6体と選出選択）</td>
-                <td>初回フレームで相手6体・トレーナー名を自動取得。<br>その後ボールマークの一致度 &lt; 0.35 になるまで本フェーズを維持</td>
-                <td>① 画面を「記録する」画面へ確実に維持。<br>② 相手パーティ6体を <code>#opp-party-slots</code> へ自動入力しアイコン更新。<br>③ 相手トレーナー名を <code>#rec-opp-trainer</code> へ自動入力。<br>④ 相手選出ドロップダウンを再構築。</td>
-                <td><code>WAITING_GAME_START</code></td>
-                <td><code>matching</code> (<code>B.ms</code>)</td>
+                <td rowspan="3"><strong><code>MATCHING</code></strong><br><span style="font-size:0.78rem;color:var(--text-muted)">見せ合い画面中</span></td>
+                <td rowspan="3">手持ち6体と選出選択画面<br>(カウントダウン中)</td>
+                <td><strong>[A]</strong> 画面左下の選出完了ボタンボールマーク<br><code>COORDS.MATCHING_BALL</code></td>
+                <td>一致度 <strong style="color:#10b981">score &ge; 0.35</strong><br>(ボールマークが継続表示中)</td>
+                <td>
+                  本フェーズ（<code>MATCHING</code>）を維持。<br>
+                  <span style="font-size:0.8rem;color:var(--text-dim)">※相手認識は突入時の初回1回のみ実行し、ループ再実行による手入力上書きは行わない。</span>
+                </td>
+                <td><span style="color:var(--text-dim)">(維持)</span></td>
+                <td rowspan="3"><code>matching</code><br>(<code>B.ms</code>)</td>
               </tr>
               <tr>
-                <td><strong><code>WAITING_GAME_START</code></strong></td>
-                <td>見せ合い終了〜対戦開始演出</td>
-                <td>中央VSロゴ (<code>COORDS.VS_SCREEN</code>) 一致度 &gt; 0.38、または見せ合い終了から 7000ms 経過</td>
-                <td>ユーザーの手動修正があればリアルタイム同期。<br>出撃演出の監視準備</td>
-                <td><code>IN_GAME</code></td>
-                <td><code>waitingGameStart</code> (<code>B.i3</code>)</td>
+                <td><strong>[B]</strong> 画面左下の選出完了ボタンボールマーク<br><code>COORDS.MATCHING_BALL</code></td>
+                <td>一致度 <strong style="color:#f43f5e">score &lt; 0.35</strong><br>(選出完了/時間切れでマーク消滅・暗転)</td>
+                <td>
+                  <ol style="padding-left:1.1rem;margin:0;font-size:0.83rem;line-height:1.6">
+                    <li>見せ合い終了タイムスタンプを記録 (<code>waitingStartTimestamp = Date.now()</code>)。</li>
+                    <li>バッジを「対戦開始待ち (VS画面待機中...)」に更新。</li>
+                    <li>次の対戦開始待機フェーズへ切り替える。</li>
+                  </ol>
+                </td>
+                <td><span class="badge badge-primary">WAITING_GAME_START</span></td>
               </tr>
               <tr>
-                <td><strong><code>IN_GAME</code></strong></td>
-                <td>対戦中（出撃演出、コマンド画面、交代）</td>
-                <td>出撃ネームプレート、常時表示HPバー、様子を見るパネルを監視して自分・相手の選出（最大4体）を取得。<br>勝敗ボール検知で試合終了判定</td>
-                <td>① 検知された自分選出（最大4体）をバッジ・ボールへ反映。<br>② 検知された相手選出（最大4体）をドロップダウン・ボールへ反映。<br>③ 勝敗ボール検知で勝敗（勝ち/負け）ボタンを自動セット。</td>
-                <td><code>FINISHED</code></td>
-                <td><code>inGame</code> (<code>B.i2</code>)</td>
+                <td><strong>[C]</strong> ユーザーによる相手パーティ修正 / 手動選出タップ</td>
+                <td>フォームへの <code>input</code>/<code>change</code>、または選出カードクリック</td>
+                <td>
+                  <ul style="padding-left:1.1rem;margin:0;font-size:0.83rem;line-height:1.6">
+                    <li><strong>相手パーティ入力時</strong>: 照合候補（<code>rivalPartyNames</code>）を即時更新し、相手選出グリッドを再描画。</li>
+                    <li><strong>手動選出時</strong>: <code>mySelectionOrder</code> からポケモン名を取り込み、右下VSバーのモンスターボールを該当ポケモンアイコンに変身させる。</li>
+                  </ul>
+                </td>
+                <td><span style="color:var(--text-dim)">(維持)</span></td>
               </tr>
               <tr>
-                <td><strong><code>FINISHED</code></strong></td>
-                <td>勝敗確定画面</td>
-                <td>勝敗確定後、ログ保存処理を実行</td>
-                <td>① <code>saveRecord()</code> を実行して対戦ログを自動保存。<br>② <strong>保存完了後、自動的に「履歴 (<code>history</code>)」タブへ画面遷移</strong>。<br>③ 次の対戦へ向けて待機状態へリセット。</td>
-                <td><code>WAITING_MATCHING</code></td>
-                <td><code>endGame</code> (<code>B.FZ</code>)</td>
+                <td rowspan="2"><strong><code>WAITING_GAME_START</code></strong><br><span style="font-size:0.78rem;color:var(--text-muted)">対戦開始待機中</span></td>
+                <td rowspan="2">見せ合い終了後の画面暗転〜VS画面演出中</td>
+                <td><strong>[A]</strong> 画面中央VSロゴ領域<br><code>COORDS.VS_SCREEN</code></td>
+                <td><code>vs_v.png</code> との一致度<br><strong style="color:#38bdf8">vsScore &gt; 0.38</strong></td>
+                <td>
+                  <ol style="padding-left:1.1rem;margin:0;font-size:0.83rem;line-height:1.6">
+                    <li>バッジを「試合中: 出撃ポケモン検知中...」に更新。</li>
+                    <li>見せ合い中に入力された手動選出を保持したまま内部リスト・VSバーを同期。</li>
+                    <li>出撃ネームプレート検知を開始。</li>
+                  </ol>
+                </td>
+                <td><span class="badge badge-primary">IN_GAME</span></td>
+                <td rowspan="2"><code>waitingGameStart</code><br>(<code>B.i3</code>)</td>
+              </tr>
+              <tr>
+                <td><strong>[B]</strong> 暗転からの経過時間タイマー<br><code>Date.now() - waitingStartTimestamp</code></td>
+                <td>暗転後 <strong style="color:#f59e0b">elapsed &gt; 7000ms</strong><br>(VS演出アニメ等の認識漏れフォールバック)</td>
+                <td>
+                  <ol style="padding-left:1.1rem;margin:0;font-size:0.83rem;line-height:1.6">
+                    <li>バッジを「試合中: 出撃ポケモン検知中...」に更新。</li>
+                    <li>手動選出を保持したまま内部リスト・VSバーを同期。</li>
+                    <li>先発ポケモンの出撃演出を見逃さないよう直ちに出撃検知を開始。</li>
+                  </ol>
+                </td>
+                <td><span class="badge badge-primary">IN_GAME</span></td>
+              </tr>
+              <tr>
+                <td rowspan="2"><strong><code>IN_GAME</code></strong><br><span style="font-size:0.78rem;color:var(--text-muted)">試合中</span></td>
+                <td rowspan="2">出撃演出、コマンド画面、技アニメーション、交代</td>
+                <td><strong>[A]</strong> 出撃ネームプレート、対戦中HPバー、様子を見るパネル<br><code>COORDS.DISPATCH_DOUBLE</code> 等</td>
+                <td>白文字OCR結果と候補（<code>rival/myPartyNames</code>）の編集距離<br><strong style="color:#38bdf8">dist &le; 2</strong></td>
+                <td>
+                  <ol style="padding-left:1.1rem;margin:0;font-size:0.83rem;line-height:1.6">
+                    <li>まだ選出リストに含まれていない場合、空き枠（最大4枠）にそのポケモン名を追加（手動確定枠は保護）。</li>
+                    <li>右下VSバーのモンスターボールを検知されたポケモンアイコン・名前に変身させる。</li>
+                    <li>フォームの選出スロット (<code>setSelectionFromNames</code>) に自動反映。</li>
+                    <li>4枠確定した陣営はOCRを自動停止。</li>
+                  </ol>
+                </td>
+                <td><span style="color:var(--text-dim)">(維持)</span></td>
+                <td rowspan="2"><code>inGame</code><br>(<code>B.i2</code>)</td>
+              </tr>
+              <tr>
+                <td><strong>[B]</strong> 画面右上の勝利ボール領域<br><code>COORDS.WIN_BALL_ME / RIVAL</code></td>
+                <td><code>win_ball.png</code> との一致度<br><strong style="color:#f59e0b">myScore &gt; 0.45 || rivalScore &gt; 0.45</strong></td>
+                <td>
+                  <ol style="padding-left:1.1rem;margin:0;font-size:0.83rem;line-height:1.6">
+                    <li>勝者を判定 (<code>isWin = myScore &gt; rivalScore</code>)。</li>
+                    <li>バッジを「試合終了: 🎉 勝利」または「試合終了: 破れたり...」に更新。</li>
+                    <li><code>_handleGameFinished(isWin)</code> を呼び出して終了処理を開始。</li>
+                  </ol>
+                </td>
+                <td><span class="badge badge-primary">FINISHED</span></td>
+              </tr>
+              <tr>
+                <td><strong><code>FINISHED</code></strong><br><span style="font-size:0.78rem;color:var(--text-muted)">試合終了〜保存</span></td>
+                <td>試合終了演出〜勝敗確定画面</td>
+                <td>勝敗確定後の自動保存・遷移シーケンスキュー</td>
+                <td><code>FINISHED</code> フェーズへの突入</td>
+                <td>
+                  <ul style="padding-left:1.1rem;margin:0;font-size:0.83rem;line-height:1.6">
+                    <li><strong>T+0ms</strong>: 相手パーティに空欄があれば出撃検知ポケモンで自動補完。ユーザーの手動選択がなければ判定結果（勝ち/負け）ボタンを自動セット。</li>
+                    <li><strong>T+800ms</strong>: <code>saveRecord()</code> を実行して対戦ログを自動保存。</li>
+                    <li><strong>T+2000ms</strong>: 保存完了後、<code>showPage('history')</code> を呼び出して<strong>自動的に「履歴」タブへ画面遷移</strong>。</li>
+                    <li><strong>T+2000ms</strong>: 状態を初期化し、次回マッチング待ちへ移行。</li>
+                  </ul>
+                </td>
+                <td><span class="badge badge-green">WAITING_MATCHING</span></td>
+                <td><code>endGame</code><br>(<code>B.FZ</code>)</td>
               </tr>
             </tbody>
           </table>
