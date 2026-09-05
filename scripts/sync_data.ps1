@@ -725,6 +725,10 @@ try {
     if (Test-Path $phogScript) {
         & $phogScript
     }
+    $switchScript = Join-Path $scriptsDir "gen_switch_features.ps1"
+    if (Test-Path $switchScript) {
+        & $switchScript
+    }
 } catch {
     Write-Warning "Could not update recognition features: $($_.Exception.Message)"
 }

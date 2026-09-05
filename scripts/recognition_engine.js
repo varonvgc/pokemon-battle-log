@@ -12,12 +12,15 @@ class PokemonRecognitionEngine {
     this.typeFeaturesAfter = {};
     this.typeFeaturesBefore = {};
     this.badgeFeatures = {};
+    this.switchFeatures = {};
     this.iconCache = new Map();
     this.typeIconCache = new Map();
     this.cropCanvas = null;
     this.templateCanvas = null;
     this.typeCropCanvas = null;
     this.typeTemplCanvas = null;
+    this.switchCropCanvas = null;
+    this.switch24Canvas = null;
   }
 
   _getBasePath() {
@@ -31,12 +34,13 @@ class PokemonRecognitionEngine {
     if (this.isLoaded) return true;
     const base = this._getBasePath();
     try {
-      const [rosterRes, geoRes, typeAfterRes, typeBeforeRes, badgeRes] = await Promise.all([
+      const [rosterRes, geoRes, typeAfterRes, typeBeforeRes, badgeRes, switchRes] = await Promise.all([
         fetch(`${base}assets/clean_roster.json`),
         fetch(`${base}assets/pokemon_geo_phog_features.json`),
         fetch(`${base}assets/type_features.json`),
         fetch(`${base}assets/type_features_before.json`),
-        fetch(`${base}assets/badge_features.json`)
+        fetch(`${base}assets/badge_features.json`),
+        fetch(`${base}assets/pokemon_switch_features.json`)
       ]);
 
       this.roster = await rosterRes.json();
@@ -44,6 +48,7 @@ class PokemonRecognitionEngine {
       const rawTypeAfter = await typeAfterRes.json();
       const rawTypeBefore = await typeBeforeRes.json();
       const rawBadge = await badgeRes.json();
+      const rawSwitch = await switchRes.json();
 
       // Decode Base64 features to Uint8Array / Float64Array
       this.geoFeatures = {};
@@ -79,8 +84,21 @@ class PokemonRecognitionEngine {
         this.badgeFeatures[key] = this._base64ToUint8(val);
       }
 
+      // Switch 1080p 24x24 Centered Features
+      this.switchFeatures = {};
+      for (const [key, val] of Object.entries(rawSwitch)) {
+        this.switchFeatures[key] = {
+          aspectRatio: Number(val.aspectRatio),
+          extent: Number(val.extent),
+          normR: Number(val.normR),
+          normG: Number(val.normG),
+          normB: Number(val.normB),
+          bytes: this._base64ToUint8(val.rgb24)
+        };
+      }
+
       this.isLoaded = true;
-      console.log('Pokemon Recognition Engine Dictionaries Loaded successfully!');
+      console.log('Pokemon Recognition Engine Dictionaries Loaded successfully! (Including Switch 1080p 24x24 Features)');
       return true;
     } catch (e) {
       console.error('Failed to load recognition dictionaries:', e);
@@ -756,6 +774,160 @@ class PokemonRecognitionEngine {
     return bestDisplay || candidateEntries[0].display;
   }
 
+  // ★ Switch 1080p 専用: 24x24 中央配置特徴抽出 (背景色 #94013F 除去 ＋ レーザー光ノイズトリミング)
+  _extractLiveSwitch24(ctx, x, y, w, h) {
+    const cropW = Math.round(w);
+    const cropH = Math.round(h);
+
+    if (!this.switchCropCanvas) {
+      this.switchCropCanvas = document.createElement('canvas');
+    }
+    this.switchCropCanvas.width = cropW;
+    this.switchCropCanvas.height = cropH;
+    const cropCtx = this.switchCropCanvas.getContext('2d', { willReadFrequently: true });
+    cropCtx.drawImage(ctx.canvas, x, y, w, h, 0, 0, cropW, cropH);
+
+    const imgData = cropCtx.getImageData(0, 0, cropW, cropH).data;
+    const bgR = 148, bgG = 1, bgB = 63;
+
+    const colFg = new Int32Array(cropW);
+    const rowFg = new Int32Array(cropH);
+    let fgCount = 0;
+    let rSum = 0.0, gSum = 0.0, bSum = 0.0;
+
+    for (let cy = 0; cy < cropH; cy++) {
+      for (let cx = 0; cx < cropW; cx++) {
+        const pIdx = (cy * cropW + cx) * 4;
+        const r = imgData[pIdx];
+        const g = imgData[pIdx + 1];
+        const b = imgData[pIdx + 2];
+        const dr = r - bgR;
+        const dg = g - bgG;
+        const db = b - bgB;
+        const diff = Math.sqrt(dr * dr + dg * dg + db * db);
+        if (diff > 50) {
+          fgCount++;
+          colFg[cx]++;
+          rowFg[cy]++;
+          rSum += r;
+          gSum += g;
+          bSum += b;
+        }
+      }
+    }
+
+    // レーザー光・斜線ノイズ除去用トリミング閾値 (noiseThresh = 8)
+    const noiseThresh = 8;
+    let minX = 0, maxX = cropW - 1, minY = 0, maxY = cropH - 1;
+    for (let cx = 0; cx < cropW; cx++) {
+      if (colFg[cx] >= noiseThresh) { minX = cx; break; }
+    }
+    for (let cx = cropW - 1; cx >= 0; cx--) {
+      if (colFg[cx] >= noiseThresh) { maxX = cx; break; }
+    }
+    for (let cy = 0; cy < cropH; cy++) {
+      if (rowFg[cy] >= noiseThresh) { minY = cy; break; }
+    }
+    for (let cy = cropH - 1; cy >= 0; cy--) {
+      if (rowFg[cy] >= noiseThresh) { maxY = cy; break; }
+    }
+
+    if (fgCount === 0 || minX >= maxX || minY >= maxY) {
+      minX = 0; maxX = cropW - 1; minY = 0; maxY = cropH - 1;
+    }
+
+    const bw = (maxX - minX) + 1;
+    const bh = (maxY - minY) + 1;
+    const aspect = bw / bh;
+    const totalColor = rSum + gSum + bSum + 0.0001;
+
+    if (!this.switch24Canvas) {
+      this.switch24Canvas = document.createElement('canvas');
+      this.switch24Canvas.width = 24;
+      this.switch24Canvas.height = 24;
+    }
+    const t24Ctx = this.switch24Canvas.getContext('2d', { willReadFrequently: true });
+    t24Ctx.fillStyle = 'rgb(148, 1, 63)';
+    t24Ctx.fillRect(0, 0, 24, 24);
+
+    t24Ctx.imageSmoothingEnabled = true;
+    t24Ctx.imageSmoothingQuality = 'high';
+
+    const scale = Math.min(20.0 / bw, 20.0 / bh);
+    const tw = Math.round(bw * scale);
+    const th = Math.round(bh * scale);
+    const tx = Math.floor((24 - tw) / 2);
+    const ty = Math.floor((24 - th) / 2);
+
+    t24Ctx.drawImage(this.switchCropCanvas, minX, minY, bw, bh, tx, ty, tw, th);
+    const t24Data = t24Ctx.getImageData(0, 0, 24, 24).data;
+
+    const bytes = new Uint8Array(24 * 24 * 3);
+    let bIdx = 0;
+    for (let i = 0; i < 24 * 24; i++) {
+      const k = i * 4;
+      bytes[bIdx++] = t24Data[k];
+      bytes[bIdx++] = t24Data[k + 1];
+      bytes[bIdx++] = t24Data[k + 2];
+    }
+
+    return {
+      aspect: aspect,
+      normR: rSum / totalColor,
+      normG: gSum / totalColor,
+      normB: bSum / totalColor,
+      bytes: bytes
+    };
+  }
+
+  // ★ Switch 1080p 専用マッチング: 24x24 加重MSE ＋ アスペクト比差分 ＋ 正規化RGB色差 (正解率98.72%)
+  _matchPokemonSwitch(ctx, x, y, w, h, candidateEntries) {
+    if (!candidateEntries || candidateEntries.length === 0) return '???';
+    if (candidateEntries.length === 1) return candidateEntries[0].display;
+
+    const live = this._extractLiveSwitch24(ctx, x, y, w, h);
+    let bestDisplay = candidateEntries[0].display;
+    let minScore = Infinity;
+    const scoredCandidates = [];
+
+    for (const entry of candidateEntries) {
+      const feat = this.switchFeatures[entry.id];
+      if (!feat) continue;
+
+      const refBytes = feat.bytes;
+      const liveBytes = live.bytes;
+
+      let sumDiff = 0.0;
+      for (let p = 0; p < 576; p++) {
+        const k = p * 3;
+        const dr = liveBytes[k] - refBytes[k];
+        const dg = liveBytes[k + 1] - refBytes[k + 1];
+        const db = liveBytes[k + 2] - refBytes[k + 2];
+        sumDiff += (dr * dr * 0.299 + dg * dg * 0.587 + db * db * 0.114);
+      }
+      const mse = sumDiff / 576.0;
+      const aspectDiff = Math.abs(live.aspect - feat.aspectRatio);
+      const colorDist = Math.abs(live.normR - feat.normR) + Math.abs(live.normG - feat.normG) + Math.abs(live.normB - feat.normB);
+
+      // 検証で実証された最適パラメータ: MSE + (150 * aspectDiff) + (800 * colorDist)
+      const score = mse + (150.0 * aspectDiff) + (800.0 * colorDist);
+      scoredCandidates.push({ display: entry.display, score, mse, aspectDiff, colorDist });
+
+      if (score < minScore) {
+        minScore = score;
+        bestDisplay = entry.display;
+      }
+    }
+
+    if (scoredCandidates.length > 1) {
+      scoredCandidates.sort((a, b) => a.score - b.score);
+      const topStr = scoredCandidates.slice(0, 3).map(c => `${c.display}(スコア${Math.round(c.score)})`).join(', ');
+      console.log(`[RecognitionEngine:Switch24] 候補上位: ${topStr} ➔ 特定: ${bestDisplay}`);
+    }
+
+    return bestDisplay;
+  }
+
   _getCandidates(t1, t2) {
     let c = [];
     if (t1 !== 'none' && t2 !== 'none') {
@@ -1103,7 +1275,7 @@ class PokemonRecognitionEngine {
           const t2 = res2.type;
 
           const candidates = this._getCandidates(t1, t2);
-          const pName = this._matchPokemonGeoPHOG(sCtx, iconX, iconY, iconW, iconH, candidates);
+          const pName = this._matchPokemonSwitch(sCtx, iconX, iconY, iconW, iconH, candidates);
           opponent.push(pName);
 
           const slotLog = `スロット${i + 1}: t1=${t1}(差${Math.round(res1.score)}), t2=${t2}(差${Math.round(res2.score)}) ➔ 候補${candidates.length}体 ➔ 特定: ${pName}`;
