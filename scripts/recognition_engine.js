@@ -12,6 +12,9 @@ class PokemonRecognitionEngine {
     this.typeFeaturesAfter = {};
     this.typeFeaturesBefore = {};
     this.badgeFeatures = {};
+    this.iconCache = new Map();
+    this.cropCanvas = null;
+    this.templateCanvas = null;
   }
 
   async loadDictionaries() {
@@ -379,6 +382,98 @@ class PokemonRecognitionEngine {
       aspectRatio: liveAspect,
       areaRatio: (mass32 / 1024.0)
     };
+  }
+
+  async _loadPokemonIcon(fileName) {
+    if (!fileName) return null;
+    if (this.iconCache.has(fileName)) {
+      return this.iconCache.get(fileName);
+    }
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        this.iconCache.set(fileName, img);
+        resolve(img);
+      };
+      img.onerror = () => {
+        this.iconCache.set(fileName, null);
+        resolve(null);
+      };
+      img.src = 'assets/pokemon_icons/' + fileName;
+    });
+  }
+
+  async _matchPokemonTemplate(ctx, x, y, w, h, candidateEntries) {
+    if (!candidateEntries || candidateEntries.length === 0) return '???';
+    if (candidateEntries.length === 1) return candidateEntries[0].display;
+
+    // キャンバス初期化（64x64 に正規化して高速・安定照合）
+    const matchSize = 64;
+    if (!this.cropCanvas) {
+      this.cropCanvas = document.createElement('canvas');
+      this.cropCanvas.width = matchSize;
+      this.cropCanvas.height = matchSize;
+    }
+    if (!this.templateCanvas) {
+      this.templateCanvas = document.createElement('canvas');
+      this.templateCanvas.width = matchSize;
+      this.templateCanvas.height = matchSize;
+    }
+
+    const cCtx = this.cropCanvas.getContext('2d', { willReadFrequently: true });
+    cCtx.clearRect(0, 0, matchSize, matchSize);
+    cCtx.drawImage(ctx.canvas, x, y, w, h, 0, 0, matchSize, matchSize);
+    const cropData = cCtx.getImageData(0, 0, matchSize, matchSize).data;
+
+    const tCtx = this.templateCanvas.getContext('2d', { willReadFrequently: true });
+
+    let bestDisplay = candidateEntries[0].display;
+    let minDiff = Infinity;
+
+    for (const entry of candidateEntries) {
+      if (!entry.file) continue;
+      const templImg = await this._loadPokemonIcon(entry.file);
+      if (!templImg) continue;
+
+      tCtx.clearRect(0, 0, matchSize, matchSize);
+      tCtx.drawImage(templImg, 0, 0, matchSize, matchSize);
+      const templData = tCtx.getImageData(0, 0, matchSize, matchSize).data;
+
+      // アルファ透過マスクを考慮したピクセルカラー差分自乗和 (Masked MSE)
+      let sumDiff = 0;
+      let pixelWeight = 0;
+
+      for (let i = 0; i < templData.length; i += 4) {
+        const tA = templData[i + 3];
+        if (tA < 40) continue; // テンプレートの透明部分はスキップ
+
+        const w = tA / 255.0;
+        const dR = templData[i] - cropData[i];
+        const dG = templData[i + 1] - cropData[i + 1];
+        const dB = templData[i + 2] - cropData[i + 2];
+
+        // 輝度・色差重み付け (人間の視覚感度準拠)
+        const diff = (dR * dR * 0.299 + dG * dG * 0.587 + dB * dB * 0.114) * w;
+        sumDiff += diff;
+        pixelWeight += w;
+      }
+
+      if (pixelWeight > 0) {
+        const avgDiff = sumDiff / pixelWeight;
+        if (avgDiff < minDiff) {
+          minDiff = avgDiff;
+          bestDisplay = entry.display;
+        }
+      }
+    }
+
+    // 全画像のロードに失敗した場合は幾何特徴量 (GeoPHOG) にフォールバック
+    if (minDiff === Infinity) {
+      return this._matchPokemonGeoPHOG(ctx, x, y, w, h, candidateEntries);
+    }
+
+    return bestDisplay;
   }
 
   _matchPokemonGeoPHOG(ctx, x, y, w, h, candidateEntries) {
@@ -780,7 +875,7 @@ class PokemonRecognitionEngine {
           const t2 = res2.score < 8000000 ? res2.type : 'none';
 
           const candidates = this._getCandidates(t1, t2);
-          const pName = this._matchPokemonGeoPHOG(sCtx, iconX, iconY, iconW, iconH, candidates);
+          const pName = await this._matchPokemonTemplate(sCtx, iconX, iconY, iconW, iconH, candidates);
           opponent.push(pName);
         }
       } else {
@@ -798,7 +893,7 @@ class PokemonRecognitionEngine {
           const t2 = res2.score < 8000000 ? res2.type : 'none';
 
           const candidates = this._getCandidates(t1, t2);
-          const pName = this._matchPokemonGeoPHOG(sCtx, iconX, slotY + iconYOff, iconW, iconH, candidates);
+          const pName = await this._matchPokemonTemplate(sCtx, iconX, slotY + iconYOff, iconW, iconH, candidates);
           opponent.push(pName);
         }
       }
@@ -826,7 +921,7 @@ class PokemonRecognitionEngine {
         const t2 = res2.score < 15000000 ? res2.type : 'none';
 
         const candidates = this._getCandidates(t1, t2);
-        const pName = this._matchPokemonGeoPHOG(sCtx, iconX, slotY + iconYOff, iconW, iconH, candidates);
+        const pName = await this._matchPokemonTemplate(sCtx, iconX, slotY + iconYOff, iconW, iconH, candidates);
         opponent.push(pName);
       }
 
