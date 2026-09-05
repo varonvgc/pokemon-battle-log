@@ -45,8 +45,8 @@
     BATTLE_HP_DOUBLE: [
       { role: 'rival', index: 0, x: 1140, y: 35,  w: 240, h: 55, isHorizontal: true }, // 相手1 (上段左)
       { role: 'rival', index: 1, x: 1510, y: 35,  w: 240, h: 55, isHorizontal: true }, // 相手2 (上段右)
-      { role: 'me',    index: 0, x: 180,  y: 860, w: 240, h: 55, isHorizontal: true }, // 自分1 (下段左)
-      { role: 'me',    index: 1, x: 530,  y: 860, w: 240, h: 55, isHorizontal: true }  // 自分2 (下段右)
+      { role: 'me',    index: 0, x: 180,  y: 905, w: 240, h: 48, isHorizontal: true }, // 自分1 (下段左: リザードン等)
+      { role: 'me',    index: 1, x: 530,  y: 905, w: 240, h: 48, isHorizontal: true }  // 自分2 (下段右: オーロンゲ等)
     ],
     // 勝敗ボール (Win / Lose 判定)
     WIN_BALL_ME:    { x: 445.3, y: 771, w: 72, h: 72 },
@@ -335,6 +335,29 @@
       return cropCanvas.toDataURL('image/png');
     }
 
+    // 選出画面（見せ合い）の「選出完了」ボタン（鮮やかな黄緑色）の存在判定
+    isSelectionButtonPresent(ctx) {
+      if (!ctx || !ctx.canvas) return false;
+      try {
+        const imgData = ctx.getImageData(300, 925, 150, 40);
+        const data = imgData.data;
+        let greenCount = 0;
+        for (let i = 0; i < data.length; i += 16) { // 4ピクセル毎に間引きサンプリング
+          const r = data[i];
+          const g = data[i + 1];
+          const b = data[i + 2];
+          // 選出完了ボタン特有の鮮やかな黄緑色 (G > 170, R > 70, B < 90)
+          if (g > 170 && r > 70 && b < 90) {
+            greenCount++;
+            if (greenCount >= 20) return true;
+          }
+        }
+      } catch (e) {
+        // cross-origin などによる例外防止
+      }
+      return false;
+    }
+
     // pamo3 完全準拠: 出撃ネームプレート用前処理 (水平シアー変形 + 2x拡大 + 閾値175二値化)
     cropForDispatchOcr(ctx, rect) {
       const { x, y, w, h } = rect;
@@ -450,26 +473,36 @@
         case 'WAITING_MATCHING': {
           const ballCrop = this.cropToBase64(ctx, COORDS.MATCHING_BALL);
           const score = await this.matchTemplate(ballCrop, this.templates.matchingBall, { useAlphaMask: true });
-          if (score > 0.45) {
-            console.log('[AutoMode] MATCHING PHASE DETECTED! score=' + score);
+          const hasBtn = this.isSelectionButtonPresent(ctx);
+          if (score > 0.42 || hasBtn) {
+            console.log(`[AutoMode] MATCHING PHASE DETECTED! score=${score}, hasBtn=${hasBtn}`);
             this.phase = 'MATCHING';
+            this.matchingExitCount = 0;
             this.updateStatusBadge('見せ合い画面検知: 相手情報取得中...');
             await this._handleMatchingPhase(ctx);
           }
           break;
         }
 
-        // 見せ合い画面継続中 (ボールマークが消えるまで留まる)
+        // 見せ合い画面継続中 (ボールマークおよび選出ボタンが消えるまで留まる)
         case 'MATCHING': {
           this._syncManualSelections();
           const ballCrop = this.cropToBase64(ctx, COORDS.MATCHING_BALL);
           const score = await this.matchTemplate(ballCrop, this.templates.matchingBall, { useAlphaMask: true });
-          if (score < 0.35) {
-            // 見せ合いボールマークが消えた -> 画面暗転 / 対戦開始へ移行！
-            console.log('[AutoMode] MATCHING FINISHED! Transition to WAITING_GAME_START');
-            this.waitingStartTimestamp = Date.now();
-            this.phase = 'WAITING_GAME_START';
-            this.updateStatusBadge('対戦開始待ち (VS画面待機中...)');
+          const hasBtn = this.isSelectionButtonPresent(ctx);
+
+          // ボールマークも選出ボタンも両方消灯した場合のみ離脱カウントを進める
+          if (score < 0.32 && !hasBtn) {
+            this.matchingExitCount = (this.matchingExitCount || 0) + 1;
+            // 連続3フレーム (約1秒) 連続で消灯した場合のみ見せ合い終了と判定 (フライング遷移を完全防止)
+            if (this.matchingExitCount >= 3) {
+              console.log('[AutoMode] MATCHING FINISHED! Transition to WAITING_GAME_START');
+              this.waitingStartTimestamp = Date.now();
+              this.phase = 'WAITING_GAME_START';
+              this.updateStatusBadge('対戦開始待ち (VS画面待機中...)');
+            }
+          } else {
+            this.matchingExitCount = 0;
           }
           break;
         }
@@ -1063,21 +1096,29 @@
       this.dispatchedSlotsMe = {};
       this.dispatchedSlotsRival = {};
       for (let i = 0; i < 4; i++) {
-        this.updateVsBarSlot('me', i, null);
-        this.updateVsBarSlot('rival', i, null);
+        this.updateVsBarSlot('me', i, null, true);
+        this.updateVsBarSlot('rival', i, null, true);
       }
     }
 
-    updateVsBarSlot(role, slotIndex, pokemonName) {
+    updateVsBarSlot(role, slotIndex, pokemonName, force = false) {
       const slotId = `vs-slot-${role}-${slotIndex}`;
       const slotEl = document.getElementById(slotId);
       if (!slotEl) return;
+
+      const currentPokemon = slotEl.dataset.currentPokemon || '';
+      const targetPokemon = pokemonName || '';
+      // すでに同じ内容が表示されている場合は再描画せず、毎フレームの popIn アニメーション（ピコピコ）を防止
+      if (!force && currentPokemon === targetPokemon) {
+        return;
+      }
+      slotEl.dataset.currentPokemon = targetPokemon;
 
       if (!pokemonName) {
         // 初期状態: モンスターボール表示 (52pxに大型化)
         slotEl.innerHTML = `<img src="assets/templates/monsterball.png" alt="ball" style="width:52px;height:52px;filter:drop-shadow(0 3px 6px rgba(0,0,0,0.6))">`;
       } else {
-        // ポケモン特定後: ポケモンスプライトアイコン + 名前アニメーション
+        // ポケモン特定後: ポケモンスプライトアイコン + 名前アニメーション (出撃時に1回だけポンッと表示)
         let spriteHtml = '';
         if (typeof window.getPokeSpriteHTMLByDisplay === 'function') {
           spriteHtml = window.getPokeSpriteHTMLByDisplay(pokemonName);

@@ -969,6 +969,7 @@ class PokemonRecognitionEngine {
           const t2X = 1801.0;
           const typeY = 172.0 + 126.0 * i;
           const tW = 40.0;
+          const tH = 40.0;
           const res1 = await this._matchTypeIconTemplate(sCtx, t1X, typeY, tW, tH);
           const res2 = await this._matchTypeIconTemplate(sCtx, t2X, typeY, tW, tH);
           const t1 = res1.type;
