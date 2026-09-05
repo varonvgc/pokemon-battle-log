@@ -34,6 +34,13 @@
       { role: 'rival', index: 0, x: 1589.6, y: 52, w: 220, h: 46 },
       { role: 'me',    index: 0, x: 148.1,  y: 932, w: 220, h: 46 }
     ],
+    // 様子を見る (ターゲット選択画面) のポケモン名領域 (出撃見逃しリカバリー用)
+    TARGET_SELECT_DOUBLE: [
+      { role: 'rival', index: 0, x: 960,  y: 225, w: 190, h: 50, isHorizontal: true }, // 相手1
+      { role: 'rival', index: 1, x: 1330, y: 225, w: 190, h: 50, isHorizontal: true }, // 相手2
+      { role: 'me',    index: 0, x: 960,  y: 532, w: 190, h: 50, isHorizontal: true }, // 自分1
+      { role: 'me',    index: 1, x: 1330, y: 532, w: 190, h: 50, isHorizontal: true }  // 自分2
+    ],
     // 勝敗ボール (Win / Lose 判定)
     WIN_BALL_ME:    { x: 445.3, y: 771, w: 72, h: 72 },
     WIN_BALL_RIVAL: { x: 1405,  y: 771, w: 72, h: 72 }
@@ -321,10 +328,9 @@
       return cropCanvas.toDataURL('image/png');
     }
 
-    // pamo3 完全準拠: 出撃ネームプレート用前処理 (19.3度回転補正 + 2x拡大 + 閾値180二値化)
+    // pamo3 完全準拠: 出撃ネームプレート用前処理 (水平シアー変形 + 2x拡大 + 閾値175二値化)
     cropForDispatchOcr(ctx, rect) {
       const { x, y, w, h } = rect;
-      const angleRad = 19.3 * Math.PI / 180;
 
       // 1. 原寸切り出し
       const srcCanvas = document.createElement('canvas');
@@ -333,28 +339,33 @@
       const srcCtx = srcCanvas.getContext('2d', { willReadFrequently: true });
       srcCtx.drawImage(ctx.canvas, x, y, w, h, 0, 0, w, h);
 
-      // 2. 19.3度回転 (Deskew) + 2x拡大で水平な大文字に補正
+      // 2. 水平軸を維持したまま文字のイタリック傾きを正立させるシアー変形 (tan(19.3°) ≈ 0.3502)
+      const skew = Math.tan(19.3 * Math.PI / 180);
       const ocrCanvas = document.createElement('canvas');
-      ocrCanvas.width = Math.round(w * 2);
+      ocrCanvas.width = Math.round(w * 2 + h * 2 * skew);
       ocrCanvas.height = Math.round(h * 2);
       const ocrCtx = ocrCanvas.getContext('2d', { willReadFrequently: true });
 
       ocrCtx.fillStyle = '#FFFFFF';
       ocrCtx.fillRect(0, 0, ocrCanvas.width, ocrCanvas.height);
 
-      ocrCtx.save();
-      ocrCtx.translate(ocrCanvas.width / 2, ocrCanvas.height / 2);
-      ocrCtx.rotate(angleRad);
-      ocrCtx.drawImage(srcCanvas, -srcCanvas.width, -srcCanvas.height, srcCanvas.width * 2, srcCanvas.height * 2);
-      ocrCtx.restore();
+      if (rect.isHorizontal) {
+        // 水平文字 (様子を見る画面のパネル等) はシアー変形不要
+        ocrCtx.drawImage(srcCanvas, 0, 0, w * 2, h * 2);
+      } else {
+        ocrCtx.save();
+        ocrCtx.transform(1, 0, -skew, 1, h * 2 * skew, 0);
+        ocrCtx.drawImage(srcCanvas, 0, 0, w * 2, h * 2);
+        ocrCtx.restore();
+      }
 
-      // 3. 閾値 175〜180 による白文字二値化 (文字=黒 0, 背景=白 255)
+      // 3. 閾値 175 による白文字二値化 (文字=黒 0, 背景=白 255)
       const imgData = ocrCtx.getImageData(0, 0, ocrCanvas.width, ocrCanvas.height);
       const d = imgData.data;
       for (let i = 0; i < d.length; i += 4) {
         const r = d[i], g = d[i + 1], b = d[i + 2];
         const bright = 0.299 * r + 0.587 * g + 0.114 * b;
-        const isText = (bright >= 175) || (r > 165 && g > 165 && b > 165);
+        const isText = (bright >= 170) || (r > 165 && g > 165 && b > 165);
         const val = isText ? 0 : 255;
         d[i] = val;
         d[i + 1] = val;
@@ -432,8 +443,8 @@
           const vsScore = await this.matchTemplate(vsCrop, this.templates.vsLogo, { useAlphaMask: true });
           const elapsed = Date.now() - (this.waitingStartTimestamp || Date.now());
 
-          // VS検知 or 35秒フォールバック
-          if (vsScore > 0.48 || elapsed > 35000) {
+          // VS検知 (vsScore > 0.38) or 10秒フォールバック (出撃演出の開始を絶対に見逃さない)
+          if (vsScore > 0.38 || elapsed > 10000) {
             console.log(`[AutoMode] GAME START DETECTED! (vsScore=${vsScore}, elapsed=${elapsed}ms)`);
             this.phase = 'IN_GAME';
             this.updateStatusBadge('試合中: 出撃ポケモン検知中...');
@@ -663,7 +674,11 @@
         this._extractMyPartyNames();
       }
 
-      const targets = COORDS.DISPATCH_DOUBLE; // ダブルバトル 4箇所固定
+      let targets = [...COORDS.DISPATCH_DOUBLE];
+      // 先発が未確定の場合 (me < 2 または rival < 2) は、様子を見る画面のパネル領域も追加監視！
+      if (this.detectedDispatchedMe.length < 2 || this.detectedDispatchedRival.length < 2) {
+        targets = targets.concat(COORDS.TARGET_SELECT_DOUBLE);
+      }
 
       for (const target of targets) {
         // すでに該当陣営が上限に達していればスキップ

@@ -13,8 +13,11 @@ class PokemonRecognitionEngine {
     this.typeFeaturesBefore = {};
     this.badgeFeatures = {};
     this.iconCache = new Map();
+    this.typeIconCache = new Map();
     this.cropCanvas = null;
     this.templateCanvas = null;
+    this.typeCropCanvas = null;
+    this.typeTemplCanvas = null;
   }
 
   async loadDictionaries() {
@@ -382,6 +385,105 @@ class PokemonRecognitionEngine {
       aspectRatio: liveAspect,
       areaRatio: (mass32 / 1024.0)
     };
+  }
+
+  async _loadTypeTemplate(typeName) {
+    if (!typeName) return null;
+    if (this.typeIconCache.has(typeName)) {
+      return this.typeIconCache.get(typeName);
+    }
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        this.typeIconCache.set(typeName, img);
+        resolve(img);
+      };
+      img.onerror = () => {
+        this.typeIconCache.set(typeName, null);
+        resolve(null);
+      };
+      img.src = `assets/type_icons/template_${typeName}.png`;
+    });
+  }
+
+  async _matchTypeIconTemplate(ctx, x, y, w = 40, h = 40) {
+    const TYPES = [
+      'normal', 'fire', 'water', 'grass', 'electric', 'ice',
+      'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug',
+      'rock', 'ghost', 'dragon', 'steel', 'dark', 'fairy'
+    ];
+
+    if (!this.typeCropCanvas) {
+      this.typeCropCanvas = document.createElement('canvas');
+      this.typeCropCanvas.width = 40;
+      this.typeCropCanvas.height = 40;
+    }
+    if (!this.typeTemplCanvas) {
+      this.typeTemplCanvas = document.createElement('canvas');
+      this.typeTemplCanvas.width = 40;
+      this.typeTemplCanvas.height = 40;
+    }
+
+    const cCtx = this.typeCropCanvas.getContext('2d', { willReadFrequently: true });
+    cCtx.clearRect(0, 0, 40, 40);
+    cCtx.drawImage(ctx.canvas, x, y, w, h, 0, 0, 40, 40);
+    const cropData = cCtx.getImageData(0, 0, 40, 40).data;
+
+    // 画面切り出し領域の平均輝度をチェック（暗い無アイコン背景なら即 none）
+    let totalBright = 0;
+    for (let i = 0; i < cropData.length; i += 4) {
+      totalBright += (cropData[i] + cropData[i + 1] + cropData[i + 2]) / 3;
+    }
+    const avgBright = totalBright / (40 * 40);
+    if (avgBright < 45) {
+      return { type: 'none', score: 999999 };
+    }
+
+    const tCtx = this.typeTemplCanvas.getContext('2d', { willReadFrequently: true });
+
+    let bestType = 'none';
+    let minDiff = Infinity;
+
+    for (const type of TYPES) {
+      const templImg = await this._loadTypeTemplate(type);
+      if (!templImg) continue;
+
+      tCtx.clearRect(0, 0, 40, 40);
+      tCtx.drawImage(templImg, 0, 0, 40, 40);
+      const templData = tCtx.getImageData(0, 0, 40, 40).data;
+
+      let sumDiff = 0;
+      let count = 0;
+
+      for (let i = 0; i < templData.length; i += 4) {
+        const a = templData[i + 3];
+        if (a < 50) continue;
+
+        const weight = a / 255.0;
+        const dR = templData[i] - cropData[i];
+        const dG = templData[i + 1] - cropData[i + 1];
+        const dB = templData[i + 2] - cropData[i + 2];
+
+        sumDiff += (dR * dR * 0.299 + dG * dG * 0.587 + dB * dB * 0.114) * weight;
+        count += weight;
+      }
+
+      if (count > 0) {
+        const mse = sumDiff / count;
+        if (mse < minDiff) {
+          minDiff = mse;
+          bestType = type;
+        }
+      }
+    }
+
+    // 属性アイコンと似ていない場合（単タイプ時の空スロットなど）は none
+    if (minDiff > 5500) {
+      return { type: 'none', score: minDiff };
+    }
+
+    return { type: bestType, score: minDiff };
   }
 
   async _loadPokemonIcon(fileName) {
@@ -867,12 +969,10 @@ class PokemonRecognitionEngine {
           const t2X = 1801.0;
           const typeY = 172.0 + 126.0 * i;
           const tW = 40.0;
-          const tH = 40.0;
-
-          const res1 = this._matchTypeTemplate(sCtx, t1X, typeY, tW, tH, this.typeFeaturesBefore);
-          const res2 = this._matchTypeTemplate(sCtx, t2X, typeY, tW, tH, this.typeFeaturesBefore);
-          const t1 = res1.score < 8000000 ? res1.type : 'none';
-          const t2 = res2.score < 8000000 ? res2.type : 'none';
+          const res1 = await this._matchTypeIconTemplate(sCtx, t1X, typeY, tW, tH);
+          const res2 = await this._matchTypeIconTemplate(sCtx, t2X, typeY, tW, tH);
+          const t1 = res1.type;
+          const t2 = res2.type;
 
           const candidates = this._getCandidates(t1, t2);
           const pName = await this._matchPokemonTemplate(sCtx, iconX, iconY, iconW, iconH, candidates);
