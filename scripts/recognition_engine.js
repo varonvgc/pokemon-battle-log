@@ -1103,7 +1103,7 @@ class PokemonRecognitionEngine {
           const t2 = res2.type;
 
           const candidates = this._getCandidates(t1, t2);
-          const pName = await this._matchPokemonTemplate(sCtx, iconX, iconY, iconW, iconH, candidates);
+          const pName = this._matchPokemonGeoPHOG(sCtx, iconX, iconY, iconW, iconH, candidates);
           opponent.push(pName);
 
           const slotLog = `スロット${i + 1}: t1=${t1}(差${Math.round(res1.score)}), t2=${t2}(差${Math.round(res2.score)}) ➔ 候補${candidates.length}体 ➔ 特定: ${pName}`;
