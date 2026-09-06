@@ -850,11 +850,12 @@
       // 手動選出があれば常に最新状態を取り込み
       this._syncManualSelections();
 
+      const maxSlots = this.battleMode === 'single' ? 3 : 4;
       const meCount = this.detectedDispatchedMe.length;
       const rivalCount = this.detectedDispatchedRival.length;
 
-      // ★ pamo3 原典完全再現 ⑥: 先発2匹が両陣営とも確定していればOCRを完全スキップ（ピコピコ完全防止）
-      if (meCount >= 2 && rivalCount >= 2) {
+      // 両陣営とも上限（ダブル4匹、シングル3匹）に達していればOCRを完全スキップ
+      if (meCount >= maxSlots && rivalCount >= maxSlots) {
         return;
       }
 
@@ -880,25 +881,26 @@
         this._extractMyPartyNames();
       }
 
-      // 対象スロットの動的選定 (2体確定済みの陣営はOCR対象から完全に除外)
+      // 対象スロットの動的選定 (最大匹数に達した陣営はOCR対象から除外)
       let targets = [];
 
-      // 1. 先発出撃演出 (DISPATCH_DOUBLE)
-      for (const t of COORDS.DISPATCH_DOUBLE) {
-        if (t.role === 'me' && meCount >= 2) continue;
-        if (t.role === 'rival' && rivalCount >= 2) continue;
+      // 1. 通常コマンド画面HPバー (BATTLE_HP_DOUBLE) ★基本かつ最優先
+      for (const t of COORDS.BATTLE_HP_DOUBLE) {
+        if (t.role === 'me' && meCount >= maxSlots) continue;
+        if (t.role === 'rival' && rivalCount >= maxSlots) continue;
         targets.push(t);
       }
 
-      // ★ pamo3 原典完全再現 ⑦: 出撃演出で未確定枠がある場合 (me < 2 または rival < 2) のみ、
-      // 様子を見る画面 (TARGET_SELECT_DOUBLE) & 通常コマンド画面HPバー (BATTLE_HP_DOUBLE) からリカバリー！
+      // 2. 様子を見る画面 (TARGET_SELECT_DOUBLE) ★Xボタンで開いた時のリカバリー
+      for (const t of COORDS.TARGET_SELECT_DOUBLE) {
+        if (t.role === 'me' && meCount >= maxSlots) continue;
+        if (t.role === 'rival' && rivalCount >= maxSlots) continue;
+        targets.push(t);
+      }
+
+      // 3. 先発出撃演出 (DISPATCH_DOUBLE) ★試合開始直後の先発未確定時のみ
       if (meCount < 2 || rivalCount < 2) {
-        for (const t of COORDS.TARGET_SELECT_DOUBLE) {
-          if (t.role === 'me' && meCount >= 2) continue;
-          if (t.role === 'rival' && rivalCount >= 2) continue;
-          targets.push(t);
-        }
-        for (const t of COORDS.BATTLE_HP_DOUBLE) {
+        for (const t of COORDS.DISPATCH_DOUBLE) {
           if (t.role === 'me' && meCount >= 2) continue;
           if (t.role === 'rival' && rivalCount >= 2) continue;
           targets.push(t);
@@ -906,9 +908,9 @@
       }
 
       for (const target of targets) {
-        // すでに該当陣営が2匹に達していればスキップ
+        // すでに該当陣営が上限枠に達していればスキップ
         const currentCount = target.role === 'rival' ? this.detectedDispatchedRival.length : this.detectedDispatchedMe.length;
-        if (currentCount >= 2) continue;
+        if (currentCount >= maxSlots) continue;
 
         const slotTracker = target.role === 'rival' ? this.dispatchedSlotsRival : this.dispatchedSlotsMe;
 
@@ -975,6 +977,16 @@
       }
     }
 
+    // 既に出撃登録済みか判定（ベース名一致も含め二重登録を完全防止）
+    _isAlreadyDispatched(role, pokemonName) {
+      const list = role === 'rival' ? this.detectedDispatchedRival : this.detectedDispatchedMe;
+      const baseName = this._normalizeBasePokeName(pokemonName);
+      return list.some(existing => {
+        const existBase = this._normalizeBasePokeName(existing);
+        return existBase === baseName || existing === pokemonName;
+      });
+    }
+
     // 出撃ポケモンが検知されたときの反映
     _handleDispatchedPokemonFound(role, pokemonName) {
       // 最新の手動選出状態を取り込み
@@ -983,7 +995,8 @@
       const list = role === 'rival' ? this.detectedDispatchedRival : this.detectedDispatchedMe;
       const maxSlots = this.battleMode === 'single' ? 3 : 4;
 
-      if (!list.includes(pokemonName) && list.length < maxSlots) {
+      // 重複チェック: 一度選出に出たポケモンは絶対に再登録しない
+      if (!this._isAlreadyDispatched(role, pokemonName) && list.length < maxSlots) {
         list.push(pokemonName);
         console.log(`[AutoMode] Dispatched Pokémon confirmed! [${role}] #${list.length}: ${pokemonName}`);
 

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>In-Game Dispatch OCR Test</title>
+  <style>
+    body { font-family: sans-serif; background: #121526; color: #fff; padding: 20px; }
+    h1 { color: #5bc0be; font-size: 20px; }
+    .card { background: #1c213d; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+    .log-box { background: #0b0d19; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 13px; max-height: 400px; overflow-y: auto; white-space: pre-wrap; color: #7bf1a8; }
+    .status-badge { display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; background: #3a506b; }
+    .badge-success { background: #2a9d8f; }
+    .badge-running { background: #e76f51; }
+    canvas { border: 1px solid #3a506b; border-radius: 4px; max-width: 100%; height: auto; }
+    .slot-row { display: flex; gap: 10px; margin-top: 10px; }
+    .slot-card { background: #252c50; padding: 8px 12px; border-radius: 6px; flex: 1; text-align: center; }
+    .slot-title { font-size: 11px; color: #8d99ae; }
+    .slot-val { font-size: 16px; font-weight: bold; color: #fff; margin-top: 4px; }
+  </style>
+  <script src="../scripts/tesseract/tesseract.min.js"></script>
+</head>
+<body>
+  <h1>In-Game 4枚連続 選出認識テスト (400ms間隔)</h1>
+  <div class="card">
+    <div>状態: <span id="status" class="status-badge badge-running">初期化中...</span></div>
+    <div style="margin-top: 10px;">
+      <button id="start-btn" style="padding: 8px 16px; background: #5bc0be; color: #000; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">テスト実行</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>現在の選出登録スロット</h3>
+    <div style="color: #ff6b6b; font-weight: bold; font-size: 14px;">相手側選出 (Rival)</div>
+    <div class="slot-row" id="rival-slots">
+      <div class="slot-card"><div class="slot-title">枠 1</div><div class="slot-val" id="rival-slot-0">-</div></div>
+      <div class="slot-card"><div class="slot-title">枠 2</div><div class="slot-val" id="rival-slot-1">-</div></div>
+      <div class="slot-card"><div class="slot-title">枠 3</div><div class="slot-val" id="rival-slot-2">-</div></div>
+      <div class="slot-card"><div class="slot-title">枠 4</div><div class="slot-val" id="rival-slot-3">-</div></div>
+    </div>
+    <div style="color: #4cc9f0; font-weight: bold; font-size: 14px; margin-top: 15px;">自分側選出 (Me)</div>
+    <div class="slot-row" id="me-slots">
+      <div class="slot-card"><div class="slot-title">枠 1</div><div class="slot-val" id="me-slot-0">-</div></div>
+      <div class="slot-card"><div class="slot-title">枠 2</div><div class="slot-val" id="me-slot-1">-</div></div>
+      <div class="slot-card"><div class="slot-title">枠 3</div><div class="slot-val" id="me-slot-2">-</div></div>
+      <div class="slot-card"><div class="slot-title">枠 4</div><div class="slot-val" id="me-slot-3">-</div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>実行ログ</h3>
+    <div class="log-box" id="log"></div>
+  </div>
+
+  <div class="card" style="display: none;">
+    <canvas id="canvas" width="1920" height="1080"></canvas>
+  </div>
+
+  <script src="../scripts/ocr_settings.js"></script>
+  <script src="../scripts/auto_mode_controller.js"></script>
+  <script>
+    const logBox = document.getElementById('log');
+    const statusEl = document.getElementById('status');
+    function log(msg) {
+      logBox.textContent += msg + '\n';
+      logBox.scrollTop = logBox.scrollHeight;
+      console.log(msg);
+    }
+
+    const testImages = [
+      { step: 1, name: '1枚目 (コノヨザル, イッカネズミ vs フラエッテ, イダイトウ)', url: 'in_game/スクリーンショット 2026-09-06 133957.png' },
+      { step: 2, name: '2枚目 (相手交代: オニシズクモ, クチート)', url: 'in_game/スクリーンショット 2026-09-06 134038.png' },
+      { step: 3, name: '3枚目 (自分交代: ドドゲザン)', url: 'in_game/スクリーンショット 2026-09-06 134106.png' },
+      { step: 4, name: '4枚目 (自分交代/死に出し: ウインディ)', url: 'in_game/スクリーンショット 2026-09-06 134128.png' }
+    ];
+
+    let controller = null;
+
+    async function init() {
+      log('[Init] Tesseractワーカー初期化中...');
+      controller = new AutoModeController();
+      // ダブルバトル設定
+      controller.battleMode = 'double';
+      // マスターポケモンリスト
+      window.POKEMON_LIST = [
+        'コノヨザル', 'イッカネズミ', 'オニシズクモ', 'クチート',
+        'フラエッテ', 'イダイトウ', 'ドドゲザン', 'ウインディ',
+        'リキキリン', 'ドラパルト', 'エルフーン', 'バサギリ'
+      ];
+      // 候補リスト
+      controller.rivalPartyNames = ['コノヨザル', 'イッカネズミ', 'オニシズクモ', 'クチート', 'ドラパルト', 'リキキリン'];
+      controller.myPartyNames = ['フラエッテ', 'イダイトウ', 'ドドゲザン', 'ウインディ', 'エルフーン', 'バサギリ'];
+
+      await controller.ensureWorkersReady();
+      log('[Init] ワーカー準備完了！');
+      statusEl.textContent = '待機中';
+      statusEl.className = 'status-badge';
+
+      // UIコールバック設定
+      window.setSelectionFromNames = function(roleKey, list) {
+        log(`[Selection Updated] role=${roleKey}, list=[${list.join(', ')}]`);
+        const prefix = roleKey === 'opp' ? 'rival' : 'me';
+        for (let i = 0; i < 4; i++) {
+          const el = document.getElementById(`${prefix}-slot-${i}`);
+          if (el) el.textContent = list[i] || '-';
+        }
+      };
+
+      document.getElementById('start-btn').addEventListener('click', runTest);
+    }
+
+    async function loadImage(url) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = url;
+      });
+    }
+
+    async function runTest() {
+      statusEl.textContent = 'テスト実行中...';
+      statusEl.className = 'status-badge badge-running';
+      log('\n========== テスト開始 ==========');
+
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+      for (let i = 0; i < testImages.length; i++) {
+        const item = testImages[i];
+        log(`\n--- STEP ${item.step}: ${item.name} ---`);
+        const img = await loadImage(item.url);
+        ctx.drawImage(img, 0, 0, 1920, 1080);
+
+        // 400msの実行間隔をシミュレート
+        controller.lastOcrTimestamp = 0; // スキップ防止
+        await controller._detectDispatchedPokemons(ctx);
+
+        log(`  相手選出状況: [${controller.detectedDispatchedRival.join(', ')}] (${controller.detectedDispatchedRival.length}/4)`);
+        log(`  自分選出状況: [${controller.detectedDispatchedMe.join(', ')}] (${controller.detectedDispatchedMe.length}/4)`);
+
+        await new Promise(r => setTimeout(r, 600));
+      }
+
+      log('\n========== テスト完了 ==========');
+      const rivalSuccess = controller.detectedDispatchedRival.length === 4;
+      const meSuccess = controller.detectedDispatchedMe.length === 4;
+      if (rivalSuccess && meSuccess) {
+        statusEl.textContent = '成功 (8/8匹 全検知完了)';
+        statusEl.className = 'status-badge badge-success';
+        log('🎉 テスト大成功！ 相手4匹・自分4匹が重複なくすべて正常に記録されました！');
+      } else {
+        statusEl.textContent = `完了 (相手:${controller.detectedDispatchedRival.length}/4, 自分:${controller.detectedDispatchedMe.length}/4)`;
+        statusEl.className = 'status-badge';
+      }
+    }
+
+    init().catch(err => {
+      log('[Error] ' + err.message);
+      statusEl.textContent = 'エラー';
+      statusEl.className = 'status-badge badge-running';
+    });
+  </script>
+</body>
+</html>
