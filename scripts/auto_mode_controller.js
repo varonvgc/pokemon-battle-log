@@ -638,6 +638,8 @@
             this._syncManualSelections();
             // 左側フォームを相手トレーナー名〜メモ欄が見える位置へ自動スクロール
             this._scrollToOppTrainerSection();
+            setTimeout(() => this._scrollToOppTrainerSection(), 1000);
+            setTimeout(() => this._scrollToOppTrainerSection(), 2500);
           }
           break;
         }
@@ -922,14 +924,12 @@
           // ★ pamo3 完全準拠: 19.3度回転Deskew + 白文字2倍二値化 (閾値180)
           const cropBase64 = this.cropForDispatchOcr(ctx, target);
 
-          // 前回の切り抜き画像と同一（静止中）かつ認識済みであればOCRをスキップして即時確定反映
+          // 既に正しく認識済み（isValid === true）かつ同一画像のスロットのみOCRをスキップ
           const cached = this.slotImageCache[cacheKey];
-          if (cached && cached.b64 === cropBase64) {
-            if (cached.bestMatch && cached.isValid) {
-              if (!this._isAlreadyDispatched(target.role, cached.bestMatch)) {
-                slotTracker[target.index] = cached.bestMatch;
-                this._handleDispatchedPokemonFound(target.role, cached.bestMatch);
-              }
+          if (cached && cached.b64 === cropBase64 && cached.isValid && cached.bestMatch) {
+            if (!this._isAlreadyDispatched(target.role, cached.bestMatch)) {
+              slotTracker[target.index] = cached.bestMatch;
+              this._handleDispatchedPokemonFound(target.role, cached.bestMatch);
             }
             continue;
           }
@@ -937,7 +937,8 @@
           const ocrRes = await this.katakanaWorker.recognize(cropBase64);
           const rawText = (ocrRes.data.text || '').replace(/[\s\r\n]/g, '');
           if (!rawText || rawText.length < 2) {
-            this.slotImageCache[cacheKey] = { b64: cropBase64, bestMatch: null, minDistance: 999, isValid: false };
+            // 未認識時はキャッシュで次フレームをスキップさせないよう isValid: false を明示
+            this.slotImageCache[cacheKey] = { b64: null, bestMatch: null, minDistance: 999, isValid: false };
             if (this.slotConfidence[confKey]) {
               this.slotConfidence[confKey].count = 0;
             }
@@ -1355,7 +1356,6 @@
 
     // 記録フォームを「相手のトレーナー名」〜「メモ欄」が見える位置へ自動スクロール
     _scrollToOppTrainerSection() {
-      // どの画面にいても確実に「記録する」タブを開き、相手トレーナー名〜メモ欄が見える位置へスクロールする
       let attempts = 0;
       const maxAttempts = 30; // 50ms × 30 = 最大1.5秒待機
 
@@ -1382,8 +1382,8 @@
         const oppTrainer = document.getElementById('rec-opp-trainer');
         const appWrapper = document.getElementById('app-wrapper');
 
-        // 要素がまだ存在しない、または非表示（DOM未展開）の場合はリトライ
-        if (!oppTrainer || oppTrainer.offsetParent === null) {
+        // 要素がDOMに未接続、または高さが0の場合はリトライ
+        if (!oppTrainer || !document.contains(oppTrainer)) {
           if (attempts < maxAttempts) {
             setTimeout(tryScroll, 50);
           }
@@ -1401,25 +1401,27 @@
         const navEl = (appWrapper && appWrapper.querySelector('nav')) || document.querySelector('nav');
         const navHeight = navEl ? navEl.getBoundingClientRect().height : 45;
 
-        // A. appWrapper のスクロール (body.auto-mode-layout 時)
-        if (appWrapper && (appWrapper.scrollHeight > appWrapper.clientHeight)) {
-          const wrapperRect = appWrapper.getBoundingClientRect();
-          // targetRect.top - wrapperRect.top が appWrapper 表示領域上での相対位置
-          // 現在の scrollTop を足すことで、appWrapper 内での絶対 Y 座標を幾何学的に正確に算出
-          const targetTop = appWrapper.scrollTop + (targetRect.top - wrapperRect.top) - navHeight - 8;
-          appWrapper.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
-        }
+        // ★ ブラウザ標準の scrollIntoView で、どの要素がスクロールコンテナであっても確実に移動！
+        try {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } catch (e) {}
 
-        // B. window / document.scrollingElement のスクロール (通常レイアウト時)
-        const windowScrollY = window.scrollY || document.documentElement.scrollTop || 0;
-        const windowTargetTop = windowScrollY + targetRect.top - navHeight - 8;
-        if (document.scrollingElement && document.scrollingElement.scrollHeight > window.innerHeight) {
-          window.scrollTo({ top: Math.max(0, windowTargetTop), behavior: 'smooth' });
-        }
+        // 上部固定ナビバーに被らないようオフセット微調整 (45px + 8px)
+        setTimeout(() => {
+          if (appWrapper) {
+            const wrapperRect = appWrapper.getBoundingClientRect();
+            const curRect = targetEl.getBoundingClientRect();
+            const targetTop = appWrapper.scrollTop + (curRect.top - wrapperRect.top) - navHeight - 8;
+            appWrapper.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+          }
+          const curRect = targetEl.getBoundingClientRect();
+          if (curRect.top < navHeight + 4) {
+            window.scrollBy({ top: curRect.top - navHeight - 8, behavior: 'smooth' });
+          }
+        }, 60);
 
-        // DOMの遅延再描画やフォント読み込みによるレイアウト変動を吸収するため、初回実行後200msにも微調整
         if (attempts === 1) {
-          setTimeout(tryScroll, 200);
+          setTimeout(tryScroll, 250);
         }
       };
 
