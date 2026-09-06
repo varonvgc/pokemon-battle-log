@@ -109,6 +109,7 @@
       this.detectedDispatchedMe = [];
       this.detectedDispatchedRival = [];
       this.rivalPartyNames = [];
+      this._hasScrolledForOpponentParty = false;
       this.isWorkersReady = false;
       this.isInitializingWorkers = false;
     }
@@ -634,12 +635,11 @@
             this.winBallMeCount = 0;
             this.winBallRivalCount = 0;
             this.updateStatusBadge('試合中: 出撃ポケモン検知中...');
-            // 手動選出を保持したままVSバーと内部リストを同期
-            this._syncManualSelections();
-            // 左側フォームを相手トレーナー名〜メモ欄が見える位置へ自動スクロール
-            this._scrollToOppTrainerSection();
-            setTimeout(() => this._scrollToOppTrainerSection(), 1000);
-            setTimeout(() => this._scrollToOppTrainerSection(), 2500);
+            // 相手パーティ記録時にまだスクロールしていない場合のみ安全にスクロール
+            if (!this._hasScrolledForOpponentParty) {
+              this._hasScrolledForOpponentParty = true;
+              this._scrollToOppTrainerSection();
+            }
           }
           break;
         }
@@ -751,6 +751,13 @@
             if (document.activeElement && typeof document.activeElement.blur === 'function') {
               document.activeElement.blur();
             }
+
+            // ★ 相手パーティの記録完了直後に自動スクロールを実行！ (1試合につき1度だけ確実に実行)
+            if (!this._hasScrolledForOpponentParty) {
+              this._hasScrolledForOpponentParty = true;
+              console.log('[AutoMode] Opponent party registered! Triggering auto-scroll to opponent section...');
+              this._scrollToOppTrainerSection();
+            }
           } else {
             console.warn('[AutoMode] Recognition engine returned empty or invalid opponent:', res);
           }
@@ -768,11 +775,12 @@
       } else {
         this.updateStatusBadge('見せ合い画面: 相手情報取得完了');
       }
-      this._scrollToOppTrainerSection();
     }
 
     // 記録画面の自動初期化 (チャンピオンズ / ランクマ / BO1 / 一番上のパーティ)
     _setupRecordFormForNewBattle() {
+      this._hasScrolledForOpponentParty = false;
+
       // 1. 記録タブへ切り替え
       if (typeof window.showPage === 'function') {
         const recordBtn = document.querySelector('nav button[onclick*="record"]') || document.querySelector('nav button:nth-child(3)');
@@ -820,7 +828,6 @@
       }
 
       console.log('[AutoMode] Record form fully auto-configured for Champions Ranked BO1');
-      this._scrollToOppTrainerSection();
     }
 
     // 自分のパーティのポケモン名一覧を取得
@@ -909,36 +916,23 @@
         targets.push(t);
       }
 
-      if (!this.slotImageCache) this.slotImageCache = {};
-
       for (const target of targets) {
         // すでに該当陣営が上限枠に達していればスキップ
         const currentCount = target.role === 'rival' ? this.detectedDispatchedRival.length : this.detectedDispatchedMe.length;
         if (currentCount >= maxSlots) continue;
 
         const slotTracker = target.role === 'rival' ? this.dispatchedSlotsRival : this.dispatchedSlotsMe;
-        const cacheKey = `${target.role}_${target.index}_${target.isHorizontal ? 'target' : 'hp'}`;
         const confKey = `${target.role}_${target.index}`;
 
         try {
           // ★ pamo3 完全準拠: 19.3度回転Deskew + 白文字2倍二値化 (閾値180)
           const cropBase64 = this.cropForDispatchOcr(ctx, target);
 
-          // 既に正しく認識済み（isValid === true）かつ同一画像のスロットのみOCRをスキップ
-          const cached = this.slotImageCache[cacheKey];
-          if (cached && cached.b64 === cropBase64 && cached.isValid && cached.bestMatch) {
-            if (!this._isAlreadyDispatched(target.role, cached.bestMatch)) {
-              slotTracker[target.index] = cached.bestMatch;
-              this._handleDispatchedPokemonFound(target.role, cached.bestMatch);
-            }
-            continue;
-          }
-
+          // ★ pamo3 原典完全準拠: 画像キャッシュによるスキップは完全撤廃！
+          // 毎周素直にOCRを実行し、検知されたポケモンがすでに選出記録済みかどうかで判定する。
           const ocrRes = await this.katakanaWorker.recognize(cropBase64);
           const rawText = (ocrRes.data.text || '').replace(/[\s\r\n]/g, '');
           if (!rawText || rawText.length < 2) {
-            // 未認識時はキャッシュで次フレームをスキップさせないよう isValid: false を明示
-            this.slotImageCache[cacheKey] = { b64: null, bestMatch: null, minDistance: 999, isValid: false };
             if (this.slotConfidence[confKey]) {
               this.slotConfidence[confKey].count = 0;
             }
@@ -1007,10 +1001,14 @@
             this.onOcrSlotResult(target.role, target.index, rawText, bestMatch, minDistance);
           }
 
-          this.slotImageCache[cacheKey] = { b64: cropBase64, bestMatch, minDistance, isValid };
+          // 出撃確定反映
+          if (isValid && bestMatch) {
+            // ★ 検知されたポケモンがすでに選出記録済みの場合は記録しない（スキップ）
+            if (this._isAlreadyDispatched(target.role, bestMatch)) {
+              continue;
+            }
 
-          // 出撃確定反映 (完全一致なら1発で即時反映、距離1〜2の曖昧一致は連続2回で安全確定)
-          if (isValid) {
+            // 未選出の新規ポケモン（3匹目や4匹目の交代・繰り出しを含む）:
             const currentConf = this.slotConfidence[confKey] || { pokemon: null, count: 0 };
             if (currentConf.pokemon === bestMatch) {
               currentConf.count += 1;
@@ -1346,6 +1344,7 @@
       this.dispatchedSlotsRival = {};
       this.slotImageCache = {};
       this.slotConfidence = {};
+      this._hasScrolledForOpponentParty = false;
       this.winBallMeCount = 0;
       this.winBallRivalCount = 0;
       for (let i = 0; i < 4; i++) {
@@ -1355,9 +1354,10 @@
     }
 
     // 記録フォームを「相手のトレーナー名」〜「メモ欄」が見える位置へ自動スクロール
+    // （相手パーティ記録後に呼び出され、ナビバー直下に相手トレーナー名が来るよう即時・確実に配置）
     _scrollToOppTrainerSection() {
       let attempts = 0;
-      const maxAttempts = 30; // 50ms × 30 = 最大1.5秒待機
+      const maxAttempts = 15;
 
       const tryScroll = () => {
         attempts++;
@@ -1368,14 +1368,6 @@
           if (typeof window.showPage === 'function') {
             const recordBtn = document.querySelector('nav button[onclick*="record"]') || document.querySelector('nav button:nth-child(3)');
             window.showPage('record', recordBtn);
-          }
-        }
-
-        // 2. フォームカードが表示されているか確認
-        const formCard = document.getElementById('record-form-card');
-        if (formCard && (formCard.style.display === 'none' || getComputedStyle(formCard).display === 'none')) {
-          if (typeof window.showRecordForm === 'function') {
-            window.showRecordForm();
           }
         }
 
@@ -1401,26 +1393,22 @@
         const navEl = (appWrapper && appWrapper.querySelector('nav')) || document.querySelector('nav');
         const navHeight = navEl ? navEl.getBoundingClientRect().height : 45;
 
-        // ★ ブラウザ標準の scrollIntoView で、どの要素がスクロールコンテナであっても確実に移動！
-        try {
-          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } catch (e) {}
+        // ★ 直接代入 (Instant Scroll): アニメーションキャンセルやflex制約を完全根絶！
+        if (appWrapper) {
+          const wrapperRect = appWrapper.getBoundingClientRect();
+          const targetTop = appWrapper.scrollTop + (targetRect.top - wrapperRect.top) - navHeight - 6;
+          appWrapper.scrollTop = Math.max(0, targetTop);
+        }
 
-        // 上部固定ナビバーに被らないようオフセット微調整 (45px + 8px)
-        setTimeout(() => {
-          if (appWrapper) {
-            const wrapperRect = appWrapper.getBoundingClientRect();
-            const curRect = targetEl.getBoundingClientRect();
-            const targetTop = appWrapper.scrollTop + (curRect.top - wrapperRect.top) - navHeight - 8;
-            appWrapper.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
-          }
-          const curRect = targetEl.getBoundingClientRect();
-          if (curRect.top < navHeight + 4) {
-            window.scrollBy({ top: curRect.top - navHeight - 8, behavior: 'smooth' });
-          }
-        }, 60);
+        // ウィンドウ全体のスクロール（オートモード外、通常レイアウト時）
+        if (document.documentElement) {
+          const winTargetTop = window.scrollY + targetRect.top - navHeight - 6;
+          window.scrollTo(0, Math.max(0, winTargetTop));
+        }
 
+        // DOM描画の微細な再計算に備え、80ms後と250ms後にも再代入して位置を完全に固定
         if (attempts === 1) {
+          setTimeout(tryScroll, 80);
           setTimeout(tryScroll, 250);
         }
       };

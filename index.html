@@ -4529,6 +4529,7 @@
             fetch('data/regulations.json').catch(() => null)
           ]);
           POKEMON_LIST = await pokeRes.json();
+          window.POKEMON_LIST = POKEMON_LIST;
           MOVES_LIST = await moveRes.json();
           ITEMS_LIST = await itemRes.json();
           if (verRes && verRes.ok) {
