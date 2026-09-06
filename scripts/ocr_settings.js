@@ -59,14 +59,16 @@ window.runOcrSetupTest = async function() {
 
     const scale = window.OCR_SETTINGS.getScale();
 
-    // pamo3のボックス（ステータス）画面のテスト座標 (1920x1080基準)
-    // - ポケモン名 (boxPokeOriginName)
-    const nameRect = { x: 1420, y: 90, w: 200, h: 40 };
-    // - 一番目のわざ (boxMove1)
-    const moveRect = { x: 1320, y: 700, w: 280, h: 50 };
+    // ボックス（ステータス）画面のテスト座標 (1920x1080基準)
+    // - ポケモン名 (帯中央の白文字、ボールアイコン除外)
+    const nameRect = { x: 1348, y: 125, w: 250, h: 45 };
+    // - 一番目のわざ (タイプアイコン右側からPP手前まで)
+    const moveRect = { x: 1340, y: 618, w: 260, h: 45 };
 
-    await processOcrTestRow('ocr-test-name', video, nameRect, scale);
-    await processOcrTestRow('ocr-test-move', video, moveRect, scale);
+    await Promise.all([
+        processOcrTestRow('ocr-test-name', video, nameRect, scale),
+        processOcrTestRow('ocr-test-move', video, moveRect, scale)
+    ]);
 };
 
 // 1行分（元画像 / 二値化画像 / OCR結果）の処理
@@ -119,20 +121,34 @@ async function processOcrTestRow(rowId, video, rect, scale) {
         const luma = r * 0.299 + g * 0.587 + b * 0.114;
         
         // pamo3では輝度が閾値以上の時黒(文字)、未満の時白(背景)にする
-        // Tesseractに読ませるため、白背景・黒文字にするのが基本
+        // Tesseractに読ませるため、白背景・黒文字にする
         const val = (luma >= threshold) ? 0 : 255;
         data[i] = data[i + 1] = data[i + 2] = val;
         data[i + 3] = 255; // alpha
     }
     ctxBin.putImageData(imgData, 0, 0);
 
-    // TesseractでOCR
-    if (window.autoModeWorker) {
+    // Tesseractワーカーの解決 (autoModeControllerから取得)
+    let worker = null;
+    if (window.autoModeController) {
+        if (!window.autoModeController.isWorkersReady) {
+            resText.textContent = "OCRエンジン準備中...";
+            await window.autoModeController.ensureWorkersReady();
+        }
+        if (rowId === 'ocr-test-name' && window.autoModeController.katakanaWorker) {
+            worker = window.autoModeController.katakanaWorker;
+        } else if (window.autoModeController.tesseractWorker) {
+            worker = window.autoModeController.tesseractWorker;
+        }
+    } else if (window.autoModeWorker) {
+        worker = window.autoModeWorker;
+    }
+
+    if (worker) {
         try {
-            // DataURL化してワーカーに渡す
             const dataUrl = cvsBin.toDataURL('image/png');
-            const ret = await window.autoModeWorker.recognize(dataUrl);
-            const text = ret.data.text.trim();
+            const ret = await worker.recognize(dataUrl);
+            const text = (ret.data.text || '').replace(/[\s\r\n]/g, '');
             resText.textContent = text || "(空)";
             resText.style.color = "var(--accent-cyan)";
         } catch (e) {
