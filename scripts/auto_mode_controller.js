@@ -775,8 +775,7 @@
     _normalizeBasePokeName(name) {
       if (!name) return '';
       const s = String(name).trim();
-      // 括弧があり、かつその中に「メガ」または「ゲンシ」が含まれている場合のみベース名を抽出
-      if ((s.includes('(') || s.includes('（')) && (s.includes('メガ') || s.includes('ゲンシ'))) {
+      if (s.includes('(') || s.includes('（')) {
         return s.split('(')[0].split('（')[0].trim();
       }
       return s;
