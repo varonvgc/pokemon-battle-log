@@ -557,8 +557,8 @@
             this.isProcessingFrame = false;
           }
         }
-        // 次のフレームチェック（350ms間隔でCPU負荷を抑制）
-        this.loopTimer = setTimeout(loop, 350);
+        // 次のフレームチェック（300ms間隔で応答性と精度のバランスを最適化）
+        this.loopTimer = setTimeout(loop, 300);
       };
       loop();
     }
@@ -870,15 +870,16 @@
         return;
       }
 
-      // OCRの実行間隔を最短400msに調整
+      // OCRの実行間隔を最短300msに調整
       const now = Date.now();
-      if (this.lastOcrTimestamp && (now - this.lastOcrTimestamp < 400)) {
+      if (this.lastOcrTimestamp && (now - this.lastOcrTimestamp < 300)) {
         return;
       }
       this.lastOcrTimestamp = now;
 
       if (!this.dispatchedSlotsMe) this.dispatchedSlotsMe = {};
       if (!this.dispatchedSlotsRival) this.dispatchedSlotsRival = {};
+      if (!this.slotConfidence) this.slotConfidence = {};
 
       // ユーザーが手入力修正した相手パーティ入力を同期
       const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
@@ -893,9 +894,11 @@
       }
 
       // 対象スロットの動的選定 (最大匹数に達した陣営はOCR対象から除外)
+      // ★ 安定画面特化: 演出中（DISPATCH_DOUBLE）は激しいカメラ移動と閃光でノイズを幻覚するため除外！
+      // 毎ターン静止表示される通常コマンド画面HPバー (BATTLE_HP_DOUBLE) と様子を見る画面 (TARGET_SELECT_DOUBLE) のみに集中
       let targets = [];
 
-      // 1. 通常コマンド画面HPバー (BATTLE_HP_DOUBLE) ★基本かつ最優先
+      // 1. 通常コマンド画面HPバー (BATTLE_HP_DOUBLE) ★最優先・毎ターン静止
       for (const t of COORDS.BATTLE_HP_DOUBLE) {
         if (t.role === 'me' && meCount >= maxSlots) continue;
         if (t.role === 'rival' && rivalCount >= maxSlots) continue;
@@ -909,15 +912,6 @@
         targets.push(t);
       }
 
-      // 3. 先発出撃演出 (DISPATCH_DOUBLE) ★試合開始直後の先発未確定時のみ
-      if (meCount < 2 || rivalCount < 2) {
-        for (const t of COORDS.DISPATCH_DOUBLE) {
-          if (t.role === 'me' && meCount >= 2) continue;
-          if (t.role === 'rival' && rivalCount >= 2) continue;
-          targets.push(t);
-        }
-      }
-
       if (!this.slotImageCache) this.slotImageCache = {};
 
       for (const target of targets) {
@@ -927,16 +921,28 @@
 
         const slotTracker = target.role === 'rival' ? this.dispatchedSlotsRival : this.dispatchedSlotsMe;
         const cacheKey = `${target.role}_${target.index}_${target.isHorizontal ? 'target' : 'hp'}`;
+        const confKey = `${target.role}_${target.index}`;
 
         try {
           // ★ pamo3 完全準拠: 19.3度回転Deskew + 白文字2倍二値化
           const cropBase64 = this.cropForDispatchOcr(ctx, target);
 
-          // 前回の切り抜き画像と同一（静止中）かつ認識済みであればOCRをスキップして再利用
+          // 前回の切り抜き画像と同一（静止中）かつ認識済みであればOCRをスキップして高速再評価
           const cached = this.slotImageCache[cacheKey];
           if (cached && cached.b64 === cropBase64) {
-            if (cached.bestMatch && cached.minDistance <= 2) {
-              if (!this._isAlreadyDispatched(target.role, cached.bestMatch)) {
+            if (cached.bestMatch && cached.isValid) {
+              const currentConf = this.slotConfidence[confKey] || { pokemon: null, count: 0 };
+              if (currentConf.pokemon === cached.bestMatch) {
+                currentConf.count += 1;
+              } else {
+                currentConf.pokemon = cached.bestMatch;
+                currentConf.count = 1;
+              }
+              this.slotConfidence[confKey] = currentConf;
+
+              // 連続2回検知で出撃確定
+              if (currentConf.count >= 2 && !this._isAlreadyDispatched(target.role, cached.bestMatch)) {
+                slotTracker[target.index] = cached.bestMatch;
                 this._handleDispatchedPokemonFound(target.role, cached.bestMatch);
               }
             }
@@ -946,13 +952,17 @@
           const ocrRes = await this.katakanaWorker.recognize(cropBase64);
           const rawText = (ocrRes.data.text || '').replace(/[\s\r\n]/g, '');
           if (!rawText || rawText.length < 2) {
-            this.slotImageCache[cacheKey] = { b64: cropBase64, bestMatch: null, minDistance: 999 };
+            this.slotImageCache[cacheKey] = { b64: cropBase64, bestMatch: null, minDistance: 999, isValid: false };
+            if (this.slotConfidence[confKey]) {
+              this.slotConfidence[confKey].count = 0;
+            }
             continue;
           }
 
           // 照合候補リスト (相手なら rivalPartyNames, 自分なら myPartyNames)
           let candidatePool = target.role === 'rival' ? this.rivalPartyNames : this.myPartyNames;
-          if (!candidatePool || candidatePool.length === 0) {
+          const hasRegisteredPool = Array.isArray(candidatePool) && candidatePool.length > 0;
+          if (!hasRegisteredPool) {
             const masterList = (window.POKEMON_LIST && window.POKEMON_LIST.length) ? window.POKEMON_LIST : (window.masterPokemonList || []);
             candidatePool = masterList.map(p => typeof p === 'string' ? p : (p && (p.name || p.display) || '')).filter(Boolean);
           }
@@ -975,8 +985,8 @@
             }
           }
 
-          // 手持ち・登録パーティと一致しなかった場合、マスタ全体から追加探索（認識ブレ・ニックネーム・パーティ不整合救済）
-          if ((!bestMatch || minDistance > 2) && window.POKEMON_LIST && window.POKEMON_LIST.length) {
+          // 手持ち・登録パーティが未登録の例外的な場合のみ、マスタ全体から追加探索
+          if (!hasRegisteredPool && (!bestMatch || minDistance > 2) && window.POKEMON_LIST && window.POKEMON_LIST.length) {
             for (const p of window.POKEMON_LIST) {
               const pName = typeof p === 'string' ? p : (p && (p.name || p.display) || '');
               if (!pName) continue;
@@ -991,21 +1001,52 @@
             }
           }
 
-          // 2文字以内の差なら一致と判定 (pamo3準拠)
+          // ★ 文字数（2〜6文字）に応じた最適許容編集距離を判定
+          // 2文字: 完全一致(0), 3〜4文字: 1以内, 5文字: 1以内(ドドゲザンvsリザードン誤認防止), 6文字: 2以内
+          const matchedTargetName = bestMatch ? (this._normalizeBasePokeName(bestMatch) || bestMatch) : '';
+          const maxAllowedDist = this._getMaxAllowedDistance(matchedTargetName.length);
+          const isValid = bestMatch && (minDistance <= maxAllowedDist);
+
           if (typeof this.onOcrSlotResult === 'function') {
             this.onOcrSlotResult(target.role, target.index, rawText, bestMatch, minDistance);
           }
 
-          this.slotImageCache[cacheKey] = { b64: cropBase64, bestMatch, minDistance };
+          this.slotImageCache[cacheKey] = { b64: cropBase64, bestMatch, minDistance, isValid };
 
-          if (bestMatch && minDistance <= 2) {
-            slotTracker[target.index] = bestMatch;
-            this._handleDispatchedPokemonFound(target.role, bestMatch);
+          // ★ 連続2回検知（デバウンス判定）
+          if (isValid) {
+            const currentConf = this.slotConfidence[confKey] || { pokemon: null, count: 0 };
+            if (currentConf.pokemon === bestMatch) {
+              currentConf.count += 1;
+            } else {
+              currentConf.pokemon = bestMatch;
+              currentConf.count = 1;
+            }
+            this.slotConfidence[confKey] = currentConf;
+
+            // 2回連続で同一ポケモンが検出された場合のみ出撃確定
+            if (currentConf.count >= 2) {
+              slotTracker[target.index] = bestMatch;
+              this._handleDispatchedPokemonFound(target.role, bestMatch);
+            }
+          } else {
+            // 一致しなかった（ノイズ）場合はカウンタをリセット
+            if (this.slotConfidence[confKey]) {
+              this.slotConfidence[confKey].count = 0;
+            }
           }
         } catch (e) {
           // スキップ
         }
       }
+    }
+
+    // 文字長に応じた最大許容編集距離を計算 (2文字:0, 3-4文字:1, 5文字:1, 6文字以上:2)
+    _getMaxAllowedDistance(nameLength) {
+      if (!nameLength || nameLength <= 2) return 0; // 2文字以下: 完全一致のみ
+      if (nameLength <= 4) return 1; // 3〜4文字: 距離1以内
+      if (nameLength === 5) return 1; // 5文字: 距離1以内 (ドドゲザン vs リザードン等の混同防止)
+      return 2; // 6文字以上: 距離2以内
     }
 
     // 既に出撃登録済みか判定（ベース名一致も含め二重登録を完全防止）
@@ -1287,6 +1328,7 @@
       this.dispatchedSlotsMe = {};
       this.dispatchedSlotsRival = {};
       this.slotImageCache = {};
+      this.slotConfidence = {};
       for (let i = 0; i < 4; i++) {
         this.updateVsBarSlot('me', i, null, true);
         this.updateVsBarSlot('rival', i, null, true);

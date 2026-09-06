@@ -199,7 +199,15 @@
   <div class="main-grid">
     <!-- 左側: 動画プレーヤー & コントロール -->
     <div class="video-card">
-      <video id="test-video" src="video/2026-08-25 23-06-53.mp4" controls playsinline></video>
+      <div style="display:flex;align-items:center;gap:0.75rem;">
+        <label style="font-size:0.85rem;font-weight:700;color:#cbd5e1;">検証動画選択:</label>
+        <select id="video-source-select" class="btn" style="flex:1;padding:0.4rem 0.6rem;background:var(--surface2);" onchange="onVideoSelectChange(this.value)">
+          <option value="video/game2/Video Project 7.mp4">game2: Video Project 7.mp4 (ゲーム画面元動画)</option>
+          <option value="video/game2/ポケモン対戦記録 - Google Chrome 2026-09-06 14-48-12.mp4">game2: ポケモン対戦記録 - Google Chrome... (アプリ画面録画)</option>
+          <option value="video/2026-08-25 23-06-53.mp4">game1: 2026-08-25 23-06-53.mp4</option>
+        </select>
+      </div>
+      <video id="test-video" src="video/game2/Video Project 7.mp4" controls playsinline></video>
       
       <div class="control-row">
         <button id="btn-toggle-loop" class="btn btn-primary" onclick="toggleTestLoop()">
@@ -477,6 +485,16 @@
     });
 
     // テストループ
+    function onVideoSelectChange(src) {
+      const v = document.getElementById('test-video');
+      if (!v) return;
+      const wasPlaying = !v.paused;
+      v.src = src;
+      v.load();
+      if (wasPlaying) v.play();
+      log(`動画ソースを切り替えました: ${src}`, 'info');
+    }
+
     function toggleTestLoop() {
       const btn = document.getElementById('btn-toggle-loop');
       if (isLoopRunning) {
