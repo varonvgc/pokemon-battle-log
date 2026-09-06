@@ -36,17 +36,17 @@
     ],
     // 様子を見る (ターゲット選択画面) のポケモン名領域 (出撃見逃しリカバリー用)
     TARGET_SELECT_DOUBLE: [
-      { role: 'rival', index: 0, x: 670,  y: 286, w: 220, h: 42, isHorizontal: true }, // 相手1 (左上パネル: コノヨザル等)
-      { role: 'rival', index: 1, x: 1140, y: 286, w: 220, h: 42, isHorizontal: true }, // 相手2 (右上パネル: イッカネズミ等)
-      { role: 'me',    index: 0, x: 670,  y: 626, w: 220, h: 42, isHorizontal: true }, // 自分1 (左下パネル: フラエッテ等)
-      { role: 'me',    index: 1, x: 1140, y: 626, w: 220, h: 42, isHorizontal: true }  // 自分2 (右下パネル: イダイトウ等)
+      { role: 'rival', index: 0, x: 650,  y: 300, w: 260, h: 55, isHorizontal: true }, // 相手1 (左上パネル: コノヨザル等)
+      { role: 'rival', index: 1, x: 1150, y: 300, w: 260, h: 55, isHorizontal: true }, // 相手2 (右上パネル: イッカネズミ等)
+      { role: 'me',    index: 0, x: 650,  y: 660, w: 260, h: 55, isHorizontal: true }, // 自分1 (左下パネル: フラエッテ等)
+      { role: 'me',    index: 1, x: 1150, y: 660, w: 260, h: 55, isHorizontal: true }  // 自分2 (右下パネル: イダイトウ等)
     ],
-    // 対戦中 (通常コマンド画面) のHPバー上のポケモン名領域 (pamo3準拠ネイティブ座標)
+    // 対戦中 (通常コマンド画面) のHPバー上のポケモン名領域 (pamo3準拠ネイティブ座標: 19.3度シアー変形適用)
     BATTLE_HP_DOUBLE: [
-      { role: 'rival', index: 0, x: 1140, y: 35,  w: 240, h: 55, isHorizontal: true }, // 相手1 (上段左)
-      { role: 'rival', index: 1, x: 1510, y: 35,  w: 240, h: 55, isHorizontal: true }, // 相手2 (上段右)
-      { role: 'me',    index: 0, x: 154.9, y: 933, w: 220, h: 46, isHorizontal: true }, // 自分1 (pamo3準拠)
-      { role: 'me',    index: 1, x: 554.6, y: 933, w: 220, h: 46, isHorizontal: true }  // 自分2 (pamo3準拠)
+      { role: 'rival', index: 0, x: 1130, y: 55,  w: 260, h: 42 }, // 相手1 (上段左: コノヨザル等)
+      { role: 'rival', index: 1, x: 1530, y: 55,  w: 260, h: 42 }, // 相手2 (上段右: イッカネズミ等)
+      { role: 'me',    index: 0, x: 135,  y: 935, w: 260, h: 42 }, // 自分1 (下段左: フラエッテ等)
+      { role: 'me',    index: 1, x: 535,  y: 935, w: 260, h: 42 }  // 自分2 (下段右: イダイトウ等)
     ],
     // 勝敗ボール (Win / Lose 判定)
     WIN_BALL_ME:    { x: 445.3, y: 771, w: 72, h: 72 },
@@ -907,19 +907,37 @@
         }
       }
 
+      if (!this.slotImageCache) this.slotImageCache = {};
+
       for (const target of targets) {
         // すでに該当陣営が上限枠に達していればスキップ
         const currentCount = target.role === 'rival' ? this.detectedDispatchedRival.length : this.detectedDispatchedMe.length;
         if (currentCount >= maxSlots) continue;
 
         const slotTracker = target.role === 'rival' ? this.dispatchedSlotsRival : this.dispatchedSlotsMe;
+        const cacheKey = `${target.role}_${target.index}_${target.isHorizontal ? 'target' : 'hp'}`;
 
         try {
           // ★ pamo3 完全準拠: 19.3度回転Deskew + 白文字2倍二値化
           const cropBase64 = this.cropForDispatchOcr(ctx, target);
+
+          // 前回の切り抜き画像と同一（静止中）かつ認識済みであればOCRをスキップして再利用
+          const cached = this.slotImageCache[cacheKey];
+          if (cached && cached.b64 === cropBase64) {
+            if (cached.bestMatch && cached.minDistance <= 2) {
+              if (!this._isAlreadyDispatched(target.role, cached.bestMatch)) {
+                this._handleDispatchedPokemonFound(target.role, cached.bestMatch);
+              }
+            }
+            continue;
+          }
+
           const ocrRes = await this.katakanaWorker.recognize(cropBase64);
           const rawText = (ocrRes.data.text || '').replace(/[\s\r\n]/g, '');
-          if (!rawText || rawText.length < 2) continue;
+          if (!rawText || rawText.length < 2) {
+            this.slotImageCache[cacheKey] = { b64: cropBase64, bestMatch: null, minDistance: 999 };
+            continue;
+          }
 
           // 照合候補リスト (相手なら rivalPartyNames, 自分なら myPartyNames)
           let candidatePool = target.role === 'rival' ? this.rivalPartyNames : this.myPartyNames;
@@ -966,6 +984,8 @@
           if (typeof this.onOcrSlotResult === 'function') {
             this.onOcrSlotResult(target.role, target.index, rawText, bestMatch, minDistance);
           }
+
+          this.slotImageCache[cacheKey] = { b64: cropBase64, bestMatch, minDistance };
 
           if (bestMatch && minDistance <= 2) {
             slotTracker[target.index] = bestMatch;
@@ -1255,6 +1275,7 @@
       this.detectedDispatchedRival = [];
       this.dispatchedSlotsMe = {};
       this.dispatchedSlotsRival = {};
+      this.slotImageCache = {};
       for (let i = 0; i < 4; i++) {
         this.updateVsBarSlot('me', i, null, true);
         this.updateVsBarSlot('rival', i, null, true);
