@@ -882,18 +882,7 @@
       // 手動選出があれば常に最新状態を取り込み
       this._syncManualSelections();
 
-      // ★ 手動入力修正の対応: DOMの相手パーティ入力欄から最新の値をプールに確実に反映する
-      const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
-      if (oppInputs && oppInputs.length > 0) {
-        let manualRivalNames = [];
-        oppInputs.forEach(input => {
-          const val = input.value.trim();
-          if (val && val !== '???') manualRivalNames.push(val);
-        });
-        if (manualRivalNames.length > 0) {
-          this.rivalPartyNames = manualRivalNames;
-        }
-      }
+
 
       const maxSlots = this.battleMode === 'single' ? 3 : 4;
       const meCount = this.detectedDispatchedMe.length;
