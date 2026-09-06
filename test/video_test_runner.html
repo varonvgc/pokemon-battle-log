@@ -202,6 +202,8 @@
       <div style="display:flex;align-items:center;gap:0.75rem;">
         <label style="font-size:0.85rem;font-weight:700;color:#cbd5e1;">検証動画選択:</label>
         <select id="video-source-select" class="btn" style="flex:1;padding:0.4rem 0.6rem;background:var(--surface2);" onchange="onVideoSelectChange(this.value)">
+          <option value="video/game6/test.mp4">game6: (最新テスト動画)</option>
+          <option value="video/game5/test.mp4">game5: (テスト動画)</option>
           <option value="video/game2/Video Project 7.mp4">game2: Video Project 7.mp4 (ゲーム画面元動画)</option>
           <option value="video/game2/ポケモン対戦記録 - Google Chrome 2026-09-06 14-48-12.mp4">game2: ポケモン対戦記録 - Google Chrome... (アプリ画面録画)</option>
           <option value="video/2026-08-25 23-06-53.mp4">game1: 2026-08-25 23-06-53.mp4</option>
@@ -651,8 +653,8 @@
     }
 
     // コントローラー内部の stepDetection を _processCurrentPhase にバインド
-    if (window.AutoModeController) {
-      window.AutoModeController.prototype.stepDetection = async function(ctx) {
+    if (window.autoModeController) {
+      window.autoModeController.stepDetection = async function(ctx) {
         await this._processCurrentPhase();
       };
     }
