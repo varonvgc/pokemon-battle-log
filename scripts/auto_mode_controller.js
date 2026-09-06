@@ -554,12 +554,32 @@
     }
 
     // --- 自動録画制御 ---
+    _updateRecordingIndicator(isRecording) {
+      const badge = document.getElementById('vs-recording-badge');
+      if (badge) {
+        badge.style.display = isRecording ? 'inline-flex' : 'none';
+      }
+      const dot = document.getElementById('auto-record-status-dot');
+      if (dot) {
+        if (isRecording) {
+          dot.style.display = 'block';
+          dot.style.animation = 'recBlink 1s infinite alternate';
+        } else {
+          const isAutoRecord = typeof localStorage !== 'undefined' && localStorage.getItem('autoModeAutoRecord') === 'true';
+          dot.style.display = isAutoRecord ? 'block' : 'none';
+          dot.style.animation = 'none';
+        }
+      }
+    }
+
     setAutoRecordEnabled(isEnabled) {
       this.isAutoRecordingEnabled = isEnabled;
       console.log(`[AutoRecord] Auto record enabled: ${isEnabled}`);
       if (!isEnabled && this.isRecording && this.mediaRecorder) {
         console.log('[AutoRecord] Canceled recording by user toggle.');
         this.cancelCurrentRecording = true;
+        this.isRecording = false;
+        this._updateRecordingIndicator(false);
         this.mediaRecorder.stop();
       }
     }
@@ -585,6 +605,7 @@
         };
         this.mediaRecorder.start(1000);
         this.isRecording = true;
+        this._updateRecordingIndicator(true);
         console.log('[AutoRecord] Started recording.');
       } catch (err) {
         console.error('[AutoRecord] Failed to start MediaRecorder:', err);
@@ -594,12 +615,14 @@
     _stopRecordingAsync() {
       return new Promise((resolve) => {
         if (!this.isRecording || !this.mediaRecorder) {
+          this._updateRecordingIndicator(false);
           resolve();
           return;
         }
         
         this.mediaRecorder.onstop = async () => {
           this.isRecording = false;
+          this._updateRecordingIndicator(false);
           if (this.cancelCurrentRecording) {
             console.log('[AutoRecord] Data discarded due to cancellation.');
             this.recordedChunks = [];
@@ -626,9 +649,31 @@
           this.mediaRecorder.stop();
         } catch(e) {
           console.warn('[AutoRecord] Failed to stop:', e);
+          this.isRecording = false;
+          this._updateRecordingIndicator(false);
           resolve();
         }
       });
+    }
+
+    forceResetPhase() {
+      console.log('[AutoMode] Force reset triggered by user.');
+      if (this.isRecording && this.mediaRecorder) {
+        this.cancelCurrentRecording = true;
+        try {
+          this.mediaRecorder.stop();
+        } catch (e) {
+          console.warn('[AutoRecord] Error stopping on force reset:', e);
+        }
+      }
+      this.isRecording = false;
+      this._updateRecordingIndicator(false);
+      this.phase = 'WAITING_MATCHING';
+      this.updateStatusBadge('対戦待ち (待機中)');
+      this.resetVsBar();
+      if (typeof window.showToast === 'function') {
+        window.showToast('対戦待ち状態へリセットしました');
+      }
     }
 
     // --- オートモードの開始・停止 ---
