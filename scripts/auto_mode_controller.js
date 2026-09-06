@@ -917,10 +917,10 @@
       }
 
       // 対象スロットの動的選定 (最大匹数に達した陣営はOCR対象から除外)
-      // ★ 超高速化: 通常コマンド画面HPバー (BATTLE_HP_DOUBLE) 4スロットのみに絞り込む！
-      // （非表示の様子を見る画面4スロットまで毎回直列OCRすると所要時間が倍増し、交代ポケモンの検知が間に合わなくなるため）
+      // ★ 通常コマンド画面HPバー (シングルなら DISPATCH_SINGLE, ダブルなら BATTLE_HP_DOUBLE) に絞り込む
       let targets = [];
-      for (const t of COORDS.BATTLE_HP_DOUBLE) {
+      const hpCoords = this.battleMode === 'single' ? COORDS.DISPATCH_SINGLE : COORDS.BATTLE_HP_DOUBLE;
+      for (const t of hpCoords) {
         if (t.role === 'me' && meCount >= maxSlots) continue;
         if (t.role === 'rival' && rivalCount >= maxSlots) continue;
         targets.push(t);
@@ -1404,15 +1404,40 @@
         const navEl = document.querySelector('nav');
         const navHeight = navEl ? navEl.getBoundingClientRect().height : 45;
 
-        // ★ window.scrollTo による確実なスクロール
-        // 瞬時にスクロールさせる (behavior: 'auto') ことで、他のフォーカスイベントによるキャンセルを防ぐ
-        const winTargetTop = window.scrollY + targetRect.top - navHeight - 10;
-        window.scrollTo({ top: Math.max(0, winTargetTop), behavior: 'auto' });
+        // ★ スクロール可能な親要素を動的に探索して直接スクロールさせる
+        let scrollParent = targetEl.parentElement;
+        while (scrollParent && scrollParent !== document.body && scrollParent !== document.documentElement) {
+          const style = window.getComputedStyle(scrollParent);
+          if (style.overflowY === 'auto' || style.overflowY === 'scroll') {
+            break;
+          }
+          scrollParent = scrollParent.parentElement;
+        }
 
-        // DOM描画の微細な再計算に備え、80ms後と250ms後にも再代入して位置を完全に固定
-        if (attempts === 1) {
-          setTimeout(() => { window.scrollTo({ top: Math.max(0, window.scrollY + targetEl.getBoundingClientRect().top - navHeight - 10), behavior: 'auto' }); }, 80);
-          setTimeout(() => { window.scrollTo({ top: Math.max(0, window.scrollY + targetEl.getBoundingClientRect().top - navHeight - 10), behavior: 'auto' }); }, 250);
+        if (scrollParent && scrollParent !== document.body && scrollParent !== document.documentElement) {
+          const parentRect = scrollParent.getBoundingClientRect();
+          scrollParent.scrollTop = Math.max(0, scrollParent.scrollTop + (targetRect.top - parentRect.top) - navHeight - 10);
+          
+          if (attempts === 1) {
+            setTimeout(() => {
+              const r = targetEl.getBoundingClientRect();
+              const p = scrollParent.getBoundingClientRect();
+              scrollParent.scrollTop = Math.max(0, scrollParent.scrollTop + (r.top - p.top) - navHeight - 10);
+            }, 80);
+            setTimeout(() => {
+              const r = targetEl.getBoundingClientRect();
+              const p = scrollParent.getBoundingClientRect();
+              scrollParent.scrollTop = Math.max(0, scrollParent.scrollTop + (r.top - p.top) - navHeight - 10);
+            }, 250);
+          }
+        } else {
+          // 該当するコンテナが見つからなければ従来の window.scrollTo
+          const winTargetTop = window.scrollY + targetRect.top - navHeight - 10;
+          window.scrollTo({ top: Math.max(0, winTargetTop), behavior: 'auto' });
+          if (attempts === 1) {
+            setTimeout(() => { window.scrollTo({ top: Math.max(0, window.scrollY + targetEl.getBoundingClientRect().top - navHeight - 10), behavior: 'auto' }); }, 80);
+            setTimeout(() => { window.scrollTo({ top: Math.max(0, window.scrollY + targetEl.getBoundingClientRect().top - navHeight - 10), behavior: 'auto' }); }, 250);
+          }
         }
       };
 
