@@ -711,7 +711,13 @@
       const partyCtx = this.captureFrame() || trainerCtx;
 
       try {
-        if (window.recognitionEngine) {
+        // ★ 相手の6匹がすでに取得完了している場合は、重い認識処理を完全にスキップする！
+        let shouldRecognize = true;
+        if (this._hasScrolledForOpponentParty && this.rivalPartyNames && this.rivalPartyNames.length > 0) {
+          shouldRecognize = false;
+        }
+
+        if (shouldRecognize && window.recognitionEngine) {
           if (!window.recognitionEngine.isLoaded && typeof window.recognitionEngine.loadDictionaries === 'function') {
             await window.recognitionEngine.loadDictionaries();
           }
@@ -726,6 +732,7 @@
           // 相手パーティ 6 匹のセット
           if (res && res.opponent && res.opponent.length) {
             console.log('[AutoMode] Detected Opponent Party:', res.opponent);
+            this.rivalPartyNames = []; // ★毎フレーム初期化して無限増殖を完全に防ぐ
             const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
             res.opponent.forEach((pName, idx) => {
               if (idx < 6 && pName && pName !== '???') {
@@ -873,6 +880,19 @@
 
       // 手動選出があれば常に最新状態を取り込み
       this._syncManualSelections();
+
+      // ★ 手動入力修正の対応: DOMの相手パーティ入力欄から最新の値をプールに確実に反映する
+      const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
+      if (oppInputs && oppInputs.length > 0) {
+        let manualRivalNames = [];
+        oppInputs.forEach(input => {
+          const val = input.value.trim();
+          if (val && val !== '???') manualRivalNames.push(val);
+        });
+        if (manualRivalNames.length > 0) {
+          this.rivalPartyNames = manualRivalNames;
+        }
+      }
 
       const maxSlots = this.battleMode === 'single' ? 3 : 4;
       const meCount = this.detectedDispatchedMe.length;
@@ -1372,8 +1392,7 @@
         }
 
         const oppTrainer = document.getElementById('rec-opp-trainer');
-        const appWrapper = document.getElementById('app-wrapper');
-
+        
         // 要素がDOMに未接続、または高さが0の場合はリトライ
         if (!oppTrainer || !document.contains(oppTrainer)) {
           if (attempts < maxAttempts) {
@@ -1382,34 +1401,28 @@
           return;
         }
 
-        const targetEl = oppTrainer.closest('div') || oppTrainer;
+        const targetEl = oppTrainer.closest('div.card') || oppTrainer.closest('div') || oppTrainer;
         const targetRect = targetEl.getBoundingClientRect();
+        
+        // レイアウト完了前ならリトライ
         if (targetRect.height === 0 && attempts < maxAttempts) {
           setTimeout(tryScroll, 50);
           return;
         }
 
         // ナビバーの高さを取得
-        const navEl = (appWrapper && appWrapper.querySelector('nav')) || document.querySelector('nav');
+        const navEl = document.querySelector('nav');
         const navHeight = navEl ? navEl.getBoundingClientRect().height : 45;
 
-        // ★ 直接代入 (Instant Scroll): アニメーションキャンセルやflex制約を完全根絶！
-        if (appWrapper) {
-          const wrapperRect = appWrapper.getBoundingClientRect();
-          const targetTop = appWrapper.scrollTop + (targetRect.top - wrapperRect.top) - navHeight - 6;
-          appWrapper.scrollTop = Math.max(0, targetTop);
-        }
-
-        // ウィンドウ全体のスクロール（オートモード外、通常レイアウト時）
-        if (document.documentElement) {
-          const winTargetTop = window.scrollY + targetRect.top - navHeight - 6;
-          window.scrollTo(0, Math.max(0, winTargetTop));
-        }
+        // ★ window.scrollTo による確実なスクロール
+        // 瞬時にスクロールさせる (behavior: 'auto') ことで、他のフォーカスイベントによるキャンセルを防ぐ
+        const winTargetTop = window.scrollY + targetRect.top - navHeight - 10;
+        window.scrollTo({ top: Math.max(0, winTargetTop), behavior: 'auto' });
 
         // DOM描画の微細な再計算に備え、80ms後と250ms後にも再代入して位置を完全に固定
         if (attempts === 1) {
-          setTimeout(tryScroll, 80);
-          setTimeout(tryScroll, 250);
+          setTimeout(() => { window.scrollTo({ top: Math.max(0, window.scrollY + targetEl.getBoundingClientRect().top - navHeight - 10), behavior: 'auto' }); }, 80);
+          setTimeout(() => { window.scrollTo({ top: Math.max(0, window.scrollY + targetEl.getBoundingClientRect().top - navHeight - 10), behavior: 'auto' }); }, 250);
         }
       };
 
