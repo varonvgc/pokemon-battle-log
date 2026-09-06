@@ -242,7 +242,8 @@
     // --- カメラ操作 ---
     async requestPermission() {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        throw new Error('ブラウザがカメラAPIに対応していません (HTTPSまたはlocalhostでアクセスしてください)');
+        alert('ブラウザがカメラAPIに対応していません。\nセキュリティ上の制約により、ローカルサーバー(http://localhost)を立てるか、HTTPS環境でアクセスしてください。');
+        return false;
       }
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
