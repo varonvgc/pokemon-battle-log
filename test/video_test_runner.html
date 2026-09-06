@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>実機動画オートモード検証テストランナー</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+JP:wght@400;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+JP:wght@400;600;700&display=swap"
+    rel="stylesheet">
   <script src="../scripts/recognition_engine.js"></script>
   <script src="../scripts/auto_mode_controller.js"></script>
+  <script src="https://unpkg.com/pica/dist/pica.min.js"></script>
   <style>
     :root {
       --bg: #0b0f19;
@@ -24,7 +28,12 @@
       --text-muted: #9ca3af;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
       font-family: 'Inter', 'Noto Sans JP', sans-serif;
       background: var(--bg);
@@ -41,8 +50,24 @@
       padding-bottom: 1rem;
       border-bottom: 1px solid var(--border);
     }
-    h1 { font-size: 1.25rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
-    .badge { font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 999px; background: rgba(99, 102, 241, 0.2); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.4); font-weight: 600; }
+
+    h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      background: rgba(99, 102, 241, 0.2);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      font-weight: 600;
+    }
 
     .main-grid {
       display: grid;
@@ -89,11 +114,29 @@
       align-items: center;
       gap: 0.35rem;
     }
-    button.btn:hover { background: #374151; border-color: rgba(255, 255, 255, 0.2); }
-    button.btn-primary { background: var(--accent); border-color: var(--accent); }
-    button.btn-primary:hover { background: #4f46e5; }
-    button.btn-success { background: var(--accent-green); border-color: var(--accent-green); }
-    button.btn-success:hover { background: #059669; }
+
+    button.btn:hover {
+      background: #374151;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    button.btn-primary {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    button.btn-primary:hover {
+      background: #4f46e5;
+    }
+
+    button.btn-success {
+      background: var(--accent-green);
+      border-color: var(--accent-green);
+    }
+
+    button.btn-success:hover {
+      background: #059669;
+    }
 
     .dash-card {
       background: var(--surface);
@@ -129,33 +172,99 @@
       padding: 0.5rem;
       text-align: center;
     }
-    .slot-crop-box .crop-title { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem; font-weight: 600; }
-    .slot-crop-box img, .slot-crop-box canvas { max-width: 100%; height: 32px; border: 1px solid rgba(255, 255, 255, 0.1); background: #000; object-fit: contain; }
-    .slot-crop-box .ocr-result { font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: var(--accent-cyan); margin-top: 0.25rem; font-weight: 700; min-height: 1.2rem; }
 
-    /* 下部VSバー（本番と同一） */
+    .slot-crop-box .crop-title {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+      font-weight: 600;
+    }
+
+    .slot-crop-box .preview-canvases {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .slot-crop-box .preview-raw-canvas {
+      width: 130px;
+      height: 36px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: #000;
+      border-radius: 4px;
+      image-rendering: pixelated;
+    }
+
+    .slot-crop-box .preview-bin-canvas {
+      width: 170px;
+      height: 36px;
+      border: 1px solid #6366f1;
+      background: #ffffff;
+      border-radius: 4px;
+      image-rendering: pixelated;
+    }
+
+    .slot-crop-box .ocr-result {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--accent-cyan);
+      margin-top: 0.35rem;
+      font-weight: 700;
+      min-height: 1.2rem;
+    }
+
+    /* 下部VSバー（テストランナー用: 自分/相手を別行に配置） */
     .vs-bar-container {
       background: rgba(17, 24, 39, 0.9);
       border: 1px solid var(--border);
       border-radius: 10px;
-      padding: 0.75rem;
+      padding: 0.6rem 0.75rem;
       display: flex;
-      align-items: center;
-      justify-content: space-between;
+      flex-direction: column;
+      gap: 0.5rem;
     }
-    .vs-side { display: flex; gap: 0.5rem; align-items: center; }
+
+    .vs-side {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      width: 100%;
+    }
+
+    .vs-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      width: 32px;
+      flex-shrink: 0;
+      text-align: center;
+    }
+
+    .vs-slots-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.4rem;
+      flex: 1;
+    }
+
     .vs-slot {
-      width: 44px;
       height: 44px;
       background: #030712;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 8px;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
+      overflow: hidden;
+      padding: 2px;
+      box-sizing: border-box;
     }
-    .vs-slot img { width: 32px; height: 32px; }
+
+    .vs-slot img {
+      width: 24px;
+      height: 24px;
+    }
 
     /* ログコンソール */
     .log-terminal {
@@ -170,19 +279,46 @@
       line-height: 1.5;
       color: #cbd5e1;
     }
-    .log-line { margin-bottom: 2px; }
-    .log-line.info { color: #38bdf8; }
-    .log-line.success { color: #34d399; font-weight: 700; }
-    .log-line.warn { color: #fbbf24; }
-    .log-line.error { color: #f87171; }
+
+    .log-line {
+      margin-bottom: 2px;
+    }
+
+    .log-line.info {
+      color: #38bdf8;
+    }
+
+    .log-line.success {
+      color: #34d399;
+      font-weight: 700;
+    }
+
+    .log-line.warn {
+      color: #fbbf24;
+    }
+
+    .log-line.error {
+      color: #f87171;
+    }
 
     @keyframes popIn {
-      0% { transform: scale(0.6); opacity: 0; }
-      70% { transform: scale(1.15); }
-      100% { transform: scale(1); opacity: 1; }
+      0% {
+        transform: scale(0.6);
+        opacity: 0;
+      }
+
+      70% {
+        transform: scale(1.15);
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
     }
   </style>
 </head>
+
 <body>
 
   <header>
@@ -192,25 +328,42 @@
     </div>
     <div>
       <a href="../index.html" class="btn" style="text-decoration:none;">← アプリへ戻る</a>
-      <a href="../docs/AUTO_MODE_SPECIFICATION.html" target="_blank" class="btn" style="text-decoration:none;">📄 仕様書</a>
+      <a href="../docs/AUTO_MODE_SPECIFICATION.html" target="_blank" class="btn" style="text-decoration:none;">📄
+        仕様書</a>
     </div>
   </header>
 
   <div class="main-grid">
     <!-- 左側: 動画プレーヤー & コントロール -->
     <div class="video-card">
-      <div style="display:flex;align-items:center;gap:0.75rem;">
+      <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
         <label style="font-size:0.85rem;font-weight:700;color:#cbd5e1;">検証動画選択:</label>
-        <select id="video-source-select" class="btn" style="flex:1;padding:0.4rem 0.6rem;background:var(--surface2);" onchange="onVideoSelectChange(this.value)">
-          <option value="video/game6/test.mp4">game6: (最新テスト動画)</option>
-          <option value="video/game5/test.mp4">game5: (テスト動画)</option>
-          <option value="video/game2/Video Project 7.mp4">game2: Video Project 7.mp4 (ゲーム画面元動画)</option>
-          <option value="video/game2/ポケモン対戦記録 - Google Chrome 2026-09-06 14-48-12.mp4">game2: ポケモン対戦記録 - Google Chrome... (アプリ画面録画)</option>
-          <option value="video/2026-08-25 23-06-53.mp4">game1: 2026-08-25 23-06-53.mp4</option>
+        <select id="video-source-select" class="btn"
+          style="flex:1;min-width:240px;padding:0.4rem 0.6rem;background:var(--surface2);"
+          onchange="onVideoSelectChange(this.value)">
+          <optgroup label="test_video フォルダ (検証対象)">
+            <option value="video/test_video/2026-08-25 23-06-53.mp4" selected>test_video: 2026-08-25 23-06-53.mp4
+            </option>
+            <option value="video/test_video/Video Project 7.mp4">test_video: Video Project 7.mp4</option>
+            <option value="video/test_video/Video Project 7B.mp4">test_video: Video Project 7B.mp4</option>
+          </optgroup>
+          <optgroup label="その他録画">
+            <option value="video/game6/ポケモン対戦記録 - Google Chrome 2026-09-06 18-32-59.mp4">game6 (最新): ポケモン対戦記録
+              (18-32-59.mp4)</option>
+            <option value="video/game5/ポケモン対戦記録 - Google Chrome 2026-09-06 17-38-26.mp4">game5: ポケモン対戦記録 (17-38-26.mp4)
+            </option>
+            <option value="video/game4/ポケモン対戦記録 - Google Chrome 2026-09-06 17-05-45.mp4">game4: ポケモン対戦記録 (17-05-45.mp4)
+            </option>
+          </optgroup>
         </select>
+        <label class="btn" style="cursor:pointer;background:#374151;">
+          📁 PCから動画を選択
+          <input type="file" accept="video/*" style="display:none;" onchange="onLocalFileSelected(event)">
+        </label>
       </div>
-      <video id="test-video" src="video/game2/Video Project 7.mp4" controls playsinline></video>
-      
+      <video id="test-video" src="video/test_video/2026-08-25 23-06-53.mp4" controls playsinline
+        crossorigin="anonymous"></video>
+
       <div class="control-row">
         <button id="btn-toggle-loop" class="btn btn-primary" onclick="toggleTestLoop()">
           ▶️ オートモード検知ループ開始
@@ -220,6 +373,9 @@
         </button>
         <button class="btn btn-success" onclick="forceTriggerMatchingPhase()">
           🎯 相手6体取得を直接実行
+        </button>
+        <button class="btn" style="background:#4b5563;" onclick="resetAutoModeStateForNewVideo()">
+          🔄 状態リセット
         </button>
         <button class="btn" onclick="seekVideo(10)">
           ⏱️ 10s
@@ -246,32 +402,48 @@
       </div>
 
       <div style="display:flex;gap:1rem;font-size:0.85rem;color:var(--text-muted);align-items:center;">
-        <span>動画再生位置: <strong id="video-time" style="color:#fff;">0.00s</strong> / <span id="video-dur">0.00s</span></span>
+        <span>動画再生位置: <strong id="video-time" style="color:#fff;">0.00s</strong> / <span
+            id="video-dur">0.00s</span></span>
         <span>実効解像度: <strong id="video-dim" style="color:#fff;">未ロード</strong></span>
       </div>
 
-      <!-- リアルタイム座標切り出しプレビュー (pamo3 Native) -->
+      <!-- リアルタイム座標切り出しプレビュー (バトル画面 HPバー上ネームプレート) -->
       <div>
-        <h3 style="font-size:0.9rem;margin-bottom:0.5rem;color:#fff;">出撃ネームプレート座標切り出しプレビュー (pamo3 Native座標)</h3>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+          <h3 style="font-size:0.9rem;margin:0;color:#fff;">出撃ネームプレート座標切り出しプレビュー (原寸 / OCR前処理二値化)</h3>
+          <button class="btn" style="padding:2px 8px;font-size:0.75rem;background:#4f46e5;border-color:#6366f1;" onclick="openOcrModal()">🔍 特大拡大プレビュー</button>
+        </div>
         <div class="slot-preview-grid">
-          <div class="slot-crop-box">
-            <div class="crop-title">自分1 [154.9, 933, 220, 46]</div>
-            <canvas id="crop-canvas-me-0" width="220" height="46"></canvas>
+          <div class="slot-crop-box" onclick="openOcrModal('me', 0)" style="cursor:pointer;" title="クリックで特大表示">
+            <div class="crop-title">自分1 (左) [原寸 / 前処理]</div>
+            <div class="preview-canvases">
+              <canvas id="crop-canvas-me-0" width="220" height="46" class="preview-raw-canvas"></canvas>
+              <canvas id="crop-bin-me-0" width="480" height="92" class="preview-bin-canvas"></canvas>
+            </div>
             <div id="ocr-res-me-0" class="ocr-result">-</div>
           </div>
-          <div class="slot-crop-box">
-            <div class="crop-title">自分2 [554.6, 933, 220, 46]</div>
-            <canvas id="crop-canvas-me-1" width="220" height="46"></canvas>
+          <div class="slot-crop-box" onclick="openOcrModal('me', 1)" style="cursor:pointer;" title="クリックで特大表示">
+            <div class="crop-title">自分2 (右) [原寸 / 前処理]</div>
+            <div class="preview-canvases">
+              <canvas id="crop-canvas-me-1" width="220" height="46" class="preview-raw-canvas"></canvas>
+              <canvas id="crop-bin-me-1" width="480" height="92" class="preview-bin-canvas"></canvas>
+            </div>
             <div id="ocr-res-me-1" class="ocr-result">-</div>
           </div>
-          <div class="slot-crop-box">
-            <div class="crop-title">相手1 [1196.7, 50, 220, 46]</div>
-            <canvas id="crop-canvas-rival-0" width="220" height="46"></canvas>
+          <div class="slot-crop-box" onclick="openOcrModal('rival', 0)" style="cursor:pointer;" title="クリックで特大表示">
+            <div class="crop-title">相手1 (左) [原寸 / 前処理]</div>
+            <div class="preview-canvases">
+              <canvas id="crop-canvas-rival-0" width="220" height="46" class="preview-raw-canvas"></canvas>
+              <canvas id="crop-bin-rival-0" width="480" height="92" class="preview-bin-canvas"></canvas>
+            </div>
             <div id="ocr-res-rival-0" class="ocr-result">-</div>
           </div>
-          <div class="slot-crop-box">
-            <div class="crop-title">相手2 [1599.8, 50, 220, 46]</div>
-            <canvas id="crop-canvas-rival-1" width="220" height="46"></canvas>
+          <div class="slot-crop-box" onclick="openOcrModal('rival', 1)" style="cursor:pointer;" title="クリックで特大表示">
+            <div class="crop-title">相手2 (右) [原寸 / 前処理]</div>
+            <div class="preview-canvases">
+              <canvas id="crop-canvas-rival-1" width="220" height="46" class="preview-raw-canvas"></canvas>
+              <canvas id="crop-bin-rival-1" width="480" height="92" class="preview-bin-canvas"></canvas>
+            </div>
             <div id="ocr-res-rival-1" class="ocr-result">-</div>
           </div>
         </div>
@@ -292,13 +464,58 @@
         </div>
       </div>
 
+      <!-- Ground Truth (正解) 突き合わせ評価カード -->
+      <div
+        style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.3);border-radius:8px;padding:0.75rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
+          <h3 style="font-size:0.85rem;color:#a5b4fc;font-weight:700;">🎯 GT(正解) 突合評価 [video_ground_truth.json]</h3>
+          <div style="display:flex;align-items:center;gap:0.4rem;">
+            <span id="gt-eval-badge"
+              style="font-size:0.75rem;padding:0.15rem 0.5rem;border-radius:999px;background:#1e1b4b;color:#a5b4fc;border:1px solid #4338ca;">GT未ロード</span>
+            <button onclick="loadGroundTruth()" class="btn" style="padding:0.1rem 0.5rem;font-size:0.7rem;background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.5);color:#c7d2fe;">🔄 再読込</button>
+          </div>
+        </div>
+        <div style="font-size:0.75rem;color:#cbd5e1;display:flex;flex-direction:column;gap:0.35rem;">
+          <div>
+            <span style="color:#94a3b8;">相手6体: </span>
+            <span id="gt-eval-opp-party" style="font-weight:700;color:#f3f4f6;">-</span>
+          </div>
+          <div>
+            <span style="color:#94a3b8;">相手選出: </span>
+            <span id="gt-eval-opp-select" style="font-weight:700;color:#f3f4f6;">-</span>
+          </div>
+          <div>
+            <span style="color:#94a3b8;">自分選出: </span>
+            <span id="gt-eval-my-select" style="font-weight:700;color:#f3f4f6;">-</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 自分のパーティ (出撃照合プール) -->
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
+          <h3 style="font-size:0.85rem;color:var(--text-muted);">自分のパーティ (出撃OCR照合プール)</h3>
+          <button onclick="editMyPartyManually()" class="btn" style="padding:0.15rem 0.5rem;font-size:0.75rem;background:#374151;border:1px solid #4b5563;">✏️ 手動編集</button>
+        </div>
+        <div id="my-party-display"
+          style="display:grid;grid-template-columns:repeat(3, 1fr);gap:0.4rem;font-size:0.75rem;">
+          <div style="background:#030712;padding:0.4rem;border-radius:4px;border:1px solid var(--border);">1. -</div>
+          <div style="background:#030712;padding:0.4rem;border-radius:4px;border:1px solid var(--border);">2. -</div>
+          <div style="background:#030712;padding:0.4rem;border-radius:4px;border:1px solid var(--border);">3. -</div>
+          <div style="background:#030712;padding:0.4rem;border-radius:4px;border:1px solid var(--border);">4. -</div>
+          <div style="background:#030712;padding:0.4rem;border-radius:4px;border:1px solid var(--border);">5. -</div>
+          <div style="background:#030712;padding:0.4rem;border-radius:4px;border:1px solid var(--border);">6. -</div>
+        </div>
+      </div>
+
       <!-- 相手パーティ認識結果 (6体) -->
       <div>
         <h3 style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.4rem;">相手パーティ (見せ合い取得) & トレーナー名</h3>
         <div id="opp-trainer-display" style="font-size:0.85rem;color:#fff;font-weight:700;margin-bottom:0.4rem;">
           トレーナー名: <span style="color:#38bdf8;">(未取得)</span>
         </div>
-        <div id="opp-party-display" style="display:grid;grid-template-columns:repeat(3, 1fr);gap:0.4rem;font-size:0.75rem;">
+        <div id="opp-party-display"
+          style="display:grid;grid-template-columns:repeat(3, 1fr);gap:0.4rem;font-size:0.75rem;">
           <div style="background:#030712;padding:0.4rem;border-radius:4px;border:1px solid var(--border);">1. -</div>
           <div style="background:#030712;padding:0.4rem;border-radius:4px;border:1px solid var(--border);">2. -</div>
           <div style="background:#030712;padding:0.4rem;border-radius:4px;border:1px solid var(--border);">3. -</div>
@@ -311,82 +528,112 @@
       <!-- 相手6枠の切り出しプレビュー (pamo3 Native) -->
       <div>
         <h3 style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.4rem;">相手6枠の切り出し目視プレビュー (アイコン & 属性1・2)</h3>
-        <div id="opp-crop-preview-list" style="display:grid;grid-template-columns:repeat(3, 1fr);gap:0.4rem;font-size:0.75rem;">
-          <div style="background:#030712;padding:0.3rem;border-radius:6px;border:1px solid var(--border);text-align:center;">
+        <div id="opp-crop-preview-list"
+          style="display:grid;grid-template-columns:repeat(3, 1fr);gap:0.4rem;font-size:0.75rem;">
+          <div
+            style="background:#030712;padding:0.3rem;border-radius:6px;border:1px solid var(--border);text-align:center;">
             <div style="color:#94a3b8;font-size:0.7rem;margin-bottom:2px;">#1</div>
             <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
-              <canvas id="crop-opp-icon-0" width="40" height="40" style="border:1px solid #334155;background:#000;"></canvas>
-              <canvas id="crop-opp-t1-0" width="24" height="24" style="border:1px solid #334155;background:#000;"></canvas>
-              <canvas id="crop-opp-t2-0" width="24" height="24" style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-icon-0" width="40" height="40"
+                style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-t1-0" width="24" height="24"
+                style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-t2-0" width="24" height="24"
+                style="border:1px solid #334155;background:#000;"></canvas>
             </div>
             <div id="crop-opp-label-0" style="color:#a5b4fc;margin-top:2px;font-size:0.7rem;">-</div>
           </div>
-          <div style="background:#030712;padding:0.3rem;border-radius:6px;border:1px solid var(--border);text-align:center;">
+          <div
+            style="background:#030712;padding:0.3rem;border-radius:6px;border:1px solid var(--border);text-align:center;">
             <div style="color:#94a3b8;font-size:0.7rem;margin-bottom:2px;">#2</div>
             <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
-              <canvas id="crop-opp-icon-1" width="40" height="40" style="border:1px solid #334155;background:#000;"></canvas>
-              <canvas id="crop-opp-t1-1" width="24" height="24" style="border:1px solid #334155;background:#000;"></canvas>
-              <canvas id="crop-opp-t2-1" width="24" height="24" style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-icon-1" width="40" height="40"
+                style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-t1-1" width="24" height="24"
+                style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-t2-1" width="24" height="24"
+                style="border:1px solid #334155;background:#000;"></canvas>
             </div>
             <div id="crop-opp-label-1" style="color:#a5b4fc;margin-top:2px;font-size:0.7rem;">-</div>
           </div>
-          <div style="background:#030712;padding:0.3rem;border-radius:6px;border:1px solid var(--border);text-align:center;">
+          <div
+            style="background:#030712;padding:0.3rem;border-radius:6px;border:1px solid var(--border);text-align:center;">
             <div style="color:#94a3b8;font-size:0.7rem;margin-bottom:2px;">#3</div>
             <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
-              <canvas id="crop-opp-icon-2" width="40" height="40" style="border:1px solid #334155;background:#000;"></canvas>
-              <canvas id="crop-opp-t1-2" width="24" height="24" style="border:1px solid #334155;background:#000;"></canvas>
-              <canvas id="crop-opp-t2-2" width="24" height="24" style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-icon-2" width="40" height="40"
+                style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-t1-2" width="24" height="24"
+                style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-t2-2" width="24" height="24"
+                style="border:1px solid #334155;background:#000;"></canvas>
             </div>
             <div id="crop-opp-label-2" style="color:#a5b4fc;margin-top:2px;font-size:0.7rem;">-</div>
           </div>
-          <div style="background:#030712;padding:0.3rem;border-radius:6px;border:1px solid var(--border);text-align:center;">
+          <div
+            style="background:#030712;padding:0.3rem;border-radius:6px;border:1px solid var(--border);text-align:center;">
             <div style="color:#94a3b8;font-size:0.7rem;margin-bottom:2px;">#4</div>
             <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
-              <canvas id="crop-opp-icon-3" width="40" height="40" style="border:1px solid #334155;background:#000;"></canvas>
-              <canvas id="crop-opp-t1-3" width="24" height="24" style="border:1px solid #334155;background:#000;"></canvas>
-              <canvas id="crop-opp-t2-3" width="24" height="24" style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-icon-3" width="40" height="40"
+                style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-t1-3" width="24" height="24"
+                style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-t2-3" width="24" height="24"
+                style="border:1px solid #334155;background:#000;"></canvas>
             </div>
             <div id="crop-opp-label-3" style="color:#a5b4fc;margin-top:2px;font-size:0.7rem;">-</div>
           </div>
-          <div style="background:#030712;padding:0.3rem;border-radius:6px;border:1px solid var(--border);text-align:center;">
+          <div
+            style="background:#030712;padding:0.3rem;border-radius:6px;border:1px solid var(--border);text-align:center;">
             <div style="color:#94a3b8;font-size:0.7rem;margin-bottom:2px;">#5</div>
             <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
-              <canvas id="crop-opp-icon-4" width="40" height="40" style="border:1px solid #334155;background:#000;"></canvas>
-              <canvas id="crop-opp-t1-4" width="24" height="24" style="border:1px solid #334155;background:#000;"></canvas>
-              <canvas id="crop-opp-t2-4" width="24" height="24" style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-icon-4" width="40" height="40"
+                style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-t1-4" width="24" height="24"
+                style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-t2-4" width="24" height="24"
+                style="border:1px solid #334155;background:#000;"></canvas>
             </div>
             <div id="crop-opp-label-4" style="color:#a5b4fc;margin-top:2px;font-size:0.7rem;">-</div>
           </div>
-          <div style="background:#030712;padding:0.3rem;border-radius:6px;border:1px solid var(--border);text-align:center;">
+          <div
+            style="background:#030712;padding:0.3rem;border-radius:6px;border:1px solid var(--border);text-align:center;">
             <div style="color:#94a3b8;font-size:0.7rem;margin-bottom:2px;">#6</div>
             <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
-              <canvas id="crop-opp-icon-5" width="40" height="40" style="border:1px solid #334155;background:#000;"></canvas>
-              <canvas id="crop-opp-t1-5" width="24" height="24" style="border:1px solid #334155;background:#000;"></canvas>
-              <canvas id="crop-opp-t2-5" width="24" height="24" style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-icon-5" width="40" height="40"
+                style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-t1-5" width="24" height="24"
+                style="border:1px solid #334155;background:#000;"></canvas>
+              <canvas id="crop-opp-t2-5" width="24" height="24"
+                style="border:1px solid #334155;background:#000;"></canvas>
             </div>
             <div id="crop-opp-label-5" style="color:#a5b4fc;margin-top:2px;font-size:0.7rem;">-</div>
           </div>
         </div>
       </div>
 
-      <!-- 下部VSバープレビュー -->
+      <!-- 下部VSバープレビュー (自分と相手を2行に分割配置) -->
       <div>
         <h3 style="font-size:0.85rem;color:var(--text-muted);margin-bottom:0.4rem;">出撃VSバー (リアルタイム表示)</h3>
         <div class="vs-bar-container">
+          <!-- 1行目: 自分 -->
           <div class="vs-side">
-            <span style="font-size:0.75rem;font-weight:700;color:#f97316;">自分</span>
-            <div id="vs-slot-me-0" class="vs-slot"><img src="../assets/templates/monsterball.png"></div>
-            <div id="vs-slot-me-1" class="vs-slot"><img src="../assets/templates/monsterball.png"></div>
-            <div id="vs-slot-me-2" class="vs-slot"><img src="../assets/templates/monsterball.png"></div>
-            <div id="vs-slot-me-3" class="vs-slot"><img src="../assets/templates/monsterball.png"></div>
+            <span class="vs-label" style="color:#f97316;">自分</span>
+            <div class="vs-slots-row">
+              <div id="vs-slot-me-0" class="vs-slot"><img src="../assets/templates/monsterball.png"></div>
+              <div id="vs-slot-me-1" class="vs-slot"><img src="../assets/templates/monsterball.png"></div>
+              <div id="vs-slot-me-2" class="vs-slot"><img src="../assets/templates/monsterball.png"></div>
+              <div id="vs-slot-me-3" class="vs-slot"><img src="../assets/templates/monsterball.png"></div>
+            </div>
           </div>
-          <span style="font-weight:800;font-size:0.9rem;color:#a855f7;">VS</span>
+          <!-- 2行目: 相手 -->
           <div class="vs-side">
-            <div id="vs-slot-rival-0" class="vs-slot"><img src="../assets/templates/monsterball.png"></div>
-            <div id="vs-slot-rival-1" class="vs-slot"><img src="../assets/templates/monsterball.png"></div>
-            <div id="vs-slot-rival-2" class="vs-slot"><img src="../assets/templates/monsterball.png"></div>
-            <div id="vs-slot-rival-3" class="vs-slot"><img src="../assets/templates/monsterball.png"></div>
-            <span style="font-size:0.75rem;font-weight:700;color:#3b82f6;">相手</span>
+            <span class="vs-label" style="color:#38bdf8;">相手</span>
+            <div class="vs-slots-row">
+              <div id="vs-slot-rival-0" class="vs-slot"><img src="../assets/templates/monsterball.png"></div>
+              <div id="vs-slot-rival-1" class="vs-slot"><img src="../assets/templates/monsterball.png"></div>
+              <div id="vs-slot-rival-2" class="vs-slot"><img src="../assets/templates/monsterball.png"></div>
+              <div id="vs-slot-rival-3" class="vs-slot"><img src="../assets/templates/monsterball.png"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -395,7 +642,8 @@
       <div>
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.4rem;">
           <h3 style="font-size:0.85rem;color:var(--text-muted);">実行ログ (Console Output)</h3>
-          <button onclick="clearLogs()" style="background:none;border:none;color:#94a3b8;font-size:0.75rem;cursor:pointer;">クリア</button>
+          <button onclick="clearLogs()"
+            style="background:none;border:none;color:#94a3b8;font-size:0.75rem;cursor:pointer;">クリア</button>
         </div>
         <div id="log-terminal" class="log-terminal"></div>
       </div>
@@ -435,6 +683,8 @@
 
     // オートモードコントローラーの初期化
     window.addEventListener('DOMContentLoaded', async () => {
+      window.isTestRunner = true;
+
       log('認識エンジン辞書およびワーカー初期化中...', 'info');
       try {
         if (window.recognitionEngine) {
@@ -443,8 +693,6 @@
         }
         if (window.autoModeController) {
           window.autoModeController.videoElement = video;
-          // 動画の登録パーティ（動画内の自分パーティ: フラエッテ, エルフーン, ドドゲザン, ウインディ, イダイトウ, カイリュー）
-          window.autoModeController.myPartyNames = ['フラエッテ', 'エルフーン', 'ドドゲザン', 'ウインディ', 'イダイトウ', 'カイリュー'];
           window.autoModeController.phase = 'WAITING_MATCHING';
           await window.autoModeController.ensureWorkersReady();
           log('AutoModeController ワーカー & テンプレート画像 初期化完了！ 待機中: WAITING_MATCHING', 'success');
@@ -452,22 +700,22 @@
           // 出撃通知をフックしてプレビュー下に表示
           if (typeof window.autoModeController._handleDispatchedPokemonFound === 'function') {
             const origDispatchHandler = window.autoModeController._handleDispatchedPokemonFound.bind(window.autoModeController);
-            window.autoModeController._handleDispatchedPokemonFound = function(side, pName) {
+            window.autoModeController._handleDispatchedPokemonFound = function (side, pName) {
               origDispatchHandler(side, pName);
               log(`🎯 出撃検知: [${side === 'me' ? '自分' : '相手'}] ${pName}`, 'success');
+              evaluateAgainstGroundTruth();
             };
           }
 
           // OCR文字読み取り結果をリアルタイム表示 & 詳細ログ出力
-          window.autoModeController.onOcrSlotResult = function(role, idx, rawText, bestMatch, dist) {
+          window.autoModeController.onOcrSlotResult = function (role, idx, rawText, bestMatch, dist, isValid) {
             const resEl = document.getElementById(`ocr-res-${role}-${idx}`);
-            if (bestMatch && dist <= 2) {
+            const isAccepted = (typeof isValid === 'boolean') ? isValid : (bestMatch && dist <= 1);
+            if (isAccepted) {
               if (resEl) {
                 resEl.style.color = '#34d399';
-                resEl.textContent = `⭕ "${rawText}" ➔ ${bestMatch}`;
+                resEl.textContent = `⭕ "${rawText}" ➔ ${bestMatch} (差${dist})`;
               }
-              // ログが多すぎるのを防ぐため、成功時や完全な無音時はログを最小限にするなどの調整が必要ですが
-              // 現在はデバッグのためすべて出力します
               log(`[OCR] ${role}[${idx}]: "${rawText}" ➔ ${bestMatch} (距離: ${dist}) ✅`, 'success');
             } else if (rawText && rawText.length > 0) {
               if (resEl) {
@@ -479,7 +727,7 @@
           };
 
           // 認識エンジンのスロット別詳細ログを表示
-          window.logEngineStep = function(slotIdx, t1, t2, pName, msg) {
+          window.logEngineStep = function (slotIdx, t1, t2, pName, msg) {
             log(msg, 'info');
             const labelEl = document.getElementById(`crop-opp-label-${slotIdx}`);
             if (labelEl) {
@@ -490,17 +738,223 @@
       } catch (err) {
         log(`初期化エラー: ${err.message}`, 'error');
       }
+
+      // コントローラー等の準備が確実に完了してから GT データを同期ロード
+      await loadGroundTruth();
     });
 
+    // Ground Truth 管理
+    let groundTruthData = {};
+    let currentVideoFileName = '2026-08-25 23-06-53.mp4';
+
+    function updateMyPartyDisplay(teamList) {
+      const disp = document.getElementById('my-party-display');
+      if (!disp) return;
+      const list = (teamList && teamList.length > 0) ? teamList : (window.autoModeController && window.autoModeController.myPartyNames) || [];
+      if (list.length === 0) {
+        disp.innerHTML = '<div style="grid-column:span 3;color:#9ca3af;padding:0.4rem;background:#030712;border:1px dashed #374151;border-radius:4px;">(パーティ未設定 - 全ポケモンリスト照合)</div>';
+        return;
+      }
+      disp.innerHTML = list.map((p, idx) => `
+        <div style="background:#1e1b4b;color:#fed7aa;padding:0.4rem;border-radius:4px;border:1px solid #c2410c;font-weight:700;display:flex;justify-content:space-between;align-items:center;">
+          <span>${idx + 1}. ${p}</span>
+        </div>
+      `).join('');
+    }
+
+    function editMyPartyManually() {
+      const current = (window.autoModeController && window.autoModeController.myPartyNames) ? window.autoModeController.myPartyNames.join(', ') : '';
+      const input = prompt('自分のパーティ (最大6匹) をカンマ区切りで入力してください:', current);
+      if (input !== null) {
+        const newTeam = input.split(/[,、]/).map(s => s.trim()).filter(Boolean);
+        if (window.autoModeController) {
+          window.autoModeController.myPartyNames = [...newTeam];
+        }
+        updateMyPartyDisplay(newTeam);
+        log(`自分のパーティを手動更新しました: ${newTeam.join(', ')}`, 'success');
+      }
+    }
+
+    async function loadGroundTruth() {
+      try {
+        const res = await fetch('../test/video_ground_truth.json?t=' + Date.now());
+        if (res.ok) {
+          groundTruthData = await res.json();
+          log('✅ video_ground_truth.json ロード成功', 'success');
+          applyGroundTruthForCurrentVideo();
+        } else {
+          document.getElementById('gt-eval-badge').textContent = `GT読込失敗 (${res.status})`;
+          log(`GT読込失敗: HTTP ${res.status}`, 'warn');
+        }
+      } catch (e) {
+        log(`GTロードエラー: ${e.message}`, 'warn');
+        document.getElementById('gt-eval-badge').textContent = 'GTロードエラー';
+      }
+    }
+
+    function applyGroundTruthForCurrentVideo() {
+      const gt = groundTruthData[currentVideoFileName];
+      const badge = document.getElementById('gt-eval-badge');
+      if (!gt) {
+        badge.textContent = `GT未定義: ${currentVideoFileName}`;
+        badge.style.background = '#374151';
+        badge.style.color = '#9ca3af';
+        document.getElementById('gt-eval-opp-party').textContent = '未定義';
+        document.getElementById('gt-eval-opp-select').textContent = '未定義';
+        document.getElementById('gt-eval-my-select').textContent = '未定義';
+        updateMyPartyDisplay([]);
+        return;
+      }
+
+      badge.textContent = `GT適用中: ${currentVideoFileName}`;
+      badge.style.background = '#1e1b4b';
+      badge.style.color = '#a5b4fc';
+
+      // 自分のパーティをGTから同期
+      if (gt.my_team && gt.my_team.length > 0 && gt.my_team.some(p => p !== '')) {
+        const validTeam = gt.my_team.filter(p => p !== '');
+        if (window.autoModeController) {
+          window.autoModeController.myPartyNames = [...validTeam];
+        }
+        updateMyPartyDisplay(validTeam);
+        log(`GTから自分のパーティを適用: ${validTeam.join(', ')}`, 'info');
+      } else {
+        updateMyPartyDisplay([]);
+      }
+
+      // 相手パーティをGTから同期 (見せ合い解析を行わずに即出撃OCRテストができるよう支援)
+      if (gt.opponent_team && gt.opponent_team.length > 0 && gt.opponent_team.some(p => p !== '')) {
+        const validOppTeam = gt.opponent_team.filter(p => p !== '');
+        if (window.autoModeController) {
+          window.autoModeController.rivalPartyNames = [...validOppTeam];
+        }
+        const disp = document.getElementById('opp-party-display');
+        if (disp) {
+          disp.innerHTML = validOppTeam.map((p, idx) => `<div style="background:#1e1b4b;color:#c7d2fe;padding:0.4rem;border-radius:4px;border:1px solid #4338ca;font-weight:700;">${idx + 1}. ${p}</div>`).join('');
+        }
+        log(`GTから相手パーティ候補プールを設定: ${validOppTeam.join(', ')}`, 'info');
+      }
+
+      evaluateAgainstGroundTruth();
+    }
+
+    function resetAutoModeStateForNewVideo() {
+      if (!window.autoModeController) return;
+      window.autoModeController.phase = 'WAITING_MATCHING';
+      window.autoModeController.waitingStartTimestamp = null;
+      window.autoModeController._hasScrolledForOpponentParty = false;
+      window.autoModeController.matchingEnterCount = 0;
+      window.autoModeController.matchingExitCount = 0;
+      window.autoModeController.rivalPartyNames = [];
+      window.autoModeController.oppTrainerName = null;
+      window.autoModeController.detectedDispatchedMe = [];
+      window.autoModeController.detectedDispatchedRival = [];
+      window.autoModeController.dispatchedSlotsMe = {};
+      window.autoModeController.dispatchedSlotsRival = {};
+      window.autoModeController.slotConfidence = {};
+      window.autoModeController.lastGameFinishTimestamp = 0;
+      document.getElementById('phase-name').textContent = 'WAITING_MATCHING';
+      document.getElementById('auto-mode-status-badge').textContent = 'WAITING_MATCHING (マッチング待機中)';
+      document.getElementById('opp-party-display').innerHTML = '<div style="background:#030712;padding:0.4rem;border-radius:4px;border:1px solid var(--border);">1. -</div><div style="background:#030712;padding:0.4rem;border-radius:4px;border:1px solid var(--border);">2. -</div><div style="background:#030712;padding:0.4rem;border-radius:4px;border:1px solid var(--border);">3. -</div><div style="background:#030712;padding:0.4rem;border-radius:4px;border:1px solid var(--border);">4. -</div><div style="background:#030712;padding:0.4rem;border-radius:4px;border:1px solid var(--border);">5. -</div><div style="background:#030712;padding:0.4rem;border-radius:4px;border:1px solid var(--border);">6. -</div>';
+      document.getElementById('opp-trainer-display').innerHTML = 'トレーナー名: <span style="color:#38bdf8;">(未取得)</span>';
+      ['me-0', 'me-1', 'rival-0', 'rival-1'].forEach(id => {
+        const el = document.getElementById(`ocr-res-${id}`);
+        if (el) { el.textContent = '-'; el.style.color = '#94a3b8'; }
+      });
+      // GTデータがあれば再適用
+      applyGroundTruthForCurrentVideo();
+      log('🔄 オートモード状態を初期化しました (WAITING_MATCHING)', 'info');
+    }
+
+    function getBasePokeName(name) {
+      if (!name) return '';
+      return String(name).split('(')[0].split('（')[0].trim();
+    }
+
+    function evaluateAgainstGroundTruth() {
+      const gt = groundTruthData[currentVideoFileName];
+      if (!gt) return;
+
+      const isMatch = (name1, name2) => {
+        if (!name1 || !name2) return false;
+        if (name1 === name2) return true;
+        return getBasePokeName(name1) === getBasePokeName(name2);
+      };
+
+      // 1. 相手6体パーティの突合
+      const elOppParty = document.getElementById('gt-eval-opp-party');
+      const oppRecognized = (window.autoModeController && window.autoModeController.rivalPartyNames) || [];
+      const oppGt = (gt.opponent_team || []).filter(p => p !== '');
+      if (oppGt.length === 0) {
+        elOppParty.innerHTML = '<span style="color:#9ca3af;">(GTに相手パーティ未記載)</span>';
+      } else if (oppRecognized.length === 0) {
+        elOppParty.innerHTML = `<span style="color:#fbbf24;">⏳ 認識待ち</span> (正解: ${oppGt.join(', ')})`;
+      } else {
+        const matchCount = oppRecognized.filter(p => oppGt.some(g => isMatch(p, g))).length;
+        const isPerfect = matchCount === oppGt.length;
+        const color = isPerfect ? '#34d399' : '#f87171';
+        elOppParty.innerHTML = `<span style="color:${color};font-weight:700;">${matchCount}/${oppGt.length}体一致</span> [認識: ${oppRecognized.join(', ')}]`;
+      }
+
+      // 2. 相手選出の突合
+      const elOppSelect = document.getElementById('gt-eval-opp-select');
+      const oppSelectRecognized = (window.autoModeController && window.autoModeController.detectedDispatchedRival) || [];
+      const oppSelectGt = (gt.opponent_selection || []).filter(p => p !== '');
+      if (oppSelectGt.length === 0) {
+        elOppSelect.innerHTML = '<span style="color:#9ca3af;">(GTに相手選出未記載)</span>';
+      } else if (oppSelectRecognized.length === 0) {
+        elOppSelect.innerHTML = `<span style="color:#fbbf24;">⏳ 出撃待ち</span> (正解: ${oppSelectGt.join(', ')})`;
+      } else {
+        const matchCount = oppSelectRecognized.filter(p => oppSelectGt.some(g => isMatch(p, g))).length;
+        const isPerfect = matchCount === oppSelectGt.length;
+        const color = isPerfect ? '#34d399' : (matchCount > 0 ? '#fbbf24' : '#f87171');
+        elOppSelect.innerHTML = `<span style="color:${color};font-weight:700;">${matchCount}/${oppSelectGt.length}体一致</span> [検知: ${oppSelectRecognized.join(', ')}]`;
+      }
+
+      // 3. 自分選出の突合
+      const elMySelect = document.getElementById('gt-eval-my-select');
+      const mySelectRecognized = (window.autoModeController && window.autoModeController.detectedDispatchedMe) || [];
+      const mySelectGt = (gt.my_selection || []).filter(p => p !== '');
+      if (mySelectGt.length === 0) {
+        elMySelect.innerHTML = '<span style="color:#9ca3af;">(GTに自分選出未記載)</span>';
+      } else if (mySelectRecognized.length === 0) {
+        elMySelect.innerHTML = `<span style="color:#fbbf24;">⏳ 出撃待ち</span> (正解: ${mySelectGt.join(', ')})`;
+      } else {
+        const matchCount = mySelectRecognized.filter(p => mySelectGt.some(g => isMatch(p, g))).length;
+        const isPerfect = matchCount === mySelectGt.length;
+        const color = isPerfect ? '#34d399' : (matchCount > 0 ? '#fbbf24' : '#f87171');
+        elMySelect.innerHTML = `<span style="color:${color};font-weight:700;">${matchCount}/${mySelectGt.length}体一致</span> [検知: ${mySelectRecognized.join(', ')}]`;
+      }
+    }
+
     // テストループ
-    function onVideoSelectChange(src) {
+    async function onVideoSelectChange(src) {
       const v = document.getElementById('test-video');
       if (!v) return;
       const wasPlaying = !v.paused;
       v.src = src;
       v.load();
       if (wasPlaying) v.play();
+
+      const fileName = src.split('/').pop();
+      currentVideoFileName = decodeURIComponent(fileName);
+      await loadGroundTruth();
       log(`動画ソースを切り替えました: ${src}`, 'info');
+    }
+
+    async function onLocalFileSelected(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const v = document.getElementById('test-video');
+      if (!v) return;
+      const wasPlaying = !v.paused;
+      const blobUrl = URL.createObjectURL(file);
+      v.src = blobUrl;
+      v.load();
+      if (wasPlaying) v.play();
+      currentVideoFileName = file.name;
+      await loadGroundTruth();
+      log(`PC上のファイルを選択しました: ${file.name} (${(file.size / 1024 / 1024).toFixed(1)}MB)`, 'success');
     }
 
     function toggleTestLoop() {
@@ -551,6 +1005,7 @@
           const disp = document.getElementById('opp-party-display');
           disp.innerHTML = pList.map((p, idx) => `<div style="background:#1e1b4b;color:#c7d2fe;padding:0.4rem;border-radius:4px;border:1px solid #4338ca;font-weight:700;">${idx + 1}. ${p}</div>`).join('');
           log(`相手パーティ: ${pList.join(', ')}`, 'success');
+          evaluateAgainstGroundTruth();
         }
         if (window.autoModeController.oppTrainerName) {
           document.getElementById('opp-trainer-display').innerHTML = `トレーナー名: <span style="color:#38bdf8;">${window.autoModeController.oppTrainerName}</span>`;
@@ -604,6 +1059,7 @@
           const pList = window.autoModeController.rivalPartyNames;
           const disp = document.getElementById('opp-party-display');
           disp.innerHTML = pList.map((p, idx) => `<div style="background:#1e1b4b;color:#c7d2fe;padding:0.4rem;border-radius:4px;border:1px solid #4338ca;font-weight:700;">${idx + 1}. ${p}</div>`).join('');
+          evaluateAgainstGroundTruth();
         }
 
         // 相手トレーナー名
@@ -615,24 +1071,114 @@
       }
     }
 
-    // プレビューキャンバスへの切り出し描画
+    // プレビューキャンバスへの切り出し描画 (元の座標準拠)
     function updatePreviewCrops(ctx) {
       const crops = [
-        { id: 'crop-canvas-me-0', rect: { x: 154.9, y: 933, w: 220, h: 46 } },
-        { id: 'crop-canvas-me-1', rect: { x: 554.6, y: 933, w: 220, h: 46 } },
-        { id: 'crop-canvas-rival-0', rect: { x: 1196.7, y: 50, w: 220, h: 46 } },
-        { id: 'crop-canvas-rival-1', rect: { x: 1599.8, y: 50, w: 220, h: 46 } }
+        // 元の座標 (BATTLE_HP_DOUBLE)
+        { id: 'crop-canvas-me-0',    binId: 'crop-bin-me-0',    rect: { role: 'me',    index: 0, x: 154.9,  y: 933, w: 220, h: 46 } },
+        { id: 'crop-canvas-me-1',    binId: 'crop-bin-me-1',    rect: { role: 'me',    index: 1, x: 554.6,  y: 933, w: 220, h: 46 } },
+        { id: 'crop-canvas-rival-0', binId: 'crop-bin-rival-0', rect: { role: 'rival', index: 0, x: 1196.7, y: 50,  w: 220, h: 46 } },
+        { id: 'crop-canvas-rival-1', binId: 'crop-bin-rival-1', rect: { role: 'rival', index: 1, x: 1599.8, y: 50,  w: 220, h: 46 } }
       ];
 
       crops.forEach(c => {
+        // 1. 原寸切り出し描画
         const canvas = document.getElementById(c.id);
-        if (!canvas) return;
-        const cCtx = canvas.getContext('2d');
-        cCtx.drawImage(ctx.canvas, c.rect.x, c.rect.y, c.rect.w, c.rect.h, 0, 0, canvas.width, canvas.height);
+        if (canvas) {
+          const cCtx = canvas.getContext('2d');
+          cCtx.clearRect(0, 0, canvas.width, canvas.height);
+          cCtx.drawImage(ctx.canvas, c.rect.x, c.rect.y, c.rect.w, c.rect.h, 0, 0, canvas.width, canvas.height);
+        }
+
+        // 2. 前処理（シアー変形＋二値化）画像のリアルタイム生成 & 描画！
+        const binCanvas = document.getElementById(c.binId);
+        if (binCanvas && window.autoModeController && typeof window.autoModeController.cropForDispatchOcr === 'function') {
+          try {
+            window.autoModeController.cropForDispatchOcr(ctx, c.rect);
+            const key = `${c.rect.role}_${c.rect.index}`;
+            const processedCanvas = window._lastOcrCanvas && window._lastOcrCanvas[key];
+            if (processedCanvas) {
+              const bCtx = binCanvas.getContext('2d');
+              bCtx.clearRect(0, 0, binCanvas.width, binCanvas.height);
+              bCtx.drawImage(processedCanvas, 0, 0, binCanvas.width, binCanvas.height);
+            }
+          } catch (e) {
+            // スキップ
+          }
+        }
       });
 
-      // 相手6枠の目視プレビューもリアルタイム描画 (pamo3 Native)
+      // 相手6枠の目視プレビューもリアルタイム描画
       updateOppSlotPreviews(ctx);
+
+      // モーダル表示中の場合はモーダル内容もリアルタイム更新
+      const modal = document.getElementById('ocr-modal');
+      if (modal && modal.style.display === 'flex') {
+        renderOcrModalContent();
+      }
+    }
+
+    // --- 前処理画像 特大拡大確認モーダル ---
+    let ocrModalTarget = null;
+
+    function openOcrModal(role = null, index = null) {
+      ocrModalTarget = (role !== null && index !== null) ? { role, index } : null;
+      const modal = document.getElementById('ocr-modal');
+      if (modal) {
+        modal.style.display = 'flex';
+        renderOcrModalContent();
+      }
+    }
+
+    function closeOcrModal() {
+      const modal = document.getElementById('ocr-modal');
+      if (modal) modal.style.display = 'none';
+    }
+
+    function renderOcrModalContent() {
+      const container = document.getElementById('ocr-modal-content');
+      if (!container) return;
+
+      const crops = [
+        { role: 'me',    index: 0, label: '自分1 (左 / 先発1)' },
+        { role: 'me',    index: 1, label: '自分2 (右 / 先発2)' },
+        { role: 'rival', index: 0, label: '相手1 (左 / 先発1)' },
+        { role: 'rival', index: 1, label: '相手2 (右 / 先発2)' }
+      ];
+
+      const targets = ocrModalTarget
+        ? crops.filter(c => c.role === ocrModalTarget.role && c.index === ocrModalTarget.index)
+        : crops;
+
+      let html = '';
+      targets.forEach(t => {
+        const rawCanvas = document.getElementById(`crop-canvas-${t.role}-${t.index}`);
+        const binCanvas = document.getElementById(`crop-bin-${t.role}-${t.index}`);
+        const rawDataUrl = rawCanvas ? rawCanvas.toDataURL() : '';
+        const binDataUrl = binCanvas ? binCanvas.toDataURL() : '';
+        const ocrResEl = document.getElementById(`ocr-res-${t.role}-${t.index}`);
+        const ocrText = ocrResEl ? ocrResEl.textContent : '-';
+
+        html += `
+          <div style="background:#030712;border:1px solid #334155;border-radius:8px;padding:1rem;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.6rem;">
+              <span style="font-weight:700;color:#93c5fd;font-size:1rem;">${t.label}</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:0.9rem;font-weight:700;color:#38bdf8;">${ocrText}</span>
+            </div>
+            <div style="display:flex;gap:1.5rem;flex-wrap:wrap;align-items:flex-start;">
+              <div>
+                <div style="font-size:0.75rem;color:#94a3b8;margin-bottom:0.25rem;">【原寸切り出し (解像度 220x46)】</div>
+                <img src="${rawDataUrl}" style="width:260px;height:auto;border:1px solid #475569;border-radius:4px;image-rendering:pixelated;background:#000;">
+              </div>
+              <div style="flex:1;min-width:320px;">
+                <div style="font-size:0.75rem;color:#94a3b8;margin-bottom:0.25rem;">【OCR前処理画像: 二値化＋19.3度シアー直立補正 (拡大表示)】</div>
+                <img src="${binDataUrl}" style="width:100%;max-width:480px;height:auto;border:2px solid #6366f1;border-radius:4px;image-rendering:pixelated;background:#fff;">
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      container.innerHTML = html;
     }
 
     function updateOppSlotPreviews(ctx) {
@@ -660,10 +1206,23 @@
 
     // コントローラー内部の stepDetection を _processCurrentPhase にバインド
     if (window.autoModeController) {
-      window.autoModeController.stepDetection = async function(ctx) {
+      window.autoModeController.stepDetection = async function (ctx) {
         await this._processCurrentPhase();
       };
     }
   </script>
+  <!-- OCR前処理画像 特大拡大確認モーダル -->
+  <div id="ocr-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(4px);" onclick="if(event.target===this)closeOcrModal()">
+    <div style="background:#0f172a;border:1px solid #334155;border-radius:12px;padding:1.5rem;max-width:860px;width:95%;max-height:90vh;overflow-y:auto;box-shadow:0 25px 50px -12px rgba(0,0,0,0.75);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;border-bottom:1px solid #334155;padding-bottom:0.75rem;">
+        <h3 id="ocr-modal-title" style="margin:0;font-size:1.1rem;color:#fff;display:flex;align-items:center;gap:0.5rem;">
+          <span>🔍</span> 前処理画像 リアルタイム拡大プレビュー (原寸 vs シアー二値化)
+        </h3>
+        <button class="btn" onclick="closeOcrModal()" style="padding:4px 14px;font-weight:700;">✕ 閉じる</button>
+      </div>
+      <div id="ocr-modal-content" style="display:flex;flex-direction:column;gap:1rem;"></div>
+    </div>
+  </div>
 </body>
+
 </html>

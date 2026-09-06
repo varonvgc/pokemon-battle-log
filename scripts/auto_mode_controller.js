@@ -207,7 +207,7 @@
         const katakanaWhitelist = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポァィゥェォッャュョヴヵヶー・';
         await this.katakanaWorker.setParameters({
           tessedit_char_whitelist: katakanaWhitelist,
-          tessedit_pageseg_mode: '7' // 単一行モード
+          tessedit_pageseg_mode: '7' // 単一行モードに戻す
         });
 
         // 汎用ワーカー (トレーナー名 & 数字用)
@@ -405,21 +405,25 @@
       srcCtx.drawImage(ctx.canvas, x, y, w, h, 0, 0, w, h);
 
       // 2. 水平軸を維持したまま文字のイタリック傾きを正立させるシアー変形 (tan(19.3°) ≈ 0.3502)
+      // さらに、Tesseractの認識精度を上げるため上下左右にパディング（余白）を追加
       const skew = Math.tan(19.3 * Math.PI / 180);
+      const padX = 20; // 左右の余白
+      const padY = 20; // 上下の余白
+      
       const ocrCanvas = document.createElement('canvas');
-      ocrCanvas.width = Math.round(w * 2 + h * 2 * skew);
-      ocrCanvas.height = Math.round(h * 2);
+      ocrCanvas.width = Math.round(w * 2 + h * 2 * skew) + padX * 2;
+      ocrCanvas.height = Math.round(h * 2) + padY * 2;
       const ocrCtx = ocrCanvas.getContext('2d', { willReadFrequently: true });
 
-      ocrCtx.fillStyle = '#FFFFFF';
+      ocrCtx.fillStyle = rect.isHorizontal ? '#FFFFFF' : '#000000';
       ocrCtx.fillRect(0, 0, ocrCanvas.width, ocrCanvas.height);
 
       if (rect.isHorizontal) {
         // 水平文字 (様子を見る画面のパネル等) はシアー変形不要
-        ocrCtx.drawImage(srcCanvas, 0, 0, w * 2, h * 2);
+        ocrCtx.drawImage(srcCanvas, padX, padY, w * 2, h * 2);
       } else {
         ocrCtx.save();
-        ocrCtx.transform(1, 0, -skew, 1, h * 2 * skew, 0);
+        ocrCtx.transform(1, 0, skew, 1, padX, padY);
         ocrCtx.drawImage(srcCanvas, 0, 0, w * 2, h * 2);
         ocrCtx.restore();
       }
@@ -490,8 +494,8 @@
           d[i + 3] = 255;
         }
       } else {
-        // 出撃ネームプレート (BATTLE_HP): pamo3 原典完全準拠 (閾値180 * scaleの白文字二値化)
-        const threshold = 180 * scale;
+        // 出撃ネームプレート (BATTLE_HP): 濁点などの消失を防ぐため閾値を下げる (145)
+        const threshold = 145 * scale;
         for (let i = 0; i < d.length; i += 4) {
           const r = d[i], g = d[i + 1], b = d[i + 2];
           const bright = 0.299 * r + 0.587 * g + 0.114 * b;
@@ -502,8 +506,42 @@
           d[i + 2] = val;
           d[i + 3] = 255;
         }
+
+        // モルフォロジー演算 (膨張処理 / Dilation):
+        // 濁点・半濁点の消失や線の途切れ・かすれを修復するため黒文字を1px太らせる
+        const cw = ocrCanvas.width;
+        const ch = ocrCanvas.height;
+        const dilated = new Uint8ClampedArray(d);
+        for (let y = 1; y < ch - 1; y++) {
+          for (let x = 1; x < cw - 1; x++) {
+            const idx = (y * cw + x) * 4;
+            if (d[idx] === 255) {
+              if (
+                d[((y - 1) * cw + x) * 4] === 0 ||
+                d[((y + 1) * cw + x) * 4] === 0 ||
+                d[(y * cw + (x - 1)) * 4] === 0 ||
+                d[(y * cw + (x + 1)) * 4] === 0
+              ) {
+                dilated[idx] = 0;
+                dilated[idx + 1] = 0;
+                dilated[idx + 2] = 0;
+              }
+            }
+          }
+        }
+        for (let i = 0; i < d.length; i += 4) {
+          d[i] = dilated[i];
+          d[i + 1] = dilated[i + 1];
+          d[i + 2] = dilated[i + 2];
+        }
       }
       ocrCtx.putImageData(imgData, 0, 0);
+
+      // デバッグ・テスト環境でのリアルタイム表示用に保持
+      if (rect && rect.role) {
+        window._lastOcrCanvas = window._lastOcrCanvas || {};
+        window._lastOcrCanvas[`${rect.role}_${rect.index}`] = ocrCanvas;
+      }
 
       return ocrCanvas.toDataURL('image/png');
     }
@@ -839,7 +877,12 @@
     }
 
     // 自分のパーティのポケモン名一覧を取得
-    _extractMyPartyNames() {
+    _extractMyPartyNames(force = false) {
+      // テスト環境、またはすでに外部(GT等)からパーティが設定されている場合は上書き保護
+      if (!force && this.myPartyNames && this.myPartyNames.length > 0 && window.isTestRunner) {
+        return;
+      }
+      const existingPool = (this.myPartyNames && this.myPartyNames.length > 0) ? [...this.myPartyNames] : [];
       this.myPartyNames = [];
       const allParties = (window.autoModeBridge && window.autoModeBridge.getParties && window.autoModeBridge.getParties()) ||
                          window.parties ||
@@ -861,6 +904,10 @@
           const alt = el.getAttribute('alt') || el.getAttribute('data-name') || el.textContent.trim();
           if (alt && !this.myPartyNames.includes(alt)) this.myPartyNames.push(alt);
         });
+      }
+      // それでも取得できず、既存プールがあれば復元
+      if (this.myPartyNames.length === 0 && existingPool.length > 0) {
+        this.myPartyNames = existingPool;
       }
       console.log('[AutoMode] My party Pokémon pool:', this.myPartyNames);
     }
@@ -1012,7 +1059,7 @@
           }
 
           if (typeof this.onOcrSlotResult === 'function') {
-            this.onOcrSlotResult(target.role, target.index, rawText, bestMatch, minDistance);
+            this.onOcrSlotResult(target.role, target.index, rawText, bestMatch, minDistance, isValid);
           }
 
           // 出撃確定反映
