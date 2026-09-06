@@ -633,6 +633,8 @@
             this.updateStatusBadge('試合中: 出撃ポケモン検知中...');
             // 手動選出を保持したままVSバーと内部リストを同期
             this._syncManualSelections();
+            // 左側フォームを相手トレーナー名〜メモ欄が見える位置へ自動スクロール
+            this._scrollToOppTrainerSection();
           }
           break;
         }
@@ -736,6 +738,14 @@
             if (typeof window.rebuildOppSelectionDropdowns === 'function') {
               window.rebuildOppSelectionDropdowns();
             }
+            // ★ 予測変換（サジェスト）ドロップダウンの強制非表示とフォーカス解除
+            document.querySelectorAll('.autocomplete-list').forEach(l => {
+              l.classList.remove('open');
+              l.innerHTML = '';
+            });
+            if (document.activeElement && typeof document.activeElement.blur === 'function') {
+              document.activeElement.blur();
+            }
           } else {
             console.warn('[AutoMode] Recognition engine returned empty or invalid opponent:', res);
           }
@@ -804,6 +814,7 @@
       }
 
       console.log('[AutoMode] Record form fully auto-configured for Champions Ranked BO1');
+      this._scrollToOppTrainerSection();
     }
 
     // 自分のパーティのポケモン名一覧を取得
@@ -1282,6 +1293,24 @@
       }
     }
 
+    // 記録フォームを「相手のトレーナー名」〜「メモ欄」が見える位置へ自動スクロール
+    _scrollToOppTrainerSection() {
+      setTimeout(() => {
+        const oppTrainer = document.getElementById('rec-opp-trainer');
+        const appWrapper = document.getElementById('app-wrapper');
+        if (oppTrainer && appWrapper) {
+          const parentDiv = oppTrainer.closest('div');
+          if (parentDiv) {
+            const navEl = appWrapper.querySelector('nav');
+            const navHeight = navEl ? navEl.offsetHeight : 45;
+            // ナビバーの直下に「相手のトレーナー名」がぴったり配置される位置へスクロール
+            const targetTop = parentDiv.offsetTop - navHeight - 6;
+            appWrapper.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+          }
+        }
+      }, 150);
+    }
+
     updateVsBarSlot(role, slotIndex, pokemonName, force = false) {
       const slotId = `vs-slot-${role}-${slotIndex}`;
       const slotEl = document.getElementById(slotId);
@@ -1296,25 +1325,22 @@
       slotEl.dataset.currentPokemon = targetPokemon;
 
       if (!pokemonName) {
-        // 初期状態: モンスターボール表示 (52pxに大型化)
-        slotEl.innerHTML = `<img src="assets/templates/monsterball.png" alt="ball" style="width:52px;height:52px;filter:drop-shadow(0 3px 6px rgba(0,0,0,0.6))">`;
+        // 初期状態: モンスターボール表示 (大型化: 68px)
+        slotEl.innerHTML = `<img src="assets/templates/monsterball.png" alt="ball" style="width:68px;height:68px;filter:drop-shadow(0 4px 8px rgba(0,0,0,0.65))">`;
       } else {
-        // ポケモン特定後: ポケモンスプライトアイコン + 名前アニメーション (出撃時に1回だけポンッと表示)
+        // ポケモン特定後: 名前を削除し、ポケモンスプライトアイコンを四角い枠いっぱいに大型表示
         let spriteHtml = '';
         if (typeof window.getPokeSpriteHTMLByDisplay === 'function') {
           spriteHtml = window.getPokeSpriteHTMLByDisplay(pokemonName);
         }
         if (!spriteHtml) {
-          spriteHtml = `<div style="font-size:24px;line-height:1">⚡</div>`;
+          spriteHtml = `<div style="font-size:36px;line-height:1">⚡</div>`;
         }
         slotEl.innerHTML = `
-          <div style="display:flex;flex-direction:column;align-items:center;animation:popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)">
-            <div style="transform:scale(1.55);transform-origin:center;margin:6px 0;filter:drop-shadow(0 3px 8px rgba(0,0,0,0.8))">
+          <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;animation:popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275)">
+            <div style="transform:scale(2.3);transform-origin:center;filter:drop-shadow(0 4px 10px rgba(0,0,0,0.85));display:flex;align-items:center;justify-content:center">
               ${spriteHtml}
             </div>
-            <span style="font-size:11.5px;font-weight:800;color:#fff;white-space:nowrap;margin-top:4px;text-shadow:0 1px 4px #000;max-width:82px;overflow:hidden;text-overflow:ellipsis">
-              ${pokemonName}
-            </span>
           </div>
         `;
       }
