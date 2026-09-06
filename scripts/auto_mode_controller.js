@@ -763,6 +763,7 @@
       } else {
         this.updateStatusBadge('見せ合い画面: 相手情報取得完了');
       }
+      this._scrollToOppTrainerSection();
     }
 
     // 記録画面の自動初期化 (チャンピオンズ / ランクマ / BO1 / 一番上のパーティ)
@@ -1329,20 +1330,75 @@
 
     // 記録フォームを「相手のトレーナー名」〜「メモ欄」が見える位置へ自動スクロール
     _scrollToOppTrainerSection() {
-      setTimeout(() => {
-        const oppTrainer = document.getElementById('rec-opp-trainer');
-        const appWrapper = document.getElementById('app-wrapper');
-        if (oppTrainer && appWrapper) {
-          const parentDiv = oppTrainer.closest('div');
-          if (parentDiv) {
-            const navEl = appWrapper.querySelector('nav');
-            const navHeight = navEl ? navEl.offsetHeight : 45;
-            // ナビバーの直下に「相手のトレーナー名」がぴったり配置される位置へスクロール
-            const targetTop = parentDiv.offsetTop - navHeight - 6;
-            appWrapper.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+      // どの画面にいても確実に「記録する」タブを開き、相手トレーナー名〜メモ欄が見える位置へスクロールする
+      let attempts = 0;
+      const maxAttempts = 30; // 50ms × 30 = 最大1.5秒待機
+
+      const tryScroll = () => {
+        attempts++;
+
+        // 1. 「記録する」ページがアクティブか確認し、開いていなければ開く
+        const recordPage = document.getElementById('page-record');
+        if (!recordPage || !recordPage.classList.contains('active')) {
+          if (typeof window.showPage === 'function') {
+            const recordBtn = document.querySelector('nav button[onclick*="record"]') || document.querySelector('nav button:nth-child(3)');
+            window.showPage('record', recordBtn);
           }
         }
-      }, 150);
+
+        // 2. フォームカードが表示されているか確認
+        const formCard = document.getElementById('record-form-card');
+        if (formCard && (formCard.style.display === 'none' || getComputedStyle(formCard).display === 'none')) {
+          if (typeof window.showRecordForm === 'function') {
+            window.showRecordForm();
+          }
+        }
+
+        const oppTrainer = document.getElementById('rec-opp-trainer');
+        const appWrapper = document.getElementById('app-wrapper');
+
+        // 要素がまだ存在しない、または非表示（DOM未展開）の場合はリトライ
+        if (!oppTrainer || oppTrainer.offsetParent === null) {
+          if (attempts < maxAttempts) {
+            setTimeout(tryScroll, 50);
+          }
+          return;
+        }
+
+        const targetEl = oppTrainer.closest('div') || oppTrainer;
+        const targetRect = targetEl.getBoundingClientRect();
+        if (targetRect.height === 0 && attempts < maxAttempts) {
+          setTimeout(tryScroll, 50);
+          return;
+        }
+
+        // ナビバーの高さを取得
+        const navEl = (appWrapper && appWrapper.querySelector('nav')) || document.querySelector('nav');
+        const navHeight = navEl ? navEl.getBoundingClientRect().height : 45;
+
+        // A. appWrapper のスクロール (body.auto-mode-layout 時)
+        if (appWrapper && (appWrapper.scrollHeight > appWrapper.clientHeight)) {
+          const wrapperRect = appWrapper.getBoundingClientRect();
+          // targetRect.top - wrapperRect.top が appWrapper 表示領域上での相対位置
+          // 現在の scrollTop を足すことで、appWrapper 内での絶対 Y 座標を幾何学的に正確に算出
+          const targetTop = appWrapper.scrollTop + (targetRect.top - wrapperRect.top) - navHeight - 8;
+          appWrapper.scrollTo({ top: Math.max(0, targetTop), behavior: 'smooth' });
+        }
+
+        // B. window / document.scrollingElement のスクロール (通常レイアウト時)
+        const windowScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+        const windowTargetTop = windowScrollY + targetRect.top - navHeight - 8;
+        if (document.scrollingElement && document.scrollingElement.scrollHeight > window.innerHeight) {
+          window.scrollTo({ top: Math.max(0, windowTargetTop), behavior: 'smooth' });
+        }
+
+        // DOMの遅延再描画やフォント読み込みによるレイアウト変動を吸収するため、初回実行後200msにも微調整
+        if (attempts === 1) {
+          setTimeout(tryScroll, 200);
+        }
+      };
+
+      tryScroll();
     }
 
     updateVsBarSlot(role, slotIndex, pokemonName, force = false) {
