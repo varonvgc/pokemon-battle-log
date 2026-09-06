@@ -907,7 +907,9 @@
       // ユーザーが手入力修正した相手パーティ入力を同期
       const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
       if (oppInputs && oppInputs.length > 0) {
-        const liveOppNames = Array.from(oppInputs).map(inp => inp.value.trim()).filter(Boolean);
+        const liveOppNames = Array.from(oppInputs)
+          .map(inp => inp.value.trim())
+          .filter(val => val && val !== '???');
         if (liveOppNames.length > 0) {
           this.rivalPartyNames = liveOppNames;
         }
@@ -975,8 +977,10 @@
             }
           }
 
-          // 手持ち・登録パーティが未登録の例外的な場合のみ、マスタ全体から追加探索
-          if (!hasRegisteredPool && (!bestMatch || minDistance > 2) && window.POKEMON_LIST && window.POKEMON_LIST.length) {
+          // 手持ち・登録パーティが未登録、またはプールが6匹揃っていない不完全な状態の場合で、
+          // プール内に該当するポケモンがいなければ (minDistance > 2)、マスタ全体から追加探索する
+          const isPoolIncomplete = Array.isArray(candidatePool) && candidatePool.length < 6;
+          if ((!hasRegisteredPool || isPoolIncomplete) && (!bestMatch || minDistance > 2) && window.POKEMON_LIST && window.POKEMON_LIST.length) {
             for (const p of window.POKEMON_LIST) {
               const pName = typeof p === 'string' ? p : (p && (p.name || p.display) || '');
               if (!pName) continue;
