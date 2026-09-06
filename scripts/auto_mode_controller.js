@@ -346,6 +346,9 @@
 
     // ★ pamo3 原典完全準拠: 白黒二値化処理 (閾値150: d.yv(f, !0, 150))
     cropBinarizedToBase64(ctx, rect, threshold = 150) {
+      const scale = (window.OCR_SETTINGS && window.OCR_SETTINGS.getScale) ? window.OCR_SETTINGS.getScale() : 1.0;
+      const finalThreshold = threshold * scale;
+
       const { x, y, w, h } = rect;
       const cropCanvas = document.createElement('canvas');
       cropCanvas.width = Math.round(w);
@@ -356,7 +359,7 @@
       const data = imgData.data;
       for (let i = 0; i < data.length; i += 4) {
         const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
-        const v = gray >= threshold ? 255 : 0;
+        const v = gray >= finalThreshold ? 255 : 0;
         data[i] = v;
         data[i + 1] = v;
         data[i + 2] = v;
@@ -419,13 +422,17 @@
         ocrCtx.restore();
       }
 
-      // 3. 閾値 175 による白文字二値化 (文字=黒 0, 背景=白 255)
+      // 3. 設定されたスケール（二値化の強さ）による白文字二値化 (文字=黒 0, 背景=白 255)
+      const scale = (window.OCR_SETTINGS && window.OCR_SETTINGS.getScale) ? window.OCR_SETTINGS.getScale() : 1.0;
+      const threshold = 155 * scale;
+
       const imgData = ocrCtx.getImageData(0, 0, ocrCanvas.width, ocrCanvas.height);
       const d = imgData.data;
       for (let i = 0; i < d.length; i += 4) {
         const r = d[i], g = d[i + 1], b = d[i + 2];
         const bright = 0.299 * r + 0.587 * g + 0.114 * b;
-        const isText = (bright >= 170) || (r > 165 && g > 165 && b > 165);
+        // pamo3の原典に合わせ、純粋な輝度による閾値判定のみとする
+        const isText = (bright >= threshold);
         const val = isText ? 0 : 255;
         d[i] = val;
         d[i + 1] = val;

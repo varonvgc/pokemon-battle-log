@@ -50,6 +50,7 @@
     window.GoogleDriveResumableUploader = GoogleDriveResumableUploader;
   </script>
   <!-- Pokemon Recognition Engine Script -->
+  <script src="scripts/ocr_settings.js"></script>
   <script src="scripts/recognition_engine.js?v=20260906_switch24"></script>
   <style>
     :root {
@@ -4083,6 +4084,7 @@
           <button type="button" class="auto-ctrl-btn" onclick="forceResetAutoModePhase()" title="対戦待ちへ強制リセット (通信切断・スタック時)">🔄</button>
           <button type="button" class="auto-ctrl-btn" onclick="refreshAutoCameraDevices()" title="カメラ再検索">📷</button>
           <button type="button" class="auto-ctrl-btn" onclick="toggleAutoSetupOverlay()" title="設定表示/非表示">⚙️</button>
+          <button type="button" class="auto-ctrl-btn" onclick="openOcrSetupModal()" title="OCR読み取り調整 (pamo3互換)">🔤</button>
           <button type="button" class="auto-ctrl-btn" onclick="toggleAutoVideoFullscreen()" title="全画面表示">⛶</button>
         </div>
       </div>
@@ -12794,6 +12796,73 @@
     <div style="font-size:9.5px;color:#64748b;display:flex;justify-content:space-between;align-items:center">
       <span>アプリは通常通り使えます</span>
       <span style="color:#a78bfa;font-size:9px">⠿ ドラッグで移動</span>
+    </div>
+  </div>
+
+  <!-- OCR Setup Modal -->
+  <div class="picker-overlay" id="ocr-setup-modal" style="display:none;z-index:10000;padding:20px;align-items:center;justify-content:center">
+    <div class="picker-modal" style="max-width:600px;width:100%;background:var(--surface);border-radius:12px;display:flex;flex-direction:column;max-height:90vh;box-shadow:0 8px 30px rgba(0,0,0,0.5)">
+      <div class="picker-header" style="border-bottom:1px solid var(--border);padding:16px 20px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-weight:700;font-size:16px">🔤 OCR読み取り調整 (pamo3互換)</div>
+          <button type="button" class="picker-close-btn" onclick="closeOcrSetupModal()" title="閉じる">✕</button>
+        </div>
+      </div>
+      <div class="picker-body" style="padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:20px">
+        <div style="font-size:13px;color:var(--text-muted);line-height:1.5">
+          現在のカメラ映像の「ボックス（ステータス）画面」から、ポケモン名と一番目のわざの枠を切り抜き、読み取りテストを行います。<br>
+          ※Switchで対象のポケモンの「つよさをみる」画面を開いた状態でテストしてください。
+        </div>
+        
+        <div style="display:flex;align-items:center;gap:12px">
+          <label style="margin:0;font-weight:600">スケール（二値化の強さ）:</label>
+          <input type="range" id="ocr-scale-slider" min="0.30" max="2.00" step="0.01" style="flex:1;accent-color:var(--accent-cyan)" oninput="onOcrScaleChange(this.value)">
+          <span id="ocr-scale-val" style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent-cyan);width:40px;text-align:right">1.00</span>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div id="ocr-test-name" style="display:flex;flex-direction:column;gap:4px">
+            <div style="font-size:12px;font-weight:700;color:var(--text-muted)">ポケモン名 (boxPokeOriginName)</div>
+            <div style="display:flex;gap:10px;align-items:flex-end;overflow-x:auto">
+              <div>
+                <div style="font-size:10px;color:var(--text-muted);margin-bottom:2px">1. 切り抜き</div>
+                <canvas class="ocr-test-color" style="height:32px;border:1px solid rgba(255,255,255,0.1);background:#000;object-fit:contain"></canvas>
+              </div>
+              <div>
+                <div style="font-size:10px;color:var(--text-muted);margin-bottom:2px">2. 二値化</div>
+                <canvas class="ocr-test-bin" style="height:32px;border:1px solid rgba(255,255,255,0.1);background:#000;object-fit:contain"></canvas>
+              </div>
+              <div style="flex:1">
+                <div style="font-size:10px;color:var(--text-muted);margin-bottom:2px">3. 読み取り結果</div>
+                <div class="ocr-test-result" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;min-height:32px;display:flex;align-items:center;border-bottom:1px dashed var(--border)">-</div>
+              </div>
+            </div>
+          </div>
+          
+          <div id="ocr-test-move" style="display:flex;flex-direction:column;gap:4px">
+            <div style="font-size:12px;font-weight:700;color:var(--text-muted)">一番目のわざ (boxMove1)</div>
+            <div style="display:flex;gap:10px;align-items:flex-end;overflow-x:auto">
+              <div>
+                <div style="font-size:10px;color:var(--text-muted);margin-bottom:2px">1. 切り抜き</div>
+                <canvas class="ocr-test-color" style="height:32px;border:1px solid rgba(255,255,255,0.1);background:#000;object-fit:contain"></canvas>
+              </div>
+              <div>
+                <div style="font-size:10px;color:var(--text-muted);margin-bottom:2px">2. 二値化</div>
+                <canvas class="ocr-test-bin" style="height:32px;border:1px solid rgba(255,255,255,0.1);background:#000;object-fit:contain"></canvas>
+              </div>
+              <div style="flex:1">
+                <div style="font-size:10px;color:var(--text-muted);margin-bottom:2px">3. 読み取り結果</div>
+                <div class="ocr-test-result" style="font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;min-height:32px;display:flex;align-items:center;border-bottom:1px dashed var(--border)">-</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;margin-top:10px">
+          <button class="btn btn-ghost btn-sm" onclick="OCR_SETTINGS.resetToDefault();onOcrScaleChange(1.0)">デフォルト(1.00)に戻す</button>
+          <button class="btn btn-primary" onclick="runOcrSetupTest()">🔄 再テスト</button>
+        </div>
+      </div>
     </div>
   </div>
 
