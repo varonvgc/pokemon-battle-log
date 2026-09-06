@@ -36,10 +36,10 @@
     ],
     // 様子を見る (ターゲット選択画面) のポケモン名領域 (出撃見逃しリカバリー用)
     TARGET_SELECT_DOUBLE: [
-      { role: 'rival', index: 0, x: 960,  y: 225, w: 190, h: 50, isHorizontal: true }, // 相手1
-      { role: 'rival', index: 1, x: 1330, y: 225, w: 190, h: 50, isHorizontal: true }, // 相手2
-      { role: 'me',    index: 0, x: 960,  y: 532, w: 190, h: 50, isHorizontal: true }, // 自分1
-      { role: 'me',    index: 1, x: 1330, y: 532, w: 190, h: 50, isHorizontal: true }  // 自分2
+      { role: 'rival', index: 0, x: 670,  y: 286, w: 220, h: 42, isHorizontal: true }, // 相手1 (左上パネル: コノヨザル等)
+      { role: 'rival', index: 1, x: 1140, y: 286, w: 220, h: 42, isHorizontal: true }, // 相手2 (右上パネル: イッカネズミ等)
+      { role: 'me',    index: 0, x: 670,  y: 626, w: 220, h: 42, isHorizontal: true }, // 自分1 (左下パネル: フラエッテ等)
+      { role: 'me',    index: 1, x: 1140, y: 626, w: 220, h: 42, isHorizontal: true }  // 自分2 (右下パネル: イダイトウ等)
     ],
     // 対戦中 (通常コマンド画面) のHPバー上のポケモン名領域 (pamo3準拠ネイティブ座標)
     BATTLE_HP_DOUBLE: [
@@ -422,22 +422,84 @@
         ocrCtx.restore();
       }
 
-      // 3. 設定されたスケール（二値化の強さ）による白文字二値化 (文字=黒 0, 背景=白 255)
+      // 3. 二値化処理 (文字=黒 0, 背景=白 255)
       const scale = (window.OCR_SETTINGS && window.OCR_SETTINGS.getScale) ? window.OCR_SETTINGS.getScale() : 1.0;
-      const threshold = 155 * scale;
-
       const imgData = ocrCtx.getImageData(0, 0, ocrCanvas.width, ocrCanvas.height);
       const d = imgData.data;
-      for (let i = 0; i < d.length; i += 4) {
-        const r = d[i], g = d[i + 1], b = d[i + 2];
-        const bright = 0.299 * r + 0.587 * g + 0.114 * b;
-        // pamo3の原典に合わせ、純粋な輝度による閾値判定のみとする
-        const isText = (bright >= threshold);
-        const val = isText ? 0 : 255;
-        d[i] = val;
-        d[i + 1] = val;
-        d[i + 2] = val;
-        d[i + 3] = 255;
+
+      if (rect.isHorizontal) {
+        // 様子を見る画面 (ターゲット選択パネル):
+        // 選択状態による黄緑ハイライト（明るい背景に青文字）や、紫パネル（低輝度白文字）に対応するため
+        // 大津の二値化 (Otsu) + 背景明暗極性判定を適用して確実に文字を抽出
+        const hist = new Int32Array(256);
+        const grays = new Uint8Array(ocrCanvas.width * ocrCanvas.height);
+        let sum = 0;
+        let pIdx = 0;
+        for (let i = 0; i < d.length; i += 4) {
+          const br = Math.round(0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2]);
+          grays[pIdx++] = br;
+          hist[br]++;
+          sum += br;
+        }
+
+        const total = grays.length;
+        let sumB = 0;
+        let wB = 0;
+        let maxVar = 0;
+        let autoThresh = 128;
+        for (let t = 0; t < 256; t++) {
+          wB += hist[t];
+          if (wB === 0) continue;
+          const wF = total - wB;
+          if (wF === 0) break;
+          sumB += t * hist[t];
+          const mB = sumB / wB;
+          const mF = (sum - sumB) / wF;
+          const v = wB * wF * (mB - mF) * (mB - mF);
+          if (v > maxVar) {
+            maxVar = v;
+            autoThresh = t;
+          }
+        }
+
+        // 外周ピクセルから背景が明るいか暗いかを判定
+        let borderSum = 0;
+        let borderCount = 0;
+        const cw = ocrCanvas.width;
+        const ch = ocrCanvas.height;
+        for (let x = 0; x < cw; x++) {
+          borderSum += grays[x] + grays[(ch - 1) * cw + x];
+          borderCount += 2;
+        }
+        for (let y = 1; y < ch - 1; y++) {
+          borderSum += grays[y * cw] + grays[y * cw + (cw - 1)];
+          borderCount += 2;
+        }
+        const isLightBg = (borderSum / borderCount) > autoThresh;
+
+        pIdx = 0;
+        for (let i = 0; i < d.length; i += 4) {
+          const isBright = grays[pIdx++] >= autoThresh;
+          const isText = isLightBg ? !isBright : isBright;
+          const val = isText ? 0 : 255;
+          d[i] = val;
+          d[i + 1] = val;
+          d[i + 2] = val;
+          d[i + 3] = 255;
+        }
+      } else {
+        // 出撃演出 (DISPATCH): pamo3 完全準拠 (閾値155 * scaleの白文字二値化)
+        const threshold = 155 * scale;
+        for (let i = 0; i < d.length; i += 4) {
+          const r = d[i], g = d[i + 1], b = d[i + 2];
+          const bright = 0.299 * r + 0.587 * g + 0.114 * b;
+          const isText = (bright >= threshold);
+          const val = isText ? 0 : 255;
+          d[i] = val;
+          d[i + 1] = val;
+          d[i + 2] = val;
+          d[i + 3] = 255;
+        }
       }
       ocrCtx.putImageData(imgData, 0, 0);
 
@@ -829,14 +891,14 @@
       }
 
       // ★ pamo3 原典完全再現 ⑦: 出撃演出で未確定枠がある場合 (me < 2 または rival < 2) のみ、
-      // 通常コマンド画面HPバー (BATTLE_HP_DOUBLE) & 様子を見る画面 (TARGET_SELECT_DOUBLE) からリカバリー！
+      // 様子を見る画面 (TARGET_SELECT_DOUBLE) & 通常コマンド画面HPバー (BATTLE_HP_DOUBLE) からリカバリー！
       if (meCount < 2 || rivalCount < 2) {
-        for (const t of COORDS.BATTLE_HP_DOUBLE) {
+        for (const t of COORDS.TARGET_SELECT_DOUBLE) {
           if (t.role === 'me' && meCount >= 2) continue;
           if (t.role === 'rival' && rivalCount >= 2) continue;
           targets.push(t);
         }
-        for (const t of COORDS.TARGET_SELECT_DOUBLE) {
+        for (const t of COORDS.BATTLE_HP_DOUBLE) {
           if (t.role === 'me' && meCount >= 2) continue;
           if (t.role === 'rival' && rivalCount >= 2) continue;
           targets.push(t);
