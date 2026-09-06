@@ -630,6 +630,9 @@
           if (vsScore > 0.40 || elapsed > 8000) {
             console.log(`[AutoMode] GAME START DETECTED! (vsScore=${vsScore.toFixed(3)}, elapsed=${elapsed}ms)`);
             this.phase = 'IN_GAME';
+            this.inGameStartTimestamp = Date.now();
+            this.winBallMeCount = 0;
+            this.winBallRivalCount = 0;
             this.updateStatusBadge('試合中: 出撃ポケモン検知中...');
             // 手動選出を保持したままVSバーと内部リストを同期
             this._syncManualSelections();
@@ -895,19 +898,10 @@
       }
 
       // 対象スロットの動的選定 (最大匹数に達した陣営はOCR対象から除外)
-      // ★ 安定画面特化: 演出中（DISPATCH_DOUBLE）は激しいカメラ移動と閃光でノイズを幻覚するため除外！
-      // 毎ターン静止表示される通常コマンド画面HPバー (BATTLE_HP_DOUBLE) と様子を見る画面 (TARGET_SELECT_DOUBLE) のみに集中
+      // ★ 超高速化: 通常コマンド画面HPバー (BATTLE_HP_DOUBLE) 4スロットのみに絞り込む！
+      // （非表示の様子を見る画面4スロットまで毎回直列OCRすると所要時間が倍増し、交代ポケモンの検知が間に合わなくなるため）
       let targets = [];
-
-      // 1. 通常コマンド画面HPバー (BATTLE_HP_DOUBLE) ★最優先・毎ターン静止 (pamo3 原典完全準拠座標)
       for (const t of COORDS.BATTLE_HP_DOUBLE) {
-        if (t.role === 'me' && meCount >= maxSlots) continue;
-        if (t.role === 'rival' && rivalCount >= maxSlots) continue;
-        targets.push(t);
-      }
-
-      // 2. 様子を見る画面 (TARGET_SELECT_DOUBLE) ★Xボタンで開いた時のリカバリー
-      for (const t of COORDS.TARGET_SELECT_DOUBLE) {
         if (t.role === 'me' && meCount >= maxSlots) continue;
         if (t.role === 'rival' && rivalCount >= maxSlots) continue;
         targets.push(t);
@@ -1025,7 +1019,9 @@
             }
             this.slotConfidence[confKey] = currentConf;
 
-            const requiredHits = (minDistance === 0) ? 1 : 2;
+            // ★ 高速確定: 登録パーティ候補からの照合の場合、距離1以内（完全一致または1文字ブレ）なら1発即時確定！
+            // （交代で出た瞬間に倒された場合でも見逃さずキャッチ）
+            const requiredHits = (minDistance <= 1) ? 1 : 2;
             if (currentConf.count >= requiredHits) {
               slotTracker[target.index] = bestMatch;
               this._handleDispatchedPokemonFound(target.role, bestMatch);
@@ -1073,12 +1069,23 @@
           const roleKey = role === 'me' ? 'my' : 'opp';
           window.setSelectionFromNames(roleKey, list);
         }
+
+        // 3. ★ 初回出撃検知時、確実に左側フォームを相手トレーナー名〜メモ欄へスクロール
+        if (this.detectedDispatchedMe.length + this.detectedDispatchedRival.length === 1) {
+          this._scrollToOppTrainerSection();
+        }
       }
     }
 
     // --- 勝敗検知 & 自動保存 ---
     async _checkGameFinish(ctx) {
       if (!this.templates.winBall) return;
+
+      // ★ 試合途中終了の完全防止 ①: IN_GAME突入後15秒間は勝敗判定を一切行わない (技演出等の誤爆防止)
+      const elapsedInGame = Date.now() - (this.inGameStartTimestamp || 0);
+      if (elapsedInGame < 15000) {
+        return;
+      }
 
       const myBallCrop = this.cropToBase64(ctx, COORDS.WIN_BALL_ME);
       const rivalBallCrop = this.cropToBase64(ctx, COORDS.WIN_BALL_RIVAL);
@@ -1088,9 +1095,25 @@
         this.matchTemplate(rivalBallCrop, this.templates.winBall, { useAlphaMask: true })
       ]);
 
-      if (myScore > 0.45 || rivalScore > 0.45) {
-        const isWin = myScore > rivalScore;
-        console.log(`[AutoMode] GAME FINISHED! Winner: ${isWin ? 'WIN (Me)' : 'LOSE (Rival)'} (my=${myScore}, rival=${rivalScore})`);
+      // ★ 試合途中終了の完全防止 ②: 閾値を0.60に厳格化 & 連続4フレーム（約1.2秒）の安定検知を要求
+      const WIN_THRESHOLD = 0.60;
+      const REQUIRED_CONSECUTIVE_FRAMES = 4;
+
+      if (myScore >= WIN_THRESHOLD) {
+        this.winBallMeCount = (this.winBallMeCount || 0) + 1;
+      } else {
+        this.winBallMeCount = 0;
+      }
+
+      if (rivalScore >= WIN_THRESHOLD) {
+        this.winBallRivalCount = (this.winBallRivalCount || 0) + 1;
+      } else {
+        this.winBallRivalCount = 0;
+      }
+
+      if (this.winBallMeCount >= REQUIRED_CONSECUTIVE_FRAMES || this.winBallRivalCount >= REQUIRED_CONSECUTIVE_FRAMES) {
+        const isWin = this.winBallMeCount > this.winBallRivalCount;
+        console.log(`[AutoMode] GAME FINISHED! Winner: ${isWin ? 'WIN (Me)' : 'LOSE (Rival)'} (myHits=${this.winBallMeCount}, rivalHits=${this.winBallRivalCount})`);
         this.phase = 'END_GAME';
         this.updateStatusBadge(`試合終了: ${isWin ? '🎉 勝利' : '破れたり...'}`);
 
@@ -1322,6 +1345,8 @@
       this.dispatchedSlotsRival = {};
       this.slotImageCache = {};
       this.slotConfidence = {};
+      this.winBallMeCount = 0;
+      this.winBallRivalCount = 0;
       for (let i = 0; i < 4; i++) {
         this.updateVsBarSlot('me', i, null, true);
         this.updateVsBarSlot('rival', i, null, true);
