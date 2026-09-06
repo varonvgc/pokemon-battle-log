@@ -1414,8 +1414,8 @@
       }
     }
 
-    // 記録フォームを「相手のトレーナー名」〜「メモ欄」が見える位置へ自動スクロール
-    // （相手パーティ記録後に呼び出され、ナビバー直下に相手トレーナー名が来るよう即時・確実に配置）
+    // 記録フォームを「自分の選出」エリアが見える位置へ自動スクロール
+    // （相手パーティ記録後に呼び出され、選出入力がスムーズに行えるように中央に配置）
     _scrollToOppTrainerSection() {
       let attempts = 0;
       const maxAttempts = 15;
@@ -1432,64 +1432,39 @@
           }
         }
 
-        const oppTrainer = document.getElementById('rec-opp-trainer');
+        // ターゲットを「自分の選出」に変更する
+        const bo1Area = document.getElementById('rec-area-bo1');
+        const isBo3 = bo1Area && window.getComputedStyle(bo1Area).display === 'none';
         
+        let targetEl = null;
+        if (isBo3) {
+          targetEl = document.getElementById('my-selection-slots-bo3-0');
+        } else {
+          targetEl = document.getElementById('my-selection-slots');
+        }
+        
+        // フォールバックとして相手のパーティ枠
+        if (!targetEl) {
+          targetEl = document.getElementById('opp-party-slots');
+        }
+
         // 要素がDOMに未接続、または高さが0の場合はリトライ
-        if (!oppTrainer || !document.contains(oppTrainer)) {
+        if (!targetEl || !document.contains(targetEl)) {
           if (attempts < maxAttempts) {
             setTimeout(tryScroll, 50);
           }
           return;
         }
 
-        const targetEl = oppTrainer.closest('div.card') || oppTrainer.closest('div') || oppTrainer;
         const targetRect = targetEl.getBoundingClientRect();
-        
         // レイアウト完了前ならリトライ
         if (targetRect.height === 0 && attempts < maxAttempts) {
           setTimeout(tryScroll, 50);
           return;
         }
 
-        // ナビバーの高さを取得
-        const navEl = document.querySelector('nav');
-        const navHeight = navEl ? navEl.getBoundingClientRect().height : 45;
-
-        // ★ スクロール可能な親要素を動的に探索して直接スクロールさせる
-        let scrollParent = targetEl.parentElement;
-        while (scrollParent && scrollParent !== document.body && scrollParent !== document.documentElement) {
-          const style = window.getComputedStyle(scrollParent);
-          if (style.overflowY === 'auto' || style.overflowY === 'scroll') {
-            break;
-          }
-          scrollParent = scrollParent.parentElement;
-        }
-
-        if (scrollParent && scrollParent !== document.body && scrollParent !== document.documentElement) {
-          const parentRect = scrollParent.getBoundingClientRect();
-          scrollParent.scrollTop = Math.max(0, scrollParent.scrollTop + (targetRect.top - parentRect.top) - navHeight - 10);
-          
-          if (attempts === 1) {
-            setTimeout(() => {
-              const r = targetEl.getBoundingClientRect();
-              const p = scrollParent.getBoundingClientRect();
-              scrollParent.scrollTop = Math.max(0, scrollParent.scrollTop + (r.top - p.top) - navHeight - 10);
-            }, 80);
-            setTimeout(() => {
-              const r = targetEl.getBoundingClientRect();
-              const p = scrollParent.getBoundingClientRect();
-              scrollParent.scrollTop = Math.max(0, scrollParent.scrollTop + (r.top - p.top) - navHeight - 10);
-            }, 250);
-          }
-        } else {
-          // 該当するコンテナが見つからなければ従来の window.scrollTo
-          const winTargetTop = window.scrollY + targetRect.top - navHeight - 10;
-          window.scrollTo({ top: Math.max(0, winTargetTop), behavior: 'auto' });
-          if (attempts === 1) {
-            setTimeout(() => { window.scrollTo({ top: Math.max(0, window.scrollY + targetEl.getBoundingClientRect().top - navHeight - 10), behavior: 'auto' }); }, 80);
-            setTimeout(() => { window.scrollTo({ top: Math.max(0, window.scrollY + targetEl.getBoundingClientRect().top - navHeight - 10), behavior: 'auto' }); }, 250);
-          }
-        }
+        // scrollIntoView を使って中央にスクロール
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
       };
 
       tryScroll();
