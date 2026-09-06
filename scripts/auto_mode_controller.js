@@ -112,6 +112,13 @@
       this._hasScrolledForOpponentParty = false;
       this.isWorkersReady = false;
       this.isInitializingWorkers = false;
+
+      // 自動録画用の状態
+      this.isAutoRecordingEnabled = false;
+      this.mediaRecorder = null;
+      this.recordedChunks = [];
+      this.isRecording = false;
+      this.cancelCurrentRecording = false;
     }
 
     // --- ワーカー & アセットのオンデマンド初期化 (オートモード開始時のみ実行) ---
@@ -546,11 +553,93 @@
       return ocrCanvas.toDataURL('image/png');
     }
 
+    // --- 自動録画制御 ---
+    setAutoRecordEnabled(isEnabled) {
+      this.isAutoRecordingEnabled = isEnabled;
+      console.log(`[AutoRecord] Auto record enabled: ${isEnabled}`);
+      if (!isEnabled && this.isRecording && this.mediaRecorder) {
+        console.log('[AutoRecord] Canceled recording by user toggle.');
+        this.cancelCurrentRecording = true;
+        this.mediaRecorder.stop();
+      }
+    }
+
+    _startRecording() {
+      if (!this.isAutoRecordingEnabled || this.isRecording || !this.stream) return;
+      try {
+        this.recordedChunks = [];
+        this.cancelCurrentRecording = false;
+        const options = { mimeType: 'video/webm; codecs=vp8,opus' };
+        let mime = 'video/webm';
+        if (MediaRecorder.isTypeSupported(options.mimeType)) {
+          mime = options.mimeType;
+        } else if (MediaRecorder.isTypeSupported('video/webm; codecs=vp9')) {
+          mime = 'video/webm; codecs=vp9';
+        }
+        
+        this.mediaRecorder = new MediaRecorder(this.stream, { mimeType: mime });
+        this.mediaRecorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) {
+            this.recordedChunks.push(e.data);
+          }
+        };
+        this.mediaRecorder.start(1000);
+        this.isRecording = true;
+        console.log('[AutoRecord] Started recording.');
+      } catch (err) {
+        console.error('[AutoRecord] Failed to start MediaRecorder:', err);
+      }
+    }
+
+    _stopRecordingAsync() {
+      return new Promise((resolve) => {
+        if (!this.isRecording || !this.mediaRecorder) {
+          resolve();
+          return;
+        }
+        
+        this.mediaRecorder.onstop = async () => {
+          this.isRecording = false;
+          if (this.cancelCurrentRecording) {
+            console.log('[AutoRecord] Data discarded due to cancellation.');
+            this.recordedChunks = [];
+            resolve();
+            return;
+          }
+          
+          console.log('[AutoRecord] Recording stopped, converting to file...');
+          const mime = this.mediaRecorder.mimeType || 'video/webm';
+          const blob = new Blob(this.recordedChunks, { type: mime });
+          this.recordedChunks = [];
+          
+          const filename = `autorec_${Date.now()}.webm`;
+          const file = new File([blob], filename, { type: mime });
+          
+          if (typeof window.attachVideoFileAsync === 'function') {
+            console.log('[AutoRecord] Attaching video file...');
+            await window.attachVideoFileAsync(file);
+          }
+          resolve();
+        };
+        
+        try {
+          this.mediaRecorder.stop();
+        } catch(e) {
+          console.warn('[AutoRecord] Failed to stop:', e);
+          resolve();
+        }
+      });
+    }
+
     // --- オートモードの開始・停止 ---
     async startAutoMode() {
       this.isAutoRunning = true;
       this.phase = 'WAITING_MATCHING';
       this.updateStatusBadge('ワーカー初期化中...');
+      // 初期状態を読み込む
+      if (typeof localStorage !== 'undefined') {
+        this.isAutoRecordingEnabled = localStorage.getItem('autoModeAutoRecord') === 'true';
+      }
       // フォームを即座に初期化・表示して待機
       this._setupRecordFormForNewBattle();
       await this.ensureWorkersReady();
@@ -627,6 +716,7 @@
               this.phase = 'MATCHING';
               this.matchingEnterCount = 0;
               this.matchingExitCount = 0;
+              this._startRecording();
               // pamo3 原典完全再現シーケンスを _handleMatchingPhase 内で実行
               await this._handleMatchingPhase(ctx);
             }
@@ -1227,8 +1317,13 @@
         console.log('[AutoMode] User already manually selected result. Preserving manual result.');
       }
 
-      // 2. 自動保存を実行
-      setTimeout(() => {
+      // 2. 自動録画停止・添付を待機してから自動保存を実行
+      setTimeout(async () => {
+        if (this.isRecording) {
+          this.updateStatusBadge('録画処理中 (添付中...)');
+          await this._stopRecordingAsync();
+        }
+        
         console.log('[AutoMode] Triggering battle log save via saveRecord()...');
         if (typeof window.saveRecord === 'function') {
           window.saveRecord();
