@@ -458,17 +458,23 @@
             };
           }
 
-          // OCR文字読み取り結果をリアルタイム表示
+          // OCR文字読み取り結果をリアルタイム表示 & 詳細ログ出力
           window.autoModeController.onOcrSlotResult = function(role, idx, rawText, bestMatch, dist) {
             const resEl = document.getElementById(`ocr-res-${role}-${idx}`);
-            if (resEl) {
-              if (bestMatch && dist <= 2) {
+            if (bestMatch && dist <= 2) {
+              if (resEl) {
                 resEl.style.color = '#34d399';
                 resEl.textContent = `⭕ "${rawText}" ➔ ${bestMatch}`;
-              } else {
-                resEl.style.color = '#94a3b8';
-                resEl.textContent = rawText ? `"${rawText}" (${bestMatch || 'なし'}, 差${dist})` : '-';
               }
+              // ログが多すぎるのを防ぐため、成功時や完全な無音時はログを最小限にするなどの調整が必要ですが
+              // 現在はデバッグのためすべて出力します
+              log(`[OCR] ${role}[${idx}]: "${rawText}" ➔ ${bestMatch} (距離: ${dist}) ✅`, 'success');
+            } else if (rawText && rawText.length > 0) {
+              if (resEl) {
+                resEl.style.color = '#94a3b8';
+                resEl.textContent = `"${rawText}" (${bestMatch || 'なし'}, 差${dist})`;
+              }
+              log(`[OCR] ${role}[${idx}]: "${rawText}" ➔ ${bestMatch || 'なし'} (距離: ${dist}) ❌弾かれ`, 'warn');
             }
           };
 
