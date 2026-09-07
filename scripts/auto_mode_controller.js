@@ -124,6 +124,7 @@
       this.currentVideoDeviceId = null;
       this.currentAudioDeviceId = null;
       this.isPreviewMuted = true;
+      this.previewVolume = 0.5;
     }
 
     // --- ワーカー & アセットのオンデマンド初期化 (オートモード開始時のみ実行) ---
@@ -372,15 +373,16 @@
 
       if (this.videoElement && this.stream) {
         this.videoElement.srcObject = this.stream;
-        // プレビュー表示のミュート状態を適用 (録画データには影響しません)
+        // プレビュー表示のミュート状態と音量を適用 (録画データには影響しません)
         this.videoElement.muted = this.isPreviewMuted;
+        this.videoElement.volume = this.previewVolume;
         try {
           await this.videoElement.play();
         } catch (playErr) {
           console.warn('[AutoMode] Video play error (handling autoplay):', playErr);
         }
       }
-      console.log(`[AutoMode] Camera & Audio stream started successfully (audio: ${!!this.currentAudioDeviceId}, previewMuted: ${this.isPreviewMuted})`);
+      console.log(`[AutoMode] Camera & Audio stream started successfully (audio: ${!!this.currentAudioDeviceId}, previewMuted: ${this.isPreviewMuted}, volume: ${this.previewVolume})`);
       return true;
     }
 
@@ -390,6 +392,14 @@
         this.videoElement.muted = this.isPreviewMuted;
       }
       console.log(`[AutoMode] Local preview muted: ${this.isPreviewMuted}`);
+    }
+
+    setVolume(vol) {
+      this.previewVolume = Math.max(0, Math.min(1, vol));
+      if (this.videoElement) {
+        this.videoElement.volume = this.previewVolume;
+      }
+      console.log(`[AutoMode] Local preview volume: ${this.previewVolume}`);
     }
 
     stopCamera() {

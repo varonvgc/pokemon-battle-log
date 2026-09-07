@@ -4119,8 +4119,12 @@
               <input type="checkbox" id="chk-auto-preview-mute" checked style="width:16px; height:16px; margin-right:6px; accent-color:#3b82f6;" onchange="toggleAutoPreviewMute(this.checked)">
               <span id="auto-mute-label-text">🔇 PCでゲーム音を出さない (ミュート)</span>
             </label>
-            <div style="font-size:11px; color:var(--text-muted); margin-top:3px; line-height:1.3;">
-              ※ミュートにしても、録画ファイルには正常に音声が保存されます。
+            <div style="display:flex; align-items:center; justify-content:center; gap:8px; margin-top:6px;">
+              <span style="font-size:12px; color:var(--text);">音量:</span>
+              <input type="range" id="auto-setup-volume-slider" min="0" max="1" step="0.01" value="0.5" oninput="onAutoVolumeChange(this.value)" style="width: 120px; height: 4px; accent-color: #3b82f6; cursor: pointer;">
+            </div>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:6px; line-height:1.3;">
+              ※ミュートや音量変更をしても、録画ファイルには正常に音声が保存されます。
             </div>
           </div>
 
@@ -4163,10 +4167,13 @@
           <button type="button" class="auto-ctrl-btn" onclick="refreshAutoCameraAndAudioDevices()" title="カメラ・音声デバイス再検索">📷</button>
           <button type="button" class="auto-ctrl-btn" onclick="toggleAutoSetupOverlay()" title="設定表示/非表示">⚙️</button>
           <button type="button" class="auto-ctrl-btn" onclick="openOcrSetupModal()" title="OCR読み取り調整 (pamo3互換)">🔤</button>
-          <!-- 追加: PC音声ミュート切替ボタン -->
-          <button type="button" class="auto-ctrl-btn" id="btn-toggle-auto-mute" onclick="toggleAutoPreviewMuteQuick()" title="PC音声ミュート中 (クリックで音声を再生/消音。録画には影響しません)">
-            <span id="auto-mute-btn-icon">🔇</span>
-          </button>
+          <!-- 追加: PC音声ミュート切替ボタンと音量スライダー -->
+          <div class="auto-volume-control" style="display:inline-flex; align-items:center; gap:4px; margin-right:4px;">
+            <button type="button" class="auto-ctrl-btn" id="btn-toggle-auto-mute" onclick="toggleAutoPreviewMuteQuick()" title="PC音声ミュート中 (クリックで音声を再生/消音。録画には影響しません)" style="margin:0;">
+              <span id="auto-mute-btn-icon">🔇</span>
+            </button>
+            <input type="range" id="auto-control-volume-slider" min="0" max="1" step="0.01" value="0.5" oninput="onAutoVolumeChange(this.value)" style="width: 50px; height: 4px; accent-color: #3b82f6; cursor: pointer; display: none;" title="PCプレビュー音量">
+          </div>
           <!-- 追加: 自動録画トグルボタン -->
           <button type="button" class="auto-ctrl-btn" id="btn-toggle-auto-record" onclick="toggleAutoRecordState()" title="自動録画: OFF" style="position:relative;">
             <span id="auto-record-icon" style="filter: grayscale(1); opacity: 0.5;">⏺️</span>
@@ -12715,11 +12722,21 @@
       // カメラ＆音声一覧をロード
       await refreshAutoCameraAndAudioDevices();
 
-      // 保存されたプレビューミュート設定を復元
+      // 保存されたプレビューミュート設定と音量設定を復元
       const savedMute = localStorage.getItem('autoModePreviewMuted') !== 'false';
+      const savedVolStr = localStorage.getItem('autoModePreviewVolume');
+      const savedVol = savedVolStr !== null ? parseFloat(savedVolStr) : 0.5;
+
       if (window.autoModeController) {
+        window.autoModeController.setVolume(savedVol);
         window.autoModeController.setMute(savedMute);
       }
+      
+      // UIに反映
+      const setupSlider = document.getElementById('auto-setup-volume-slider');
+      const controlSlider = document.getElementById('auto-control-volume-slider');
+      if (setupSlider) setupSlider.value = savedVol;
+      if (controlSlider) controlSlider.value = savedVol;
       updateMuteUI(savedMute);
 
       console.log(`[AutoMode] Entered PC Auto Mode (Split View: Champions ${autoMatchType} BO1)`);
@@ -12835,14 +12852,39 @@
       }
       const quickBtn = document.getElementById('btn-toggle-auto-mute');
       const quickIcon = document.getElementById('auto-mute-btn-icon');
+      const controlSlider = document.getElementById('auto-control-volume-slider');
       if (quickBtn) {
         quickBtn.title = isMuted ? 'PC音声ミュート中 (クリックで再生。録画には影響しません)' : 'PC音声再生中 (クリックでミュート。録画には影響しません)';
         if (quickIcon) quickIcon.textContent = isMuted ? '🔇' : '🔊';
         if (isMuted) {
           quickBtn.style.color = '#94a3b8';
+          if (controlSlider) controlSlider.style.display = 'none';
         } else {
           quickBtn.style.color = '#22c55e';
+          if (controlSlider) controlSlider.style.display = 'inline-block';
         }
+      }
+    }
+
+    // 音量変更ハンドラ
+    function onAutoVolumeChange(value) {
+      const vol = parseFloat(value);
+      localStorage.setItem('autoModePreviewVolume', vol.toString());
+      if (window.autoModeController) {
+        window.autoModeController.setVolume(vol);
+      }
+      
+      // UIのスライダーを同期
+      const setupSlider = document.getElementById('auto-setup-volume-slider');
+      const controlSlider = document.getElementById('auto-control-volume-slider');
+      if (setupSlider && setupSlider.value !== value) setupSlider.value = value;
+      if (controlSlider && controlSlider.value !== value) controlSlider.value = value;
+
+      // 音量が0より大きければ自動的にミュート解除
+      if (vol > 0 && window.autoModeController && window.autoModeController.isPreviewMuted) {
+        toggleAutoPreviewMute(false);
+      } else if (vol === 0 && window.autoModeController && !window.autoModeController.isPreviewMuted) {
+        toggleAutoPreviewMute(true);
       }
     }
 
