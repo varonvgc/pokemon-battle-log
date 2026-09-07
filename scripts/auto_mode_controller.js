@@ -119,6 +119,11 @@
       this.recordedChunks = [];
       this.isRecording = false;
       this.cancelCurrentRecording = false;
+
+      // 音声 & デバイス管理
+      this.currentVideoDeviceId = null;
+      this.currentAudioDeviceId = null;
+      this.isPreviewMuted = true;
     }
 
     // --- ワーカー & アセットのオンデマンド初期化 (オートモード開始時のみ実行) ---
@@ -246,20 +251,28 @@
       });
     }
 
-    // --- カメラ操作 ---
+    // --- カメラ & 音声操作 ---
     async requestPermission() {
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        alert('ブラウザがカメラAPIに対応していません。\nセキュリティ上の制約により、ローカルサーバー(http://localhost)を立てるか、HTTPS環境でアクセスしてください。');
+        alert('ブラウザがカメラ・音声APIに対応していません。\nセキュリティ上の制約により、ローカルサーバー(http://localhost)を立てるか、HTTPS環境でアクセスしてください。');
         return false;
       }
       try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
-        // 許可が得られたら即座にトラックを解放
+        // カメラと音声の両方の権限をリクエスト
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
         stream.getTracks().forEach(t => t.stop());
         return true;
       } catch (err) {
-        console.warn('[AutoMode] Camera permission denied or failed:', err);
-        return false;
+        console.warn('[AutoMode] Video+Audio permission failed, falling back to video only:', err);
+        try {
+          // 音声デバイスがない等の場合は映像のみで再試行
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+          stream.getTracks().forEach(t => t.stop());
+          return true;
+        } catch (err2) {
+          console.warn('[AutoMode] Camera permission denied or failed:', err2);
+          return false;
+        }
       }
     }
 
@@ -279,16 +292,50 @@
       }
     }
 
-    async startCamera(deviceId = null) {
+    async getAudioDevices(requestPerm = false) {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+        return [];
+      }
+      if (requestPerm) {
+        await this.requestPermission();
+      }
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        return devices.filter(d => d.kind === 'audioinput');
+      } catch (e) {
+        console.error('[AutoMode] Error enumerating audio devices:', e);
+        return [];
+      }
+    }
+
+    async startCamera(videoDeviceId = null, audioDeviceId = null) {
       if (this.stream) {
         this.stopCamera();
       }
 
+      if (videoDeviceId !== null) {
+        this.currentVideoDeviceId = videoDeviceId;
+      }
+      if (audioDeviceId !== null) {
+        this.currentAudioDeviceId = audioDeviceId;
+      }
+
+      // 音声制約: ゲーム音を劣化させずにそのまま取り込むためノイズキャンセルや自動ゲインはOFFにする
+      const buildAudioConstraint = (devId) => {
+        if (!devId) return false;
+        return {
+          deviceId: { exact: devId },
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false
+        };
+      };
+
       // 1080p 60fps を目指しつつ、OBS仮想カメラ等の仕様に合わせて柔軟に接続
       const constraints = {
-        audio: false,
-        video: deviceId ? {
-          deviceId: { exact: deviceId },
+        audio: buildAudioConstraint(this.currentAudioDeviceId),
+        video: this.currentVideoDeviceId ? {
+          deviceId: { exact: this.currentVideoDeviceId },
           width: { ideal: 1920, min: 1280 },
           height: { ideal: 1080, min: 720 },
           frameRate: { ideal: 60, min: 30 }
@@ -301,29 +348,48 @@
       try {
         this.stream = await navigator.mediaDevices.getUserMedia(constraints);
       } catch (e1) {
-        console.warn('[AutoMode] Strict camera constraints failed, falling back to basic deviceId:', e1);
+        console.warn('[AutoMode] Strict constraints failed, trying basic deviceId fallback:', e1);
         try {
-          // フォールバック: 解像度制約なしでデバイスに直結
+          // フォールバック1: 解像度制約なしでデバイス直結 (音声あり)
           this.stream = await navigator.mediaDevices.getUserMedia({
-            audio: false,
-            video: deviceId ? { deviceId: { exact: deviceId } } : true
+            audio: this.currentAudioDeviceId ? { deviceId: { exact: this.currentAudioDeviceId } } : false,
+            video: this.currentVideoDeviceId ? { deviceId: { exact: this.currentVideoDeviceId } } : true
           });
         } catch (e2) {
-          console.error('[AutoMode] Failed to start camera stream:', e2);
-          return false;
+          console.warn('[AutoMode] DeviceId fallback with audio failed, falling back to video only:', e2);
+          try {
+            // フォールバック2: 音声が原因で失敗した可能性を考慮し、映像のみで接続
+            this.stream = await navigator.mediaDevices.getUserMedia({
+              audio: false,
+              video: this.currentVideoDeviceId ? { deviceId: { exact: this.currentVideoDeviceId } } : true
+            });
+          } catch (e3) {
+            console.error('[AutoMode] Failed to start camera stream completely:', e3);
+            return false;
+          }
         }
       }
 
       if (this.videoElement && this.stream) {
         this.videoElement.srcObject = this.stream;
+        // プレビュー表示のミュート状態を適用 (録画データには影響しません)
+        this.videoElement.muted = this.isPreviewMuted;
         try {
           await this.videoElement.play();
         } catch (playErr) {
           console.warn('[AutoMode] Video play error (handling autoplay):', playErr);
         }
       }
-      console.log('[AutoMode] Camera stream started successfully');
+      console.log(`[AutoMode] Camera & Audio stream started successfully (audio: ${!!this.currentAudioDeviceId}, previewMuted: ${this.isPreviewMuted})`);
       return true;
+    }
+
+    setMute(isMuted) {
+      this.isPreviewMuted = !!isMuted;
+      if (this.videoElement) {
+        this.videoElement.muted = this.isPreviewMuted;
+      }
+      console.log(`[AutoMode] Local preview muted: ${this.isPreviewMuted}`);
     }
 
     stopCamera() {

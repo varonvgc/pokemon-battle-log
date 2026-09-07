@@ -4108,7 +4108,23 @@
             <option value="">カメラデバイスを選択...</option>
           </select>
 
-          <button type="button" class="auto-setup-checkbox-btn" id="btn-auto-mode-start" onclick="toggleAutoModeCapture()" style="display:none">
+          <!-- 追加: 音声入力デバイス選択 (pamo3互換) -->
+          <select id="auto-audio-select" class="auto-setup-select" onchange="onAutoAudioSelectChange(this.value)" style="display:none; margin-top:8px;">
+            <option value="">🎤 音声入力: なし (無音録画)</option>
+          </select>
+
+          <!-- 追加: プレビュー音声ミュート切替 -->
+          <div id="auto-audio-preview-toggle-wrapper" style="display:none; margin-top:10px; text-align:center;">
+            <label style="display:inline-flex; align-items:center; cursor:pointer; font-size:13px; font-weight:bold; color:var(--text);">
+              <input type="checkbox" id="chk-auto-preview-mute" checked style="width:16px; height:16px; margin-right:6px; accent-color:#3b82f6;" onchange="toggleAutoPreviewMute(this.checked)">
+              <span id="auto-mute-label-text">🔇 PCでゲーム音を出さない (ミュート)</span>
+            </label>
+            <div style="font-size:11px; color:var(--text-muted); margin-top:3px; line-height:1.3;">
+              ※ミュートにしても、録画ファイルには正常に音声が保存されます。
+            </div>
+          </div>
+
+          <button type="button" class="auto-setup-checkbox-btn" id="btn-auto-mode-start" onclick="toggleAutoModeCapture()" style="display:none; margin-top:14px;">
             <input type="checkbox" id="chk-auto-mode-run" style="width:18px;height:18px;cursor:pointer;accent-color:#22c55e" onclick="event.stopPropagation();toggleAutoModeCapture()">
             <span>自動モードをスタート!!</span>
           </button>
@@ -4125,12 +4141,13 @@
           </div>
 
           <div id="auto-setup-permission-hint" style="display:none;margin-top:14px;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.4);border-radius:10px;padding:10px 14px;font-size:12px;color:#fca5a5;line-height:1.6;text-align:left">
-            ⚠️ <b>カメラの許可が必要です</b><br>
-            ブラウザのURL欄左にある 🔒（鍵アイコンや設定マーク）をクリックし、<b>カメラを「許可」</b>に切り替えてから、もう一度「セットアップを開始する」を押してください。
+            ⚠️ <b>カメラまたはマイクの許可が必要です</b><br>
+            ブラウザのURL欄左にある 🔒（鍵アイコンや設定マーク）をクリックし、<b>カメラ・マイクを「許可」</b>に切り替えてから、もう一度「セットアップを開始する」を押してください。
           </div>
 
           <div style="margin-top:20px;font-size:12px;color:var(--text-muted);line-height:1.6">
-            ※ OBS の「仮想カメラ開始」をクリックし、1920×1080 (16:9) でSwitchの対戦画面を取り込んでください。
+            ※ OBS の「仮想カメラ開始」をクリックし、1920×1080 (16:9) でSwitchの対戦画面を取り込んでください。<br>
+            音声はキャプチャボードの音声入力または仮想オーディオを選択できます。
           </div>
         </div>
       </div>
@@ -4143,9 +4160,13 @@
         </div>
         <div class="auto-mode-icon-buttons">
           <button type="button" class="auto-ctrl-btn" onclick="forceResetAutoModePhase()" title="対戦待ちへ強制リセット (通信切断・スタック時)">🔄</button>
-          <button type="button" class="auto-ctrl-btn" onclick="refreshAutoCameraDevices()" title="カメラ再検索">📷</button>
+          <button type="button" class="auto-ctrl-btn" onclick="refreshAutoCameraAndAudioDevices()" title="カメラ・音声デバイス再検索">📷</button>
           <button type="button" class="auto-ctrl-btn" onclick="toggleAutoSetupOverlay()" title="設定表示/非表示">⚙️</button>
           <button type="button" class="auto-ctrl-btn" onclick="openOcrSetupModal()" title="OCR読み取り調整 (pamo3互換)">🔤</button>
+          <!-- 追加: PC音声ミュート切替ボタン -->
+          <button type="button" class="auto-ctrl-btn" id="btn-toggle-auto-mute" onclick="toggleAutoPreviewMuteQuick()" title="PC音声ミュート中 (クリックで音声を再生/消音。録画には影響しません)">
+            <span id="auto-mute-btn-icon">🔇</span>
+          </button>
           <!-- 追加: 自動録画トグルボタン -->
           <button type="button" class="auto-ctrl-btn" id="btn-toggle-auto-record" onclick="toggleAutoRecordState()" title="自動録画: OFF" style="position:relative;">
             <span id="auto-record-icon" style="filter: grayscale(1); opacity: 0.5;">⏺️</span>
@@ -12691,8 +12712,15 @@
         window.autoModeController.videoElement = videoEl;
       }
 
-      // カメラ一覧をロード
-      await refreshAutoCameraDevices();
+      // カメラ＆音声一覧をロード
+      await refreshAutoCameraAndAudioDevices();
+
+      // 保存されたプレビューミュート設定を復元
+      const savedMute = localStorage.getItem('autoModePreviewMuted') !== 'false';
+      if (window.autoModeController) {
+        window.autoModeController.setMute(savedMute);
+      }
+      updateMuteUI(savedMute);
 
       console.log(`[AutoMode] Entered PC Auto Mode (Split View: Champions ${autoMatchType} BO1)`);
     }
@@ -12718,6 +12746,13 @@
       if (overlay) overlay.classList.remove('hidden');
 
       console.log('[AutoMode] Exited PC Auto Mode');
+    }
+
+    // カメラ＆音声デバイス一覧の更新
+    async function refreshAutoCameraAndAudioDevices() {
+      const camRes = await refreshAutoCameraDevices();
+      const audioRes = await refreshAutoAudioDevices();
+      return { camRes, audioRes };
     }
 
     // カメラデバイス一覧の更新
@@ -12746,8 +12781,11 @@
         select.appendChild(opt);
       });
 
-      // OBS Virtual Camera が見つかれば自動選択
-      if (obsDevice) {
+      // 保存されたカメラまたはOBS Virtual Camera を優先選択
+      const savedCamId = localStorage.getItem('autoModeCameraDeviceId');
+      if (savedCamId && devices.some(d => d.deviceId === savedCamId)) {
+        select.value = savedCamId;
+      } else if (obsDevice) {
         select.value = obsDevice.deviceId;
       } else if (devices.length === 1 && devices[0].deviceId) {
         select.value = devices[0].deviceId;
@@ -12756,28 +12794,101 @@
       return { devices, obsDevice, hasRealLabels };
     }
 
+    // 音声デバイス一覧の更新
+    async function refreshAutoAudioDevices() {
+      const select = document.getElementById('auto-audio-select');
+      if (!select || !window.autoModeController) return null;
+
+      const devices = await window.autoModeController.getAudioDevices();
+      select.innerHTML = '<option value="">🎤 音声入力: なし (無音録画)</option>';
+
+      let defaultAudio = null;
+      devices.forEach((d, idx) => {
+        const opt = document.createElement('option');
+        opt.value = d.deviceId;
+        opt.textContent = d.label || `マイク/オーディオ ${idx + 1}`;
+        const lower = (d.label || '').toLowerCase();
+        if (lower.includes('capture') || lower.includes('game') || lower.includes('obs') || lower.includes('line') || lower.includes('デジタル') || lower.includes('ライン')) {
+          if (!defaultAudio) defaultAudio = d;
+        }
+        select.appendChild(opt);
+      });
+
+      // 保存された音声デバイスまたはキャプチャ機器を優先選択
+      const savedAudioId = localStorage.getItem('autoModeAudioDeviceId');
+      if (savedAudioId && devices.some(d => d.deviceId === savedAudioId)) {
+        select.value = savedAudioId;
+      } else if (defaultAudio) {
+        select.value = defaultAudio.deviceId;
+      }
+
+      return { devices, defaultAudio };
+    }
+
+    // ミュート状態の反映とUI更新
+    function updateMuteUI(isMuted) {
+      const chk = document.getElementById('chk-auto-preview-mute');
+      if (chk) chk.checked = isMuted;
+      const labelText = document.getElementById('auto-mute-label-text');
+      if (labelText) {
+        labelText.textContent = isMuted ? '🔇 PCでゲーム音を出さない (ミュート)' : '🔊 PCでゲーム音を再生中';
+      }
+      const quickBtn = document.getElementById('btn-toggle-auto-mute');
+      const quickIcon = document.getElementById('auto-mute-btn-icon');
+      if (quickBtn) {
+        quickBtn.title = isMuted ? 'PC音声ミュート中 (クリックで再生。録画には影響しません)' : 'PC音声再生中 (クリックでミュート。録画には影響しません)';
+        if (quickIcon) quickIcon.textContent = isMuted ? '🔇' : '🔊';
+        if (isMuted) {
+          quickBtn.style.color = '#94a3b8';
+        } else {
+          quickBtn.style.color = '#22c55e';
+        }
+      }
+    }
+
+    function toggleAutoPreviewMute(isMuted) {
+      localStorage.setItem('autoModePreviewMuted', isMuted ? 'true' : 'false');
+      if (window.autoModeController) {
+        window.autoModeController.setMute(isMuted);
+      }
+      updateMuteUI(isMuted);
+    }
+
+    function toggleAutoPreviewMuteQuick() {
+      const current = window.autoModeController ? window.autoModeController.isPreviewMuted : true;
+      toggleAutoPreviewMute(!current);
+    }
+
     // セットアップ開始ボタンクリック
     async function onAutoSetupStartClick() {
       const select = document.getElementById('auto-camera-select');
+      const audioSelect = document.getElementById('auto-audio-select');
+      const muteWrapper = document.getElementById('auto-audio-preview-toggle-wrapper');
       const startBtn = document.getElementById('btn-auto-setup-start');
       const runBtn = document.getElementById('btn-auto-mode-start');
       const hint = document.getElementById('auto-setup-permission-hint');
 
       if (hint) hint.style.display = 'none';
 
-      // 1. まずブラウザにカメラ利用許可を要求 (ブラウザの「カメラの使用を許可しますか？」ダイアログを起動)
+      // 1. まずブラウザにカメラ・音声利用許可を要求
       const permitted = await window.autoModeController.requestPermission();
       if (!permitted) {
         if (hint) hint.style.display = 'block';
         return;
       }
 
-      // 2. 許可された状態でデバイス一覧を再取得（本物のデバイス名 OBS Virtual Camera 等が確実に取れる）
-      const res = await refreshAutoCameraDevices();
+      // 2. 許可された状態でデバイス一覧を再取得
+      await refreshAutoCameraAndAudioDevices();
       if (select) select.style.display = 'block';
+      if (audioSelect) audioSelect.style.display = 'block';
+      if (muteWrapper) muteWrapper.style.display = 'block';
       if (startBtn) startBtn.style.display = 'none';
 
-      // 3. OBSデバイスまたは選択可能なカメラがあれば直ちに映像開始
+      // 保存されたプレビューミュート設定を復元 (デフォルトはミュート)
+      const savedMute = localStorage.getItem('autoModePreviewMuted') !== 'false';
+      toggleAutoPreviewMute(savedMute);
+
+      // 3. 選択可能なカメラがあれば直ちに映像開始
       if (select && select.value) {
         await onAutoCameraSelectChange(select.value);
       }
@@ -12786,10 +12897,24 @@
     // カメラ選択変更
     async function onAutoCameraSelectChange(deviceId) {
       if (!deviceId || !window.autoModeController) return;
-      const ok = await window.autoModeController.startCamera(deviceId);
+      localStorage.setItem('autoModeCameraDeviceId', deviceId);
+      const audioSelect = document.getElementById('auto-audio-select');
+      const audioDeviceId = audioSelect ? audioSelect.value : null;
+      const ok = await window.autoModeController.startCamera(deviceId, audioDeviceId);
       const runBtn = document.getElementById('btn-auto-mode-start');
       if (ok && runBtn) {
         runBtn.style.display = 'flex';
+      }
+    }
+
+    // 音声デバイス選択変更
+    async function onAutoAudioSelectChange(audioDeviceId) {
+      if (!window.autoModeController) return;
+      localStorage.setItem('autoModeAudioDeviceId', audioDeviceId || '');
+      const camSelect = document.getElementById('auto-camera-select');
+      const camDeviceId = camSelect ? camSelect.value : null;
+      if (camDeviceId) {
+        await window.autoModeController.startCamera(camDeviceId, audioDeviceId);
       }
     }
 
