@@ -12654,9 +12654,17 @@
         setRecordMode('champions');
       }
 
-      // 3. 形式: ランクマ / BO1
+      // 3. 形式: 直前の記録の形式、なければランクマ / BO1
+      let autoMatchType = 'ランクマ';
+      try {
+        const savedType = localStorage.getItem('pkm_last_match_type');
+        if (savedType && ['ランクマ', '公式大会', '非公式', 'フレ戦', 'showdown'].includes(savedType)) {
+          autoMatchType = savedType;
+        }
+      } catch (e) {}
+
       if (typeof setRecordMatchType === 'function') {
-        setRecordMatchType('ranked');
+        setRecordMatchType(autoMatchType);
       }
       if (typeof setRecordMatchBo === 'function') {
         setRecordMatchBo(1);
@@ -12686,7 +12694,7 @@
       // カメラ一覧をロード
       await refreshAutoCameraDevices();
 
-      console.log('[AutoMode] Entered PC Auto Mode (Split View: Champions Ranked BO1)');
+      console.log(`[AutoMode] Entered PC Auto Mode (Split View: Champions ${autoMatchType} BO1)`);
     }
 
     function exitAutoMode() {

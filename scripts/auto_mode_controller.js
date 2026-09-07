@@ -575,12 +575,30 @@
     setAutoRecordEnabled(isEnabled) {
       this.isAutoRecordingEnabled = isEnabled;
       console.log(`[AutoRecord] Auto record enabled: ${isEnabled}`);
-      if (!isEnabled && this.isRecording && this.mediaRecorder) {
+      if (!isEnabled && (this.isRecording || this.mediaRecorder)) {
         console.log('[AutoRecord] Canceled recording by user toggle.');
+        this._cancelAndDiscardRecording();
+      }
+    }
+
+    _cancelAndDiscardRecording() {
+      if (this.mediaRecorder) {
         this.cancelCurrentRecording = true;
         this.isRecording = false;
         this._updateRecordingIndicator(false);
-        this.mediaRecorder.stop();
+        try {
+          if (this.mediaRecorder.state !== 'inactive') {
+            this.mediaRecorder.stop();
+          }
+        } catch (e) {
+          console.warn('[AutoRecord] Error stopping mediaRecorder on cancel:', e);
+        }
+        this.recordedChunks = [];
+        this.mediaRecorder = null;
+        this._recordingStopPromise = null;
+      } else {
+        this.isRecording = false;
+        this._updateRecordingIndicator(false);
       }
     }
 
@@ -603,76 +621,67 @@
             this.recordedChunks.push(e.data);
           }
         };
+
+        this._recordingStopPromise = new Promise((resolve) => {
+          this.mediaRecorder.onstop = async () => {
+            this.isRecording = false;
+            this._updateRecordingIndicator(false);
+            if (this.cancelCurrentRecording) {
+              console.log('[AutoRecord] Data discarded due to cancellation/reset.');
+              this.recordedChunks = [];
+              this.mediaRecorder = null;
+              resolve(null);
+              return;
+            }
+            
+            console.log('[AutoRecord] Recording stopped, converting to file...');
+            const finalMime = (this.mediaRecorder && this.mediaRecorder.mimeType) || 'video/webm';
+            const blob = new Blob(this.recordedChunks, { type: finalMime });
+            this.recordedChunks = [];
+            this.mediaRecorder = null;
+            
+            const filename = `autorec_${Date.now()}.webm`;
+            const file = new File([blob], filename, { type: finalMime });
+            
+            if (typeof window.attachVideoFileAsync === 'function') {
+              console.log('[AutoRecord] Attaching video file...');
+              await window.attachVideoFileAsync(file);
+            }
+            resolve(file);
+          };
+        });
+
         this.mediaRecorder.start(1000);
         this.isRecording = true;
         this._updateRecordingIndicator(true);
         console.log('[AutoRecord] Started recording.');
       } catch (err) {
         console.error('[AutoRecord] Failed to start MediaRecorder:', err);
+        this.isRecording = false;
+        this.mediaRecorder = null;
+        this._updateRecordingIndicator(false);
       }
     }
 
-    _stopRecordingAsync() {
-      return new Promise((resolve) => {
-        if (!this.isRecording || !this.mediaRecorder) {
-          this._updateRecordingIndicator(false);
-          resolve();
-          return;
-        }
-        
-        this.mediaRecorder.onstop = async () => {
-          this.isRecording = false;
-          this._updateRecordingIndicator(false);
-          if (this.cancelCurrentRecording) {
-            console.log('[AutoRecord] Data discarded due to cancellation.');
-            this.recordedChunks = [];
-            resolve();
-            return;
-          }
-          
-          console.log('[AutoRecord] Recording stopped, converting to file...');
-          const mime = this.mediaRecorder.mimeType || 'video/webm';
-          const blob = new Blob(this.recordedChunks, { type: mime });
-          this.recordedChunks = [];
-          
-          const filename = `autorec_${Date.now()}.webm`;
-          const file = new File([blob], filename, { type: mime });
-          
-          if (typeof window.attachVideoFileAsync === 'function') {
-            console.log('[AutoRecord] Attaching video file...');
-            await window.attachVideoFileAsync(file);
-          }
-          resolve();
-        };
-        
-        try {
-          this.mediaRecorder.stop();
-        } catch(e) {
-          console.warn('[AutoRecord] Failed to stop:', e);
-          this.isRecording = false;
-          this._updateRecordingIndicator(false);
-          resolve();
-        }
-      });
-    }
-
-    forceResetPhase() {
-      console.log('[AutoMode] Force reset triggered by user.');
-      if (this.isRecording && this.mediaRecorder) {
-        this.cancelCurrentRecording = true;
-        try {
-          this.mediaRecorder.stop();
-        } catch (e) {
-          console.warn('[AutoRecord] Error stopping on force reset:', e);
-        }
+    async _stopRecordingAsync() {
+      if (!this.isRecording || !this.mediaRecorder) {
+        this._updateRecordingIndicator(false);
+        return;
       }
-      this.isRecording = false;
-      this._updateRecordingIndicator(false);
-      this.phase = 'WAITING_MATCHING';
-      this.updateStatusBadge('対戦待ち (待機中)');
-      this.resetVsBar();
-      if (typeof window.showToast === 'function') {
-        window.showToast('対戦待ち状態へリセットしました');
+      
+      try {
+        if (this.mediaRecorder.state !== 'inactive') {
+          this.mediaRecorder.stop();
+        }
+      } catch(e) {
+        console.warn('[AutoRecord] Failed to stop recorder:', e);
+        this.isRecording = false;
+        this._updateRecordingIndicator(false);
+      }
+
+      if (this._recordingStopPromise) {
+        await this._recordingStopPromise;
+        this._recordingStopPromise = null;
       }
     }
 
@@ -696,6 +705,7 @@
       this.isAutoRunning = false;
       this.phase = 'IDLE';
       this.updateStatusBadge('自動モードOFF');
+      this._cancelAndDiscardRecording();
       if (this.loopTimer) {
         clearTimeout(this.loopTimer);
         this.loopTimer = null;
@@ -705,6 +715,7 @@
     // --- 通信切断・スタック時の手動フェーズ強制リセット (案B仕様) ---
     forceResetPhase() {
       console.log(`[AutoMode] Force resetting phase from ${this.phase} to WAITING_MATCHING`);
+      this._cancelAndDiscardRecording();
       this.phase = 'WAITING_MATCHING';
       this.waitingStartTimestamp = null;
       this.updateStatusBadge('自動モード稼働中 (手動リセット完了/待機中)');
@@ -712,6 +723,8 @@
       // 入力フォーム側の相手パーティや選出は保持し、ユーザーが手動で勝敗選択および保存を行えるようにする
       if (typeof window.showRecordToast === 'function') {
         window.showRecordToast('🔄 オートモードを対戦待ちへリセットしました。現在の記録は手動で結果選択・保存できます。');
+      } else if (typeof window.showToast === 'function') {
+        window.showToast('対戦待ち状態へリセットしました');
       } else {
         alert('オートモードを対戦待ちへリセットしました。\n現在の試合記録は手動で結果選択・保存を行ってください。');
       }
@@ -973,9 +986,17 @@
         window.setRecordMode('champions');
       }
 
-      // 3. 形式: ランクマ / BO1
+      // 3. 形式: 直前の記録の形式、なければランクマ / BO1
+      let matchType = 'ランクマ';
+      try {
+        const savedType = localStorage.getItem('pkm_last_match_type');
+        if (savedType && ['ランクマ', '公式大会', '非公式', 'フレ戦', 'showdown'].includes(savedType)) {
+          matchType = savedType;
+        }
+      } catch (e) {}
+
       if (typeof window.setRecordMatchType === 'function') {
-        window.setRecordMatchType('ranked');
+        window.setRecordMatchType(matchType);
       }
       if (typeof window.setRecordMatchBo === 'function') {
         window.setRecordMatchBo(1);
@@ -1008,7 +1029,7 @@
         }
       }
 
-      console.log('[AutoMode] Record form fully auto-configured for Champions Ranked BO1');
+      console.log(`[AutoMode] Record form fully auto-configured for Champions (${matchType} BO1)`);
     }
 
     // 自分のパーティのポケモン名一覧を取得
