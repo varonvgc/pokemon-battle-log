@@ -3490,8 +3490,6 @@
       <div style="display:flex;gap:8px;align-items:center">
         <button class="btn btn-ghost" onclick="openAiPartyModal(null)"
           style="border-color:var(--accent);color:#c4b5fd">📸 画像から自動作成</button>
-        <button class="btn btn-ghost" onclick="openReplicaModal()"
-          style="border-color:#14b8a6;color:#14b8a6">🔑 レンタルコード</button>
         <button class="btn btn-primary" onclick="openPartyEdit(null)">＋ 新規登録</button>
       </div>
     </div>
@@ -13168,24 +13166,7 @@
       </div>
     </div>
   </div>
-  <!-- Replica Code Modal -->
-  <div id="replica-modal" class="modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;justify-content:center;align-items:center;">
-    <div class="modal-content" style="background:var(--surface);width:90%;max-width:400px;border-radius:12px;padding:20px;position:relative;">
-      <h3 style="margin-top:0;margin-bottom:12px;font-size:18px;">レンタルコードから読み込み</h3>
-      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">
-        10桁のレンタルコードを入力してパーティデータを取得します。<br>
-      </p>
-      <input type="text" id="replica-code-input" placeholder="例: A4RBRNN9YE" style="width:100%;padding:10px;font-size:16px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);margin-bottom:16px;text-transform:uppercase;">
-      <div id="replica-error" style="color:var(--danger);font-size:13px;margin-bottom:10px;"></div>
-      <div id="replica-loading" style="display:none;color:var(--primary);font-size:13px;margin-bottom:10px;">データを取得し、日本語に翻訳しています...</div>
-      <div style="display:flex;justify-content:flex-end;gap:8px;">
-        <button class="btn btn-ghost" onclick="closeReplicaModal()">キャンセル</button>
-        <button class="btn btn-primary" onclick="importReplicaCode()">読み込む</button>
-      </div>
-    </div>
-  </div>
 
-  <script src="scripts/replica_import.js"></script>
 </body>
 
 </html>
