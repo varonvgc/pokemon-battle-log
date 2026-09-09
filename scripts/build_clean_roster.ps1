@@ -117,58 +117,66 @@ foreach ($p in $pkmData) {
     $t2 = if ($p.type2 -and $typeMap.ContainsKey($p.type2)) { $typeMap[$p.type2] } else { "none" }
 
     # Determine icon file
-    $targetFile = ""
-    if ($nameToFileName.ContainsKey($disp)) {
-        $targetFile = $nameToFileName[$disp]
-    } elseif ($nameToFileName.ContainsKey($p.name)) {
-        $targetFile = $nameToFileName[$p.name]
+    # N:1 Mapping: Find all candidates in pokemon_map.json by pokeDexId (no)
+    $matchedFiles = @()
+    $candidates = $null
+    if (Test-Path $pokeMapPath) {
+        if (-not $global:pokeMapDataList) {
+            $global:pokeMapDataList = Get-Content $pokeMapPath -Encoding UTF8 -Raw | ConvertFrom-Json
+        }
+        $candidates = $global:pokeMapDataList | Where-Object { [string]$_.pokeDexId -eq [string]$p.no }
     }
 
-    if (-not $targetFile -or -not (Test-Path (Join-Path $iconsDir $targetFile))) {
-        if ($disp.Contains($uLycanMidday)) { $targetFile = "lycanroc-midday.png" }
-        elseif ($disp.Contains($uLycanMid)) { $targetFile = "lycanroc-midnight.png" }
-        elseif ($disp.Contains($uLycanDusk)) { $targetFile = "lycanroc-dusk.png" }
-        elseif ($disp.Contains($uMeowMale) -and $p.name -eq [System.Text.RegularExpressions.Regex]::Unescape("\u30cb\u30e3\u30aa\u30cb\u30af\u30b9")) { $targetFile = "meowstic-male.png" }
-        elseif ($disp.Contains($uMeowFemale) -and $p.name -eq [System.Text.RegularExpressions.Regex]::Unescape("\u30cb\u30e3\u30aa\u30cb\u30af\u30b9")) { $targetFile = "meowstic-female.png" }
-        elseif ($p.name -eq [System.Text.RegularExpressions.Regex]::Unescape("\u30cb\u30e3\u30aa\u30cb\u30af\u30b9")) { $targetFile = "meowstic-male.png" }
-        elseif ($disp.Contains($uStunGalar)) { $targetFile = "stunfisk.png" }
-        elseif ($p.name -eq $uMrRime) { $targetFile = "mr-rime.png" }
-        elseif ($disp.Contains($uBascMale) -and $p.name -eq [System.Text.RegularExpressions.Regex]::Unescape("\u30a4\u30c0\u30a4\u30c8\u30a6")) { $targetFile = "basculegion-male.png" }
-        elseif ($disp.Contains($uBascFemale) -and $p.name -eq [System.Text.RegularExpressions.Regex]::Unescape("\u30a4\u30c0\u30a4\u30c8\u30a6")) { $targetFile = "basculegion-female.png" }
-        elseif ($p.name -eq [System.Text.RegularExpressions.Regex]::Unescape("\u30a4\u30c0\u30a4\u30c8\u30a6")) { $targetFile = "basculegion-male.png" }
-        elseif ($disp.Contains("Four")) { $targetFile = "maushold-four.png" }
-        elseif ($p.name -eq $uMaushold) { $targetFile = "maushold-three.png" }
-        elseif ($disp.Contains("Hero") -or $disp.Contains([System.Text.RegularExpressions.Regex]::Unescape("\u30de\u30a4\u30c6\u30a3"))) { $targetFile = "palafin-hero.png" }
-        elseif ($p.name -eq $uPalafin) { $targetFile = "palafin-zero.png" }
+    if ($candidates) {
+        if ($disp -match "オス" -or $disp -match "Male" -or $disp -match "M-Mega") {
+            $filtered = $candidates | Where-Object { $_.nameJa -match "オス" -or $_.nameEn -match "Male" }
+            if ($filtered) { $candidates = $filtered }
+        } elseif ($disp -match "メス" -or $disp -match "Female" -or $disp -match "F-Mega") {
+            $filtered = $candidates | Where-Object { $_.nameJa -match "メス" -or $_.nameEn -match "Female" }
+            if ($filtered) { $candidates = $filtered }
+        }
+        
+        foreach ($c in $candidates) {
+            if ($c.fileName -and (Test-Path (Join-Path $iconsDir $c.fileName)) -and -not $matchedFiles.Contains($c.fileName)) {
+                $matchedFiles += $c.fileName
+            }
+        }
     }
 
-    if (-not $targetFile -or -not (Test-Path (Join-Path $iconsDir $targetFile))) {
+    if ($matchedFiles.Count -eq 0) {
         if ($jaToEnId.ContainsKey($disp)) {
             $enFile = "$($jaToEnId[$disp]).png"
-            if (Test-Path (Join-Path $iconsDir $enFile)) { $targetFile = $enFile }
+            if (Test-Path (Join-Path $iconsDir $enFile)) { $matchedFiles += $enFile }
         } elseif ($jaToEnId.ContainsKey($p.name)) {
             $enFile = "$($jaToEnId[$p.name]).png"
-            if (Test-Path (Join-Path $iconsDir $enFile)) { $targetFile = $enFile }
+            if (Test-Path (Join-Path $iconsDir $enFile)) { $matchedFiles += $enFile }
         }
     }
 
-    if (-not $targetFile -or -not (Test-Path (Join-Path $iconsDir $targetFile))) {
-        if ($p.no) {
-            $numStr = [string]$p.no
-            $dexFile = "dex_$numStr.png"
-            if (Test-Path (Join-Path $iconsDir $dexFile)) { $targetFile = $dexFile }
-        }
+    if ($matchedFiles.Count -eq 0 -and $p.no) {
+        $numStr = [string]$p.no
+        $dexFile = "dex_$numStr.png"
+        if (Test-Path (Join-Path $iconsDir $dexFile)) { $matchedFiles += $dexFile }
     }
 
-    $id = "$($p.no)_$disp"
-    $cleanRoster += [PSCustomObject]@{
-        id = $id
-        no = [string]$p.no
-        name = $p.name
-        display = $disp
-        t1 = $t1
-        t2 = $t2
-        file = $targetFile
+    if ($matchedFiles.Count -eq 0) {
+        $matchedFiles += ""
+    }
+
+    foreach ($file in $matchedFiles) {
+        $baseId = "$($p.no)_$disp"
+        $uid = if ($file) { "${baseId}_${file}" } else { $baseId }
+        
+        $cleanRoster += [PSCustomObject]@{
+            id = $uid
+            originalId = $baseId
+            no = [string]$p.no
+            name = $p.name
+            display = $disp
+            t1 = $t1
+            t2 = $t2
+            file = $file
+        }
     }
 }
 

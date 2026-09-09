@@ -1,6 +1,7 @@
 ﻿[
     {
-        "id":  "3_フシギバナ",
+        "id":  "3_フシギバナ_venusaur.png",
+        "originalId":  "3_フシギバナ",
         "no":  "3",
         "name":  "フシギバナ",
         "display":  "フシギバナ",
@@ -9,7 +10,8 @@
         "file":  "venusaur.png"
     },
     {
-        "id":  "6_リザードン",
+        "id":  "6_リザードン_charizard.png",
+        "originalId":  "6_リザードン",
         "no":  "6",
         "name":  "リザードン",
         "display":  "リザードン",
@@ -18,7 +20,8 @@
         "file":  "charizard.png"
     },
     {
-        "id":  "9_カメックス",
+        "id":  "9_カメックス_blastoise.png",
+        "originalId":  "9_カメックス",
         "no":  "9",
         "name":  "カメックス",
         "display":  "カメックス",
@@ -27,7 +30,8 @@
         "file":  "blastoise.png"
     },
     {
-        "id":  "15_スピアー",
+        "id":  "15_スピアー_beedrill.png",
+        "originalId":  "15_スピアー",
         "no":  "15",
         "name":  "スピアー",
         "display":  "スピアー",
@@ -36,7 +40,8 @@
         "file":  "beedrill.png"
     },
     {
-        "id":  "18_ピジョット",
+        "id":  "18_ピジョット_pidgeot.png",
+        "originalId":  "18_ピジョット",
         "no":  "18",
         "name":  "ピジョット",
         "display":  "ピジョット",
@@ -45,7 +50,8 @@
         "file":  "pidgeot.png"
     },
     {
-        "id":  "24_アーボック",
+        "id":  "24_アーボック_arbok.png",
+        "originalId":  "24_アーボック",
         "no":  "24",
         "name":  "アーボック",
         "display":  "アーボック",
@@ -54,7 +60,8 @@
         "file":  "arbok.png"
     },
     {
-        "id":  "25_ピカチュウ",
+        "id":  "25_ピカチュウ_pikachu.png",
+        "originalId":  "25_ピカチュウ",
         "no":  "25",
         "name":  "ピカチュウ",
         "display":  "ピカチュウ",
@@ -63,7 +70,8 @@
         "file":  "pikachu.png"
     },
     {
-        "id":  "26_ライチュウ",
+        "id":  "26_ライチュウ_raichu.png",
+        "originalId":  "26_ライチュウ",
         "no":  "26",
         "name":  "ライチュウ",
         "display":  "ライチュウ",
@@ -72,7 +80,18 @@
         "file":  "raichu.png"
     },
     {
-        "id":  "26_ライチュウ(アローラのすがた)",
+        "id":  "26_ライチュウ_raichu-alolan.png",
+        "originalId":  "26_ライチュウ",
+        "no":  "26",
+        "name":  "ライチュウ",
+        "display":  "ライチュウ",
+        "t1":  "electric",
+        "t2":  "none",
+        "file":  "raichu-alolan.png"
+    },
+    {
+        "id":  "26_ライチュウ(アローラのすがた)_raichu.png",
+        "originalId":  "26_ライチュウ(アローラのすがた)",
         "no":  "26",
         "name":  "ライチュウ",
         "display":  "ライチュウ(アローラのすがた)",
@@ -81,7 +100,18 @@
         "file":  "raichu.png"
     },
     {
-        "id":  "36_ピクシー",
+        "id":  "26_ライチュウ(アローラのすがた)_raichu-alolan.png",
+        "originalId":  "26_ライチュウ(アローラのすがた)",
+        "no":  "26",
+        "name":  "ライチュウ",
+        "display":  "ライチュウ(アローラのすがた)",
+        "t1":  "electric",
+        "t2":  "psychic",
+        "file":  "raichu-alolan.png"
+    },
+    {
+        "id":  "36_ピクシー_clefable.png",
+        "originalId":  "36_ピクシー",
         "no":  "36",
         "name":  "ピクシー",
         "display":  "ピクシー",
@@ -90,7 +120,8 @@
         "file":  "clefable.png"
     },
     {
-        "id":  "38_キュウコン",
+        "id":  "38_キュウコン_ninetales.png",
+        "originalId":  "38_キュウコン",
         "no":  "38",
         "name":  "キュウコン",
         "display":  "キュウコン",
@@ -99,7 +130,18 @@
         "file":  "ninetales.png"
     },
     {
-        "id":  "38_キュウコン(アローラのすがた)",
+        "id":  "38_キュウコン_ninetales-alolan.png",
+        "originalId":  "38_キュウコン",
+        "no":  "38",
+        "name":  "キュウコン",
+        "display":  "キュウコン",
+        "t1":  "fire",
+        "t2":  "none",
+        "file":  "ninetales-alolan.png"
+    },
+    {
+        "id":  "38_キュウコン(アローラのすがた)_ninetales.png",
+        "originalId":  "38_キュウコン(アローラのすがた)",
         "no":  "38",
         "name":  "キュウコン",
         "display":  "キュウコン(アローラのすがた)",
@@ -108,7 +150,18 @@
         "file":  "ninetales.png"
     },
     {
-        "id":  "45_ラフレシア",
+        "id":  "38_キュウコン(アローラのすがた)_ninetales-alolan.png",
+        "originalId":  "38_キュウコン(アローラのすがた)",
+        "no":  "38",
+        "name":  "キュウコン",
+        "display":  "キュウコン(アローラのすがた)",
+        "t1":  "ice",
+        "t2":  "fairy",
+        "file":  "ninetales-alolan.png"
+    },
+    {
+        "id":  "45_ラフレシア_vileplume.png",
+        "originalId":  "45_ラフレシア",
         "no":  "45",
         "name":  "ラフレシア",
         "display":  "ラフレシア",
@@ -117,7 +170,8 @@
         "file":  "vileplume.png"
     },
     {
-        "id":  "59_ウインディ",
+        "id":  "59_ウインディ_arcanine.png",
+        "originalId":  "59_ウインディ",
         "no":  "59",
         "name":  "ウインディ",
         "display":  "ウインディ",
@@ -126,7 +180,18 @@
         "file":  "arcanine.png"
     },
     {
-        "id":  "59_ウインディ(ヒスイのすがた)",
+        "id":  "59_ウインディ_arcanine-hisuian.png",
+        "originalId":  "59_ウインディ",
+        "no":  "59",
+        "name":  "ウインディ",
+        "display":  "ウインディ",
+        "t1":  "fire",
+        "t2":  "none",
+        "file":  "arcanine-hisuian.png"
+    },
+    {
+        "id":  "59_ウインディ(ヒスイのすがた)_arcanine.png",
+        "originalId":  "59_ウインディ(ヒスイのすがた)",
         "no":  "59",
         "name":  "ウインディ",
         "display":  "ウインディ(ヒスイのすがた)",
@@ -135,7 +200,18 @@
         "file":  "arcanine.png"
     },
     {
-        "id":  "65_フーディン",
+        "id":  "59_ウインディ(ヒスイのすがた)_arcanine-hisuian.png",
+        "originalId":  "59_ウインディ(ヒスイのすがた)",
+        "no":  "59",
+        "name":  "ウインディ",
+        "display":  "ウインディ(ヒスイのすがた)",
+        "t1":  "fire",
+        "t2":  "rock",
+        "file":  "arcanine-hisuian.png"
+    },
+    {
+        "id":  "65_フーディン_alakazam.png",
+        "originalId":  "65_フーディン",
         "no":  "65",
         "name":  "フーディン",
         "display":  "フーディン",
@@ -144,7 +220,8 @@
         "file":  "alakazam.png"
     },
     {
-        "id":  "68_カイリキー",
+        "id":  "68_カイリキー_machamp.png",
+        "originalId":  "68_カイリキー",
         "no":  "68",
         "name":  "カイリキー",
         "display":  "カイリキー",
@@ -153,7 +230,8 @@
         "file":  "machamp.png"
     },
     {
-        "id":  "71_ウツボット",
+        "id":  "71_ウツボット_victreebel.png",
+        "originalId":  "71_ウツボット",
         "no":  "71",
         "name":  "ウツボット",
         "display":  "ウツボット",
@@ -162,7 +240,8 @@
         "file":  "victreebel.png"
     },
     {
-        "id":  "80_ヤドラン",
+        "id":  "80_ヤドラン_slowbro.png",
+        "originalId":  "80_ヤドラン",
         "no":  "80",
         "name":  "ヤドラン",
         "display":  "ヤドラン",
@@ -171,7 +250,18 @@
         "file":  "slowbro.png"
     },
     {
-        "id":  "80_ヤドラン(ガラルのすがた)",
+        "id":  "80_ヤドラン_slowbro-galarian.png",
+        "originalId":  "80_ヤドラン",
+        "no":  "80",
+        "name":  "ヤドラン",
+        "display":  "ヤドラン",
+        "t1":  "water",
+        "t2":  "psychic",
+        "file":  "slowbro-galarian.png"
+    },
+    {
+        "id":  "80_ヤドラン(ガラルのすがた)_slowbro.png",
+        "originalId":  "80_ヤドラン(ガラルのすがた)",
         "no":  "80",
         "name":  "ヤドラン",
         "display":  "ヤドラン(ガラルのすがた)",
@@ -180,7 +270,18 @@
         "file":  "slowbro.png"
     },
     {
-        "id":  "94_ゲンガー",
+        "id":  "80_ヤドラン(ガラルのすがた)_slowbro-galarian.png",
+        "originalId":  "80_ヤドラン(ガラルのすがた)",
+        "no":  "80",
+        "name":  "ヤドラン",
+        "display":  "ヤドラン(ガラルのすがた)",
+        "t1":  "poison",
+        "t2":  "psychic",
+        "file":  "slowbro-galarian.png"
+    },
+    {
+        "id":  "94_ゲンガー_gengar.png",
+        "originalId":  "94_ゲンガー",
         "no":  "94",
         "name":  "ゲンガー",
         "display":  "ゲンガー",
@@ -189,7 +290,8 @@
         "file":  "gengar.png"
     },
     {
-        "id":  "115_ガルーラ",
+        "id":  "115_ガルーラ_kangaskhan.png",
+        "originalId":  "115_ガルーラ",
         "no":  "115",
         "name":  "ガルーラ",
         "display":  "ガルーラ",
@@ -198,7 +300,8 @@
         "file":  "kangaskhan.png"
     },
     {
-        "id":  "121_スターミー",
+        "id":  "121_スターミー_starmie.png",
+        "originalId":  "121_スターミー",
         "no":  "121",
         "name":  "スターミー",
         "display":  "スターミー",
@@ -207,7 +310,8 @@
         "file":  "starmie.png"
     },
     {
-        "id":  "127_カイロス",
+        "id":  "127_カイロス_pinsir.png",
+        "originalId":  "127_カイロス",
         "no":  "127",
         "name":  "カイロス",
         "display":  "カイロス",
@@ -216,7 +320,38 @@
         "file":  "pinsir.png"
     },
     {
-        "id":  "128_ケンタロス",
+        "id":  "128_ケンタロス_tauros-paldean-combat.png",
+        "originalId":  "128_ケンタロス",
+        "no":  "128",
+        "name":  "ケンタロス",
+        "display":  "ケンタロス",
+        "t1":  "normal",
+        "t2":  "none",
+        "file":  "tauros-paldean-combat.png"
+    },
+    {
+        "id":  "128_ケンタロス_tauros-paldean-blaze.png",
+        "originalId":  "128_ケンタロス",
+        "no":  "128",
+        "name":  "ケンタロス",
+        "display":  "ケンタロス",
+        "t1":  "normal",
+        "t2":  "none",
+        "file":  "tauros-paldean-blaze.png"
+    },
+    {
+        "id":  "128_ケンタロス_tauros-paldean-aqua.png",
+        "originalId":  "128_ケンタロス",
+        "no":  "128",
+        "name":  "ケンタロス",
+        "display":  "ケンタロス",
+        "t1":  "normal",
+        "t2":  "none",
+        "file":  "tauros-paldean-aqua.png"
+    },
+    {
+        "id":  "128_ケンタロス_tauros.png",
+        "originalId":  "128_ケンタロス",
         "no":  "128",
         "name":  "ケンタロス",
         "display":  "ケンタロス",
@@ -225,7 +360,38 @@
         "file":  "tauros.png"
     },
     {
-        "id":  "128_ケンタロス(コンバット種)",
+        "id":  "128_ケンタロス(コンバット種)_tauros-paldean-combat.png",
+        "originalId":  "128_ケンタロス(コンバット種)",
+        "no":  "128",
+        "name":  "ケンタロス",
+        "display":  "ケンタロス(コンバット種)",
+        "t1":  "fighting",
+        "t2":  "none",
+        "file":  "tauros-paldean-combat.png"
+    },
+    {
+        "id":  "128_ケンタロス(コンバット種)_tauros-paldean-blaze.png",
+        "originalId":  "128_ケンタロス(コンバット種)",
+        "no":  "128",
+        "name":  "ケンタロス",
+        "display":  "ケンタロス(コンバット種)",
+        "t1":  "fighting",
+        "t2":  "none",
+        "file":  "tauros-paldean-blaze.png"
+    },
+    {
+        "id":  "128_ケンタロス(コンバット種)_tauros-paldean-aqua.png",
+        "originalId":  "128_ケンタロス(コンバット種)",
+        "no":  "128",
+        "name":  "ケンタロス",
+        "display":  "ケンタロス(コンバット種)",
+        "t1":  "fighting",
+        "t2":  "none",
+        "file":  "tauros-paldean-aqua.png"
+    },
+    {
+        "id":  "128_ケンタロス(コンバット種)_tauros.png",
+        "originalId":  "128_ケンタロス(コンバット種)",
         "no":  "128",
         "name":  "ケンタロス",
         "display":  "ケンタロス(コンバット種)",
@@ -234,7 +400,38 @@
         "file":  "tauros.png"
     },
     {
-        "id":  "128_ケンタロス(ブレイズ種)",
+        "id":  "128_ケンタロス(ブレイズ種)_tauros-paldean-combat.png",
+        "originalId":  "128_ケンタロス(ブレイズ種)",
+        "no":  "128",
+        "name":  "ケンタロス",
+        "display":  "ケンタロス(ブレイズ種)",
+        "t1":  "fighting",
+        "t2":  "fire",
+        "file":  "tauros-paldean-combat.png"
+    },
+    {
+        "id":  "128_ケンタロス(ブレイズ種)_tauros-paldean-blaze.png",
+        "originalId":  "128_ケンタロス(ブレイズ種)",
+        "no":  "128",
+        "name":  "ケンタロス",
+        "display":  "ケンタロス(ブレイズ種)",
+        "t1":  "fighting",
+        "t2":  "fire",
+        "file":  "tauros-paldean-blaze.png"
+    },
+    {
+        "id":  "128_ケンタロス(ブレイズ種)_tauros-paldean-aqua.png",
+        "originalId":  "128_ケンタロス(ブレイズ種)",
+        "no":  "128",
+        "name":  "ケンタロス",
+        "display":  "ケンタロス(ブレイズ種)",
+        "t1":  "fighting",
+        "t2":  "fire",
+        "file":  "tauros-paldean-aqua.png"
+    },
+    {
+        "id":  "128_ケンタロス(ブレイズ種)_tauros.png",
+        "originalId":  "128_ケンタロス(ブレイズ種)",
         "no":  "128",
         "name":  "ケンタロス",
         "display":  "ケンタロス(ブレイズ種)",
@@ -243,7 +440,38 @@
         "file":  "tauros.png"
     },
     {
-        "id":  "128_ケンタロス(ウォーター種)",
+        "id":  "128_ケンタロス(ウォーター種)_tauros-paldean-combat.png",
+        "originalId":  "128_ケンタロス(ウォーター種)",
+        "no":  "128",
+        "name":  "ケンタロス",
+        "display":  "ケンタロス(ウォーター種)",
+        "t1":  "fighting",
+        "t2":  "water",
+        "file":  "tauros-paldean-combat.png"
+    },
+    {
+        "id":  "128_ケンタロス(ウォーター種)_tauros-paldean-blaze.png",
+        "originalId":  "128_ケンタロス(ウォーター種)",
+        "no":  "128",
+        "name":  "ケンタロス",
+        "display":  "ケンタロス(ウォーター種)",
+        "t1":  "fighting",
+        "t2":  "water",
+        "file":  "tauros-paldean-blaze.png"
+    },
+    {
+        "id":  "128_ケンタロス(ウォーター種)_tauros-paldean-aqua.png",
+        "originalId":  "128_ケンタロス(ウォーター種)",
+        "no":  "128",
+        "name":  "ケンタロス",
+        "display":  "ケンタロス(ウォーター種)",
+        "t1":  "fighting",
+        "t2":  "water",
+        "file":  "tauros-paldean-aqua.png"
+    },
+    {
+        "id":  "128_ケンタロス(ウォーター種)_tauros.png",
+        "originalId":  "128_ケンタロス(ウォーター種)",
         "no":  "128",
         "name":  "ケンタロス",
         "display":  "ケンタロス(ウォーター種)",
@@ -252,7 +480,8 @@
         "file":  "tauros.png"
     },
     {
-        "id":  "130_ギャラドス",
+        "id":  "130_ギャラドス_gyarados.png",
+        "originalId":  "130_ギャラドス",
         "no":  "130",
         "name":  "ギャラドス",
         "display":  "ギャラドス",
@@ -261,7 +490,8 @@
         "file":  "gyarados.png"
     },
     {
-        "id":  "132_メタモン",
+        "id":  "132_メタモン_ditto.png",
+        "originalId":  "132_メタモン",
         "no":  "132",
         "name":  "メタモン",
         "display":  "メタモン",
@@ -270,7 +500,8 @@
         "file":  "ditto.png"
     },
     {
-        "id":  "134_シャワーズ",
+        "id":  "134_シャワーズ_vaporeon.png",
+        "originalId":  "134_シャワーズ",
         "no":  "134",
         "name":  "シャワーズ",
         "display":  "シャワーズ",
@@ -279,7 +510,8 @@
         "file":  "vaporeon.png"
     },
     {
-        "id":  "135_サンダース",
+        "id":  "135_サンダース_jolteon.png",
+        "originalId":  "135_サンダース",
         "no":  "135",
         "name":  "サンダース",
         "display":  "サンダース",
@@ -288,7 +520,8 @@
         "file":  "jolteon.png"
     },
     {
-        "id":  "136_ブースター",
+        "id":  "136_ブースター_flareon.png",
+        "originalId":  "136_ブースター",
         "no":  "136",
         "name":  "ブースター",
         "display":  "ブースター",
@@ -297,7 +530,8 @@
         "file":  "flareon.png"
     },
     {
-        "id":  "142_プテラ",
+        "id":  "142_プテラ_aerodactyl.png",
+        "originalId":  "142_プテラ",
         "no":  "142",
         "name":  "プテラ",
         "display":  "プテラ",
@@ -306,7 +540,8 @@
         "file":  "aerodactyl.png"
     },
     {
-        "id":  "143_カビゴン",
+        "id":  "143_カビゴン_snorlax.png",
+        "originalId":  "143_カビゴン",
         "no":  "143",
         "name":  "カビゴン",
         "display":  "カビゴン",
@@ -315,7 +550,8 @@
         "file":  "snorlax.png"
     },
     {
-        "id":  "149_カイリュー",
+        "id":  "149_カイリュー_dragonite.png",
+        "originalId":  "149_カイリュー",
         "no":  "149",
         "name":  "カイリュー",
         "display":  "カイリュー",
@@ -324,7 +560,8 @@
         "file":  "dragonite.png"
     },
     {
-        "id":  "154_メガニウム",
+        "id":  "154_メガニウム_meganium.png",
+        "originalId":  "154_メガニウム",
         "no":  "154",
         "name":  "メガニウム",
         "display":  "メガニウム",
@@ -333,7 +570,8 @@
         "file":  "meganium.png"
     },
     {
-        "id":  "157_バクフーン",
+        "id":  "157_バクフーン_typhlosion.png",
+        "originalId":  "157_バクフーン",
         "no":  "157",
         "name":  "バクフーン",
         "display":  "バクフーン",
@@ -342,7 +580,18 @@
         "file":  "typhlosion.png"
     },
     {
-        "id":  "157_バクフーン(ヒスイのすがた)",
+        "id":  "157_バクフーン_typhlosion-hisuian.png",
+        "originalId":  "157_バクフーン",
+        "no":  "157",
+        "name":  "バクフーン",
+        "display":  "バクフーン",
+        "t1":  "fire",
+        "t2":  "none",
+        "file":  "typhlosion-hisuian.png"
+    },
+    {
+        "id":  "157_バクフーン(ヒスイのすがた)_typhlosion.png",
+        "originalId":  "157_バクフーン(ヒスイのすがた)",
         "no":  "157",
         "name":  "バクフーン",
         "display":  "バクフーン(ヒスイのすがた)",
@@ -351,7 +600,18 @@
         "file":  "typhlosion.png"
     },
     {
-        "id":  "160_オーダイル",
+        "id":  "157_バクフーン(ヒスイのすがた)_typhlosion-hisuian.png",
+        "originalId":  "157_バクフーン(ヒスイのすがた)",
+        "no":  "157",
+        "name":  "バクフーン",
+        "display":  "バクフーン(ヒスイのすがた)",
+        "t1":  "fire",
+        "t2":  "ghost",
+        "file":  "typhlosion-hisuian.png"
+    },
+    {
+        "id":  "160_オーダイル_feraligatr.png",
+        "originalId":  "160_オーダイル",
         "no":  "160",
         "name":  "オーダイル",
         "display":  "オーダイル",
@@ -360,7 +620,8 @@
         "file":  "feraligatr.png"
     },
     {
-        "id":  "168_アリアドス",
+        "id":  "168_アリアドス_ariados.png",
+        "originalId":  "168_アリアドス",
         "no":  "168",
         "name":  "アリアドス",
         "display":  "アリアドス",
@@ -369,7 +630,8 @@
         "file":  "ariados.png"
     },
     {
-        "id":  "181_デンリュウ",
+        "id":  "181_デンリュウ_ampharos.png",
+        "originalId":  "181_デンリュウ",
         "no":  "181",
         "name":  "デンリュウ",
         "display":  "デンリュウ",
@@ -378,7 +640,8 @@
         "file":  "ampharos.png"
     },
     {
-        "id":  "184_マリルリ",
+        "id":  "184_マリルリ_azumarill.png",
+        "originalId":  "184_マリルリ",
         "no":  "184",
         "name":  "マリルリ",
         "display":  "マリルリ",
@@ -387,7 +650,8 @@
         "file":  "azumarill.png"
     },
     {
-        "id":  "186_ニョロトノ",
+        "id":  "186_ニョロトノ_politoed.png",
+        "originalId":  "186_ニョロトノ",
         "no":  "186",
         "name":  "ニョロトノ",
         "display":  "ニョロトノ",
@@ -396,7 +660,8 @@
         "file":  "politoed.png"
     },
     {
-        "id":  "196_エーフィ",
+        "id":  "196_エーフィ_espeon.png",
+        "originalId":  "196_エーフィ",
         "no":  "196",
         "name":  "エーフィ",
         "display":  "エーフィ",
@@ -405,7 +670,8 @@
         "file":  "espeon.png"
     },
     {
-        "id":  "197_ブラッキー",
+        "id":  "197_ブラッキー_umbreon.png",
+        "originalId":  "197_ブラッキー",
         "no":  "197",
         "name":  "ブラッキー",
         "display":  "ブラッキー",
@@ -414,7 +680,8 @@
         "file":  "umbreon.png"
     },
     {
-        "id":  "199_ヤドキング",
+        "id":  "199_ヤドキング_slowking.png",
+        "originalId":  "199_ヤドキング",
         "no":  "199",
         "name":  "ヤドキング",
         "display":  "ヤドキング",
@@ -423,7 +690,18 @@
         "file":  "slowking.png"
     },
     {
-        "id":  "199_ヤドキング(ガラルのすがた)",
+        "id":  "199_ヤドキング_slowking-galarian.png",
+        "originalId":  "199_ヤドキング",
+        "no":  "199",
+        "name":  "ヤドキング",
+        "display":  "ヤドキング",
+        "t1":  "water",
+        "t2":  "psychic",
+        "file":  "slowking-galarian.png"
+    },
+    {
+        "id":  "199_ヤドキング(ガラルのすがた)_slowking.png",
+        "originalId":  "199_ヤドキング(ガラルのすがた)",
         "no":  "199",
         "name":  "ヤドキング",
         "display":  "ヤドキング(ガラルのすがた)",
@@ -432,7 +710,18 @@
         "file":  "slowking.png"
     },
     {
-        "id":  "205_フォレトス",
+        "id":  "199_ヤドキング(ガラルのすがた)_slowking-galarian.png",
+        "originalId":  "199_ヤドキング(ガラルのすがた)",
+        "no":  "199",
+        "name":  "ヤドキング",
+        "display":  "ヤドキング(ガラルのすがた)",
+        "t1":  "poison",
+        "t2":  "psychic",
+        "file":  "slowking-galarian.png"
+    },
+    {
+        "id":  "205_フォレトス_forretress.png",
+        "originalId":  "205_フォレトス",
         "no":  "205",
         "name":  "フォレトス",
         "display":  "フォレトス",
@@ -441,7 +730,8 @@
         "file":  "forretress.png"
     },
     {
-        "id":  "208_ハガネール",
+        "id":  "208_ハガネール_steelix.png",
+        "originalId":  "208_ハガネール",
         "no":  "208",
         "name":  "ハガネール",
         "display":  "ハガネール",
@@ -450,7 +740,8 @@
         "file":  "steelix.png"
     },
     {
-        "id":  "211_ハリーセン",
+        "id":  "211_ハリーセン_qwilfish.png",
+        "originalId":  "211_ハリーセン",
         "no":  "211",
         "name":  "ハリーセン",
         "display":  "ハリーセン",
@@ -459,7 +750,18 @@
         "file":  "qwilfish.png"
     },
     {
-        "id":  "212_ハッサム",
+        "id":  "211_ハリーセン_qwilfish-hisuian.png",
+        "originalId":  "211_ハリーセン",
+        "no":  "211",
+        "name":  "ハリーセン",
+        "display":  "ハリーセン",
+        "t1":  "water",
+        "t2":  "poison",
+        "file":  "qwilfish-hisuian.png"
+    },
+    {
+        "id":  "212_ハッサム_scizor.png",
+        "originalId":  "212_ハッサム",
         "no":  "212",
         "name":  "ハッサム",
         "display":  "ハッサム",
@@ -468,7 +770,8 @@
         "file":  "scizor.png"
     },
     {
-        "id":  "214_ヘラクロス",
+        "id":  "214_ヘラクロス_heracross.png",
+        "originalId":  "214_ヘラクロス",
         "no":  "214",
         "name":  "ヘラクロス",
         "display":  "ヘラクロス",
@@ -477,7 +780,8 @@
         "file":  "heracross.png"
     },
     {
-        "id":  "227_エアームド",
+        "id":  "227_エアームド_skarmory.png",
+        "originalId":  "227_エアームド",
         "no":  "227",
         "name":  "エアームド",
         "display":  "エアームド",
@@ -486,7 +790,8 @@
         "file":  "skarmory.png"
     },
     {
-        "id":  "229_ヘルガー",
+        "id":  "229_ヘルガー_houndoom.png",
+        "originalId":  "229_ヘルガー",
         "no":  "229",
         "name":  "ヘルガー",
         "display":  "ヘルガー",
@@ -495,7 +800,8 @@
         "file":  "houndoom.png"
     },
     {
-        "id":  "248_バンギラス",
+        "id":  "248_バンギラス_tyranitar.png",
+        "originalId":  "248_バンギラス",
         "no":  "248",
         "name":  "バンギラス",
         "display":  "バンギラス",
@@ -504,7 +810,8 @@
         "file":  "tyranitar.png"
     },
     {
-        "id":  "254_ジュカイン",
+        "id":  "254_ジュカイン_sceptile.png",
+        "originalId":  "254_ジュカイン",
         "no":  "254",
         "name":  "ジュカイン",
         "display":  "ジュカイン",
@@ -513,7 +820,8 @@
         "file":  "sceptile.png"
     },
     {
-        "id":  "257_バシャーモ",
+        "id":  "257_バシャーモ_blaziken.png",
+        "originalId":  "257_バシャーモ",
         "no":  "257",
         "name":  "バシャーモ",
         "display":  "バシャーモ",
@@ -522,7 +830,8 @@
         "file":  "blaziken.png"
     },
     {
-        "id":  "260_ラグラージ",
+        "id":  "260_ラグラージ_swampert.png",
+        "originalId":  "260_ラグラージ",
         "no":  "260",
         "name":  "ラグラージ",
         "display":  "ラグラージ",
@@ -531,7 +840,8 @@
         "file":  "swampert.png"
     },
     {
-        "id":  "279_ペリッパー",
+        "id":  "279_ペリッパー_pelipper.png",
+        "originalId":  "279_ペリッパー",
         "no":  "279",
         "name":  "ペリッパー",
         "display":  "ペリッパー",
@@ -540,7 +850,8 @@
         "file":  "pelipper.png"
     },
     {
-        "id":  "282_サーナイト",
+        "id":  "282_サーナイト_gardevoir.png",
+        "originalId":  "282_サーナイト",
         "no":  "282",
         "name":  "サーナイト",
         "display":  "サーナイト",
@@ -549,7 +860,8 @@
         "file":  "gardevoir.png"
     },
     {
-        "id":  "302_ヤミラミ",
+        "id":  "302_ヤミラミ_sableye.png",
+        "originalId":  "302_ヤミラミ",
         "no":  "302",
         "name":  "ヤミラミ",
         "display":  "ヤミラミ",
@@ -558,7 +870,8 @@
         "file":  "sableye.png"
     },
     {
-        "id":  "303_クチート",
+        "id":  "303_クチート_mawile.png",
+        "originalId":  "303_クチート",
         "no":  "303",
         "name":  "クチート",
         "display":  "クチート",
@@ -567,7 +880,8 @@
         "file":  "mawile.png"
     },
     {
-        "id":  "306_ボスゴドラ",
+        "id":  "306_ボスゴドラ_aggron.png",
+        "originalId":  "306_ボスゴドラ",
         "no":  "306",
         "name":  "ボスゴドラ",
         "display":  "ボスゴドラ",
@@ -576,7 +890,8 @@
         "file":  "aggron.png"
     },
     {
-        "id":  "308_チャーレム",
+        "id":  "308_チャーレム_medicham.png",
+        "originalId":  "308_チャーレム",
         "no":  "308",
         "name":  "チャーレム",
         "display":  "チャーレム",
@@ -585,7 +900,8 @@
         "file":  "medicham.png"
     },
     {
-        "id":  "310_ライボルト",
+        "id":  "310_ライボルト_manectric.png",
+        "originalId":  "310_ライボルト",
         "no":  "310",
         "name":  "ライボルト",
         "display":  "ライボルト",
@@ -594,7 +910,8 @@
         "file":  "manectric.png"
     },
     {
-        "id":  "319_サメハダー",
+        "id":  "319_サメハダー_sharpedo.png",
+        "originalId":  "319_サメハダー",
         "no":  "319",
         "name":  "サメハダー",
         "display":  "サメハダー",
@@ -603,7 +920,8 @@
         "file":  "sharpedo.png"
     },
     {
-        "id":  "323_バクーダ",
+        "id":  "323_バクーダ_camerupt.png",
+        "originalId":  "323_バクーダ",
         "no":  "323",
         "name":  "バクーダ",
         "display":  "バクーダ",
@@ -612,7 +930,8 @@
         "file":  "camerupt.png"
     },
     {
-        "id":  "324_コータス",
+        "id":  "324_コータス_torkoal.png",
+        "originalId":  "324_コータス",
         "no":  "324",
         "name":  "コータス",
         "display":  "コータス",
@@ -621,7 +940,8 @@
         "file":  "torkoal.png"
     },
     {
-        "id":  "334_チルタリス",
+        "id":  "334_チルタリス_altaria.png",
+        "originalId":  "334_チルタリス",
         "no":  "334",
         "name":  "チルタリス",
         "display":  "チルタリス",
@@ -630,7 +950,8 @@
         "file":  "altaria.png"
     },
     {
-        "id":  "350_ミロカロス",
+        "id":  "350_ミロカロス_milotic.png",
+        "originalId":  "350_ミロカロス",
         "no":  "350",
         "name":  "ミロカロス",
         "display":  "ミロカロス",
@@ -639,7 +960,8 @@
         "file":  "milotic.png"
     },
     {
-        "id":  "351_ポワルン(ポワルンのすがた)",
+        "id":  "351_ポワルン(ポワルンのすがた)_castform.png",
+        "originalId":  "351_ポワルン(ポワルンのすがた)",
         "no":  "351",
         "name":  "ポワルン",
         "display":  "ポワルン(ポワルンのすがた)",
@@ -648,7 +970,8 @@
         "file":  "castform.png"
     },
     {
-        "id":  "351_ポワルン(たいようのすがた)",
+        "id":  "351_ポワルン(たいようのすがた)_castform.png",
+        "originalId":  "351_ポワルン(たいようのすがた)",
         "no":  "351",
         "name":  "ポワルン",
         "display":  "ポワルン(たいようのすがた)",
@@ -657,7 +980,8 @@
         "file":  "castform.png"
     },
     {
-        "id":  "351_ポワルン(あまみずのすがた)",
+        "id":  "351_ポワルン(あまみずのすがた)_castform.png",
+        "originalId":  "351_ポワルン(あまみずのすがた)",
         "no":  "351",
         "name":  "ポワルン",
         "display":  "ポワルン(あまみずのすがた)",
@@ -666,7 +990,8 @@
         "file":  "castform.png"
     },
     {
-        "id":  "351_ポワルン(ゆきぐものすがた)",
+        "id":  "351_ポワルン(ゆきぐものすがた)_castform.png",
+        "originalId":  "351_ポワルン(ゆきぐものすがた)",
         "no":  "351",
         "name":  "ポワルン",
         "display":  "ポワルン(ゆきぐものすがた)",
@@ -675,7 +1000,8 @@
         "file":  "castform.png"
     },
     {
-        "id":  "354_ジュペッタ",
+        "id":  "354_ジュペッタ_banette.png",
+        "originalId":  "354_ジュペッタ",
         "no":  "354",
         "name":  "ジュペッタ",
         "display":  "ジュペッタ",
@@ -684,7 +1010,8 @@
         "file":  "banette.png"
     },
     {
-        "id":  "358_チリーン",
+        "id":  "358_チリーン_chimecho.png",
+        "originalId":  "358_チリーン",
         "no":  "358",
         "name":  "チリーン",
         "display":  "チリーン",
@@ -693,7 +1020,8 @@
         "file":  "chimecho.png"
     },
     {
-        "id":  "359_アブソル",
+        "id":  "359_アブソル_absol.png",
+        "originalId":  "359_アブソル",
         "no":  "359",
         "name":  "アブソル",
         "display":  "アブソル",
@@ -702,7 +1030,8 @@
         "file":  "absol.png"
     },
     {
-        "id":  "362_オニゴーリ",
+        "id":  "362_オニゴーリ_glalie.png",
+        "originalId":  "362_オニゴーリ",
         "no":  "362",
         "name":  "オニゴーリ",
         "display":  "オニゴーリ",
@@ -711,7 +1040,8 @@
         "file":  "glalie.png"
     },
     {
-        "id":  "376_メタグロス",
+        "id":  "376_メタグロス_metagross.png",
+        "originalId":  "376_メタグロス",
         "no":  "376",
         "name":  "メタグロス",
         "display":  "メタグロス",
@@ -720,7 +1050,8 @@
         "file":  "metagross.png"
     },
     {
-        "id":  "389_ドダイトス",
+        "id":  "389_ドダイトス_torterra.png",
+        "originalId":  "389_ドダイトス",
         "no":  "389",
         "name":  "ドダイトス",
         "display":  "ドダイトス",
@@ -729,7 +1060,8 @@
         "file":  "torterra.png"
     },
     {
-        "id":  "392_ゴウカザル",
+        "id":  "392_ゴウカザル_infernape.png",
+        "originalId":  "392_ゴウカザル",
         "no":  "392",
         "name":  "ゴウカザル",
         "display":  "ゴウカザル",
@@ -738,7 +1070,8 @@
         "file":  "infernape.png"
     },
     {
-        "id":  "395_エンペルト",
+        "id":  "395_エンペルト_empoleon.png",
+        "originalId":  "395_エンペルト",
         "no":  "395",
         "name":  "エンペルト",
         "display":  "エンペルト",
@@ -747,7 +1080,8 @@
         "file":  "empoleon.png"
     },
     {
-        "id":  "398_ムクホーク",
+        "id":  "398_ムクホーク_staraptor.png",
+        "originalId":  "398_ムクホーク",
         "no":  "398",
         "name":  "ムクホーク",
         "display":  "ムクホーク",
@@ -756,7 +1090,8 @@
         "file":  "staraptor.png"
     },
     {
-        "id":  "405_レントラー",
+        "id":  "405_レントラー_luxray.png",
+        "originalId":  "405_レントラー",
         "no":  "405",
         "name":  "レントラー",
         "display":  "レントラー",
@@ -765,7 +1100,8 @@
         "file":  "luxray.png"
     },
     {
-        "id":  "407_ロズレイド",
+        "id":  "407_ロズレイド_roserade.png",
+        "originalId":  "407_ロズレイド",
         "no":  "407",
         "name":  "ロズレイド",
         "display":  "ロズレイド",
@@ -774,7 +1110,8 @@
         "file":  "roserade.png"
     },
     {
-        "id":  "409_ラムパルド",
+        "id":  "409_ラムパルド_rampardos.png",
+        "originalId":  "409_ラムパルド",
         "no":  "409",
         "name":  "ラムパルド",
         "display":  "ラムパルド",
@@ -783,7 +1120,8 @@
         "file":  "rampardos.png"
     },
     {
-        "id":  "411_トリデプス",
+        "id":  "411_トリデプス_bastiodon.png",
+        "originalId":  "411_トリデプス",
         "no":  "411",
         "name":  "トリデプス",
         "display":  "トリデプス",
@@ -792,7 +1130,8 @@
         "file":  "bastiodon.png"
     },
     {
-        "id":  "428_ミミロップ",
+        "id":  "428_ミミロップ_lopunny.png",
+        "originalId":  "428_ミミロップ",
         "no":  "428",
         "name":  "ミミロップ",
         "display":  "ミミロップ",
@@ -801,7 +1140,8 @@
         "file":  "lopunny.png"
     },
     {
-        "id":  "442_ミカルゲ",
+        "id":  "442_ミカルゲ_spiritomb.png",
+        "originalId":  "442_ミカルゲ",
         "no":  "442",
         "name":  "ミカルゲ",
         "display":  "ミカルゲ",
@@ -810,7 +1150,8 @@
         "file":  "spiritomb.png"
     },
     {
-        "id":  "445_ガブリアス",
+        "id":  "445_ガブリアス_garchomp.png",
+        "originalId":  "445_ガブリアス",
         "no":  "445",
         "name":  "ガブリアス",
         "display":  "ガブリアス",
@@ -819,7 +1160,8 @@
         "file":  "garchomp.png"
     },
     {
-        "id":  "448_ルカリオ",
+        "id":  "448_ルカリオ_lucario.png",
+        "originalId":  "448_ルカリオ",
         "no":  "448",
         "name":  "ルカリオ",
         "display":  "ルカリオ",
@@ -828,16 +1170,28 @@
         "file":  "lucario.png"
     },
     {
-        "id":  "450_カバルドン",
+        "id":  "450_カバルドン_hippowdon-male.png",
+        "originalId":  "450_カバルドン",
         "no":  "450",
         "name":  "カバルドン",
         "display":  "カバルドン",
         "t1":  "ground",
         "t2":  "none",
-        "file":  "hippowdon.png"
+        "file":  "hippowdon-male.png"
     },
     {
-        "id":  "454_ドクロッグ",
+        "id":  "450_カバルドン_hippowdon-female.png",
+        "originalId":  "450_カバルドン",
+        "no":  "450",
+        "name":  "カバルドン",
+        "display":  "カバルドン",
+        "t1":  "ground",
+        "t2":  "none",
+        "file":  "hippowdon-female.png"
+    },
+    {
+        "id":  "454_ドクロッグ_toxicroak.png",
+        "originalId":  "454_ドクロッグ",
         "no":  "454",
         "name":  "ドクロッグ",
         "display":  "ドクロッグ",
@@ -846,7 +1200,8 @@
         "file":  "toxicroak.png"
     },
     {
-        "id":  "460_ユキノオー",
+        "id":  "460_ユキノオー_abomasnow.png",
+        "originalId":  "460_ユキノオー",
         "no":  "460",
         "name":  "ユキノオー",
         "display":  "ユキノオー",
@@ -855,7 +1210,8 @@
         "file":  "abomasnow.png"
     },
     {
-        "id":  "461_マニューラ",
+        "id":  "461_マニューラ_weavile.png",
+        "originalId":  "461_マニューラ",
         "no":  "461",
         "name":  "マニューラ",
         "display":  "マニューラ",
@@ -864,7 +1220,8 @@
         "file":  "weavile.png"
     },
     {
-        "id":  "464_ドサイドン",
+        "id":  "464_ドサイドン_rhyperior.png",
+        "originalId":  "464_ドサイドン",
         "no":  "464",
         "name":  "ドサイドン",
         "display":  "ドサイドン",
@@ -873,7 +1230,8 @@
         "file":  "rhyperior.png"
     },
     {
-        "id":  "470_リーフィア",
+        "id":  "470_リーフィア_leafeon.png",
+        "originalId":  "470_リーフィア",
         "no":  "470",
         "name":  "リーフィア",
         "display":  "リーフィア",
@@ -882,7 +1240,8 @@
         "file":  "leafeon.png"
     },
     {
-        "id":  "471_グレイシア",
+        "id":  "471_グレイシア_glaceon.png",
+        "originalId":  "471_グレイシア",
         "no":  "471",
         "name":  "グレイシア",
         "display":  "グレイシア",
@@ -891,7 +1250,8 @@
         "file":  "glaceon.png"
     },
     {
-        "id":  "472_グライオン",
+        "id":  "472_グライオン_gliscor.png",
+        "originalId":  "472_グライオン",
         "no":  "472",
         "name":  "グライオン",
         "display":  "グライオン",
@@ -900,7 +1260,8 @@
         "file":  "gliscor.png"
     },
     {
-        "id":  "473_マンムー",
+        "id":  "473_マンムー_mamoswine.png",
+        "originalId":  "473_マンムー",
         "no":  "473",
         "name":  "マンムー",
         "display":  "マンムー",
@@ -909,7 +1270,8 @@
         "file":  "mamoswine.png"
     },
     {
-        "id":  "475_エルレイド",
+        "id":  "475_エルレイド_gallade.png",
+        "originalId":  "475_エルレイド",
         "no":  "475",
         "name":  "エルレイド",
         "display":  "エルレイド",
@@ -918,7 +1280,8 @@
         "file":  "gallade.png"
     },
     {
-        "id":  "478_ユキメノコ",
+        "id":  "478_ユキメノコ_froslass.png",
+        "originalId":  "478_ユキメノコ",
         "no":  "478",
         "name":  "ユキメノコ",
         "display":  "ユキメノコ",
@@ -927,7 +1290,8 @@
         "file":  "froslass.png"
     },
     {
-        "id":  "479_ロトム(ロトムのすがた)",
+        "id":  "479_ロトム(ロトムのすがた)_rotom.png",
+        "originalId":  "479_ロトム(ロトムのすがた)",
         "no":  "479",
         "name":  "ロトム",
         "display":  "ロトム(ロトムのすがた)",
@@ -936,7 +1300,58 @@
         "file":  "rotom.png"
     },
     {
-        "id":  "479_ロトム(ヒートロトム)",
+        "id":  "479_ロトム(ロトムのすがた)_heat-rotom.png",
+        "originalId":  "479_ロトム(ロトムのすがた)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(ロトムのすがた)",
+        "t1":  "electric",
+        "t2":  "ghost",
+        "file":  "heat-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(ロトムのすがた)_wash-rotom.png",
+        "originalId":  "479_ロトム(ロトムのすがた)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(ロトムのすがた)",
+        "t1":  "electric",
+        "t2":  "ghost",
+        "file":  "wash-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(ロトムのすがた)_frost-rotom.png",
+        "originalId":  "479_ロトム(ロトムのすがた)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(ロトムのすがた)",
+        "t1":  "electric",
+        "t2":  "ghost",
+        "file":  "frost-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(ロトムのすがた)_fan-rotom.png",
+        "originalId":  "479_ロトム(ロトムのすがた)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(ロトムのすがた)",
+        "t1":  "electric",
+        "t2":  "ghost",
+        "file":  "fan-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(ロトムのすがた)_mow-rotom.png",
+        "originalId":  "479_ロトム(ロトムのすがた)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(ロトムのすがた)",
+        "t1":  "electric",
+        "t2":  "ghost",
+        "file":  "mow-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(ヒートロトム)_rotom.png",
+        "originalId":  "479_ロトム(ヒートロトム)",
         "no":  "479",
         "name":  "ロトム",
         "display":  "ロトム(ヒートロトム)",
@@ -945,7 +1360,58 @@
         "file":  "rotom.png"
     },
     {
-        "id":  "479_ロトム(ウォッシュロトム)",
+        "id":  "479_ロトム(ヒートロトム)_heat-rotom.png",
+        "originalId":  "479_ロトム(ヒートロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(ヒートロトム)",
+        "t1":  "electric",
+        "t2":  "fire",
+        "file":  "heat-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(ヒートロトム)_wash-rotom.png",
+        "originalId":  "479_ロトム(ヒートロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(ヒートロトム)",
+        "t1":  "electric",
+        "t2":  "fire",
+        "file":  "wash-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(ヒートロトム)_frost-rotom.png",
+        "originalId":  "479_ロトム(ヒートロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(ヒートロトム)",
+        "t1":  "electric",
+        "t2":  "fire",
+        "file":  "frost-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(ヒートロトム)_fan-rotom.png",
+        "originalId":  "479_ロトム(ヒートロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(ヒートロトム)",
+        "t1":  "electric",
+        "t2":  "fire",
+        "file":  "fan-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(ヒートロトム)_mow-rotom.png",
+        "originalId":  "479_ロトム(ヒートロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(ヒートロトム)",
+        "t1":  "electric",
+        "t2":  "fire",
+        "file":  "mow-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(ウォッシュロトム)_rotom.png",
+        "originalId":  "479_ロトム(ウォッシュロトム)",
         "no":  "479",
         "name":  "ロトム",
         "display":  "ロトム(ウォッシュロトム)",
@@ -954,7 +1420,58 @@
         "file":  "rotom.png"
     },
     {
-        "id":  "479_ロトム(フロストロトム)",
+        "id":  "479_ロトム(ウォッシュロトム)_heat-rotom.png",
+        "originalId":  "479_ロトム(ウォッシュロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(ウォッシュロトム)",
+        "t1":  "electric",
+        "t2":  "water",
+        "file":  "heat-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(ウォッシュロトム)_wash-rotom.png",
+        "originalId":  "479_ロトム(ウォッシュロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(ウォッシュロトム)",
+        "t1":  "electric",
+        "t2":  "water",
+        "file":  "wash-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(ウォッシュロトム)_frost-rotom.png",
+        "originalId":  "479_ロトム(ウォッシュロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(ウォッシュロトム)",
+        "t1":  "electric",
+        "t2":  "water",
+        "file":  "frost-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(ウォッシュロトム)_fan-rotom.png",
+        "originalId":  "479_ロトム(ウォッシュロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(ウォッシュロトム)",
+        "t1":  "electric",
+        "t2":  "water",
+        "file":  "fan-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(ウォッシュロトム)_mow-rotom.png",
+        "originalId":  "479_ロトム(ウォッシュロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(ウォッシュロトム)",
+        "t1":  "electric",
+        "t2":  "water",
+        "file":  "mow-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(フロストロトム)_rotom.png",
+        "originalId":  "479_ロトム(フロストロトム)",
         "no":  "479",
         "name":  "ロトム",
         "display":  "ロトム(フロストロトム)",
@@ -963,7 +1480,58 @@
         "file":  "rotom.png"
     },
     {
-        "id":  "479_ロトム(スピンロトム)",
+        "id":  "479_ロトム(フロストロトム)_heat-rotom.png",
+        "originalId":  "479_ロトム(フロストロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(フロストロトム)",
+        "t1":  "electric",
+        "t2":  "ice",
+        "file":  "heat-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(フロストロトム)_wash-rotom.png",
+        "originalId":  "479_ロトム(フロストロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(フロストロトム)",
+        "t1":  "electric",
+        "t2":  "ice",
+        "file":  "wash-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(フロストロトム)_frost-rotom.png",
+        "originalId":  "479_ロトム(フロストロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(フロストロトム)",
+        "t1":  "electric",
+        "t2":  "ice",
+        "file":  "frost-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(フロストロトム)_fan-rotom.png",
+        "originalId":  "479_ロトム(フロストロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(フロストロトム)",
+        "t1":  "electric",
+        "t2":  "ice",
+        "file":  "fan-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(フロストロトム)_mow-rotom.png",
+        "originalId":  "479_ロトム(フロストロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(フロストロトム)",
+        "t1":  "electric",
+        "t2":  "ice",
+        "file":  "mow-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(スピンロトム)_rotom.png",
+        "originalId":  "479_ロトム(スピンロトム)",
         "no":  "479",
         "name":  "ロトム",
         "display":  "ロトム(スピンロトム)",
@@ -972,7 +1540,58 @@
         "file":  "rotom.png"
     },
     {
-        "id":  "479_ロトム(カットロトム)",
+        "id":  "479_ロトム(スピンロトム)_heat-rotom.png",
+        "originalId":  "479_ロトム(スピンロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(スピンロトム)",
+        "t1":  "electric",
+        "t2":  "flying",
+        "file":  "heat-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(スピンロトム)_wash-rotom.png",
+        "originalId":  "479_ロトム(スピンロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(スピンロトム)",
+        "t1":  "electric",
+        "t2":  "flying",
+        "file":  "wash-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(スピンロトム)_frost-rotom.png",
+        "originalId":  "479_ロトム(スピンロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(スピンロトム)",
+        "t1":  "electric",
+        "t2":  "flying",
+        "file":  "frost-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(スピンロトム)_fan-rotom.png",
+        "originalId":  "479_ロトム(スピンロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(スピンロトム)",
+        "t1":  "electric",
+        "t2":  "flying",
+        "file":  "fan-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(スピンロトム)_mow-rotom.png",
+        "originalId":  "479_ロトム(スピンロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(スピンロトム)",
+        "t1":  "electric",
+        "t2":  "flying",
+        "file":  "mow-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(カットロトム)_rotom.png",
+        "originalId":  "479_ロトム(カットロトム)",
         "no":  "479",
         "name":  "ロトム",
         "display":  "ロトム(カットロトム)",
@@ -981,7 +1600,58 @@
         "file":  "rotom.png"
     },
     {
-        "id":  "497_ジャローダ",
+        "id":  "479_ロトム(カットロトム)_heat-rotom.png",
+        "originalId":  "479_ロトム(カットロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(カットロトム)",
+        "t1":  "electric",
+        "t2":  "grass",
+        "file":  "heat-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(カットロトム)_wash-rotom.png",
+        "originalId":  "479_ロトム(カットロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(カットロトム)",
+        "t1":  "electric",
+        "t2":  "grass",
+        "file":  "wash-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(カットロトム)_frost-rotom.png",
+        "originalId":  "479_ロトム(カットロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(カットロトム)",
+        "t1":  "electric",
+        "t2":  "grass",
+        "file":  "frost-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(カットロトム)_fan-rotom.png",
+        "originalId":  "479_ロトム(カットロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(カットロトム)",
+        "t1":  "electric",
+        "t2":  "grass",
+        "file":  "fan-rotom.png"
+    },
+    {
+        "id":  "479_ロトム(カットロトム)_mow-rotom.png",
+        "originalId":  "479_ロトム(カットロトム)",
+        "no":  "479",
+        "name":  "ロトム",
+        "display":  "ロトム(カットロトム)",
+        "t1":  "electric",
+        "t2":  "grass",
+        "file":  "mow-rotom.png"
+    },
+    {
+        "id":  "497_ジャローダ_serperior.png",
+        "originalId":  "497_ジャローダ",
         "no":  "497",
         "name":  "ジャローダ",
         "display":  "ジャローダ",
@@ -990,7 +1660,8 @@
         "file":  "serperior.png"
     },
     {
-        "id":  "500_エンブオー",
+        "id":  "500_エンブオー_emboar.png",
+        "originalId":  "500_エンブオー",
         "no":  "500",
         "name":  "エンブオー",
         "display":  "エンブオー",
@@ -999,7 +1670,8 @@
         "file":  "emboar.png"
     },
     {
-        "id":  "503_ダイケンキ",
+        "id":  "503_ダイケンキ_samurott.png",
+        "originalId":  "503_ダイケンキ",
         "no":  "503",
         "name":  "ダイケンキ",
         "display":  "ダイケンキ",
@@ -1008,7 +1680,18 @@
         "file":  "samurott.png"
     },
     {
-        "id":  "503_ダイケンキ(ヒスイのすがた)",
+        "id":  "503_ダイケンキ_samurott-hisuian.png",
+        "originalId":  "503_ダイケンキ",
+        "no":  "503",
+        "name":  "ダイケンキ",
+        "display":  "ダイケンキ",
+        "t1":  "water",
+        "t2":  "none",
+        "file":  "samurott-hisuian.png"
+    },
+    {
+        "id":  "503_ダイケンキ(ヒスイのすがた)_samurott.png",
+        "originalId":  "503_ダイケンキ(ヒスイのすがた)",
         "no":  "503",
         "name":  "ダイケンキ",
         "display":  "ダイケンキ(ヒスイのすがた)",
@@ -1017,7 +1700,18 @@
         "file":  "samurott.png"
     },
     {
-        "id":  "505_ミルホッグ",
+        "id":  "503_ダイケンキ(ヒスイのすがた)_samurott-hisuian.png",
+        "originalId":  "503_ダイケンキ(ヒスイのすがた)",
+        "no":  "503",
+        "name":  "ダイケンキ",
+        "display":  "ダイケンキ(ヒスイのすがた)",
+        "t1":  "water",
+        "t2":  "dark",
+        "file":  "samurott-hisuian.png"
+    },
+    {
+        "id":  "505_ミルホッグ_watchog.png",
+        "originalId":  "505_ミルホッグ",
         "no":  "505",
         "name":  "ミルホッグ",
         "display":  "ミルホッグ",
@@ -1026,7 +1720,8 @@
         "file":  "watchog.png"
     },
     {
-        "id":  "510_レパルダス",
+        "id":  "510_レパルダス_liepard.png",
+        "originalId":  "510_レパルダス",
         "no":  "510",
         "name":  "レパルダス",
         "display":  "レパルダス",
@@ -1035,7 +1730,8 @@
         "file":  "liepard.png"
     },
     {
-        "id":  "512_ヤナッキー",
+        "id":  "512_ヤナッキー_simisage.png",
+        "originalId":  "512_ヤナッキー",
         "no":  "512",
         "name":  "ヤナッキー",
         "display":  "ヤナッキー",
@@ -1044,7 +1740,8 @@
         "file":  "simisage.png"
     },
     {
-        "id":  "514_バオッキー",
+        "id":  "514_バオッキー_simisear.png",
+        "originalId":  "514_バオッキー",
         "no":  "514",
         "name":  "バオッキー",
         "display":  "バオッキー",
@@ -1053,7 +1750,8 @@
         "file":  "simisear.png"
     },
     {
-        "id":  "516_ヒヤッキー",
+        "id":  "516_ヒヤッキー_simipour.png",
+        "originalId":  "516_ヒヤッキー",
         "no":  "516",
         "name":  "ヒヤッキー",
         "display":  "ヒヤッキー",
@@ -1062,7 +1760,8 @@
         "file":  "simipour.png"
     },
     {
-        "id":  "518_ムシャーナ",
+        "id":  "518_ムシャーナ_musharna.png",
+        "originalId":  "518_ムシャーナ",
         "no":  "518",
         "name":  "ムシャーナ",
         "display":  "ムシャーナ",
@@ -1071,7 +1770,8 @@
         "file":  "musharna.png"
     },
     {
-        "id":  "530_ドリュウズ",
+        "id":  "530_ドリュウズ_excadrill.png",
+        "originalId":  "530_ドリュウズ",
         "no":  "530",
         "name":  "ドリュウズ",
         "display":  "ドリュウズ",
@@ -1080,7 +1780,8 @@
         "file":  "excadrill.png"
     },
     {
-        "id":  "531_タブンネ",
+        "id":  "531_タブンネ_audino.png",
+        "originalId":  "531_タブンネ",
         "no":  "531",
         "name":  "タブンネ",
         "display":  "タブンネ",
@@ -1089,7 +1790,8 @@
         "file":  "audino.png"
     },
     {
-        "id":  "534_ローブシン",
+        "id":  "534_ローブシン_conkeldurr.png",
+        "originalId":  "534_ローブシン",
         "no":  "534",
         "name":  "ローブシン",
         "display":  "ローブシン",
@@ -1098,7 +1800,8 @@
         "file":  "conkeldurr.png"
     },
     {
-        "id":  "545_ペンドラー",
+        "id":  "545_ペンドラー_scolipede.png",
+        "originalId":  "545_ペンドラー",
         "no":  "545",
         "name":  "ペンドラー",
         "display":  "ペンドラー",
@@ -1107,7 +1810,8 @@
         "file":  "scolipede.png"
     },
     {
-        "id":  "547_エルフーン",
+        "id":  "547_エルフーン_whimsicott.png",
+        "originalId":  "547_エルフーン",
         "no":  "547",
         "name":  "エルフーン",
         "display":  "エルフーン",
@@ -1116,7 +1820,8 @@
         "file":  "whimsicott.png"
     },
     {
-        "id":  "553_ワルビアル",
+        "id":  "553_ワルビアル_krookodile.png",
+        "originalId":  "553_ワルビアル",
         "no":  "553",
         "name":  "ワルビアル",
         "display":  "ワルビアル",
@@ -1125,7 +1830,8 @@
         "file":  "krookodile.png"
     },
     {
-        "id":  "560_ズルズキン",
+        "id":  "560_ズルズキン_scrafty.png",
+        "originalId":  "560_ズルズキン",
         "no":  "560",
         "name":  "ズルズキン",
         "display":  "ズルズキン",
@@ -1134,7 +1840,8 @@
         "file":  "scrafty.png"
     },
     {
-        "id":  "563_デスカーン",
+        "id":  "563_デスカーン_cofagrigus.png",
+        "originalId":  "563_デスカーン",
         "no":  "563",
         "name":  "デスカーン",
         "display":  "デスカーン",
@@ -1143,7 +1850,8 @@
         "file":  "cofagrigus.png"
     },
     {
-        "id":  "569_ダストダス",
+        "id":  "569_ダストダス_garbodor.png",
+        "originalId":  "569_ダストダス",
         "no":  "569",
         "name":  "ダストダス",
         "display":  "ダストダス",
@@ -1152,7 +1860,8 @@
         "file":  "garbodor.png"
     },
     {
-        "id":  "571_ゾロアーク",
+        "id":  "571_ゾロアーク_zoroark.png",
+        "originalId":  "571_ゾロアーク",
         "no":  "571",
         "name":  "ゾロアーク",
         "display":  "ゾロアーク",
@@ -1161,7 +1870,18 @@
         "file":  "zoroark.png"
     },
     {
-        "id":  "571_ゾロアーク(ヒスイのすがた)",
+        "id":  "571_ゾロアーク_hisuian-zoroark.png",
+        "originalId":  "571_ゾロアーク",
+        "no":  "571",
+        "name":  "ゾロアーク",
+        "display":  "ゾロアーク",
+        "t1":  "dark",
+        "t2":  "none",
+        "file":  "hisuian-zoroark.png"
+    },
+    {
+        "id":  "571_ゾロアーク(ヒスイのすがた)_zoroark.png",
+        "originalId":  "571_ゾロアーク(ヒスイのすがた)",
         "no":  "571",
         "name":  "ゾロアーク",
         "display":  "ゾロアーク(ヒスイのすがた)",
@@ -1170,7 +1890,18 @@
         "file":  "zoroark.png"
     },
     {
-        "id":  "579_ランクルス",
+        "id":  "571_ゾロアーク(ヒスイのすがた)_hisuian-zoroark.png",
+        "originalId":  "571_ゾロアーク(ヒスイのすがた)",
+        "no":  "571",
+        "name":  "ゾロアーク",
+        "display":  "ゾロアーク(ヒスイのすがた)",
+        "t1":  "normal",
+        "t2":  "ghost",
+        "file":  "hisuian-zoroark.png"
+    },
+    {
+        "id":  "579_ランクルス_reuniclus.png",
+        "originalId":  "579_ランクルス",
         "no":  "579",
         "name":  "ランクルス",
         "display":  "ランクルス",
@@ -1179,7 +1910,8 @@
         "file":  "reuniclus.png"
     },
     {
-        "id":  "584_バイバニラ",
+        "id":  "584_バイバニラ_vanilluxe.png",
+        "originalId":  "584_バイバニラ",
         "no":  "584",
         "name":  "バイバニラ",
         "display":  "バイバニラ",
@@ -1188,7 +1920,8 @@
         "file":  "vanilluxe.png"
     },
     {
-        "id":  "587_エモンガ",
+        "id":  "587_エモンガ_emolga.png",
+        "originalId":  "587_エモンガ",
         "no":  "587",
         "name":  "エモンガ",
         "display":  "エモンガ",
@@ -1197,7 +1930,8 @@
         "file":  "emolga.png"
     },
     {
-        "id":  "604_シビルドン",
+        "id":  "604_シビルドン_eelektross.png",
+        "originalId":  "604_シビルドン",
         "no":  "604",
         "name":  "シビルドン",
         "display":  "シビルドン",
@@ -1206,7 +1940,8 @@
         "file":  "eelektross.png"
     },
     {
-        "id":  "609_シャンデラ",
+        "id":  "609_シャンデラ_chandelure.png",
+        "originalId":  "609_シャンデラ",
         "no":  "609",
         "name":  "シャンデラ",
         "display":  "シャンデラ",
@@ -1215,7 +1950,8 @@
         "file":  "chandelure.png"
     },
     {
-        "id":  "614_ツンベアー",
+        "id":  "614_ツンベアー_beartic.png",
+        "originalId":  "614_ツンベアー",
         "no":  "614",
         "name":  "ツンベアー",
         "display":  "ツンベアー",
@@ -1224,7 +1960,8 @@
         "file":  "beartic.png"
     },
     {
-        "id":  "618_マッギョ",
+        "id":  "618_マッギョ_stunfisk.png",
+        "originalId":  "618_マッギョ",
         "no":  "618",
         "name":  "マッギョ",
         "display":  "マッギョ",
@@ -1233,7 +1970,8 @@
         "file":  "stunfisk.png"
     },
     {
-        "id":  "618_マッギョ(ガラルのすがた)",
+        "id":  "618_マッギョ(ガラルのすがた)_stunfisk.png",
+        "originalId":  "618_マッギョ(ガラルのすがた)",
         "no":  "618",
         "name":  "マッギョ",
         "display":  "マッギョ(ガラルのすがた)",
@@ -1242,7 +1980,8 @@
         "file":  "stunfisk.png"
     },
     {
-        "id":  "623_ゴルーグ",
+        "id":  "623_ゴルーグ_golurk.png",
+        "originalId":  "623_ゴルーグ",
         "no":  "623",
         "name":  "ゴルーグ",
         "display":  "ゴルーグ",
@@ -1251,7 +1990,8 @@
         "file":  "golurk.png"
     },
     {
-        "id":  "635_サザンドラ",
+        "id":  "635_サザンドラ_hydreigon.png",
+        "originalId":  "635_サザンドラ",
         "no":  "635",
         "name":  "サザンドラ",
         "display":  "サザンドラ",
@@ -1260,7 +2000,8 @@
         "file":  "hydreigon.png"
     },
     {
-        "id":  "637_ウルガモス",
+        "id":  "637_ウルガモス_volcarona.png",
+        "originalId":  "637_ウルガモス",
         "no":  "637",
         "name":  "ウルガモス",
         "display":  "ウルガモス",
@@ -1269,7 +2010,8 @@
         "file":  "volcarona.png"
     },
     {
-        "id":  "652_ブリガロン",
+        "id":  "652_ブリガロン_chesnaught.png",
+        "originalId":  "652_ブリガロン",
         "no":  "652",
         "name":  "ブリガロン",
         "display":  "ブリガロン",
@@ -1278,7 +2020,8 @@
         "file":  "chesnaught.png"
     },
     {
-        "id":  "655_マフォクシー",
+        "id":  "655_マフォクシー_delphox.png",
+        "originalId":  "655_マフォクシー",
         "no":  "655",
         "name":  "マフォクシー",
         "display":  "マフォクシー",
@@ -1287,7 +2030,8 @@
         "file":  "delphox.png"
     },
     {
-        "id":  "658_ゲッコウガ",
+        "id":  "658_ゲッコウガ_greninja.png",
+        "originalId":  "658_ゲッコウガ",
         "no":  "658",
         "name":  "ゲッコウガ",
         "display":  "ゲッコウガ",
@@ -1296,7 +2040,8 @@
         "file":  "greninja.png"
     },
     {
-        "id":  "660_ホルード",
+        "id":  "660_ホルード_diggersby.png",
+        "originalId":  "660_ホルード",
         "no":  "660",
         "name":  "ホルード",
         "display":  "ホルード",
@@ -1305,7 +2050,8 @@
         "file":  "diggersby.png"
     },
     {
-        "id":  "663_ファイアロー",
+        "id":  "663_ファイアロー_talonflame.png",
+        "originalId":  "663_ファイアロー",
         "no":  "663",
         "name":  "ファイアロー",
         "display":  "ファイアロー",
@@ -1314,7 +2060,8 @@
         "file":  "talonflame.png"
     },
     {
-        "id":  "666_ビビヨン",
+        "id":  "666_ビビヨン_vivillon.png",
+        "originalId":  "666_ビビヨン",
         "no":  "666",
         "name":  "ビビヨン",
         "display":  "ビビヨン",
@@ -1323,7 +2070,8 @@
         "file":  "vivillon.png"
     },
     {
-        "id":  "666_ビビヨン(ファンシーなもよう)",
+        "id":  "666_ビビヨン(ファンシーなもよう)_vivillon.png",
+        "originalId":  "666_ビビヨン(ファンシーなもよう)",
         "no":  "666",
         "name":  "ビビヨン",
         "display":  "ビビヨン(ファンシーなもよう)",
@@ -1332,7 +2080,8 @@
         "file":  "vivillon.png"
     },
     {
-        "id":  "666_ビビヨン(Pokeball)",
+        "id":  "666_ビビヨン(Pokeball)_vivillon.png",
+        "originalId":  "666_ビビヨン(Pokeball)",
         "no":  "666",
         "name":  "ビビヨン",
         "display":  "ビビヨン(Pokeball)",
@@ -1341,16 +2090,38 @@
         "file":  "vivillon.png"
     },
     {
-        "id":  "668_カエンジシ",
+        "id":  "668_カエンジシ_pyroar-male.png",
+        "originalId":  "668_カエンジシ",
         "no":  "668",
         "name":  "カエンジシ",
         "display":  "カエンジシ",
         "t1":  "fire",
         "t2":  "normal",
-        "file":  "pyroar.png"
+        "file":  "pyroar-male.png"
     },
     {
-        "id":  "670_フラエッテ(えいえんのはな)",
+        "id":  "668_カエンジシ_pyroar-female.png",
+        "originalId":  "668_カエンジシ",
+        "no":  "668",
+        "name":  "カエンジシ",
+        "display":  "カエンジシ",
+        "t1":  "fire",
+        "t2":  "normal",
+        "file":  "pyroar-female.png"
+    },
+    {
+        "id":  "670_フラエッテ(えいえんのはな)_floette.png",
+        "originalId":  "670_フラエッテ(えいえんのはな)",
+        "no":  "670",
+        "name":  "フラエッテ",
+        "display":  "フラエッテ(えいえんのはな)",
+        "t1":  "fairy",
+        "t2":  "none",
+        "file":  "floette.png"
+    },
+    {
+        "id":  "670_フラエッテ(えいえんのはな)_floette-eternal.png",
+        "originalId":  "670_フラエッテ(えいえんのはな)",
         "no":  "670",
         "name":  "フラエッテ",
         "display":  "フラエッテ(えいえんのはな)",
@@ -1359,7 +2130,8 @@
         "file":  "floette-eternal.png"
     },
     {
-        "id":  "671_フラージェス",
+        "id":  "671_フラージェス_florges.png",
+        "originalId":  "671_フラージェス",
         "no":  "671",
         "name":  "フラージェス",
         "display":  "フラージェス",
@@ -1368,7 +2140,8 @@
         "file":  "florges.png"
     },
     {
-        "id":  "675_ゴロンダ",
+        "id":  "675_ゴロンダ_pangoro.png",
+        "originalId":  "675_ゴロンダ",
         "no":  "675",
         "name":  "ゴロンダ",
         "display":  "ゴロンダ",
@@ -1377,7 +2150,8 @@
         "file":  "pangoro.png"
     },
     {
-        "id":  "676_トリミアン",
+        "id":  "676_トリミアン_furfrou.png",
+        "originalId":  "676_トリミアン",
         "no":  "676",
         "name":  "トリミアン",
         "display":  "トリミアン",
@@ -1386,7 +2160,8 @@
         "file":  "furfrou.png"
     },
     {
-        "id":  "678_ニャオニクス(オスのすがた)",
+        "id":  "678_ニャオニクス(オスのすがた)_meowstic-male.png",
+        "originalId":  "678_ニャオニクス(オスのすがた)",
         "no":  "678",
         "name":  "ニャオニクス",
         "display":  "ニャオニクス(オスのすがた)",
@@ -1395,7 +2170,28 @@
         "file":  "meowstic-male.png"
     },
     {
-        "id":  "678_ニャオニクス(メスのすがた)",
+        "id":  "678_ニャオニクス(オスのすがた)_meowstic-female.png",
+        "originalId":  "678_ニャオニクス(オスのすがた)",
+        "no":  "678",
+        "name":  "ニャオニクス",
+        "display":  "ニャオニクス(オスのすがた)",
+        "t1":  "psychic",
+        "t2":  "none",
+        "file":  "meowstic-female.png"
+    },
+    {
+        "id":  "678_ニャオニクス(メスのすがた)_meowstic-male.png",
+        "originalId":  "678_ニャオニクス(メスのすがた)",
+        "no":  "678",
+        "name":  "ニャオニクス",
+        "display":  "ニャオニクス(メスのすがた)",
+        "t1":  "psychic",
+        "t2":  "none",
+        "file":  "meowstic-male.png"
+    },
+    {
+        "id":  "678_ニャオニクス(メスのすがた)_meowstic-female.png",
+        "originalId":  "678_ニャオニクス(メスのすがた)",
         "no":  "678",
         "name":  "ニャオニクス",
         "display":  "ニャオニクス(メスのすがた)",
@@ -1404,7 +2200,8 @@
         "file":  "meowstic-female.png"
     },
     {
-        "id":  "681_ギルガルド(シールドフォルム)",
+        "id":  "681_ギルガルド(シールドフォルム)_aegislash.png",
+        "originalId":  "681_ギルガルド(シールドフォルム)",
         "no":  "681",
         "name":  "ギルガルド",
         "display":  "ギルガルド(シールドフォルム)",
@@ -1413,7 +2210,8 @@
         "file":  "aegislash.png"
     },
     {
-        "id":  "681_ギルガルド(ブレードフォルム)",
+        "id":  "681_ギルガルド(ブレードフォルム)_aegislash.png",
+        "originalId":  "681_ギルガルド(ブレードフォルム)",
         "no":  "681",
         "name":  "ギルガルド",
         "display":  "ギルガルド(ブレードフォルム)",
@@ -1422,7 +2220,8 @@
         "file":  "aegislash.png"
     },
     {
-        "id":  "683_フレフワン",
+        "id":  "683_フレフワン_aromatisse.png",
+        "originalId":  "683_フレフワン",
         "no":  "683",
         "name":  "フレフワン",
         "display":  "フレフワン",
@@ -1431,7 +2230,8 @@
         "file":  "aromatisse.png"
     },
     {
-        "id":  "685_ペロリーム",
+        "id":  "685_ペロリーム_slurpuff.png",
+        "originalId":  "685_ペロリーム",
         "no":  "685",
         "name":  "ペロリーム",
         "display":  "ペロリーム",
@@ -1440,7 +2240,8 @@
         "file":  "slurpuff.png"
     },
     {
-        "id":  "687_カラマネロ",
+        "id":  "687_カラマネロ_malamar.png",
+        "originalId":  "687_カラマネロ",
         "no":  "687",
         "name":  "カラマネロ",
         "display":  "カラマネロ",
@@ -1449,7 +2250,8 @@
         "file":  "malamar.png"
     },
     {
-        "id":  "689_ガメノデス",
+        "id":  "689_ガメノデス_barbaracle.png",
+        "originalId":  "689_ガメノデス",
         "no":  "689",
         "name":  "ガメノデス",
         "display":  "ガメノデス",
@@ -1458,7 +2260,8 @@
         "file":  "barbaracle.png"
     },
     {
-        "id":  "691_ドラミドロ",
+        "id":  "691_ドラミドロ_dragalge.png",
+        "originalId":  "691_ドラミドロ",
         "no":  "691",
         "name":  "ドラミドロ",
         "display":  "ドラミドロ",
@@ -1467,7 +2270,8 @@
         "file":  "dragalge.png"
     },
     {
-        "id":  "693_ブロスター",
+        "id":  "693_ブロスター_clawitzer.png",
+        "originalId":  "693_ブロスター",
         "no":  "693",
         "name":  "ブロスター",
         "display":  "ブロスター",
@@ -1476,7 +2280,8 @@
         "file":  "clawitzer.png"
     },
     {
-        "id":  "695_エレザード",
+        "id":  "695_エレザード_heliolisk.png",
+        "originalId":  "695_エレザード",
         "no":  "695",
         "name":  "エレザード",
         "display":  "エレザード",
@@ -1485,7 +2290,8 @@
         "file":  "heliolisk.png"
     },
     {
-        "id":  "697_ガチゴラス",
+        "id":  "697_ガチゴラス_tyrantrum.png",
+        "originalId":  "697_ガチゴラス",
         "no":  "697",
         "name":  "ガチゴラス",
         "display":  "ガチゴラス",
@@ -1494,7 +2300,8 @@
         "file":  "tyrantrum.png"
     },
     {
-        "id":  "699_アマルルガ",
+        "id":  "699_アマルルガ_aurorus.png",
+        "originalId":  "699_アマルルガ",
         "no":  "699",
         "name":  "アマルルガ",
         "display":  "アマルルガ",
@@ -1503,7 +2310,8 @@
         "file":  "aurorus.png"
     },
     {
-        "id":  "700_ニンフィア",
+        "id":  "700_ニンフィア_sylveon.png",
+        "originalId":  "700_ニンフィア",
         "no":  "700",
         "name":  "ニンフィア",
         "display":  "ニンフィア",
@@ -1512,7 +2320,8 @@
         "file":  "sylveon.png"
     },
     {
-        "id":  "701_ルチャブル",
+        "id":  "701_ルチャブル_hawlucha.png",
+        "originalId":  "701_ルチャブル",
         "no":  "701",
         "name":  "ルチャブル",
         "display":  "ルチャブル",
@@ -1521,7 +2330,8 @@
         "file":  "hawlucha.png"
     },
     {
-        "id":  "702_デデンネ",
+        "id":  "702_デデンネ_dedenne.png",
+        "originalId":  "702_デデンネ",
         "no":  "702",
         "name":  "デデンネ",
         "display":  "デデンネ",
@@ -1530,7 +2340,8 @@
         "file":  "dedenne.png"
     },
     {
-        "id":  "706_ヌメルゴン",
+        "id":  "706_ヌメルゴン_goodra.png",
+        "originalId":  "706_ヌメルゴン",
         "no":  "706",
         "name":  "ヌメルゴン",
         "display":  "ヌメルゴン",
@@ -1539,7 +2350,18 @@
         "file":  "goodra.png"
     },
     {
-        "id":  "706_ヌメルゴン(ヒスイのすがた)",
+        "id":  "706_ヌメルゴン_goodra-hisuian.png",
+        "originalId":  "706_ヌメルゴン",
+        "no":  "706",
+        "name":  "ヌメルゴン",
+        "display":  "ヌメルゴン",
+        "t1":  "dragon",
+        "t2":  "none",
+        "file":  "goodra-hisuian.png"
+    },
+    {
+        "id":  "706_ヌメルゴン(ヒスイのすがた)_goodra.png",
+        "originalId":  "706_ヌメルゴン(ヒスイのすがた)",
         "no":  "706",
         "name":  "ヌメルゴン",
         "display":  "ヌメルゴン(ヒスイのすがた)",
@@ -1548,7 +2370,18 @@
         "file":  "goodra.png"
     },
     {
-        "id":  "707_クレッフィ",
+        "id":  "706_ヌメルゴン(ヒスイのすがた)_goodra-hisuian.png",
+        "originalId":  "706_ヌメルゴン(ヒスイのすがた)",
+        "no":  "706",
+        "name":  "ヌメルゴン",
+        "display":  "ヌメルゴン(ヒスイのすがた)",
+        "t1":  "steel",
+        "t2":  "dragon",
+        "file":  "goodra-hisuian.png"
+    },
+    {
+        "id":  "707_クレッフィ_klefki.png",
+        "originalId":  "707_クレッフィ",
         "no":  "707",
         "name":  "クレッフィ",
         "display":  "クレッフィ",
@@ -1557,7 +2390,8 @@
         "file":  "klefki.png"
     },
     {
-        "id":  "709_オーロット",
+        "id":  "709_オーロット_trevenant.png",
+        "originalId":  "709_オーロット",
         "no":  "709",
         "name":  "オーロット",
         "display":  "オーロット",
@@ -1566,7 +2400,8 @@
         "file":  "trevenant.png"
     },
     {
-        "id":  "711_パンプジン",
+        "id":  "711_パンプジン_gourgeist.png",
+        "originalId":  "711_パンプジン",
         "no":  "711",
         "name":  "パンプジン",
         "display":  "パンプジン",
@@ -1575,7 +2410,8 @@
         "file":  "gourgeist.png"
     },
     {
-        "id":  "711_パンプジン(ちいさいサイズ)",
+        "id":  "711_パンプジン(ちいさいサイズ)_gourgeist.png",
+        "originalId":  "711_パンプジン(ちいさいサイズ)",
         "no":  "711",
         "name":  "パンプジン",
         "display":  "パンプジン(ちいさいサイズ)",
@@ -1584,7 +2420,8 @@
         "file":  "gourgeist.png"
     },
     {
-        "id":  "711_パンプジン(おおきいサイズ)",
+        "id":  "711_パンプジン(おおきいサイズ)_gourgeist.png",
+        "originalId":  "711_パンプジン(おおきいサイズ)",
         "no":  "711",
         "name":  "パンプジン",
         "display":  "パンプジン(おおきいサイズ)",
@@ -1593,7 +2430,8 @@
         "file":  "gourgeist.png"
     },
     {
-        "id":  "711_パンプジン(とくだいサイズ)",
+        "id":  "711_パンプジン(とくだいサイズ)_gourgeist.png",
+        "originalId":  "711_パンプジン(とくだいサイズ)",
         "no":  "711",
         "name":  "パンプジン",
         "display":  "パンプジン(とくだいサイズ)",
@@ -1602,7 +2440,8 @@
         "file":  "gourgeist.png"
     },
     {
-        "id":  "713_クレベース",
+        "id":  "713_クレベース_avalugg.png",
+        "originalId":  "713_クレベース",
         "no":  "713",
         "name":  "クレベース",
         "display":  "クレベース",
@@ -1611,7 +2450,18 @@
         "file":  "avalugg.png"
     },
     {
-        "id":  "713_クレベース(ヒスイのすがた)",
+        "id":  "713_クレベース_avalugg-hisuian.png",
+        "originalId":  "713_クレベース",
+        "no":  "713",
+        "name":  "クレベース",
+        "display":  "クレベース",
+        "t1":  "ice",
+        "t2":  "none",
+        "file":  "avalugg-hisuian.png"
+    },
+    {
+        "id":  "713_クレベース(ヒスイのすがた)_avalugg.png",
+        "originalId":  "713_クレベース(ヒスイのすがた)",
         "no":  "713",
         "name":  "クレベース",
         "display":  "クレベース(ヒスイのすがた)",
@@ -1620,7 +2470,18 @@
         "file":  "avalugg.png"
     },
     {
-        "id":  "715_オンバーン",
+        "id":  "713_クレベース(ヒスイのすがた)_avalugg-hisuian.png",
+        "originalId":  "713_クレベース(ヒスイのすがた)",
+        "no":  "713",
+        "name":  "クレベース",
+        "display":  "クレベース(ヒスイのすがた)",
+        "t1":  "ice",
+        "t2":  "rock",
+        "file":  "avalugg-hisuian.png"
+    },
+    {
+        "id":  "715_オンバーン_noivern.png",
+        "originalId":  "715_オンバーン",
         "no":  "715",
         "name":  "オンバーン",
         "display":  "オンバーン",
@@ -1629,7 +2490,8 @@
         "file":  "noivern.png"
     },
     {
-        "id":  "724_ジュナイパー",
+        "id":  "724_ジュナイパー_decidueye.png",
+        "originalId":  "724_ジュナイパー",
         "no":  "724",
         "name":  "ジュナイパー",
         "display":  "ジュナイパー",
@@ -1638,7 +2500,18 @@
         "file":  "decidueye.png"
     },
     {
-        "id":  "724_ジュナイパー(ヒスイのすがた)",
+        "id":  "724_ジュナイパー_decidueye-hisuian.png",
+        "originalId":  "724_ジュナイパー",
+        "no":  "724",
+        "name":  "ジュナイパー",
+        "display":  "ジュナイパー",
+        "t1":  "grass",
+        "t2":  "ghost",
+        "file":  "decidueye-hisuian.png"
+    },
+    {
+        "id":  "724_ジュナイパー(ヒスイのすがた)_decidueye.png",
+        "originalId":  "724_ジュナイパー(ヒスイのすがた)",
         "no":  "724",
         "name":  "ジュナイパー",
         "display":  "ジュナイパー(ヒスイのすがた)",
@@ -1647,7 +2520,18 @@
         "file":  "decidueye.png"
     },
     {
-        "id":  "727_ガオガエン",
+        "id":  "724_ジュナイパー(ヒスイのすがた)_decidueye-hisuian.png",
+        "originalId":  "724_ジュナイパー(ヒスイのすがた)",
+        "no":  "724",
+        "name":  "ジュナイパー",
+        "display":  "ジュナイパー(ヒスイのすがた)",
+        "t1":  "grass",
+        "t2":  "fighting",
+        "file":  "decidueye-hisuian.png"
+    },
+    {
+        "id":  "727_ガオガエン_incineroar.png",
+        "originalId":  "727_ガオガエン",
         "no":  "727",
         "name":  "ガオガエン",
         "display":  "ガオガエン",
@@ -1656,7 +2540,8 @@
         "file":  "incineroar.png"
     },
     {
-        "id":  "730_アシレーヌ",
+        "id":  "730_アシレーヌ_primarina.png",
+        "originalId":  "730_アシレーヌ",
         "no":  "730",
         "name":  "アシレーヌ",
         "display":  "アシレーヌ",
@@ -1665,7 +2550,8 @@
         "file":  "primarina.png"
     },
     {
-        "id":  "733_ドデカバシ",
+        "id":  "733_ドデカバシ_toucannon.png",
+        "originalId":  "733_ドデカバシ",
         "no":  "733",
         "name":  "ドデカバシ",
         "display":  "ドデカバシ",
@@ -1674,7 +2560,8 @@
         "file":  "toucannon.png"
     },
     {
-        "id":  "740_ケケンカニ",
+        "id":  "740_ケケンカニ_crabominable.png",
+        "originalId":  "740_ケケンカニ",
         "no":  "740",
         "name":  "ケケンカニ",
         "display":  "ケケンカニ",
@@ -1683,7 +2570,8 @@
         "file":  "crabominable.png"
     },
     {
-        "id":  "745_ルガルガン(まひるのすがた)",
+        "id":  "745_ルガルガン(まひるのすがた)_lycanroc-midday.png",
+        "originalId":  "745_ルガルガン(まひるのすがた)",
         "no":  "745",
         "name":  "ルガルガン",
         "display":  "ルガルガン(まひるのすがた)",
@@ -1692,7 +2580,38 @@
         "file":  "lycanroc-midday.png"
     },
     {
-        "id":  "745_ルガルガン(まよなかのすがた)",
+        "id":  "745_ルガルガン(まひるのすがた)_lycanroc-midnight.png",
+        "originalId":  "745_ルガルガン(まひるのすがた)",
+        "no":  "745",
+        "name":  "ルガルガン",
+        "display":  "ルガルガン(まひるのすがた)",
+        "t1":  "rock",
+        "t2":  "none",
+        "file":  "lycanroc-midnight.png"
+    },
+    {
+        "id":  "745_ルガルガン(まひるのすがた)_lycanroc-dusk.png",
+        "originalId":  "745_ルガルガン(まひるのすがた)",
+        "no":  "745",
+        "name":  "ルガルガン",
+        "display":  "ルガルガン(まひるのすがた)",
+        "t1":  "rock",
+        "t2":  "none",
+        "file":  "lycanroc-dusk.png"
+    },
+    {
+        "id":  "745_ルガルガン(まよなかのすがた)_lycanroc-midday.png",
+        "originalId":  "745_ルガルガン(まよなかのすがた)",
+        "no":  "745",
+        "name":  "ルガルガン",
+        "display":  "ルガルガン(まよなかのすがた)",
+        "t1":  "rock",
+        "t2":  "none",
+        "file":  "lycanroc-midday.png"
+    },
+    {
+        "id":  "745_ルガルガン(まよなかのすがた)_lycanroc-midnight.png",
+        "originalId":  "745_ルガルガン(まよなかのすがた)",
         "no":  "745",
         "name":  "ルガルガン",
         "display":  "ルガルガン(まよなかのすがた)",
@@ -1701,7 +2620,38 @@
         "file":  "lycanroc-midnight.png"
     },
     {
-        "id":  "745_ルガルガン(たそがれのすがた)",
+        "id":  "745_ルガルガン(まよなかのすがた)_lycanroc-dusk.png",
+        "originalId":  "745_ルガルガン(まよなかのすがた)",
+        "no":  "745",
+        "name":  "ルガルガン",
+        "display":  "ルガルガン(まよなかのすがた)",
+        "t1":  "rock",
+        "t2":  "none",
+        "file":  "lycanroc-dusk.png"
+    },
+    {
+        "id":  "745_ルガルガン(たそがれのすがた)_lycanroc-midday.png",
+        "originalId":  "745_ルガルガン(たそがれのすがた)",
+        "no":  "745",
+        "name":  "ルガルガン",
+        "display":  "ルガルガン(たそがれのすがた)",
+        "t1":  "rock",
+        "t2":  "none",
+        "file":  "lycanroc-midday.png"
+    },
+    {
+        "id":  "745_ルガルガン(たそがれのすがた)_lycanroc-midnight.png",
+        "originalId":  "745_ルガルガン(たそがれのすがた)",
+        "no":  "745",
+        "name":  "ルガルガン",
+        "display":  "ルガルガン(たそがれのすがた)",
+        "t1":  "rock",
+        "t2":  "none",
+        "file":  "lycanroc-midnight.png"
+    },
+    {
+        "id":  "745_ルガルガン(たそがれのすがた)_lycanroc-dusk.png",
+        "originalId":  "745_ルガルガン(たそがれのすがた)",
         "no":  "745",
         "name":  "ルガルガン",
         "display":  "ルガルガン(たそがれのすがた)",
@@ -1710,7 +2660,8 @@
         "file":  "lycanroc-dusk.png"
     },
     {
-        "id":  "748_ドヒドイデ",
+        "id":  "748_ドヒドイデ_toxapex.png",
+        "originalId":  "748_ドヒドイデ",
         "no":  "748",
         "name":  "ドヒドイデ",
         "display":  "ドヒドイデ",
@@ -1719,7 +2670,8 @@
         "file":  "toxapex.png"
     },
     {
-        "id":  "750_バンバドロ",
+        "id":  "750_バンバドロ_mudsdale.png",
+        "originalId":  "750_バンバドロ",
         "no":  "750",
         "name":  "バンバドロ",
         "display":  "バンバドロ",
@@ -1728,7 +2680,8 @@
         "file":  "mudsdale.png"
     },
     {
-        "id":  "752_オニシズクモ",
+        "id":  "752_オニシズクモ_araquanid.png",
+        "originalId":  "752_オニシズクモ",
         "no":  "752",
         "name":  "オニシズクモ",
         "display":  "オニシズクモ",
@@ -1737,7 +2690,8 @@
         "file":  "araquanid.png"
     },
     {
-        "id":  "758_エンニュート",
+        "id":  "758_エンニュート_salazzle.png",
+        "originalId":  "758_エンニュート",
         "no":  "758",
         "name":  "エンニュート",
         "display":  "エンニュート",
@@ -1746,7 +2700,8 @@
         "file":  "salazzle.png"
     },
     {
-        "id":  "763_アマージョ",
+        "id":  "763_アマージョ_tsareena.png",
+        "originalId":  "763_アマージョ",
         "no":  "763",
         "name":  "アマージョ",
         "display":  "アマージョ",
@@ -1755,7 +2710,8 @@
         "file":  "tsareena.png"
     },
     {
-        "id":  "765_ヤレユータン",
+        "id":  "765_ヤレユータン_oranguru.png",
+        "originalId":  "765_ヤレユータン",
         "no":  "765",
         "name":  "ヤレユータン",
         "display":  "ヤレユータン",
@@ -1764,7 +2720,8 @@
         "file":  "oranguru.png"
     },
     {
-        "id":  "766_ナゲツケサル",
+        "id":  "766_ナゲツケサル_passimian.png",
+        "originalId":  "766_ナゲツケサル",
         "no":  "766",
         "name":  "ナゲツケサル",
         "display":  "ナゲツケサル",
@@ -1773,7 +2730,8 @@
         "file":  "passimian.png"
     },
     {
-        "id":  "778_ミミッキュ",
+        "id":  "778_ミミッキュ_mimikyu.png",
+        "originalId":  "778_ミミッキュ",
         "no":  "778",
         "name":  "ミミッキュ",
         "display":  "ミミッキュ",
@@ -1782,7 +2740,8 @@
         "file":  "mimikyu.png"
     },
     {
-        "id":  "778_ミミッキュ(ばれたすがた)",
+        "id":  "778_ミミッキュ(ばれたすがた)_mimikyu.png",
+        "originalId":  "778_ミミッキュ(ばれたすがた)",
         "no":  "778",
         "name":  "ミミッキュ",
         "display":  "ミミッキュ(ばれたすがた)",
@@ -1791,7 +2750,8 @@
         "file":  "mimikyu.png"
     },
     {
-        "id":  "780_ジジーロン",
+        "id":  "780_ジジーロン_drampa.png",
+        "originalId":  "780_ジジーロン",
         "no":  "780",
         "name":  "ジジーロン",
         "display":  "ジジーロン",
@@ -1800,7 +2760,8 @@
         "file":  "drampa.png"
     },
     {
-        "id":  "784_ジャラランガ",
+        "id":  "784_ジャラランガ_kommo-o.png",
+        "originalId":  "784_ジャラランガ",
         "no":  "784",
         "name":  "ジャラランガ",
         "display":  "ジャラランガ",
@@ -1809,7 +2770,8 @@
         "file":  "kommo-o.png"
     },
     {
-        "id":  "823_アーマーガア",
+        "id":  "823_アーマーガア_corviknight.png",
+        "originalId":  "823_アーマーガア",
         "no":  "823",
         "name":  "アーマーガア",
         "display":  "アーマーガア",
@@ -1818,7 +2780,8 @@
         "file":  "corviknight.png"
     },
     {
-        "id":  "841_アップリュー",
+        "id":  "841_アップリュー_flapple.png",
+        "originalId":  "841_アップリュー",
         "no":  "841",
         "name":  "アップリュー",
         "display":  "アップリュー",
@@ -1827,7 +2790,8 @@
         "file":  "flapple.png"
     },
     {
-        "id":  "842_タルップル",
+        "id":  "842_タルップル_appletun.png",
+        "originalId":  "842_タルップル",
         "no":  "842",
         "name":  "タルップル",
         "display":  "タルップル",
@@ -1836,7 +2800,8 @@
         "file":  "appletun.png"
     },
     {
-        "id":  "844_サダイジャ",
+        "id":  "844_サダイジャ_sandaconda.png",
+        "originalId":  "844_サダイジャ",
         "no":  "844",
         "name":  "サダイジャ",
         "display":  "サダイジャ",
@@ -1845,7 +2810,8 @@
         "file":  "sandaconda.png"
     },
     {
-        "id":  "855_ポットデス",
+        "id":  "855_ポットデス_polteageist.png",
+        "originalId":  "855_ポットデス",
         "no":  "855",
         "name":  "ポットデス",
         "display":  "ポットデス",
@@ -1854,7 +2820,18 @@
         "file":  "polteageist.png"
     },
     {
-        "id":  "855_ポットデス(しんさくフォルム)",
+        "id":  "855_ポットデス_polteageist-antique.png",
+        "originalId":  "855_ポットデス",
+        "no":  "855",
+        "name":  "ポットデス",
+        "display":  "ポットデス",
+        "t1":  "ghost",
+        "t2":  "none",
+        "file":  "polteageist-antique.png"
+    },
+    {
+        "id":  "855_ポットデス(しんさくフォルム)_polteageist.png",
+        "originalId":  "855_ポットデス(しんさくフォルム)",
         "no":  "855",
         "name":  "ポットデス",
         "display":  "ポットデス(しんさくフォルム)",
@@ -1863,7 +2840,18 @@
         "file":  "polteageist.png"
     },
     {
-        "id":  "858_ブリムオン",
+        "id":  "855_ポットデス(しんさくフォルム)_polteageist-antique.png",
+        "originalId":  "855_ポットデス(しんさくフォルム)",
+        "no":  "855",
+        "name":  "ポットデス",
+        "display":  "ポットデス(しんさくフォルム)",
+        "t1":  "ghost",
+        "t2":  "none",
+        "file":  "polteageist-antique.png"
+    },
+    {
+        "id":  "858_ブリムオン_hatterene.png",
+        "originalId":  "858_ブリムオン",
         "no":  "858",
         "name":  "ブリムオン",
         "display":  "ブリムオン",
@@ -1872,7 +2860,8 @@
         "file":  "hatterene.png"
     },
     {
-        "id":  "861_オーロンゲ",
+        "id":  "861_オーロンゲ_grimmsnarl.png",
+        "originalId":  "861_オーロンゲ",
         "no":  "861",
         "name":  "オーロンゲ",
         "display":  "オーロンゲ",
@@ -1881,7 +2870,8 @@
         "file":  "grimmsnarl.png"
     },
     {
-        "id":  "866_バリコオル",
+        "id":  "866_バリコオル_mr-rime.png",
+        "originalId":  "866_バリコオル",
         "no":  "866",
         "name":  "バリコオル",
         "display":  "バリコオル",
@@ -1890,7 +2880,8 @@
         "file":  "mr-rime.png"
     },
     {
-        "id":  "867_デスバーン",
+        "id":  "867_デスバーン_runerigus.png",
+        "originalId":  "867_デスバーン",
         "no":  "867",
         "name":  "デスバーン",
         "display":  "デスバーン",
@@ -1899,7 +2890,8 @@
         "file":  "runerigus.png"
     },
     {
-        "id":  "869_マホイップ",
+        "id":  "869_マホイップ_alcremie.png",
+        "originalId":  "869_マホイップ",
         "no":  "869",
         "name":  "マホイップ",
         "display":  "マホイップ",
@@ -1908,7 +2900,8 @@
         "file":  "alcremie.png"
     },
     {
-        "id":  "870_タイレーツ",
+        "id":  "870_タイレーツ_falinks.png",
+        "originalId":  "870_タイレーツ",
         "no":  "870",
         "name":  "タイレーツ",
         "display":  "タイレーツ",
@@ -1917,7 +2910,8 @@
         "file":  "falinks.png"
     },
     {
-        "id":  "877_モルぺコ(まんぷくもよう)",
+        "id":  "877_モルぺコ(まんぷくもよう)_morpeko.png",
+        "originalId":  "877_モルぺコ(まんぷくもよう)",
         "no":  "877",
         "name":  "モルペコ",
         "display":  "モルぺコ(まんぷくもよう)",
@@ -1926,7 +2920,8 @@
         "file":  "morpeko.png"
     },
     {
-        "id":  "877_モルぺコ(はらぺこもよう)",
+        "id":  "877_モルぺコ(はらぺこもよう)_morpeko.png",
+        "originalId":  "877_モルぺコ(はらぺこもよう)",
         "no":  "877",
         "name":  "モルペコ",
         "display":  "モルぺコ(はらぺこもよう)",
@@ -1935,7 +2930,8 @@
         "file":  "morpeko.png"
     },
     {
-        "id":  "887_ドラパルト",
+        "id":  "887_ドラパルト_dragapult.png",
+        "originalId":  "887_ドラパルト",
         "no":  "887",
         "name":  "ドラパルト",
         "display":  "ドラパルト",
@@ -1944,7 +2940,8 @@
         "file":  "dragapult.png"
     },
     {
-        "id":  "899_アヤシシ",
+        "id":  "899_アヤシシ_wyrdeer.png",
+        "originalId":  "899_アヤシシ",
         "no":  "899",
         "name":  "アヤシシ",
         "display":  "アヤシシ",
@@ -1953,7 +2950,8 @@
         "file":  "wyrdeer.png"
     },
     {
-        "id":  "900_バサギリ",
+        "id":  "900_バサギリ_kleavor.png",
+        "originalId":  "900_バサギリ",
         "no":  "900",
         "name":  "バサギリ",
         "display":  "バサギリ",
@@ -1962,7 +2960,8 @@
         "file":  "kleavor.png"
     },
     {
-        "id":  "902_イダイトウ(オスのすがた)",
+        "id":  "902_イダイトウ(オスのすがた)_basculegion-male.png",
+        "originalId":  "902_イダイトウ(オスのすがた)",
         "no":  "902",
         "name":  "イダイトウ",
         "display":  "イダイトウ(オスのすがた)",
@@ -1971,7 +2970,28 @@
         "file":  "basculegion-male.png"
     },
     {
-        "id":  "902_イダイトウ(メスのすがた)",
+        "id":  "902_イダイトウ(オスのすがた)_basculegion-female.png",
+        "originalId":  "902_イダイトウ(オスのすがた)",
+        "no":  "902",
+        "name":  "イダイトウ",
+        "display":  "イダイトウ(オスのすがた)",
+        "t1":  "water",
+        "t2":  "ghost",
+        "file":  "basculegion-female.png"
+    },
+    {
+        "id":  "902_イダイトウ(メスのすがた)_basculegion-male.png",
+        "originalId":  "902_イダイトウ(メスのすがた)",
+        "no":  "902",
+        "name":  "イダイトウ",
+        "display":  "イダイトウ(メスのすがた)",
+        "t1":  "water",
+        "t2":  "ghost",
+        "file":  "basculegion-male.png"
+    },
+    {
+        "id":  "902_イダイトウ(メスのすがた)_basculegion-female.png",
+        "originalId":  "902_イダイトウ(メスのすがた)",
         "no":  "902",
         "name":  "イダイトウ",
         "display":  "イダイトウ(メスのすがた)",
@@ -1980,7 +3000,8 @@
         "file":  "basculegion-female.png"
     },
     {
-        "id":  "903_オオニューラ",
+        "id":  "903_オオニューラ_sneasler.png",
+        "originalId":  "903_オオニューラ",
         "no":  "903",
         "name":  "オオニューラ",
         "display":  "オオニューラ",
@@ -1989,7 +3010,8 @@
         "file":  "sneasler.png"
     },
     {
-        "id":  "904_ハリーマン",
+        "id":  "904_ハリーマン_overqwil.png",
+        "originalId":  "904_ハリーマン",
         "no":  "904",
         "name":  "ハリーマン",
         "display":  "ハリーマン",
@@ -1998,7 +3020,8 @@
         "file":  "overqwil.png"
     },
     {
-        "id":  "908_マスカーニャ",
+        "id":  "908_マスカーニャ_meowscarada.png",
+        "originalId":  "908_マスカーニャ",
         "no":  "908",
         "name":  "マスカーニャ",
         "display":  "マスカーニャ",
@@ -2007,7 +3030,8 @@
         "file":  "meowscarada.png"
     },
     {
-        "id":  "911_ラウドボーン",
+        "id":  "911_ラウドボーン_skeledirge.png",
+        "originalId":  "911_ラウドボーン",
         "no":  "911",
         "name":  "ラウドボーン",
         "display":  "ラウドボーン",
@@ -2016,7 +3040,8 @@
         "file":  "skeledirge.png"
     },
     {
-        "id":  "914_ウェーニバル",
+        "id":  "914_ウェーニバル_quaquaval.png",
+        "originalId":  "914_ウェーニバル",
         "no":  "914",
         "name":  "ウェーニバル",
         "display":  "ウェーニバル",
@@ -2025,7 +3050,18 @@
         "file":  "quaquaval.png"
     },
     {
-        "id":  "925_イッカネズミ",
+        "id":  "925_イッカネズミ_maushold-four.png",
+        "originalId":  "925_イッカネズミ",
+        "no":  "925",
+        "name":  "イッカネズミ",
+        "display":  "イッカネズミ",
+        "t1":  "normal",
+        "t2":  "none",
+        "file":  "maushold-four.png"
+    },
+    {
+        "id":  "925_イッカネズミ_maushold-three.png",
+        "originalId":  "925_イッカネズミ",
         "no":  "925",
         "name":  "イッカネズミ",
         "display":  "イッカネズミ",
@@ -2034,7 +3070,8 @@
         "file":  "maushold-three.png"
     },
     {
-        "id":  "925_イッカネズミ(Four)",
+        "id":  "925_イッカネズミ(Four)_maushold-four.png",
+        "originalId":  "925_イッカネズミ(Four)",
         "no":  "925",
         "name":  "イッカネズミ",
         "display":  "イッカネズミ(Four)",
@@ -2043,7 +3080,18 @@
         "file":  "maushold-four.png"
     },
     {
-        "id":  "934_キョジオーン",
+        "id":  "925_イッカネズミ(Four)_maushold-three.png",
+        "originalId":  "925_イッカネズミ(Four)",
+        "no":  "925",
+        "name":  "イッカネズミ",
+        "display":  "イッカネズミ(Four)",
+        "t1":  "normal",
+        "t2":  "none",
+        "file":  "maushold-three.png"
+    },
+    {
+        "id":  "934_キョジオーン_garganacl.png",
+        "originalId":  "934_キョジオーン",
         "no":  "934",
         "name":  "キョジオーン",
         "display":  "キョジオーン",
@@ -2052,7 +3100,8 @@
         "file":  "garganacl.png"
     },
     {
-        "id":  "936_グレンアルマ",
+        "id":  "936_グレンアルマ_armarouge.png",
+        "originalId":  "936_グレンアルマ",
         "no":  "936",
         "name":  "グレンアルマ",
         "display":  "グレンアルマ",
@@ -2061,7 +3110,8 @@
         "file":  "armarouge.png"
     },
     {
-        "id":  "937_ソウブレイズ",
+        "id":  "937_ソウブレイズ_ceruledge.png",
+        "originalId":  "937_ソウブレイズ",
         "no":  "937",
         "name":  "ソウブレイズ",
         "display":  "ソウブレイズ",
@@ -2070,7 +3120,8 @@
         "file":  "ceruledge.png"
     },
     {
-        "id":  "939_ハラバリー",
+        "id":  "939_ハラバリー_bellibolt.png",
+        "originalId":  "939_ハラバリー",
         "no":  "939",
         "name":  "ハラバリー",
         "display":  "ハラバリー",
@@ -2079,7 +3130,8 @@
         "file":  "bellibolt.png"
     },
     {
-        "id":  "952_スコヴィラン",
+        "id":  "952_スコヴィラン_scovillain.png",
+        "originalId":  "952_スコヴィラン",
         "no":  "952",
         "name":  "スコヴィラン",
         "display":  "スコヴィラン",
@@ -2088,7 +3140,8 @@
         "file":  "scovillain.png"
     },
     {
-        "id":  "956_クエスパトラ",
+        "id":  "956_クエスパトラ_espathra.png",
+        "originalId":  "956_クエスパトラ",
         "no":  "956",
         "name":  "クエスパトラ",
         "display":  "クエスパトラ",
@@ -2097,7 +3150,8 @@
         "file":  "espathra.png"
     },
     {
-        "id":  "959_デカヌチャン",
+        "id":  "959_デカヌチャン_tinkaton.png",
+        "originalId":  "959_デカヌチャン",
         "no":  "959",
         "name":  "デカヌチャン",
         "display":  "デカヌチャン",
@@ -2106,7 +3160,18 @@
         "file":  "tinkaton.png"
     },
     {
-        "id":  "964_イルカマン",
+        "id":  "964_イルカマン_palafin-hero.png",
+        "originalId":  "964_イルカマン",
+        "no":  "964",
+        "name":  "イルカマン",
+        "display":  "イルカマン",
+        "t1":  "water",
+        "t2":  "none",
+        "file":  "palafin-hero.png"
+    },
+    {
+        "id":  "964_イルカマン_palafin-zero.png",
+        "originalId":  "964_イルカマン",
         "no":  "964",
         "name":  "イルカマン",
         "display":  "イルカマン",
@@ -2115,7 +3180,8 @@
         "file":  "palafin-zero.png"
     },
     {
-        "id":  "964_イルカマン(マイティフォルム)",
+        "id":  "964_イルカマン(マイティフォルム)_palafin-hero.png",
+        "originalId":  "964_イルカマン(マイティフォルム)",
         "no":  "964",
         "name":  "イルカマン",
         "display":  "イルカマン(マイティフォルム)",
@@ -2124,7 +3190,18 @@
         "file":  "palafin-hero.png"
     },
     {
-        "id":  "968_ミミズズ",
+        "id":  "964_イルカマン(マイティフォルム)_palafin-zero.png",
+        "originalId":  "964_イルカマン(マイティフォルム)",
+        "no":  "964",
+        "name":  "イルカマン",
+        "display":  "イルカマン(マイティフォルム)",
+        "t1":  "water",
+        "t2":  "none",
+        "file":  "palafin-zero.png"
+    },
+    {
+        "id":  "968_ミミズズ_orthworm.png",
+        "originalId":  "968_ミミズズ",
         "no":  "968",
         "name":  "ミミズズ",
         "display":  "ミミズズ",
@@ -2133,7 +3210,8 @@
         "file":  "orthworm.png"
     },
     {
-        "id":  "970_キラフロル",
+        "id":  "970_キラフロル_glimmora.png",
+        "originalId":  "970_キラフロル",
         "no":  "970",
         "name":  "キラフロル",
         "display":  "キラフロル",
@@ -2142,7 +3220,8 @@
         "file":  "glimmora.png"
     },
     {
-        "id":  "972_ハカドッグ",
+        "id":  "972_ハカドッグ_houndstone.png",
+        "originalId":  "972_ハカドッグ",
         "no":  "972",
         "name":  "ハカドッグ",
         "display":  "ハカドッグ",
@@ -2151,7 +3230,8 @@
         "file":  "houndstone.png"
     },
     {
-        "id":  "979_コノヨザル",
+        "id":  "979_コノヨザル_annihilape.png",
+        "originalId":  "979_コノヨザル",
         "no":  "979",
         "name":  "コノヨザル",
         "display":  "コノヨザル",
@@ -2160,7 +3240,8 @@
         "file":  "annihilape.png"
     },
     {
-        "id":  "981_リキキリン",
+        "id":  "981_リキキリン_farigiraf.png",
+        "originalId":  "981_リキキリン",
         "no":  "981",
         "name":  "リキキリン",
         "display":  "リキキリン",
@@ -2169,7 +3250,8 @@
         "file":  "farigiraf.png"
     },
     {
-        "id":  "983_ドドゲザン",
+        "id":  "983_ドドゲザン_kingambit.png",
+        "originalId":  "983_ドドゲザン",
         "no":  "983",
         "name":  "ドドゲザン",
         "display":  "ドドゲザン",
@@ -2178,7 +3260,8 @@
         "file":  "kingambit.png"
     },
     {
-        "id":  "1000_サーフゴー",
+        "id":  "1000_サーフゴー_gholdengo.png",
+        "originalId":  "1000_サーフゴー",
         "no":  "1000",
         "name":  "サーフゴー",
         "display":  "サーフゴー",
@@ -2187,7 +3270,8 @@
         "file":  "gholdengo.png"
     },
     {
-        "id":  "1013_ヤバソチャ",
+        "id":  "1013_ヤバソチャ_sinistcha.png",
+        "originalId":  "1013_ヤバソチャ",
         "no":  "1013",
         "name":  "ヤバソチャ",
         "display":  "ヤバソチャ",
@@ -2196,7 +3280,8 @@
         "file":  "sinistcha.png"
     },
     {
-        "id":  "1013_ヤバソチャ(ケッサクのすがた)",
+        "id":  "1013_ヤバソチャ(ケッサクのすがた)_sinistcha.png",
+        "originalId":  "1013_ヤバソチャ(ケッサクのすがた)",
         "no":  "1013",
         "name":  "ヤバソチャ",
         "display":  "ヤバソチャ(ケッサクのすがた)",
@@ -2205,7 +3290,8 @@
         "file":  "sinistcha.png"
     },
     {
-        "id":  "1018_ブリジュラス",
+        "id":  "1018_ブリジュラス_archaludon.png",
+        "originalId":  "1018_ブリジュラス",
         "no":  "1018",
         "name":  "ブリジュラス",
         "display":  "ブリジュラス",
@@ -2214,7 +3300,8 @@
         "file":  "archaludon.png"
     },
     {
-        "id":  "1019_カミツオロチ",
+        "id":  "1019_カミツオロチ_hydrapple.png",
+        "originalId":  "1019_カミツオロチ",
         "no":  "1019",
         "name":  "カミツオロチ",
         "display":  "カミツオロチ",
