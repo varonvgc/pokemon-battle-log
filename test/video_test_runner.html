@@ -1027,20 +1027,25 @@
 
         const coords = window.COORDS || (window.AutoModeController && window.AutoModeController.COORDS);
 
-        // マッチング判定スコアを可視化計算
-        let ballScore = 0;
-        let hasBtn = false;
-        if (coords && coords.MATCHING_BALL && window.autoModeController.templates && window.autoModeController.templates.matchingBall) {
+        // マッチング判定スコアとクロップ領域を可視化
+        if (coords && coords.MATCHING_BALL) {
           const ballCrop = window.autoModeController.cropToBase64(ctx, coords.MATCHING_BALL);
-          ballScore = await window.autoModeController.matchTemplate(ballCrop, window.autoModeController.templates.matchingBall, { useAlphaMask: true });
-          hasBtn = window.autoModeController.isSelectionButtonPresent(ctx);
-          document.getElementById('ball-score').textContent = `${ballScore.toFixed(3)} (ボタン: ${hasBtn ? '検出' : '無'})`;
           const previewImg = document.getElementById('preview-ball-img');
           if (previewImg) {
             previewImg.src = ballCrop;
             previewImg.style.display = 'inline-block';
           }
+          if (window.autoModeController.templates && window.autoModeController.templates.matchingBall) {
+            let ballScore = await window.autoModeController.matchTemplate(ballCrop, window.autoModeController.templates.matchingBall, { useAlphaMask: true });
+            let hasBtn = window.autoModeController.isSelectionButtonPresent(ctx);
+            document.getElementById('ball-score').textContent = `${ballScore.toFixed(3)} (ボタン: ${hasBtn ? '検出' : '無'})`;
+          } else {
+            document.getElementById('ball-score').textContent = '読込中...';
+          }
+        } else {
+          document.getElementById('ball-score').textContent = '座標未定義';
         }
+        
         if (coords && coords.VS_SCREEN && window.autoModeController.templates && window.autoModeController.templates.vsLogo) {
           const vsCrop = window.autoModeController.cropToBase64(ctx, coords.VS_SCREEN);
           const vsScore = await window.autoModeController.matchTemplate(vsCrop, window.autoModeController.templates.vsLogo, { useAlphaMask: true });
