@@ -10,7 +10,7 @@
   // 1920x1080 基準の認識座標マップ (pamo3 準拠)
   const COORDS = {
     // 見せ合い検知ボール (Matching Phase)
-    MATCHING_BALL: { x: 132, y: 922, w: 46, h: 46 },
+    MATCHING_BALL: { x: 139, y: 923, w: 46, h: 46 },
     // 選出数 3/4 OCR (選出匹数・シングル/ダブル判定)
     BATTLE_FORMAT_DIGIT: { x: 233.5, y: 923.9, w: 23, h: 46 },
     // 相手トレーナー名 (Champions)
@@ -19,8 +19,8 @@
     VS_SCREEN: { x: 860, y: 565, w: 50, h: 84 },
     // 見せ合い画面の相手 6 匹アイコン
     RIVAL_ICON: (index) => {
-      const top = 158.5 + 125.9 * index; // Y座標を1px上に補正 (元159.5)
-      return { x: 1613.8, y: top, w: 104.6, h: 104.6 }; // X座標を7px左に補正 (元1620.8)
+      const top = 159.5 + 125.9 * index;
+      return { x: 1620.8, y: top, w: 104.6, h: 104.6 };
     },
     // 出撃ポケモン名 (ダブルバトル: 相手2匹, 自分2匹)
     DISPATCH_DOUBLE: [
