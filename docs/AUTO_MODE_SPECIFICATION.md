@@ -68,7 +68,7 @@ stateDiagram-v2
 
 | 項目名 | X | Y | Width | Height | 使用テンプレート画像 | 判定しきい値 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `MATCHING_BALL` (見せ合いボールマーク) | 139.0 | 923.0 | 46.0 | 46.0 | `assets/images/opencv/champions/template_ui/matching_phase_ball.png` | **`>= 0.70` (2連続)** で見せ合い開始 (背景色変化に対応して閾値緩和)<br>`< 0.40`（3連続）で見せ合い終了 |
+| `MATCHING_BALL` (見せ合いボールマーク) | 120.0 | 900.0 | 80.0 | 80.0 | `assets/images/opencv/champions/template_ui/matching_phase_ball.png` | **`>= 0.70` (2連続)** で見せ合い開始 (背景色変化に対応して閾値緩和)<br>`< 0.40`（3連続）で見せ合い終了 |
 | `VS_SCREEN` (VS画面中央ロゴ) | 860.0 | 565.0 | 200.0 | 80.0 | `assets/images/opencv/champions/template_ui/vs_v.png` | `> 0.40` または 8秒経過で対戦開始 |
 | `WIN_BALL_ME` (自分側勝利ボール) | 445.3 | 771.0 | 72.0 | 72.0 | `assets/images/opencv/champions/template_ui/win_ball.png` | `> 0.55` (3連続) で勝ち判定 |
 | `WIN_BALL_RIVAL` (相手側勝利ボール) | 1405.0 | 771.0 | 72.0 | 72.0 | `assets/images/opencv/champions/template_ui/win_ball.png` | `> 0.55` (3連続) で負け判定 |
