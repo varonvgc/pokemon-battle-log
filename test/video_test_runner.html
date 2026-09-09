@@ -459,7 +459,7 @@
         </div>
         <div style="font-size:0.8rem;color:var(--text-muted);display:flex;gap:1rem;flex-wrap:wrap;">
           <span>フェーズ: <strong id="phase-name" style="color:#a5b4fc;">WAITING_MATCHING</strong></span>
-          <span>見せ合いボール: <strong id="ball-score" style="color:#cbd5e1;">-</strong></span>
+          <span>見せ合いボール: <strong id="ball-score" style="color:#cbd5e1;">-</strong> <img id="preview-ball-img" src="" style="width:23px;height:23px;vertical-align:middle;border:1px solid #4338ca;background:#000;display:none;margin-left:0.5rem;" title="ボールマーククロップ領域プレビュー" /></span>
           <span>VSロゴ: <strong id="vs-score" style="color:#cbd5e1;">-</strong></span>
         </div>
       </div>
@@ -1035,6 +1035,11 @@
           ballScore = await window.autoModeController.matchTemplate(ballCrop, window.autoModeController.templates.matchingBall, { useAlphaMask: true });
           hasBtn = window.autoModeController.isSelectionButtonPresent(ctx);
           document.getElementById('ball-score').textContent = `${ballScore.toFixed(3)} (ボタン: ${hasBtn ? '検出' : '無'})`;
+          const previewImg = document.getElementById('preview-ball-img');
+          if (previewImg) {
+            previewImg.src = ballCrop;
+            previewImg.style.display = 'inline-block';
+          }
         }
         if (coords && coords.VS_SCREEN && window.autoModeController.templates && window.autoModeController.templates.vsLogo) {
           const vsCrop = window.autoModeController.cropToBase64(ctx, coords.VS_SCREEN);
