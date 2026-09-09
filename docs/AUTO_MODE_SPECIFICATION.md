@@ -49,7 +49,7 @@ stateDiagram-v2
 
 | フェーズ名 (`this.phase`) | 画面の状態 | ① 監視対象 (What) | ② トリガー条件 (Condition) | ③ 発火時に起こる動作 (Action & Behavior) | 遷移先 | pamo3 内部対応 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **`WAITING_MATCHING`**<br>(マッチング待機中) | 対戦相手の検索中 / ロビー画面 | 画面左下の選出完了ボタンボールマーク (`COORDS.MATCHING_BALL`)<br>※試合終了後8秒間はクールダウン待機 | `matching_phase_ball.png` との一致度 **`score >= 0.85` が2連続**<br>※誤検知原因の緑ボタン判定は完全撤廃 | ① バッジを「見せ合い画面検知: 画面安定待ち (3秒ウェイト)...」に更新。<br>② 前回の選出リストとVSバーを初期化 (`resetVsBar`)。<br>③ 画面を「記録する」タブへ切替 (`showPage('record')`)。<br>④ ルールをダブルバトルに固定し、手持ちパーティを選択・展開。<br>⑤ **【pamo3原典①③完全準拠】** 3秒待機後に二値化閾値150で相手トレーナー名OCR、さらに1秒待機後に最新フレームで相手6体（OpenCV TM_CCOEFF_NORMED）を高精度特定してフォーム入力。 | `MATCHING` | `waitingMatching`<br>(`B.xO`) |
+| **`WAITING_MATCHING`**<br>(マッチング待機中) | 対戦相手の検索中 / ロビー画面 | 画面左下の選出完了ボタンボールマーク (`COORDS.MATCHING_BALL`)<br>※試合終了後8秒間はクールダウン待機 | `matching_phase_ball.png` との一致度 **`score >= 0.70` が2連続**<br>※シーズン変化等による背景色変化に対応するため閾値を緩和 | ① バッジを「見せ合い画面検知: 画面安定待ち (3秒ウェイト)...」に更新。<br>② 前回の選出リストとVSバーを初期化 (`resetVsBar`)。<br>③ 画面を「記録する」タブへ切替 (`showPage('record')`)。<br>④ ルールをダブルバトルに固定し、手持ちパーティを選択・展開。<br>⑤ **【pamo3原典①③完全準拠】** 3秒待機後に二値化閾値150で相手トレーナー名OCR、さらに1秒待機後に最新フレームで相手6体（OpenCV TM_CCOEFF_NORMED）を高精度特定してフォーム入力。 | `MATCHING` | `waitingMatching`<br>(`B.xO`) |
 | **`MATCHING`**<br>(見せ合い画面中) | 手持ち6体と選出選択画面 (カウントダウン中) | **[A]** 画面左下の選出完了ボタンボールマーク (`COORDS.MATCHING_BALL`) | 一致度 `score >= 0.40`<br>(マークが継続表示中) | 本フェーズ（`MATCHING`）を維持。<br>※相手認識は突入時の初回1回のみ実行し、ループ再実行による手入力上書きは行わない。 | (維持) | `matching`<br>(`B.ms`) |
 | ^ | ^ | **[B]** 画面左下の選出完了ボタンボールマーク (`COORDS.MATCHING_BALL`) | 一致度 `score < 0.40` が**連続3フレーム (約1秒) 継続**<br>(ノイズや一時的な明度変化によるフライング遷移を完全防止) | ① 見せ合い終了タイムスタンプを記録 (`waitingStartTimestamp = Date.now()`)。<br>② バッジを「対戦開始待ち (VS画面待機中...)」に更新。<br>③ 次の対戦開始待ちへフェーズを切り替える。 | `WAITING_GAME_START` | ^ |
 | ^ | ^ | **[C]** ユーザーによる相手パーティ修正 / 手動選出タップ | フォームへの `input`/`change` イベント、または選出カードのクリック | ① 相手パーティ入力時: 照合候補リスト（`rivalPartyNames`）を即時更新し、相手選出グリッドを再描画。<br>② 手動選出時: `mySelectionOrder` からポケモン名を取り込み、右下VSバーのモンスターボールを該当ポケモンアイコンに変身させる。 | (維持) | - |
@@ -68,7 +68,7 @@ stateDiagram-v2
 
 | 項目名 | X | Y | Width | Height | 使用テンプレート画像 | 判定しきい値 |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| `MATCHING_BALL` (見せ合いボールマーク) | 139.0 | 923.0 | 46.0 | 46.0 | `assets/images/opencv/champions/template_ui/matching_phase_ball.png` | **`>= 0.85` (2連続)** で見せ合い開始 (誤検知防止のため閾値強化)<br>`< 0.40`（3連続）で見せ合い終了 |
+| `MATCHING_BALL` (見せ合いボールマーク) | 139.0 | 923.0 | 46.0 | 46.0 | `assets/images/opencv/champions/template_ui/matching_phase_ball.png` | **`>= 0.70` (2連続)** で見せ合い開始 (背景色変化に対応して閾値緩和)<br>`< 0.40`（3連続）で見せ合い終了 |
 | `VS_SCREEN` (VS画面中央ロゴ) | 860.0 | 565.0 | 200.0 | 80.0 | `assets/images/opencv/champions/template_ui/vs_v.png` | `> 0.40` または 8秒経過で対戦開始 |
 | `WIN_BALL_ME` (自分側勝利ボール) | 445.3 | 771.0 | 72.0 | 72.0 | `assets/images/opencv/champions/template_ui/win_ball.png` | `> 0.55` (3連続) で勝ち判定 |
 | `WIN_BALL_RIVAL` (相手側勝利ボール) | 1405.0 | 771.0 | 72.0 | 72.0 | `assets/images/opencv/champions/template_ui/win_ball.png` | `> 0.55` (3連続) で負け判定 |

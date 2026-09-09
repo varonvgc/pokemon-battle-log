@@ -842,11 +842,11 @@
           const ballCrop = this.cropToBase64(ctx, COORDS.MATCHING_BALL);
           const score = await this.matchTemplate(ballCrop, this.templates.matchingBall, { useAlphaMask: true });
 
-          // ★ 誤検知防止: 閾値を0.85に引き上げ、2連続フレーム一致を要求
-          if (score >= 0.85) {
+          // ★ 誤検知防止: 閾値を0.85から0.70へ緩和 (シーズン変化等による背景色変化に対応)、2連続フレーム一致を要求
+          if (score >= 0.70) {
             this.matchingEnterCount = (this.matchingEnterCount || 0) + 1;
             if (this.matchingEnterCount >= 2) {
-              console.log(`[AutoMode] MATCHING PHASE DETECTED! score=${score.toFixed(3)} >= 0.85`);
+              console.log(`[AutoMode] MATCHING PHASE DETECTED! score=${score.toFixed(3)} >= 0.70`);
               this.phase = 'MATCHING';
               this.matchingEnterCount = 0;
               this.matchingExitCount = 0;
