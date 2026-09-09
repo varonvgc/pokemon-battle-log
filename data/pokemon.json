@@ -1459,7 +1459,7 @@
         "ability1":  "メロメロボディ",
         "ability2":  "かちき",
         "ability_hidden":  "おみとおし",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  40
     },
     {
@@ -1801,7 +1801,7 @@
         "ability1":  "じゅうなん",
         "ability2":  "テクニシャン",
         "ability_hidden":  "きんちょうかん",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  53
     },
     {
@@ -1820,7 +1820,7 @@
         "ability1":  "ファーコート",
         "ability2":  "テクニシャン",
         "ability_hidden":  "びびり",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  1161
     },
     {
@@ -2637,7 +2637,7 @@
         "ability1":  "するどいめ",
         "ability2":  "せいしんりょく",
         "ability_hidden":  "まけんき",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  83
     },
     {
@@ -3644,7 +3644,7 @@
         "ability1":  "ぼうおん",
         "ability2":  "フィルター",
         "ability_hidden":  "テクニシャン",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  122
     },
     {
@@ -8185,7 +8185,7 @@
         "ability1":  "ヘドロえき",
         "ability2":  "ねんちゃく",
         "ability_hidden":  "くいしんぼう",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  317
     },
     {
@@ -9173,7 +9173,7 @@
         "ability1":  "きれあじ",
         "ability2":  "",
         "ability_hidden":  "",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  1433
     },
     {
@@ -9458,7 +9458,7 @@
         "ability1":  "いかく",
         "ability2":  "",
         "ability_hidden":  "じしんかじょう",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  373
     },
     {
@@ -9477,7 +9477,7 @@
         "ability1":  "スカイスキン",
         "ability2":  "",
         "ability_hidden":  "",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  1356
     },
     {
@@ -11149,7 +11149,7 @@
         "ability1":  "ふゆう",
         "ability2":  "",
         "ability_hidden":  "",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  1435
     },
     {
@@ -11244,7 +11244,7 @@
         "ability1":  "Aura Guard",
         "ability2":  "",
         "ability_hidden":  "",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  1436
     },
     {
@@ -16925,7 +16925,7 @@
         "ability1":  "そうしょく",
         "ability2":  "",
         "ability_hidden":  "くさのけがわ",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  673
     },
     {
@@ -19452,7 +19452,7 @@
         "ability1":  "ききかいひ",
         "ability2":  "",
         "ability_hidden":  "",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  768
     },
     {
@@ -19468,10 +19468,10 @@
         "spatk":  "70",
         "spdef":  "120",
         "spd":  "40",
-        "ability1":  "ききかいひ",
+        "ability1":  "かたいツメ",
         "ability2":  "",
         "ability_hidden":  "",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  1442
     },
     {
@@ -20915,7 +20915,7 @@
         "ability1":  "しんりょく",
         "ability2":  "",
         "ability_hidden":  "グラスメイカー",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  812
     },
     {
@@ -20991,7 +20991,7 @@
         "ability1":  "もうか",
         "ability2":  "",
         "ability_hidden":  "リベロ",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  815
     },
     {
@@ -21067,7 +21067,7 @@
         "ability1":  "げきりゅう",
         "ability2":  "",
         "ability_hidden":  "スナイパー",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  818
     },
     {
@@ -21314,7 +21314,7 @@
         "ability1":  "にげあし",
         "ability2":  "かるわざ",
         "ability_hidden":  "はりこみ",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  828
     },
     {
@@ -21846,7 +21846,7 @@
         "ability1":  "パンクロック",
         "ability2":  "プラス",
         "ability_hidden":  "テクニシャン",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  849
     },
     {
@@ -21865,7 +21865,7 @@
         "ability1":  "パンクロック",
         "ability2":  "マイナス",
         "ability_hidden":  "テクニシャン",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  1214
     },
     {
@@ -21998,7 +21998,7 @@
         "ability1":  "じゅうなん",
         "ability2":  "",
         "ability_hidden":  "テクニシャン",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  853
     },
     {
@@ -22264,7 +22264,7 @@
         "ability1":  "カブトアーマー",
         "ability2":  "かたいツメ",
         "ability_hidden":  "はがねのせいしん",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  863
     },
     {
@@ -22302,7 +22302,7 @@
         "ability1":  "ふくつのこころ",
         "ability2":  "",
         "ability_hidden":  "きもったま",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  865
     },
     {
@@ -22454,7 +22454,7 @@
         "ability1":  "ひらいしん",
         "ability2":  "",
         "ability_hidden":  "エレキメイカー",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  871
     },
     {
@@ -22568,7 +22568,7 @@
         "ability1":  "せいしんりょく",
         "ability2":  "シンクロ",
         "ability_hidden":  "サイコメイカー",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  876
     },
     {
@@ -22587,7 +22587,7 @@
         "ability1":  "マイペース",
         "ability2":  "シンクロ",
         "ability_hidden":  "サイコメイカー",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  1224
     },
     {
@@ -23784,7 +23784,7 @@
         "ability1":  "ちくでん",
         "ability2":  "しぜんかいふく",
         "ability_hidden":  "てつのこぶし",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  923
     },
     {
@@ -23936,7 +23936,7 @@
         "ability1":  "こぼれダネ",
         "ability2":  "",
         "ability_hidden":  "しゅうかく",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  930
     },
     {
@@ -23955,7 +23955,7 @@
         "ability1":  "いかく",
         "ability2":  "はりきり",
         "ability_hidden":  "こんじょう",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  931
     },
     {
@@ -23974,7 +23974,7 @@
         "ability1":  "いかく",
         "ability2":  "はりきり",
         "ability_hidden":  "こんじょう",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  1265
     },
     {
@@ -23993,7 +23993,7 @@
         "ability1":  "いかく",
         "ability2":  "はりきり",
         "ability_hidden":  "ちからずく",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  1266
     },
     {
@@ -24012,7 +24012,7 @@
         "ability1":  "いかく",
         "ability2":  "はりきり",
         "ability_hidden":  "ちからずく",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  1267
     },
     {
@@ -24240,7 +24240,7 @@
         "ability1":  "いかく",
         "ability2":  "ばんけん",
         "ability_hidden":  "はりこみ",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  943
     },
     {
@@ -25456,7 +25456,7 @@
         "ability1":  "ねつこうかん",
         "ability2":  "",
         "ability_hidden":  "アイスボディ",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  998
     },
     {
@@ -25475,7 +25475,7 @@
         "ability1":  "ねつこうかん",
         "ability2":  "",
         "ability_hidden":  "アイスボディ",
-        "confirmed":  false,
+        "confirmed":  true,
         "iconIndex":  1451
     },
     {

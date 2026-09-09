@@ -160,6 +160,16 @@
         "file":  "ninetales-alolan.png"
     },
     {
+        "id":  "40_プクリン_wigglytuff.png",
+        "originalId":  "40_プクリン",
+        "no":  "40",
+        "name":  "プクリン",
+        "display":  "プクリン",
+        "t1":  "normal",
+        "t2":  "fairy",
+        "file":  "wigglytuff.png"
+    },
+    {
         "id":  "45_ラフレシア_vileplume.png",
         "originalId":  "45_ラフレシア",
         "no":  "45",
@@ -168,6 +178,46 @@
         "t1":  "grass",
         "t2":  "poison",
         "file":  "vileplume.png"
+    },
+    {
+        "id":  "53_ペルシアン_persian.png",
+        "originalId":  "53_ペルシアン",
+        "no":  "53",
+        "name":  "ペルシアン",
+        "display":  "ペルシアン",
+        "t1":  "normal",
+        "t2":  "none",
+        "file":  "persian.png"
+    },
+    {
+        "id":  "53_ペルシアン_persian-alolan.png",
+        "originalId":  "53_ペルシアン",
+        "no":  "53",
+        "name":  "ペルシアン",
+        "display":  "ペルシアン",
+        "t1":  "normal",
+        "t2":  "none",
+        "file":  "persian-alolan.png"
+    },
+    {
+        "id":  "53_ペルシアン(アローラのすがた)_persian.png",
+        "originalId":  "53_ペルシアン(アローラのすがた)",
+        "no":  "53",
+        "name":  "ペルシアン",
+        "display":  "ペルシアン(アローラのすがた)",
+        "t1":  "dark",
+        "t2":  "none",
+        "file":  "persian.png"
+    },
+    {
+        "id":  "53_ペルシアン(アローラのすがた)_persian-alolan.png",
+        "originalId":  "53_ペルシアン(アローラのすがた)",
+        "no":  "53",
+        "name":  "ペルシアン",
+        "display":  "ペルシアン(アローラのすがた)",
+        "t1":  "dark",
+        "t2":  "none",
+        "file":  "persian-alolan.png"
     },
     {
         "id":  "59_ウインディ_arcanine.png",
@@ -280,6 +330,16 @@
         "file":  "slowbro-galarian.png"
     },
     {
+        "id":  "83_カモネギ_farfetchd.png",
+        "originalId":  "83_カモネギ",
+        "no":  "83",
+        "name":  "カモネギ",
+        "display":  "カモネギ",
+        "t1":  "normal",
+        "t2":  "flying",
+        "file":  "farfetchd.png"
+    },
+    {
         "id":  "94_ゲンガー_gengar.png",
         "originalId":  "94_ゲンガー",
         "no":  "94",
@@ -308,6 +368,16 @@
         "t1":  "water",
         "t2":  "psychic",
         "file":  "starmie.png"
+    },
+    {
+        "id":  "122_バリヤード_mr-mime.png",
+        "originalId":  "122_バリヤード",
+        "no":  "122",
+        "name":  "バリヤード",
+        "display":  "バリヤード",
+        "t1":  "psychic",
+        "t2":  "fairy",
+        "file":  "mr-mime.png"
     },
     {
         "id":  "127_カイロス_pinsir.png",
@@ -910,6 +980,16 @@
         "file":  "manectric.png"
     },
     {
+        "id":  "317_マルノーム_swalot.png",
+        "originalId":  "317_マルノーム",
+        "no":  "317",
+        "name":  "マルノーム",
+        "display":  "マルノーム",
+        "t1":  "poison",
+        "t2":  "none",
+        "file":  "swalot.png"
+    },
+    {
         "id":  "319_サメハダー_sharpedo.png",
         "originalId":  "319_サメハダー",
         "no":  "319",
@@ -1038,6 +1118,16 @@
         "t1":  "ice",
         "t2":  "none",
         "file":  "glalie.png"
+    },
+    {
+        "id":  "373_ボーマンダ_salamence.png",
+        "originalId":  "373_ボーマンダ",
+        "no":  "373",
+        "name":  "ボーマンダ",
+        "display":  "ボーマンダ",
+        "t1":  "dragon",
+        "t2":  "flying",
+        "file":  "salamence.png"
     },
     {
         "id":  "376_メタグロス_metagross.png",
@@ -1840,14 +1930,14 @@
         "file":  "scrafty.png"
     },
     {
-        "id":  "563_デスカーン_cofagrigus.png",
+        "id":  "563_デスカーン_mega-cofagrigus.png",
         "originalId":  "563_デスカーン",
         "no":  "563",
         "name":  "デスカーン",
         "display":  "デスカーン",
         "t1":  "ghost",
         "t2":  "none",
-        "file":  "cofagrigus.png"
+        "file":  "mega-cofagrigus.png"
     },
     {
         "id":  "569_ダストダス_garbodor.png",
@@ -2138,6 +2228,16 @@
         "t1":  "fairy",
         "t2":  "none",
         "file":  "florges.png"
+    },
+    {
+        "id":  "673_ゴーゴート_gogoat.png",
+        "originalId":  "673_ゴーゴート",
+        "no":  "673",
+        "name":  "ゴーゴート",
+        "display":  "ゴーゴート",
+        "t1":  "grass",
+        "t2":  "none",
+        "file":  "gogoat.png"
     },
     {
         "id":  "675_ゴロンダ_pangoro.png",
@@ -2730,6 +2830,16 @@
         "file":  "passimian.png"
     },
     {
+        "id":  "768_グソクムシャ_golisopod.png",
+        "originalId":  "768_グソクムシャ",
+        "no":  "768",
+        "name":  "グソクムシャ",
+        "display":  "グソクムシャ",
+        "t1":  "bug",
+        "t2":  "water",
+        "file":  "golisopod.png"
+    },
+    {
         "id":  "778_ミミッキュ_mimikyu.png",
         "originalId":  "778_ミミッキュ",
         "no":  "778",
@@ -2770,6 +2880,36 @@
         "file":  "kommo-o.png"
     },
     {
+        "id":  "812_ゴリランダー_rillaboom.png",
+        "originalId":  "812_ゴリランダー",
+        "no":  "812",
+        "name":  "ゴリランダー",
+        "display":  "ゴリランダー",
+        "t1":  "grass",
+        "t2":  "none",
+        "file":  "rillaboom.png"
+    },
+    {
+        "id":  "815_エースバーン_cinderace.png",
+        "originalId":  "815_エースバーン",
+        "no":  "815",
+        "name":  "エースバーン",
+        "display":  "エースバーン",
+        "t1":  "fire",
+        "t2":  "none",
+        "file":  "cinderace.png"
+    },
+    {
+        "id":  "818_インテレオン_inteleon.png",
+        "originalId":  "818_インテレオン",
+        "no":  "818",
+        "name":  "インテレオン",
+        "display":  "インテレオン",
+        "t1":  "water",
+        "t2":  "none",
+        "file":  "inteleon.png"
+    },
+    {
         "id":  "823_アーマーガア_corviknight.png",
         "originalId":  "823_アーマーガア",
         "no":  "823",
@@ -2778,6 +2918,16 @@
         "t1":  "flying",
         "t2":  "steel",
         "file":  "corviknight.png"
+    },
+    {
+        "id":  "828_フォクスライ_thievul.png",
+        "originalId":  "828_フォクスライ",
+        "no":  "828",
+        "name":  "フォクスライ",
+        "display":  "フォクスライ",
+        "t1":  "dark",
+        "t2":  "none",
+        "file":  "thievul.png"
     },
     {
         "id":  "841_アップリュー_flapple.png",
@@ -2808,6 +2958,56 @@
         "t1":  "ground",
         "t2":  "none",
         "file":  "sandaconda.png"
+    },
+    {
+        "id":  "849_ストリンダー_toxtricity-amped.png",
+        "originalId":  "849_ストリンダー",
+        "no":  "849",
+        "name":  "ストリンダー",
+        "display":  "ストリンダー",
+        "t1":  "electric",
+        "t2":  "poison",
+        "file":  "toxtricity-amped.png"
+    },
+    {
+        "id":  "849_ストリンダー_toxtricity-low-key.png",
+        "originalId":  "849_ストリンダー",
+        "no":  "849",
+        "name":  "ストリンダー",
+        "display":  "ストリンダー",
+        "t1":  "electric",
+        "t2":  "poison",
+        "file":  "toxtricity-low-key.png"
+    },
+    {
+        "id":  "849_ストリンダー(ローなすがた)_toxtricity-amped.png",
+        "originalId":  "849_ストリンダー(ローなすがた)",
+        "no":  "849",
+        "name":  "ストリンダー",
+        "display":  "ストリンダー(ローなすがた)",
+        "t1":  "electric",
+        "t2":  "poison",
+        "file":  "toxtricity-amped.png"
+    },
+    {
+        "id":  "849_ストリンダー(ローなすがた)_toxtricity-low-key.png",
+        "originalId":  "849_ストリンダー(ローなすがた)",
+        "no":  "849",
+        "name":  "ストリンダー",
+        "display":  "ストリンダー(ローなすがた)",
+        "t1":  "electric",
+        "t2":  "poison",
+        "file":  "toxtricity-low-key.png"
+    },
+    {
+        "id":  "853_オトスパス_grapploct.png",
+        "originalId":  "853_オトスパス",
+        "no":  "853",
+        "name":  "オトスパス",
+        "display":  "オトスパス",
+        "t1":  "fighting",
+        "t2":  "none",
+        "file":  "grapploct.png"
     },
     {
         "id":  "855_ポットデス_polteageist.png",
@@ -2870,6 +3070,26 @@
         "file":  "grimmsnarl.png"
     },
     {
+        "id":  "863_ニャイキング_perrserker.png",
+        "originalId":  "863_ニャイキング",
+        "no":  "863",
+        "name":  "ニャイキング",
+        "display":  "ニャイキング",
+        "t1":  "steel",
+        "t2":  "none",
+        "file":  "perrserker.png"
+    },
+    {
+        "id":  "865_ネギガナイト_sirfetchd.png",
+        "originalId":  "865_ネギガナイト",
+        "no":  "865",
+        "name":  "ネギガナイト",
+        "display":  "ネギガナイト",
+        "t1":  "fighting",
+        "t2":  "none",
+        "file":  "sirfetchd.png"
+    },
+    {
         "id":  "866_バリコオル_mr-rime.png",
         "originalId":  "866_バリコオル",
         "no":  "866",
@@ -2908,6 +3128,56 @@
         "t1":  "fighting",
         "t2":  "none",
         "file":  "falinks.png"
+    },
+    {
+        "id":  "871_バチンウニ_pincurchin.png",
+        "originalId":  "871_バチンウニ",
+        "no":  "871",
+        "name":  "バチンウニ",
+        "display":  "バチンウニ",
+        "t1":  "electric",
+        "t2":  "none",
+        "file":  "pincurchin.png"
+    },
+    {
+        "id":  "876_イエッサン(オスのすがた)_indeedee-male.png",
+        "originalId":  "876_イエッサン(オスのすがた)",
+        "no":  "876",
+        "name":  "イエッサン",
+        "display":  "イエッサン(オスのすがた)",
+        "t1":  "psychic",
+        "t2":  "normal",
+        "file":  "indeedee-male.png"
+    },
+    {
+        "id":  "876_イエッサン(オスのすがた)_indeedee-female.png",
+        "originalId":  "876_イエッサン(オスのすがた)",
+        "no":  "876",
+        "name":  "イエッサン",
+        "display":  "イエッサン(オスのすがた)",
+        "t1":  "psychic",
+        "t2":  "normal",
+        "file":  "indeedee-female.png"
+    },
+    {
+        "id":  "876_イエッサン(メスのすがた)_indeedee-male.png",
+        "originalId":  "876_イエッサン(メスのすがた)",
+        "no":  "876",
+        "name":  "イエッサン",
+        "display":  "イエッサン(メスのすがた)",
+        "t1":  "psychic",
+        "t2":  "normal",
+        "file":  "indeedee-male.png"
+    },
+    {
+        "id":  "876_イエッサン(メスのすがた)_indeedee-female.png",
+        "originalId":  "876_イエッサン(メスのすがた)",
+        "no":  "876",
+        "name":  "イエッサン",
+        "display":  "イエッサン(メスのすがた)",
+        "t1":  "psychic",
+        "t2":  "normal",
+        "file":  "indeedee-female.png"
     },
     {
         "id":  "877_モルぺコ(まんぷくもよう)_morpeko.png",
@@ -3050,6 +3320,16 @@
         "file":  "quaquaval.png"
     },
     {
+        "id":  "923_パーモット_pawmot.png",
+        "originalId":  "923_パーモット",
+        "no":  "923",
+        "name":  "パーモット",
+        "display":  "パーモット",
+        "t1":  "electric",
+        "t2":  "fighting",
+        "file":  "pawmot.png"
+    },
+    {
         "id":  "925_イッカネズミ_maushold-four.png",
         "originalId":  "925_イッカネズミ",
         "no":  "925",
@@ -3090,6 +3370,176 @@
         "file":  "maushold-three.png"
     },
     {
+        "id":  "930_オリーヴァ_arboliva.png",
+        "originalId":  "930_オリーヴァ",
+        "no":  "930",
+        "name":  "オリーヴァ",
+        "display":  "オリーヴァ",
+        "t1":  "grass",
+        "t2":  "normal",
+        "file":  "arboliva.png"
+    },
+    {
+        "id":  "931_イキリンコ_squawkabilly-green.png",
+        "originalId":  "931_イキリンコ",
+        "no":  "931",
+        "name":  "イキリンコ",
+        "display":  "イキリンコ",
+        "t1":  "normal",
+        "t2":  "flying",
+        "file":  "squawkabilly-green.png"
+    },
+    {
+        "id":  "931_イキリンコ_squawkabilly-yellow.png",
+        "originalId":  "931_イキリンコ",
+        "no":  "931",
+        "name":  "イキリンコ",
+        "display":  "イキリンコ",
+        "t1":  "normal",
+        "t2":  "flying",
+        "file":  "squawkabilly-yellow.png"
+    },
+    {
+        "id":  "931_イキリンコ_squawkabilly-blue.png",
+        "originalId":  "931_イキリンコ",
+        "no":  "931",
+        "name":  "イキリンコ",
+        "display":  "イキリンコ",
+        "t1":  "normal",
+        "t2":  "flying",
+        "file":  "squawkabilly-blue.png"
+    },
+    {
+        "id":  "931_イキリンコ_squawkabilly-white.png",
+        "originalId":  "931_イキリンコ",
+        "no":  "931",
+        "name":  "イキリンコ",
+        "display":  "イキリンコ",
+        "t1":  "normal",
+        "t2":  "flying",
+        "file":  "squawkabilly-white.png"
+    },
+    {
+        "id":  "931_イキリンコ(Blue)_squawkabilly-green.png",
+        "originalId":  "931_イキリンコ(Blue)",
+        "no":  "931",
+        "name":  "イキリンコ",
+        "display":  "イキリンコ(Blue)",
+        "t1":  "normal",
+        "t2":  "flying",
+        "file":  "squawkabilly-green.png"
+    },
+    {
+        "id":  "931_イキリンコ(Blue)_squawkabilly-yellow.png",
+        "originalId":  "931_イキリンコ(Blue)",
+        "no":  "931",
+        "name":  "イキリンコ",
+        "display":  "イキリンコ(Blue)",
+        "t1":  "normal",
+        "t2":  "flying",
+        "file":  "squawkabilly-yellow.png"
+    },
+    {
+        "id":  "931_イキリンコ(Blue)_squawkabilly-blue.png",
+        "originalId":  "931_イキリンコ(Blue)",
+        "no":  "931",
+        "name":  "イキリンコ",
+        "display":  "イキリンコ(Blue)",
+        "t1":  "normal",
+        "t2":  "flying",
+        "file":  "squawkabilly-blue.png"
+    },
+    {
+        "id":  "931_イキリンコ(Blue)_squawkabilly-white.png",
+        "originalId":  "931_イキリンコ(Blue)",
+        "no":  "931",
+        "name":  "イキリンコ",
+        "display":  "イキリンコ(Blue)",
+        "t1":  "normal",
+        "t2":  "flying",
+        "file":  "squawkabilly-white.png"
+    },
+    {
+        "id":  "931_イキリンコ(Yellow)_squawkabilly-green.png",
+        "originalId":  "931_イキリンコ(Yellow)",
+        "no":  "931",
+        "name":  "イキリンコ",
+        "display":  "イキリンコ(Yellow)",
+        "t1":  "normal",
+        "t2":  "flying",
+        "file":  "squawkabilly-green.png"
+    },
+    {
+        "id":  "931_イキリンコ(Yellow)_squawkabilly-yellow.png",
+        "originalId":  "931_イキリンコ(Yellow)",
+        "no":  "931",
+        "name":  "イキリンコ",
+        "display":  "イキリンコ(Yellow)",
+        "t1":  "normal",
+        "t2":  "flying",
+        "file":  "squawkabilly-yellow.png"
+    },
+    {
+        "id":  "931_イキリンコ(Yellow)_squawkabilly-blue.png",
+        "originalId":  "931_イキリンコ(Yellow)",
+        "no":  "931",
+        "name":  "イキリンコ",
+        "display":  "イキリンコ(Yellow)",
+        "t1":  "normal",
+        "t2":  "flying",
+        "file":  "squawkabilly-blue.png"
+    },
+    {
+        "id":  "931_イキリンコ(Yellow)_squawkabilly-white.png",
+        "originalId":  "931_イキリンコ(Yellow)",
+        "no":  "931",
+        "name":  "イキリンコ",
+        "display":  "イキリンコ(Yellow)",
+        "t1":  "normal",
+        "t2":  "flying",
+        "file":  "squawkabilly-white.png"
+    },
+    {
+        "id":  "931_イキリンコ(ホワイトキュレム)_squawkabilly-green.png",
+        "originalId":  "931_イキリンコ(ホワイトキュレム)",
+        "no":  "931",
+        "name":  "イキリンコ",
+        "display":  "イキリンコ(ホワイトキュレム)",
+        "t1":  "normal",
+        "t2":  "flying",
+        "file":  "squawkabilly-green.png"
+    },
+    {
+        "id":  "931_イキリンコ(ホワイトキュレム)_squawkabilly-yellow.png",
+        "originalId":  "931_イキリンコ(ホワイトキュレム)",
+        "no":  "931",
+        "name":  "イキリンコ",
+        "display":  "イキリンコ(ホワイトキュレム)",
+        "t1":  "normal",
+        "t2":  "flying",
+        "file":  "squawkabilly-yellow.png"
+    },
+    {
+        "id":  "931_イキリンコ(ホワイトキュレム)_squawkabilly-blue.png",
+        "originalId":  "931_イキリンコ(ホワイトキュレム)",
+        "no":  "931",
+        "name":  "イキリンコ",
+        "display":  "イキリンコ(ホワイトキュレム)",
+        "t1":  "normal",
+        "t2":  "flying",
+        "file":  "squawkabilly-blue.png"
+    },
+    {
+        "id":  "931_イキリンコ(ホワイトキュレム)_squawkabilly-white.png",
+        "originalId":  "931_イキリンコ(ホワイトキュレム)",
+        "no":  "931",
+        "name":  "イキリンコ",
+        "display":  "イキリンコ(ホワイトキュレム)",
+        "t1":  "normal",
+        "t2":  "flying",
+        "file":  "squawkabilly-white.png"
+    },
+    {
         "id":  "934_キョジオーン_garganacl.png",
         "originalId":  "934_キョジオーン",
         "no":  "934",
@@ -3128,6 +3578,16 @@
         "t1":  "electric",
         "t2":  "none",
         "file":  "bellibolt.png"
+    },
+    {
+        "id":  "943_マフィティフ_mabosstiff.png",
+        "originalId":  "943_マフィティフ",
+        "no":  "943",
+        "name":  "マフィティフ",
+        "display":  "マフィティフ",
+        "t1":  "dark",
+        "t2":  "none",
+        "file":  "mabosstiff.png"
     },
     {
         "id":  "952_スコヴィラン_scovillain.png",
@@ -3258,6 +3718,16 @@
         "t1":  "dark",
         "t2":  "steel",
         "file":  "kingambit.png"
+    },
+    {
+        "id":  "998_セグレイブ_baxcalibur.png",
+        "originalId":  "998_セグレイブ",
+        "no":  "998",
+        "name":  "セグレイブ",
+        "display":  "セグレイブ",
+        "t1":  "dragon",
+        "t2":  "ice",
+        "file":  "baxcalibur.png"
     },
     {
         "id":  "1000_サーフゴー_gholdengo.png",
