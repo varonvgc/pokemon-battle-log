@@ -237,11 +237,20 @@
 
     // --- テンプレートマッチング実行 (Worker経由) ---
     async matchTemplate(cropBase64, templateBase64, options = {}) {
-      if (!this.pawmiWorker || !cropBase64 || !templateBase64) return 0;
+      if (!this.pawmiWorker) {
+        console.warn('[AutoMode] pawmiWorker is not initialized or dead.');
+        return 0;
+      }
+      if (!cropBase64 || !templateBase64) {
+        console.warn('[AutoMode] Missing image data for matching.');
+        return 0;
+      }
+      
       const id = ++this.jobSeq;
       return new Promise((resolve) => {
         this.callbacks.set(id, (err, maxVal) => {
           if (err) {
+            console.warn('[AutoMode] Worker returned error:', err);
             resolve(0);
           } else {
             resolve(typeof maxVal === 'number' ? maxVal : 0);
@@ -846,11 +855,11 @@
           const ballCrop = this.cropToBase64(ctx, COORDS.MATCHING_BALL);
           const score = await this.matchTemplate(ballCrop, this.templates.matchingBall, { useAlphaMask: true });
 
-          // ★ 誤検知防止: 閾値を0.85から0.70へ緩和 (シーズン変化等による背景色変化に対応)、2連続フレーム一致を要求
-          if (score >= 0.70) {
+          // ★ 誤検知防止: 閾値を0.80へ調整 (シーズン変化等による背景色変化に対応しつつ、誤検知を防止)、2連続フレーム一致を要求
+          if (score >= 0.80) {
             this.matchingEnterCount = (this.matchingEnterCount || 0) + 1;
             if (this.matchingEnterCount >= 2) {
-              console.log(`[AutoMode] MATCHING PHASE DETECTED! score=${score.toFixed(3)} >= 0.70`);
+              console.log(`[AutoMode] MATCHING PHASE DETECTED! score=${score.toFixed(3)} >= 0.80`);
               this.phase = 'MATCHING';
               this.matchingEnterCount = 0;
               this.matchingExitCount = 0;
