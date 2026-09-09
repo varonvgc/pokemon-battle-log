@@ -733,4 +733,17 @@ try {
     Write-Warning "Could not update recognition features: $($_.Exception.Message)"
 }
 
+# 15. Reset Firebase Master Data to force clients to clear overrides
+Write-Host "`n--- Resetting Firebase Master Data ---" -ForegroundColor Cyan
+$resetScript = Join-Path $scriptsDir "reset_firebase_master.py"
+if (Test-Path $resetScript) {
+    try {
+        python $resetScript
+    } catch {
+        Write-Warning "Could not reset Firebase master: $($_.Exception.Message)"
+    }
+} else {
+    Write-Warning "reset_firebase_master.py not found. Skipping Firebase reset."
+}
+
 Write-Host "`n=== Comprehensive Master Sync & AI Recognition Engine Ready! ===" -ForegroundColor Cyan

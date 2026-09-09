@@ -4623,11 +4623,11 @@
         try {
           // 1. 基本マスタを最優先で高速取得（ブラウザキャッシュを有効活用）
           const [pokeRes, moveRes, itemRes, verRes, regRes] = await Promise.all([
-            fetch('data/pokemon.json'),
-            fetch('data/moves.json'),
-            fetch('data/items.json'),
-            fetch('data/version.json').catch(() => null),
-            fetch('data/regulations.json').catch(() => null)
+            fetch('data/pokemon.json?v=' + Date.now()),
+            fetch('data/moves.json?v=' + Date.now()),
+            fetch('data/items.json?v=' + Date.now()),
+            fetch('data/version.json?v=' + Date.now()).catch(() => null),
+            fetch('data/regulations.json?v=' + Date.now()).catch(() => null)
           ]);
           POKEMON_LIST = await pokeRes.json();
           window.POKEMON_LIST = POKEMON_LIST;
