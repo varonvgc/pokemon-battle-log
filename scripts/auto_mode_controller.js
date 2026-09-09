@@ -19,8 +19,8 @@
     VS_SCREEN: { x: 860, y: 565, w: 50, h: 84 },
     // 見せ合い画面の相手 6 匹アイコン
     RIVAL_ICON: (index) => {
-      const top = 159.5 + 125.9 * index;
-      return { x: 1620.8, y: top, w: 104.6, h: 104.6 };
+      const top = 158.5 + 125.9 * index; // Y座標を1px上に補正 (元159.5)
+      return { x: 1613.8, y: top, w: 104.6, h: 104.6 }; // X座標を7px左に補正 (元1620.8)
     },
     // 出撃ポケモン名 (ダブルバトル: 相手2匹, 自分2匹)
     DISPATCH_DOUBLE: [
