@@ -9,8 +9,8 @@
 
   // 1920x1080 基準の認識座標マップ (pamo3 準拠)
   const COORDS = {
-    // 見せ合い検知ボール (Matching Phase) 座標ズレ吸収のため探索領域を拡大
-    MATCHING_BALL: { x: 120, y: 900, w: 80, h: 80 },
+    // 見せ合い検知ボール (Matching Phase)
+    MATCHING_BALL: { x: 132, y: 922, w: 46, h: 46 },
     // 選出数 3/4 OCR (選出匹数・シングル/ダブル判定)
     BATTLE_FORMAT_DIGIT: { x: 233.5, y: 923.9, w: 23, h: 46 },
     // 相手トレーナー名 (Champions)
