@@ -986,7 +986,7 @@ class PokemonRecognitionEngine {
   }
 
   _resolveMySelection(ctx, myTeamList) {
-    const slot0Y = 160;
+    const slot0Y = 178;
     const slotPitch = 137;
 
     const teamTypeInfo = myTeamList.map(pName => {
@@ -1135,7 +1135,7 @@ class PokemonRecognitionEngine {
       } else {
         // iPhoneスクショ用座標 (2532x1170 space)
         cropX = (mode === 'BEFORE') ? 1800 : 1650;
-        cropY = (mode === 'BEFORE') ? 50 : 80;
+        cropY = (mode === 'BEFORE') ? 50 : 98;
         cropW = (mode === 'BEFORE') ? 550 : 450;
         cropH = (mode === 'BEFORE') ? 80 : 70;
       }
@@ -1313,7 +1313,7 @@ class PokemonRecognitionEngine {
       };
     } else {
       // AFTER Mode
-      const slot0Y = 160;
+      const slot0Y = 178;
       const slotPitch = 137;
       const iconX = 1760, iconW = 120, iconYOff = 2, iconH = 118;
       const t1X = 1912, t1YOff = 12, t2X = 1970, t2YOff = 12, tW = 45, tH = 45;
