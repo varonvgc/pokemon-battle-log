@@ -1,4 +1,4 @@
-# Pure ASCII Safe Robust Pokepaste Translation Map Generator
+﻿# Pure ASCII Safe Robust Pokepaste Translation Map Generator
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
 
 $rootDir = Split-Path $PSScriptRoot -Parent

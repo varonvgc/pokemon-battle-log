@@ -1,4 +1,4 @@
-# Pure ASCII Safe Comprehensive Showdown Master Sync Script (Data & Assets)
+﻿# Pure ASCII Safe Comprehensive Showdown Master Sync Script (Data & Assets)
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
 
 $rootDir = $PSScriptRoot

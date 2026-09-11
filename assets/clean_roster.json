@@ -2270,26 +2270,6 @@
         "file":  "meowstic-male.png"
     },
     {
-        "id":  "678_ニャオニクス(オスのすがた)_meowstic-female.png",
-        "originalId":  "678_ニャオニクス(オスのすがた)",
-        "no":  "678",
-        "name":  "ニャオニクス",
-        "display":  "ニャオニクス(オスのすがた)",
-        "t1":  "psychic",
-        "t2":  "none",
-        "file":  "meowstic-female.png"
-    },
-    {
-        "id":  "678_ニャオニクス(メスのすがた)_meowstic-male.png",
-        "originalId":  "678_ニャオニクス(メスのすがた)",
-        "no":  "678",
-        "name":  "ニャオニクス",
-        "display":  "ニャオニクス(メスのすがた)",
-        "t1":  "psychic",
-        "t2":  "none",
-        "file":  "meowstic-male.png"
-    },
-    {
         "id":  "678_ニャオニクス(メスのすがた)_meowstic-female.png",
         "originalId":  "678_ニャオニクス(メスのすがた)",
         "no":  "678",
@@ -3150,26 +3130,6 @@
         "file":  "indeedee-male.png"
     },
     {
-        "id":  "876_イエッサン(オスのすがた)_indeedee-female.png",
-        "originalId":  "876_イエッサン(オスのすがた)",
-        "no":  "876",
-        "name":  "イエッサン",
-        "display":  "イエッサン(オスのすがた)",
-        "t1":  "psychic",
-        "t2":  "normal",
-        "file":  "indeedee-female.png"
-    },
-    {
-        "id":  "876_イエッサン(メスのすがた)_indeedee-male.png",
-        "originalId":  "876_イエッサン(メスのすがた)",
-        "no":  "876",
-        "name":  "イエッサン",
-        "display":  "イエッサン(メスのすがた)",
-        "t1":  "psychic",
-        "t2":  "normal",
-        "file":  "indeedee-male.png"
-    },
-    {
         "id":  "876_イエッサン(メスのすがた)_indeedee-female.png",
         "originalId":  "876_イエッサン(メスのすがた)",
         "no":  "876",
@@ -3235,26 +3195,6 @@
         "no":  "902",
         "name":  "イダイトウ",
         "display":  "イダイトウ(オスのすがた)",
-        "t1":  "water",
-        "t2":  "ghost",
-        "file":  "basculegion-male.png"
-    },
-    {
-        "id":  "902_イダイトウ(オスのすがた)_basculegion-female.png",
-        "originalId":  "902_イダイトウ(オスのすがた)",
-        "no":  "902",
-        "name":  "イダイトウ",
-        "display":  "イダイトウ(オスのすがた)",
-        "t1":  "water",
-        "t2":  "ghost",
-        "file":  "basculegion-female.png"
-    },
-    {
-        "id":  "902_イダイトウ(メスのすがた)_basculegion-male.png",
-        "originalId":  "902_イダイトウ(メスのすがた)",
-        "no":  "902",
-        "name":  "イダイトウ",
-        "display":  "イダイトウ(メスのすがた)",
         "t1":  "water",
         "t2":  "ghost",
         "file":  "basculegion-male.png"

@@ -1,4 +1,4 @@
-# Build Clean Roster from pokemon.json (Confirmed Only) with Strict Mega Exclusion
+﻿﻿# Build Clean Roster from pokemon.json (Confirmed Only) with Strict Mega Exclusion
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.SecurityProtocolType]::Tls12
 
 $rootDir = Split-Path $PSScriptRoot -Parent
@@ -128,8 +128,8 @@ foreach ($p in $pkmData) {
     }
 
     if ($candidates) {
-        if ($disp -match "オス" -or $disp -match "Male" -or $disp -match "M-Mega") {
-            $filtered = $candidates | Where-Object { $_.nameJa -match "オス" -or $_.nameEn -match "Male" }
+        if ($disp -match "オス" -or $disp -match "\bMale\b" -or $disp -match "M-Mega") {
+            $filtered = $candidates | Where-Object { $_.nameJa -match "オス" -or $_.nameEn -match "\bMale\b" }
             if ($filtered) { $candidates = $filtered }
         } elseif ($disp -match "メス" -or $disp -match "Female" -or $disp -match "F-Mega") {
             $filtered = $candidates | Where-Object { $_.nameJa -match "メス" -or $_.nameEn -match "Female" }

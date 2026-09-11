@@ -1,4 +1,4 @@
-Add-Type -AssemblyName System.Drawing
+﻿Add-Type -AssemblyName System.Drawing
 
 $rootDir = Split-Path $PSScriptRoot -Parent
 $assetsDir = Join-Path $rootDir "assets"
