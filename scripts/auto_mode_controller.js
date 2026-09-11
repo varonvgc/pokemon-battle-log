@@ -729,8 +729,21 @@
             this.recordedChunks = [];
             this.mediaRecorder = null;
             
+            // --- WebMのDuration(尺)情報を修復する ---
+            let finalBlob = blob;
+            if (typeof ysFixWebmDuration === 'function') {
+              console.log('[AutoRecord] Fixing WebM duration metadata...');
+              const durationMs = Date.now() - (this._recordingStartTime || Date.now());
+              try {
+                finalBlob = await ysFixWebmDuration(blob, durationMs, { logger: false });
+                console.log('[AutoRecord] WebM duration fixed.');
+              } catch(e) {
+                console.warn('[AutoRecord] Failed to fix WebM duration:', e);
+              }
+            }
+
             const filename = `autorec_${Date.now()}.webm`;
-            const file = new File([blob], filename, { type: finalMime });
+            const file = new File([finalBlob], filename, { type: finalMime });
             
             if (typeof window.attachVideoFileAsync === 'function') {
               console.log('[AutoRecord] Attaching video file...');
@@ -741,6 +754,7 @@
         });
 
         this.mediaRecorder.start(1000);
+        this._recordingStartTime = Date.now();
         this.isRecording = true;
         this._updateRecordingIndicator(true);
         console.log('[AutoRecord] Started recording.');
