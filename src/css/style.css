@@ -1,4 +1,4 @@
-    :root {
+﻿    :root {
       --bg: #0f1117;
       --surface: #1a1d2e;
       --surface2: #252840;
@@ -275,7 +275,7 @@
       display: block;
       width: 40px;
       height: 30px;
-      background-image: url('assets/pokemonicons-sheet.png');
+      background-image: url('../../assets/pokemonicons-sheet.png');
       background-repeat: no-repeat;
       image-rendering: pixelated;
       pointer-events: none;
@@ -865,7 +865,7 @@
       display: block;
       width: 40px;
       height: 30px;
-      background-image: url('assets/pokemonicons-sheet.png');
+      background-image: url('../../assets/pokemonicons-sheet.png');
       background-repeat: no-repeat;
       image-rendering: pixelated;
       flex-shrink: 0;
@@ -971,7 +971,7 @@
       display: block;
       width: 40px;
       height: 30px;
-      background-image: url('assets/pokemonicons-sheet.png');
+      background-image: url('../../assets/pokemonicons-sheet.png');
       background-repeat: no-repeat;
       image-rendering: pixelated;
       pointer-events: none;
@@ -1094,7 +1094,7 @@
       display: block;
       width: 40px;
       height: 30px;
-      background-image: url('assets/pokemonicons-sheet.png');
+      background-image: url('../../assets/pokemonicons-sheet.png');
       background-repeat: no-repeat;
       image-rendering: pixelated;
     }
@@ -1151,7 +1151,7 @@
       display: block;
       width: 40px;
       height: 30px;
-      background-image: url('assets/pokemonicons-sheet.png');
+      background-image: url('../../assets/pokemonicons-sheet.png');
       background-repeat: no-repeat;
       image-rendering: pixelated;
     }
@@ -1242,7 +1242,7 @@
       display: block;
       width: 40px;
       height: 30px;
-      background-image: url('assets/pokemonicons-sheet.png');
+      background-image: url('../../assets/pokemonicons-sheet.png');
       background-repeat: no-repeat;
       image-rendering: pixelated;
     }
@@ -1681,7 +1681,7 @@
       display: block;
       width: 40px;
       height: 30px;
-      background-image: url('assets/pokemonicons-sheet.png');
+      background-image: url('../../assets/pokemonicons-sheet.png');
       background-repeat: no-repeat;
       image-rendering: pixelated;
     }
