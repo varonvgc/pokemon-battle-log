@@ -475,6 +475,7 @@
           const client = google.accounts.oauth2.initTokenClient({
             client_id: cId,
             scope: 'https://www.googleapis.com/auth/drive.file',
+            include_granted_scopes: false,
             callback: (response) => {
               if (response.error) {
                 console.warn('Google OAuth response error:', response);
