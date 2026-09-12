@@ -31,4 +31,4 @@ jobs:
           GCP_REFRESH_TOKEN: ${{ secrets.GCP_REFRESH_TOKEN }}
           FIREBASE_SERVICE_ACCOUNT_KEY: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_KEY }}
         run: |
-          python scripts/sync_drive_to_youtube.py
+          python tools/sync_drive_to_youtube.py
