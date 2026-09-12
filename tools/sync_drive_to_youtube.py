@@ -239,34 +239,47 @@ def delete_drive_file(drive_service, file_id):
         print(f"  ⚠️ Google Drive のファイル削除に失敗しました (手動削除推奨): {e}")
 
 def update_firestore_record(db, uid, record_id, youtube_video_id):
-    """Firestore の該当レコードを更新"""
+    """Firestore の該当レコードを更新 (main ドキュメントと subcollection 両方)"""
     main_doc_ref = db.collection('users').document(uid).collection('data').document('main')
     main_doc = main_doc_ref.get()
-    if not main_doc.exists:
-        print(f"  ⚠️ ユーザー {uid} の main ドキュメントが存在しません")
-        return
+    updated_main = False
+    
+    if main_doc.exists:
+        data = main_doc.to_dict()
+        records = data.get('records', [])
+        for rec in records:
+            if isinstance(rec, dict) and rec.get('id') == record_id:
+                rec['video_url'] = f"https://youtu.be/{youtube_video_id}"
+                rec['youtube_video_id'] = youtube_video_id
+                rec['sync_status'] = 'uploaded'
+                rec['synced_at'] = int(datetime.now().timestamp() * 1000)
+                updated_main = True
+                break
 
-    data = main_doc.to_dict()
-    records = data.get('records', [])
-    updated = False
+        if updated_main:
+            main_doc_ref.update({
+                'records': records,
+                'updatedAt': firestore.SERVER_TIMESTAMP
+            })
+            print(f"  ✅ Firestore mainドキュメント レコード更新完了 (Record ID: {record_id})")
 
-    for rec in records:
-        if isinstance(rec, dict) and rec.get('id') == record_id:
-            rec['video_url'] = f"https://youtu.be/{youtube_video_id}"
-            rec['youtube_video_id'] = youtube_video_id
-            rec['sync_status'] = 'uploaded'
-            rec['synced_at'] = int(datetime.now().timestamp() * 1000)
-            updated = True
-            break
+    # Webアプリは subcollection を優先マージするため、そちらも更新する
+    sub_doc_ref = db.collection('users').document(uid).collection('records').document(str(record_id))
+    try:
+        if sub_doc_ref.get().exists:
+            sub_doc_ref.update({
+                'video_url': f"https://youtu.be/{youtube_video_id}",
+                'youtube_video_id': youtube_video_id,
+                'sync_status': 'uploaded',
+                'synced_at': int(datetime.now().timestamp() * 1000),
+                'updatedAt': firestore.SERVER_TIMESTAMP
+            })
+            print(f"  ✅ Firestore subcollection レコード更新完了 (Record ID: {record_id})")
+    except Exception as e:
+        print(f"  ⚠️ subcollection 更新エラー: {e}")
 
-    if updated:
-        main_doc_ref.update({
-            'records': records,
-            'updatedAt': firestore.SERVER_TIMESTAMP
-        })
-        print(f"  ✅ Firestore レコード更新完了 (Record ID: {record_id})")
-    else:
-        print(f"  ⚠️ レコード ID {record_id} が見つかりませんでした")
+    if not updated_main:
+        print(f"  ⚠️ mainドキュメントにレコード ID {record_id} が見つかりませんでした")
 
 def main():
     print("=" * 60)
