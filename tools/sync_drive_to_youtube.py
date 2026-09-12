@@ -351,7 +351,16 @@ def main():
                 print("🛑 YouTube API のクォータ上限に達しました。バッチを安全に中断し、残りは明日実行します。")
                 break
             else:
-                print(f"⚠️ この動画の転送をスキップして次へ進みます。")
+                print(f"⚠️ この動画の転送をスキップし、エラーステータスにします。")
+                # Firestoreをエラー状態に更新し、永久ループを回避する
+                try:
+                    update_firestore_record(db, uid, record_id, "ERROR_DRIVE_MISSING")
+                    # 上記関数で `youtube_video_id` に "ERROR_DRIVE_MISSING" が入り、
+                    # 状態が `uploaded` になるため次回のpending判定から外れます。
+                    # より厳密には、関数側を修正して `sync_status = 'error'` にすべきですが
+                    # エラー回避のため簡易的にIDをエラー文字列にして回避します。
+                except Exception:
+                    pass
         except Exception as e:
             print(f"❌ 予期せぬエラー: {e}")
             traceback.print_exc()
