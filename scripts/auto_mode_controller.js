@@ -393,12 +393,37 @@
         this.videoElement.volume = this.previewVolume;
         try {
           await this.videoElement.play();
+          this._startCanvasRenderLoop();
         } catch (playErr) {
           console.warn('[AutoMode] Video play error (handling autoplay):', playErr);
         }
       }
       console.log(`[AutoMode] Camera & Audio stream started successfully (audio: ${!!this.currentAudioDeviceId}, previewMuted: ${this.isPreviewMuted}, volume: ${this.previewVolume})`);
       return true;
+    }
+
+    _startCanvasRenderLoop() {
+      this._stopCanvasRenderLoop();
+      const canvas = document.getElementById('auto-mode-canvas');
+      if (!canvas || !this.videoElement) return;
+      const ctx = canvas.getContext('2d');
+      const render = () => {
+        if (!this.stream || this.videoElement.paused || this.videoElement.ended) return;
+        if (this.videoElement.videoWidth && this.videoElement.videoHeight) {
+          if (canvas.width !== this.videoElement.videoWidth) canvas.width = this.videoElement.videoWidth;
+          if (canvas.height !== this.videoElement.videoHeight) canvas.height = this.videoElement.videoHeight;
+          ctx.drawImage(this.videoElement, 0, 0, canvas.width, canvas.height);
+        }
+        this._renderLoopId = requestAnimationFrame(render);
+      };
+      this._renderLoopId = requestAnimationFrame(render);
+    }
+
+    _stopCanvasRenderLoop() {
+      if (this._renderLoopId) {
+        cancelAnimationFrame(this._renderLoopId);
+        this._renderLoopId = null;
+      }
     }
 
     setMute(isMuted) {
@@ -418,6 +443,7 @@
     }
 
     stopCamera() {
+      this._stopCanvasRenderLoop();
       if (this.stream) {
         this.stream.getTracks().forEach(t => t.stop());
         this.stream = null;

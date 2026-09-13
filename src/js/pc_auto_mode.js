@@ -456,9 +456,9 @@
       const h = document.getElementById('auto-color-hue')?.value || 0;
 
       const filterStr = `brightness(${b}) contrast(${c}) saturate(${s}) hue-rotate(${h}deg)`;
-      const videoEl = document.getElementById('auto-mode-video');
-      if (videoEl) {
-        videoEl.style.filter = filterStr;
+      const canvasEl = document.getElementById('auto-mode-canvas');
+      if (canvasEl) {
+        canvasEl.style.filter = filterStr;
       }
 
       // UIラベル更新
