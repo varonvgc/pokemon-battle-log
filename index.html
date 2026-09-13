@@ -58,6 +58,25 @@
 </head>
 
 <body>
+  <!-- OBS Color Correction SVG Filters -->
+  <svg width="0" height="0" style="position:absolute;">
+    <!-- 1. 黒潰れ補正 (Full Rangeと勘違いして拡張されたコントラストをLimitedに戻す) -->
+    <filter id="obs-crush-fix">
+      <feComponentTransfer>
+        <feFuncR type="linear" slope="0.8588" intercept="0.0627"/>
+        <feFuncG type="linear" slope="0.8588" intercept="0.0627"/>
+        <feFuncB type="linear" slope="0.8588" intercept="0.0627"/>
+      </feComponentTransfer>
+    </filter>
+    <!-- 2. 白浮き/くすみ補正 (Limited Rangeのまま表示されてしまったものをFullに拡張する) -->
+    <filter id="obs-washout-fix">
+      <feComponentTransfer>
+        <feFuncR type="linear" slope="1.1644" intercept="-0.0730"/>
+        <feFuncG type="linear" slope="1.1644" intercept="-0.0730"/>
+        <feFuncB type="linear" slope="1.1644" intercept="-0.0730"/>
+      </feComponentTransfer>
+    </filter>
+  </svg>
   <!-- アプリメインラッパー (通常時は全幅、オートモード時は左側幅30%としてそのまま動作) -->
   <div id="app-wrapper">
     <div id="conflict-banner">
@@ -813,7 +832,12 @@
                   <input type="range" id="auto-color-hue" min="-180" max="180" step="5" value="0" oninput="updateAutoColorFilter()" style="accent-color:#3b82f6;">
                 </div>
 
-                <button type="button" class="btn btn-ghost btn-sm" onclick="resetAutoColorFilter()" style="margin-top:4px; padding:6px; font-size:12px; border:1px solid rgba(255,255,255,0.2);">リセット</button>
+                <div style="font-size:11px; text-align:center; color:var(--text-muted); margin-bottom:-4px; margin-top:8px;">OBS専用プリセット</div>
+                <div style="display:flex; gap:8px;">
+                  <button class="btn-reset" style="flex:1; padding:4px; font-size:11px;" onclick="applyAutoColorSvg('obs-crush-fix')" title="黒が濃すぎたり、色が強烈すぎる場合に押してください">黒潰れ補正</button>
+                  <button class="btn-reset" style="flex:1; padding:4px; font-size:11px;" onclick="applyAutoColorSvg('obs-washout-fix')" title="全体が白っぽく、色が薄い場合に押してください">白浮き補正</button>
+                </div>
+                <button type="button" class="btn btn-ghost btn-sm" onclick="resetAutoColorFilter()" style="margin-top:4px; padding:6px; font-size:12px; border:1px solid rgba(255,255,255,0.2);">スライダーをリセット</button>
               </div>
             </div>
           </div>

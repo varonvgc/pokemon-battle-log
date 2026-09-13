@@ -477,23 +477,65 @@
       localStorage.setItem('autoModeColorC', c);
       localStorage.setItem('autoModeColorS', s);
       localStorage.setItem('autoModeColorH', h);
+      localStorage.removeItem('autoModeColorSvg'); // スライダー操作時はSVG設定を消去
     };
+
+    window.applyAutoColorSvg = function(filterId) {
+      const canvasEl = document.getElementById('auto-mode-canvas');
+      if (canvasEl) {
+        canvasEl.style.filter = `url(#${filterId})`;
+      }
+      localStorage.setItem('autoModeColorSvg', filterId);
+      
+      // スライダー表示はリセット相当にする
+      if (document.getElementById('auto-color-brightness')) document.getElementById('auto-color-brightness').value = 1;
+      if (document.getElementById('auto-color-contrast')) document.getElementById('auto-color-contrast').value = 1;
+      if (document.getElementById('auto-color-saturate')) document.getElementById('auto-color-saturate').value = 1;
+      if (document.getElementById('auto-color-hue')) document.getElementById('auto-color-hue').value = 0;
+      updateAutoColorLabelsOnly();
+    };
+
+    function updateAutoColorLabelsOnly() {
+      const lblB = document.getElementById('lbl-color-brightness');
+      const lblC = document.getElementById('lbl-color-contrast');
+      const lblS = document.getElementById('lbl-color-saturate');
+      const lblH = document.getElementById('lbl-color-hue');
+      if (lblB) lblB.textContent = '100%';
+      if (lblC) lblC.textContent = '100%';
+      if (lblS) lblS.textContent = '100%';
+      if (lblH) lblH.textContent = '0deg';
+    }
 
     window.resetAutoColorFilter = function() {
       const bEl = document.getElementById('auto-color-brightness');
       const cEl = document.getElementById('auto-color-contrast');
       const sEl = document.getElementById('auto-color-saturate');
       const hEl = document.getElementById('auto-color-hue');
-      
       if (bEl) bEl.value = 1;
       if (cEl) cEl.value = 1;
       if (sEl) sEl.value = 1;
       if (hEl) hEl.value = 0;
       
-      updateAutoColorFilter();
+      const canvasEl = document.getElementById('auto-mode-canvas');
+      if (canvasEl) {
+        canvasEl.style.filter = 'none';
+      }
+      updateAutoColorLabelsOnly();
+      
+      localStorage.removeItem('autoModeColorB');
+      localStorage.removeItem('autoModeColorC');
+      localStorage.removeItem('autoModeColorS');
+      localStorage.removeItem('autoModeColorH');
+      localStorage.removeItem('autoModeColorSvg');
     };
 
-    window.initAutoColorSettings = function() {
+    function initAutoColorSettings() {
+      const svgFilter = localStorage.getItem('autoModeColorSvg');
+      if (svgFilter) {
+        window.applyAutoColorSvg(svgFilter);
+        return;
+      }
+
       const b = localStorage.getItem('autoModeColorB');
       const c = localStorage.getItem('autoModeColorC');
       const s = localStorage.getItem('autoModeColorS');
