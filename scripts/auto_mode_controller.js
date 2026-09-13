@@ -436,7 +436,17 @@
         uniform sampler2D u_image;
         varying vec2 v_texCoord;
         void main() {
-          gl_FragColor = texture2D(u_image, v_texCoord);
+          vec4 color = texture2D(u_image, v_texCoord);
+          // pamo3 (Flutter CanvasKit) の色空間バグを完全にシミュレートする
+          // sRGBの鮮やかな映像をリニア空間に変換(ガンマ2.2)したまま出力することで、
+          // ユーザーが見慣れている「少し暗く、マイルドなくすんだ色」を強制的に再現
+          color.rgb = pow(color.rgb, vec3(2.2));
+          
+          // pamo3の黒は完全な黒(0)ではなく少し浮いている(約20/255 = 0.08)ため、
+          // コントラストをわずかに下げて黒を浮かせる近似補正を追加
+          color.rgb = color.rgb * 0.92 + 0.08;
+          
+          gl_FragColor = color;
         }
       `;
 
