@@ -512,13 +512,13 @@
       const sEl = document.getElementById('auto-color-saturate');
       const hEl = document.getElementById('auto-color-hue');
       if (bEl) bEl.value = 1;
-      if (cEl) cEl.value = 1;
-      if (sEl) sEl.value = 1;
+      if (cEl) cEl.value = 0.9;
+      if (sEl) sEl.value = 0.85;
       if (hEl) hEl.value = 0;
       
       const canvasEl = document.getElementById('auto-mode-canvas');
       if (canvasEl) {
-        canvasEl.style.filter = 'none';
+        canvasEl.style.filter = 'brightness(1) contrast(0.9) saturate(0.85) hue-rotate(0deg)';
       }
       updateAutoColorLabelsOnly();
       
@@ -541,26 +541,18 @@
       const s = localStorage.getItem('autoModeColorS');
       const h = localStorage.getItem('autoModeColorH');
 
-      if (b !== null) {
-        const bEl = document.getElementById('auto-color-brightness');
-        if (bEl) bEl.value = b;
-      }
-      if (c !== null) {
-        const cEl = document.getElementById('auto-color-contrast');
-        if (cEl) cEl.value = c;
-      }
-      if (s !== null) {
-        const sEl = document.getElementById('auto-color-saturate');
-        if (sEl) sEl.value = s;
-      }
-      if (h !== null) {
-        const hEl = document.getElementById('auto-color-hue');
-        if (hEl) hEl.value = h;
-      }
+      const bEl = document.getElementById('auto-color-brightness');
+      const cEl = document.getElementById('auto-color-contrast');
+      const sEl = document.getElementById('auto-color-saturate');
+      const hEl = document.getElementById('auto-color-hue');
+
+      if (bEl) bEl.value = b !== null ? b : 1;
+      if (cEl) cEl.value = c !== null ? c : 0.9;
+      if (sEl) sEl.value = s !== null ? s : 0.85;
+      if (hEl) hEl.value = h !== null ? h : 0;
 
       // 要素が存在すれば適用
       if (document.getElementById('auto-color-brightness')) {
         updateAutoColorFilter();
       }
-    };
-
+    }
