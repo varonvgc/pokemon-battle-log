@@ -403,118 +403,17 @@
       this._stopCanvasRenderLoop();
       const canvas = document.getElementById('auto-mode-canvas');
       if (!canvas || !this.videoElement) return;
-
-      const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-      if (!gl) {
-        // WebGLが使えない環境のフォールバック (2D Canvas)
-        const ctx = canvas.getContext('2d');
-        const render2d = () => {
-          if (!this.stream || this.videoElement.paused || this.videoElement.ended) return;
-          if (this.videoElement.videoWidth && this.videoElement.videoHeight) {
-            if (canvas.width !== this.videoElement.videoWidth) canvas.width = this.videoElement.videoWidth;
-            if (canvas.height !== this.videoElement.videoHeight) canvas.height = this.videoElement.videoHeight;
-            ctx.drawImage(this.videoElement, 0, 0, canvas.width, canvas.height);
-          }
-          this._renderLoopId = requestAnimationFrame(render2d);
-        };
-        this._renderLoopId = requestAnimationFrame(render2d);
-        return;
-      }
-
-      // --- WebGLによる描画 (pamo3の挙動を模倣してYUV→RGB色空間バグを回避) ---
-      const vsSource = `
-        attribute vec2 a_position;
-        attribute vec2 a_texCoord;
-        varying vec2 v_texCoord;
-        void main() {
-          gl_Position = vec4(a_position, 0.0, 1.0);
-          v_texCoord = a_texCoord;
-        }
-      `;
-      const fsSource = `
-        precision mediump float;
-        uniform sampler2D u_image;
-        varying vec2 v_texCoord;
-        void main() {
-          vec4 color = texture2D(u_image, v_texCoord);
-          // pamo3 (Flutter CanvasKit) の色空間バグを完全にシミュレートする
-          // sRGBの鮮やかな映像をリニア空間に変換(ガンマ2.2)したまま出力することで、
-          // ユーザーが見慣れている「少し暗く、マイルドなくすんだ色」を強制的に再現
-          color.rgb = pow(color.rgb, vec3(2.2));
-          
-          // pamo3の黒は完全な黒(0)ではなく少し浮いている(約20/255 = 0.08)ため、
-          // コントラストをわずかに下げて黒を浮かせる近似補正を追加
-          color.rgb = color.rgb * 0.92 + 0.08;
-          
-          gl_FragColor = color;
-        }
-      `;
-
-      const createShader = (gl, type, source) => {
-        const shader = gl.createShader(type);
-        gl.shaderSource(shader, source);
-        gl.compileShader(shader);
-        return shader;
-      };
-
-      const program = gl.createProgram();
-      gl.attachShader(program, createShader(gl, gl.VERTEX_SHADER, vsSource));
-      gl.attachShader(program, createShader(gl, gl.FRAGMENT_SHADER, fsSource));
-      gl.linkProgram(program);
-      gl.useProgram(program);
-
-      // ポリゴンの頂点座標
-      const posBuffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-        -1.0, -1.0,   1.0, -1.0,  -1.0,  1.0,
-        -1.0,  1.0,   1.0, -1.0,   1.0,  1.0
-      ]), gl.STATIC_DRAW);
-      const posLoc = gl.getAttribLocation(program, "a_position");
-      gl.enableVertexAttribArray(posLoc);
-      gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
-
-      // テクスチャ座標
-      const texBuffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, texBuffer);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
-        0.0, 0.0,     1.0, 0.0,   0.0, 1.0,
-        0.0, 1.0,     1.0, 0.0,   1.0, 1.0
-      ]), gl.STATIC_DRAW);
-      const texLoc = gl.getAttribLocation(program, "a_texCoord");
-      gl.enableVertexAttribArray(texLoc);
-      gl.vertexAttribPointer(texLoc, 2, gl.FLOAT, false, 0, 0);
-
-      // テクスチャ設定
-      const texture = gl.createTexture();
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-      
-      // 画像のY軸を反転 (HTML要素のY軸は下向き、WebGLは上向きのため)
-      gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-      
-      // pamo3(Flutter)と全く同じ色（ブラウザによる過剰な色空間補正・蛍光色化を無効化する）
-      gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
-
-      const renderGL = () => {
+      const ctx = canvas.getContext('2d');
+      const render = () => {
         if (!this.stream || this.videoElement.paused || this.videoElement.ended) return;
         if (this.videoElement.videoWidth && this.videoElement.videoHeight) {
-          if (canvas.width !== this.videoElement.videoWidth || canvas.height !== this.videoElement.videoHeight) {
-            canvas.width = this.videoElement.videoWidth;
-            canvas.height = this.videoElement.videoHeight;
-            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-          }
-          
-          gl.bindTexture(gl.TEXTURE_2D, texture);
-          // video要素をそのままテクスチャとして流し込む
-          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.videoElement);
-          gl.drawArrays(gl.TRIANGLES, 0, 6);
+          if (canvas.width !== this.videoElement.videoWidth) canvas.width = this.videoElement.videoWidth;
+          if (canvas.height !== this.videoElement.videoHeight) canvas.height = this.videoElement.videoHeight;
+          ctx.drawImage(this.videoElement, 0, 0, canvas.width, canvas.height);
         }
-        this._renderLoopId = requestAnimationFrame(renderGL);
+        this._renderLoopId = requestAnimationFrame(render);
       };
-      this._renderLoopId = requestAnimationFrame(renderGL);
+      this._renderLoopId = requestAnimationFrame(render);
     }
 
     _stopCanvasRenderLoop() {
