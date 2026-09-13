@@ -484,6 +484,9 @@
       
       // 画像のY軸を反転 (HTML要素のY軸は下向き、WebGLは上向きのため)
       gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+      
+      // pamo3(Flutter)と全く同じ色（ブラウザによる過剰な色空間補正・蛍光色化を無効化する）
+      gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
 
       const renderGL = () => {
         if (!this.stream || this.videoElement.paused || this.videoElement.ended) return;
@@ -495,7 +498,7 @@
           }
           
           gl.bindTexture(gl.TEXTURE_2D, texture);
-          // video要素をそのままテクスチャとして流し込む (ここでブラウザのWebGLドライバが正しく色変換を行う)
+          // video要素をそのままテクスチャとして流し込む
           gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.videoElement);
           gl.drawArrays(gl.TRIANGLES, 0, 6);
         }
