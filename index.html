@@ -775,6 +775,47 @@
           <button type="button" class="auto-ctrl-btn" onclick="refreshAutoCameraAndAudioDevices()" title="カメラ・音声デバイス再検索">📷</button>
           <button type="button" class="auto-ctrl-btn" onclick="toggleAutoSetupOverlay()" title="設定表示/非表示">⚙️</button>
           <button type="button" class="auto-ctrl-btn" onclick="openOcrSetupModal()" title="OCR読み取り調整 (pamo3互換)">🔤</button>
+          <!-- 色調補正ボタンとポップアップ -->
+          <div class="auto-color-control" style="position:relative; display:inline-flex; align-items:center; margin-right:4px;">
+            <button type="button" class="auto-ctrl-btn" onclick="toggleColorAdjustPopup()" title="映像の色調補正 (明るさ・コントラスト等)" style="margin:0;">
+              🎨
+            </button>
+            <div id="auto-color-popup" style="display:none; position:absolute; bottom:100%; left:50%; transform:translateX(-50%); padding-bottom:12px; z-index:100;">
+              <div style="background:rgba(30,41,59,0.95); border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:16px; box-shadow:0 8px 24px rgba(0,0,0,0.6); backdrop-filter:blur(12px); width:240px; display:flex; flex-direction:column; gap:12px;">
+                <div style="font-size:13px; font-weight:bold; color:#fff; text-align:center; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:8px;">映像の色調補正</div>
+                
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <div style="display:flex; justify-content:space-between; font-size:12px; color:#cbd5e1;">
+                    <span>明るさ</span><span id="lbl-color-brightness">100%</span>
+                  </div>
+                  <input type="range" id="auto-color-brightness" min="0.5" max="2" step="0.05" value="1" oninput="updateAutoColorFilter()" style="accent-color:#3b82f6;">
+                </div>
+                
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <div style="display:flex; justify-content:space-between; font-size:12px; color:#cbd5e1;">
+                    <span>コントラスト</span><span id="lbl-color-contrast">100%</span>
+                  </div>
+                  <input type="range" id="auto-color-contrast" min="0.5" max="2" step="0.05" value="1" oninput="updateAutoColorFilter()" style="accent-color:#3b82f6;">
+                </div>
+                
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <div style="display:flex; justify-content:space-between; font-size:12px; color:#cbd5e1;">
+                    <span>彩度</span><span id="lbl-color-saturate">100%</span>
+                  </div>
+                  <input type="range" id="auto-color-saturate" min="0" max="2" step="0.05" value="1" oninput="updateAutoColorFilter()" style="accent-color:#3b82f6;">
+                </div>
+
+                <div style="display:flex; flex-direction:column; gap:4px;">
+                  <div style="display:flex; justify-content:space-between; font-size:12px; color:#cbd5e1;">
+                    <span>色相</span><span id="lbl-color-hue">0deg</span>
+                  </div>
+                  <input type="range" id="auto-color-hue" min="-180" max="180" step="5" value="0" oninput="updateAutoColorFilter()" style="accent-color:#3b82f6;">
+                </div>
+
+                <button type="button" class="btn btn-ghost btn-sm" onclick="resetAutoColorFilter()" style="margin-top:4px; padding:6px; font-size:12px; border:1px solid rgba(255,255,255,0.2);">リセット</button>
+              </div>
+            </div>
+          </div>
           <!-- 追加: PC音声ミュート切替ボタンと縦型音量スライダー -->
           <div class="auto-volume-control" style="position:relative; display:inline-flex; align-items:center; margin-right:4px;" onmouseenter="document.getElementById('auto-volume-popup').style.display='flex'" onmouseleave="document.getElementById('auto-volume-popup').style.display='none'">
             <button type="button" class="auto-ctrl-btn" id="btn-toggle-auto-mute" onclick="toggleAutoPreviewMuteQuick()" title="PC音声ミュート中 (クリックで音声を再生/消音。録画には影響しません)" style="margin:0;">

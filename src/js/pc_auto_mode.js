@@ -99,6 +99,9 @@
       if (controlSlider) controlSlider.value = savedVol;
       updateMuteUI(savedMute);
 
+      // 色調補正の初期化
+      initAutoColorSettings();
+
       console.log(`[AutoMode] Entered PC Auto Mode (Split View: Champions ${autoMatchType} BO1)`);
     }
 
@@ -435,4 +438,87 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       initAutoRecordState();
+      initAutoColorSettings();
     });
+
+    // --- 色調補正機能 ---
+    window.toggleColorAdjustPopup = function() {
+      const popup = document.getElementById('auto-color-popup');
+      if (popup) {
+        popup.style.display = popup.style.display === 'none' ? 'block' : 'none';
+      }
+    };
+
+    window.updateAutoColorFilter = function() {
+      const b = document.getElementById('auto-color-brightness')?.value || 1;
+      const c = document.getElementById('auto-color-contrast')?.value || 1;
+      const s = document.getElementById('auto-color-saturate')?.value || 1;
+      const h = document.getElementById('auto-color-hue')?.value || 0;
+
+      const filterStr = `brightness(${b}) contrast(${c}) saturate(${s}) hue-rotate(${h}deg)`;
+      const videoEl = document.getElementById('auto-mode-video');
+      if (videoEl) {
+        videoEl.style.filter = filterStr;
+      }
+
+      // UIラベル更新
+      const lblB = document.getElementById('lbl-color-brightness');
+      const lblC = document.getElementById('lbl-color-contrast');
+      const lblS = document.getElementById('lbl-color-saturate');
+      const lblH = document.getElementById('lbl-color-hue');
+      
+      if (lblB) lblB.textContent = Math.round(b * 100) + '%';
+      if (lblC) lblC.textContent = Math.round(c * 100) + '%';
+      if (lblS) lblS.textContent = Math.round(s * 100) + '%';
+      if (lblH) lblH.textContent = h + 'deg';
+
+      // 保存
+      localStorage.setItem('autoModeColorB', b);
+      localStorage.setItem('autoModeColorC', c);
+      localStorage.setItem('autoModeColorS', s);
+      localStorage.setItem('autoModeColorH', h);
+    };
+
+    window.resetAutoColorFilter = function() {
+      const bEl = document.getElementById('auto-color-brightness');
+      const cEl = document.getElementById('auto-color-contrast');
+      const sEl = document.getElementById('auto-color-saturate');
+      const hEl = document.getElementById('auto-color-hue');
+      
+      if (bEl) bEl.value = 1;
+      if (cEl) cEl.value = 1;
+      if (sEl) sEl.value = 1;
+      if (hEl) hEl.value = 0;
+      
+      updateAutoColorFilter();
+    };
+
+    window.initAutoColorSettings = function() {
+      const b = localStorage.getItem('autoModeColorB');
+      const c = localStorage.getItem('autoModeColorC');
+      const s = localStorage.getItem('autoModeColorS');
+      const h = localStorage.getItem('autoModeColorH');
+
+      if (b !== null) {
+        const bEl = document.getElementById('auto-color-brightness');
+        if (bEl) bEl.value = b;
+      }
+      if (c !== null) {
+        const cEl = document.getElementById('auto-color-contrast');
+        if (cEl) cEl.value = c;
+      }
+      if (s !== null) {
+        const sEl = document.getElementById('auto-color-saturate');
+        if (sEl) sEl.value = s;
+      }
+      if (h !== null) {
+        const hEl = document.getElementById('auto-color-hue');
+        if (hEl) hEl.value = h;
+      }
+
+      // 要素が存在すれば適用
+      if (document.getElementById('auto-color-brightness')) {
+        updateAutoColorFilter();
+      }
+    };
+
