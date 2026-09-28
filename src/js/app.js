@@ -7,6 +7,9 @@
     let POKEMON_ICON_BY_NAME = {};
     let POKEMON_BY_ICON_FILE = {};
     let _masterDataPromise = null;
+    let _isSpectatorMode = false;
+    let _spectatorOwnerUid = null;
+    let _spectatorPasscode = null;
 
     // ---- PARTIES (State variables hoisted to top) ----
     const PARTY_PAGE_SIZE = 30;
@@ -635,6 +638,7 @@
 
     // Firestoreへのデータ保存
     async function saveData() {
+      if (_isSpectatorMode) return; // 観戦モード中は保存処理をブロック
       localStorage.setItem('pkm_parties', JSON.stringify(parties));
       localStorage.setItem('pkm_records', JSON.stringify(records));
       localStorage.setItem('pkm_seasons', JSON.stringify(seasons));
@@ -662,6 +666,11 @@
         if (driveClientId) payload.driveClientId = driveClientId;
 
         await setDoc(doc(db, 'users', uid, 'data', 'main'), payload, { merge: true });
+        const isEnabled = localStorage.getItem('pkm_share_enabled') === 'true';
+        const passcode = localStorage.getItem('pkm_share_passcode');
+        if (isEnabled && passcode) {
+           await syncShareData(uid, passcode);
+        }
         _lastLoadedAt = Date.now();
         // 自分が保存したのでバナーを消す
         _conflictBannerDismissed = false;
@@ -8378,6 +8387,186 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       initRecordAiEvents();
+    });
+
+    
+    // ==== 共有設定・観戦モード関連 ====
+    async function generateShareHash(uid, passcode) {
+      const msgUint8 = new TextEncoder().encode(uid + ':' + passcode);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function toggleShareEnabled() {
+      const isEnabled = document.getElementById('dm-share-enabled').checked;
+      const area = document.getElementById('dm-share-settings-area');
+      if (area) area.style.display = isEnabled ? 'block' : 'none';
+      
+      if (!isEnabled) {
+        // 共有OFF時はすぐにクラウドへ反映
+        saveShareSettings(false);
+      } else {
+        if (currentUser) {
+            document.getElementById('dm-share-url').value = location.origin + location.pathname + '?share=' + currentUser.uid;
+        }
+      }
+    }
+
+    async function saveShareSettings(forceEnabled) {
+      const enabledCheckbox = document.getElementById('dm-share-enabled');
+      const isEnabled = forceEnabled !== undefined ? forceEnabled : (enabledCheckbox ? enabledCheckbox.checked : false);
+      const passcode = document.getElementById('dm-share-passcode') ? document.getElementById('dm-share-passcode').value.trim() : '';
+
+      if (isEnabled && (!passcode || !/^[a-zA-Z0-9!-/:-@\[-`{-~]{1,10}$/.test(passcode))) {
+        alert('合言葉は半角英数記号1〜10文字で設定してください。');
+        return;
+      }
+
+      localStorage.setItem('pkm_share_enabled', isEnabled);
+      localStorage.setItem('pkm_share_passcode', passcode);
+
+      if (currentUser && window._firestoreOps && window._fbReady) {
+        try {
+          // mainドキュメントに状態保存
+          await window._firestoreOps.setDoc(
+            window._firestoreOps.doc(window._db, 'users', currentUser.uid, 'data', 'main'),
+            {
+              shareEnabled: isEnabled,
+              sharePasscode: passcode,
+              updatedAt: window._firestoreOps.serverTimestamp()
+            },
+            { merge: true }
+          );
+          
+          // 共有ONの場合はshares_dataにもデータを同期
+          if (isEnabled) {
+             await syncShareData(currentUser.uid, passcode);
+          } else if (passcode) {
+             // 共有OFFの場合、該当ハッシュのデータを消去(任意)
+             const hash = await generateShareHash(currentUser.uid, passcode);
+             await window._firestoreOps.deleteDoc(window._firestoreOps.doc(window._db, 'shares_data', hash));
+          }
+
+          if (forceEnabled !== false) {
+             showRecordToast('✅ 共有設定を保存しました');
+          }
+        } catch(e) {
+          console.error("Share config save error", e);
+        }
+      }
+    }
+
+    window.toggleShareEnabled = toggleShareEnabled;
+    window.saveShareSettings = saveShareSettings;
+    window.copyShareUrl = function() {
+        const url = document.getElementById('dm-share-url');
+        if (url && url.value) {
+            navigator.clipboard.writeText(url.value).then(() => showRecordToast('📋 URLをコピーしました！'));
+        }
+    };
+
+    function updateShareUI() {
+       const isEnabled = localStorage.getItem('pkm_share_enabled') === 'true';
+       const passcode = localStorage.getItem('pkm_share_passcode') || '';
+       const cb = document.getElementById('dm-share-enabled');
+       const passEl = document.getElementById('dm-share-passcode');
+       const urlEl = document.getElementById('dm-share-url');
+       
+       if (cb) cb.checked = isEnabled;
+       if (passEl) passEl.value = passcode;
+       if (urlEl && currentUser) {
+           urlEl.value = location.origin + location.pathname + '?share=' + currentUser.uid;
+       }
+       toggleShareEnabled();
+    }
+
+    async function syncShareData(uid, passcode) {
+       if (!uid || !passcode || !_fbReady) return;
+       const hash = await generateShareHash(uid, passcode);
+       const payload = {
+          ownerUid: uid,
+          ownerName: getShowdownUsername() || currentUser.displayName || "Unknown",
+          parties: parties || [],
+          records: records || [],
+          seasons: seasons || [],
+          customTags: customTags || [],
+          updatedAt: window._firestoreOps.serverTimestamp()
+       };
+       await window._firestoreOps.setDoc(
+          window._firestoreOps.doc(window._db, 'shares_data', hash),
+          payload
+       );
+    }
+
+    async function initSpectatorMode() {
+       const params = new URLSearchParams(window.location.search);
+       const shareUid = params.get('share');
+       if (!shareUid) return false;
+
+       _isSpectatorMode = true;
+       _spectatorOwnerUid = shareUid;
+
+       // モード変更UI
+       const banner = document.getElementById('spectator-banner');
+       if (banner) banner.style.display = 'block';
+       document.querySelectorAll('.dm-admin-only, .btn-auto-mode').forEach(el => el.style.display = 'none');
+       
+       // 記録・データ管理タブを隠す
+       document.querySelectorAll('nav button').forEach(b => {
+           if (b.textContent.includes('記録する') || b.textContent.includes('データ管理')) {
+               b.style.display = 'none';
+           }
+       });
+
+       setTimeout(async () => {
+           const passcode = prompt("👀 共有データを閲覧するための合言葉を入力してください");
+           if (!passcode) {
+               location.href = location.origin + location.pathname;
+               return;
+           }
+           
+           try {
+               const hash = await generateShareHash(shareUid, passcode);
+               // _fbReadyになるまで待つ
+               let waitCount = 0;
+               while (!_fbReady && waitCount < 50) {
+                   await new Promise(r => setTimeout(r, 100));
+                   waitCount++;
+               }
+               
+               const snap = await window._firestoreOps.getDoc(window._firestoreOps.doc(window._db, 'shares_data', hash));
+               if (snap.exists()) {
+                   const data = snap.data();
+                   parties = data.parties || [];
+                   records = data.records || [];
+                   seasons = data.seasons || [];
+                   customTags = data.customTags || [];
+                   
+                   const ownerName = data.ownerName || "プレイヤー";
+                   const nameSpan = document.getElementById('spectator-owner-name');
+                   if (nameSpan) nameSpan.textContent = ownerName;
+                   
+                   renderParties();
+                   renderHistory();
+                   showRecordToast(`✅ ${ownerName}さんのデータを読み込みました`);
+               } else {
+                   alert("❌ 合言葉が間違っているか、共有がオフになっています。");
+                   location.href = location.origin + location.pathname;
+               }
+           } catch(e) {
+               console.error("Spectator load error", e);
+               alert("❌ データの読み込みに失敗しました。");
+           }
+       }, 500);
+
+       return true;
+    }
+
+
+    // ==== Spectator Mode Bootstrap ====
+    window.addEventListener('DOMContentLoaded', () => {
+        initSpectatorMode();
     });
 
     // ---- INIT ----

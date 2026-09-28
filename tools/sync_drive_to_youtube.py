@@ -263,6 +263,33 @@ def update_firestore_record(db, uid, record_id, youtube_video_id):
             })
             print(f"  ✅ Firestore mainドキュメント レコード更新完了 (Record ID: {record_id})")
 
+            # --- 共有データの更新 ---
+            share_enabled = data.get('shareEnabled', False)
+            share_passcode = data.get('sharePasscode', '')
+            if share_enabled and share_passcode:
+                try:
+                    import hashlib
+                    hash_str = hashlib.sha256(f"{uid}:{share_passcode}".encode('utf-8')).hexdigest()
+                    share_ref = db.collection('shares_data').document(hash_str)
+                    share_doc = share_ref.get()
+                    if share_doc.exists:
+                        share_data = share_doc.to_dict()
+                        share_records = share_data.get('records', [])
+                        updated_share = False
+                        for sr in share_records:
+                            if isinstance(sr, dict) and str(sr.get('id')) == str(record_id):
+                                sr['video_url'] = f"https://youtu.be/{youtube_video_id}"
+                                sr['youtube_video_id'] = youtube_video_id
+                                updated_share = True
+                                break
+                        if updated_share:
+                            share_ref.update({'records': share_records, 'updatedAt': firestore.SERVER_TIMESTAMP})
+                            print(f"  ✅ Firestore shares_data レコード更新完了 (Record ID: {record_id})")
+                except Exception as e:
+                    print(f"  ⚠️ shares_data 更新エラー: {e}")
+            # ---------------------------
+
+
     # Webアプリは subcollection を優先マージするため、そちらも更新する
     sub_doc_ref = db.collection('users').document(uid).collection('records').document(str(record_id))
     try:

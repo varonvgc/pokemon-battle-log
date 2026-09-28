@@ -87,6 +87,12 @@
       </div>
     </div>
 
+    <!-- 共有(閲覧専用)モード用バナー -->
+    <div id="spectator-banner" style="display:none;background:var(--primary);color:#fff;padding:8px 20px;text-align:center;font-size:14px;font-weight:bold;z-index:9999;">
+      👀 <span id="spectator-owner-name"></span>さんの対戦ログを閲覧中 (閲覧専用)
+      <a href="index.html" style="color:#fff;text-decoration:underline;margin-left:12px;font-weight:normal;font-size:12px;">自分のデータに戻る</a>
+    </div>
+
     <nav>
       <span class="logo">⚔️ 対戦記録</span>
       <button class="active" onclick="showPage('parties',this)">パーティ管理</button>
@@ -612,6 +618,38 @@
         <button type="button" class="btn btn-primary btn-sm" onclick="openCreateTagModal()" style="font-size:12px;padding:4px 10px">+ 新規タグ作成</button>
       </div>
       <div id="dm-tags-list" style="display:flex;flex-direction:column;gap:8px"></div>
+    </div>
+
+    <!-- 共有設定カード -->
+    <div class="card mb-4" id="dm-share-card">
+      <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <span style="display:flex;align-items:center;gap:6px">🔗 履歴の外部共有設定</span>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:14px;font-weight:bold;">
+          <input type="checkbox" id="dm-share-enabled" onchange="toggleShareEnabled()" style="width:16px;height:16px;">
+          共有を有効にする
+        </label>
+      </div>
+      
+      <div id="dm-share-settings-area" style="display:none;">
+        <div style="margin-bottom:12px;">
+          <label style="font-size:12px;color:var(--text-muted);margin-bottom:6px;display:block">共有URL</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" id="dm-share-url" readonly style="flex:1;background:var(--surface2);color:var(--text-muted)" autocomplete="off">
+            <button type="button" class="btn btn-ghost" onclick="copyShareUrl()" style="white-space:nowrap">📋 コピー</button>
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size:12px;color:var(--text-muted);margin-bottom:6px;display:block">合言葉 (半角英数記号10文字まで)</label>
+          <div style="display:flex;gap:8px;align-items:center">
+            <input type="text" id="dm-share-passcode" placeholder="例: poke2026!" maxlength="10" pattern="^[a-zA-Z0-9!-/:-@\[-`{-~]{1,10}$" style="flex:1" autocomplete="off">
+            <button type="button" class="btn btn-primary" onclick="saveShareSettings()" style="white-space:nowrap">💾 保存</button>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:12px">
+        ※ 共有をONにすると、URLと合言葉を知っている人があなたの対戦記録を「閲覧専用」で見られるようになります。
+      </div>
     </div>
 
     <!-- Showdown ユーザー名設定カード（全ユーザー共通） -->
