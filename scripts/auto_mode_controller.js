@@ -822,6 +822,14 @@
       if (typeof localStorage !== 'undefined') {
         this.isAutoRecordingEnabled = localStorage.getItem('autoModeAutoRecord') === 'true';
       }
+      // ローカル保存設定かつ自動録画ONの場合はフォルダアクセス権限を確認・要求（ユーザー操作契機）
+      if (typeof window.checkLocalRecordingPermissionIfNeeded === 'function') {
+        try {
+          await window.checkLocalRecordingPermissionIfNeeded();
+        } catch (e) {
+          console.warn('[AutoMode] Permission check error:', e);
+        }
+      }
       // フォームを即座に初期化・表示して待機
       this._setupRecordFormForNewBattle();
       await this.ensureWorkersReady();

@@ -357,7 +357,100 @@
       }
     }
 
-    // Google Drive 設定
+    // 動画保存先・連携設定 (Google Drive / ローカル端末)
+    function getVideoStorageType() {
+      return localStorage.getItem('pkm_video_storage_type') || 'drive';
+    }
+
+    function setVideoStorageType(type) {
+      localStorage.setItem('pkm_video_storage_type', type);
+    }
+
+    function getLocalDirName() {
+      return localStorage.getItem('pkm_local_dir_name') || '';
+    }
+
+    function onStorageTypeChanged(type) {
+      setVideoStorageType(type);
+      updateDriveSettingsUI();
+    }
+    window.onStorageTypeChanged = onStorageTypeChanged;
+
+    async function verifyFilePermission(handle, readWrite = true) {
+      if (!handle) return false;
+      const options = {};
+      if (readWrite) options.mode = 'readwrite';
+      try {
+        if ((await handle.queryPermission(options)) === 'granted') {
+          return true;
+        }
+        if ((await handle.requestPermission(options)) === 'granted') {
+          return true;
+        }
+      } catch (e) {
+        console.warn('verifyFilePermission error:', e);
+      }
+      return false;
+    }
+    window.verifyFilePermission = verifyFilePermission;
+
+    async function selectLocalDirectory() {
+      if (!window.showDirectoryPicker) {
+        alert('お使いのブラウザはローカルフォルダ直接保存に対応していません。Google ChromeまたはMicrosoft Edgeをご利用ください。');
+        return;
+      }
+      try {
+        const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
+        if (handle) {
+          await VideoStore.saveHandle('local_video_dir', handle);
+          localStorage.setItem('pkm_local_dir_name', handle.name);
+          updateDriveSettingsUI();
+          showRecordToast(`📁 保存先フォルダ「${handle.name}」を設定しました`);
+        }
+      } catch (e) {
+        if (e.name !== 'AbortError') {
+          console.error('Directory picker failed:', e);
+          alert('フォルダの選択に失敗しました: ' + e.message);
+        }
+      }
+    }
+    window.selectLocalDirectory = selectLocalDirectory;
+
+    async function saveVideoToLocalDirectory(fileOrBlob, fileName) {
+      const handle = await VideoStore.getHandle('local_video_dir');
+      if (!handle) {
+        throw new Error('ローカル保存先フォルダが未設定です。「データ管理」でフォルダを選択してください。');
+      }
+      const ok = await verifyFilePermission(handle, true);
+      if (!ok) {
+        throw new Error('保存先フォルダへの書き込み権限が許可されませんでした。');
+      }
+      const fileHandle = await handle.getFileHandle(fileName, { create: true });
+      const writable = await fileHandle.createWritable();
+      await writable.write(fileOrBlob);
+      await writable.close();
+      return fileName;
+    }
+    window.saveVideoToLocalDirectory = saveVideoToLocalDirectory;
+
+    async function checkLocalRecordingPermissionIfNeeded() {
+      if (getVideoStorageType() !== 'local') return true;
+      const isAutoRecord = localStorage.getItem('autoModeAutoRecord') === 'true';
+      if (!isAutoRecord) return true;
+      const handle = await VideoStore.getHandle('local_video_dir');
+      if (!handle) {
+        alert('⚠️ 動画保存先が「ローカル端末」に設定されていますが、フォルダが選択されていません。「データ管理」でフォルダを選択してください。');
+        return false;
+      }
+      const ok = await verifyFilePermission(handle, true);
+      if (!ok) {
+        alert('⚠️ 保存先フォルダへのアクセス権限が許可されませんでした。録画が保存できない可能性があります。');
+        return false;
+      }
+      return true;
+    }
+    window.checkLocalRecordingPermissionIfNeeded = checkLocalRecordingPermissionIfNeeded;
+
     function getDriveFolderId() {
       return localStorage.getItem('pkm_drive_folder_id') || '';
     }
@@ -367,6 +460,7 @@
     }
 
     async function saveDriveSettings() {
+      const storageType = getVideoStorageType();
       const folderInput = document.getElementById('dm-drive-folder-id');
       const clientInput = document.getElementById('dm-drive-client-id');
       const folderId = (folderInput ? folderInput.value : '').trim();
@@ -374,6 +468,7 @@
 
       localStorage.setItem('pkm_drive_folder_id', folderId);
       localStorage.setItem('pkm_drive_client_id', clientId);
+      localStorage.setItem('pkm_video_storage_type', storageType);
 
       if (currentUser && _fbReady) {
         const { doc, setDoc } = window._firestoreOps;
@@ -382,6 +477,7 @@
           await setDoc(doc(db, 'users', currentUser.uid, 'data', 'main'), {
             driveFolderId: folderId,
             driveClientId: clientId,
+            videoStorageType: storageType,
             updatedAt: window._firestoreOps.serverTimestamp(),
             updatedBy: CLIENT_ID
           }, { merge: true });
@@ -389,11 +485,28 @@
           console.error('Failed to save Drive settings to Firestore:', e);
         }
       }
-      showRecordToast('✅ Google Drive設定を保存しました！');
+      showRecordToast('✅ 動画保存設定を保存しました！');
       updateDriveSettingsUI();
     }
 
     function updateDriveSettingsUI() {
+      const storageType = getVideoStorageType();
+      const driveRadio = document.getElementById('storage-type-drive');
+      const localRadio = document.getElementById('storage-type-local');
+      if (driveRadio) driveRadio.checked = (storageType === 'drive');
+      if (localRadio) localRadio.checked = (storageType === 'local');
+
+      const driveSec = document.getElementById('dm-drive-storage-section');
+      const localSec = document.getElementById('dm-local-storage-section');
+      if (driveSec) driveSec.style.display = (storageType === 'drive') ? 'block' : 'none';
+      if (localSec) localSec.style.display = (storageType === 'local') ? 'block' : 'none';
+
+      const localDirNameEl = document.getElementById('dm-local-dir-name');
+      if (localDirNameEl) {
+        const dirName = getLocalDirName();
+        localDirNameEl.textContent = dirName ? `選択中: ${dirName}` : '未選択';
+      }
+
       const folderInput = document.getElementById('dm-drive-folder-id');
       const clientInput = document.getElementById('dm-drive-client-id');
       if (folderInput) folderInput.value = getDriveFolderId();
@@ -401,18 +514,31 @@
 
       const badge = document.getElementById('dm-drive-status-badge');
       if (badge) {
-        if (window._googleDriveAccessToken && Date.now() < window._googleDriveTokenExpiresAt) {
-          badge.textContent = '認証済み (接続中)';
-          badge.style.background = 'rgba(74,222,128,0.15)';
-          badge.style.color = 'var(--win)';
-        } else if (getDriveClientId()) {
-          badge.textContent = 'Client ID設定済 (未認証)';
-          badge.style.background = 'rgba(245,158,11,0.15)';
-          badge.style.color = '#f59e0b';
+        if (storageType === 'local') {
+          const dirName = getLocalDirName();
+          if (dirName) {
+            badge.textContent = `ローカル (${dirName})`;
+            badge.style.background = 'rgba(59,130,246,0.15)';
+            badge.style.color = '#3b82f6';
+          } else {
+            badge.textContent = 'フォルダ未選択';
+            badge.style.background = 'rgba(239,68,68,0.15)';
+            badge.style.color = '#ef4444';
+          }
         } else {
-          badge.textContent = '未設定';
-          badge.style.background = 'var(--surface2)';
-          badge.style.color = 'var(--text-muted)';
+          if (window._googleDriveAccessToken && Date.now() < window._googleDriveTokenExpiresAt) {
+            badge.textContent = '認証済み (接続中)';
+            badge.style.background = 'rgba(74,222,128,0.15)';
+            badge.style.color = 'var(--win)';
+          } else if (getDriveClientId()) {
+            badge.textContent = 'Client ID設定済 (未認証)';
+            badge.style.background = 'rgba(245,158,11,0.15)';
+            badge.style.color = '#f59e0b';
+          } else {
+            badge.textContent = '未設定';
+            badge.style.background = 'var(--surface2)';
+            badge.style.color = 'var(--text-muted)';
+          }
         }
       }
     }
@@ -660,6 +786,9 @@
           }
           if (data.driveClientId !== undefined) {
             localStorage.setItem('pkm_drive_client_id', data.driveClientId || '');
+          }
+          if (data.videoStorageType !== undefined) {
+            localStorage.setItem('pkm_video_storage_type', data.videoStorageType || 'drive');
           }
           updateDriveSettingsUI();
 
@@ -3166,22 +3295,49 @@
 
       // 添付動画情報の引き継ぎ・保存
       if (_attachedVideoData) {
-        rec.sync_status = _attachedVideoData.sync_status || 'local_pending';
-        rec.created_at = _attachedVideoData.created_at || Date.now();
-        if (_attachedVideoData.original_name) rec.video_original_name = _attachedVideoData.original_name;
-        if (_attachedVideoData.drive_file_id) rec.drive_file_id = _attachedVideoData.drive_file_id;
-        if (_attachedVideoData.video_url) rec.video_url = _attachedVideoData.video_url;
-        if (_attachedVideoData.youtube_video_id) rec.youtube_video_id = _attachedVideoData.youtube_video_id;
-        // local_pendingかつ仮キーの場合、IndexedDBのキーを実レコードIDに変更
-        if (_attachedVideoData.sync_status === 'local_pending' &&
-            _attachedVideoData.local_key && _attachedVideoData.local_key.startsWith('_new_')) {
-          const finalId = editingRecordId || rec.id;
-          try {
-            await VideoStore.rename(_attachedVideoData.local_key, finalId);
-          } catch(e) {
-            console.warn('IndexedDB rename error:', e);
+        if (_attachedVideoData.sync_status === 'local_file') {
+          if (_attachedVideoData.file) {
+            const finalId = editingRecordId || rec.id;
+            const ext = (_attachedVideoData.original_name && _attachedVideoData.original_name.includes('.'))
+              ? _attachedVideoData.original_name.split('.').pop()
+              : 'webm';
+            const localFileName = `battle_${finalId}_${Date.now()}.${ext}`;
+            try {
+              await saveVideoToLocalDirectory(_attachedVideoData.file, localFileName);
+              rec.sync_status = 'local_file';
+              rec.local_file_name = localFileName;
+              rec.created_at = _attachedVideoData.created_at || Date.now();
+              if (_attachedVideoData.original_name) rec.video_original_name = _attachedVideoData.original_name;
+              showRecordToast('📁 動画をローカルフォルダに保存しました');
+            } catch (err) {
+              console.error('Failed to save video to local folder:', err);
+              alert(`⚠️ ローカルフォルダへの動画保存に失敗しました: ${err.message}`);
+            }
+          } else if (_attachedVideoData.local_file_name) {
+            // 編集モードで既存ローカル動画を維持する場合
+            rec.sync_status = 'local_file';
+            rec.local_file_name = _attachedVideoData.local_file_name;
+            rec.created_at = _attachedVideoData.created_at || Date.now();
+            if (_attachedVideoData.original_name) rec.video_original_name = _attachedVideoData.original_name;
           }
-          _attachedVideoData.local_key = finalId;
+        } else {
+          rec.sync_status = _attachedVideoData.sync_status || 'local_pending';
+          rec.created_at = _attachedVideoData.created_at || Date.now();
+          if (_attachedVideoData.original_name) rec.video_original_name = _attachedVideoData.original_name;
+          if (_attachedVideoData.drive_file_id) rec.drive_file_id = _attachedVideoData.drive_file_id;
+          if (_attachedVideoData.video_url) rec.video_url = _attachedVideoData.video_url;
+          if (_attachedVideoData.youtube_video_id) rec.youtube_video_id = _attachedVideoData.youtube_video_id;
+          // local_pendingかつ仮キーの場合、IndexedDBのキーを実レコードIDに変更
+          if (_attachedVideoData.sync_status === 'local_pending' &&
+              _attachedVideoData.local_key && _attachedVideoData.local_key.startsWith('_new_')) {
+            const finalId = editingRecordId || rec.id;
+            try {
+              await VideoStore.rename(_attachedVideoData.local_key, finalId);
+            } catch(e) {
+              console.warn('IndexedDB rename error:', e);
+            }
+            _attachedVideoData.local_key = finalId;
+          }
         }
       }
 
@@ -3204,8 +3360,10 @@
         showRecordToast('💾 対戦記録を保存しました！');
       }
 
-      // WiFi環境かつ認証済みなら即座にアップロードキューを起動
-      setTimeout(() => startUploadQueue(), 300);
+      // WiFi環境かつ認証済みなら即座にアップロードキューを起動（ローカルモード時はスキップ）
+      if (getVideoStorageType() !== 'local') {
+        setTimeout(() => startUploadQueue(), 300);
+      }
 
       // 動画添付状態のリセット
       _attachedVideoData = null;
@@ -3302,7 +3460,9 @@
 
       // 動画バッジのHTML
       let videoBadgeHtml = '';
-      if (r.sync_status === 'local_pending') {
+      if (r.sync_status === 'local_file') {
+        videoBadgeHtml = `<span style="font-size:10px;padding:1px 5px;background:#3b82f6;color:#fff;border-radius:4px;font-weight:700" title="ローカルフォルダに保存済み (直接再生可)">📁 ローカル</span>`;
+      } else if (r.sync_status === 'local_pending') {
         videoBadgeHtml = `<span style="font-size:10px;padding:1px 5px;background:var(--accent);color:#fff;border-radius:4px;font-weight:700" title="端末内に保存中 (タップでアプリ内再生)">📱 ローカル</span>`;
       } else if (r.video_url || r.drive_file_id || r.youtube_video_id) {
         const isUploaded = r.sync_status === 'yt_uploaded' || r.sync_status === 'uploaded' ||
@@ -3491,12 +3651,21 @@
     const VideoStore = (() => {
       const DB_NAME = 'PokemonBattleVideoStore';
       const STORE_NAME = 'videos';
+      const STORE_HANDLES = 'handles';
       let _db = null;
       async function open() {
         if (_db) return _db;
         return new Promise((resolve, reject) => {
-          const req = indexedDB.open(DB_NAME, 1);
-          req.onupgradeneeded = (e) => { e.target.result.createObjectStore(STORE_NAME); };
+          const req = indexedDB.open(DB_NAME, 2);
+          req.onupgradeneeded = (e) => {
+            const db = e.target.result;
+            if (!db.objectStoreNames.contains(STORE_NAME)) {
+              db.createObjectStore(STORE_NAME);
+            }
+            if (!db.objectStoreNames.contains(STORE_HANDLES)) {
+              db.createObjectStore(STORE_HANDLES);
+            }
+          };
           req.onsuccess = (e) => { _db = e.target.result; resolve(_db); };
           req.onerror = (e) => reject(e.target.error);
         });
@@ -3534,6 +3703,24 @@
           if (!file) return;
           await this.save(newKey, file);
           await this.delete(oldKey);
+        },
+        async saveHandle(key, handle) {
+          const db = await open();
+          return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_HANDLES, 'readwrite');
+            tx.objectStore(STORE_HANDLES).put(handle, key);
+            tx.oncomplete = () => resolve();
+            tx.onerror = (e) => reject(e.target.error);
+          });
+        },
+        async getHandle(key) {
+          const db = await open();
+          return new Promise((resolve, reject) => {
+            const tx = db.transaction(STORE_HANDLES, 'readonly');
+            const req = tx.objectStore(STORE_HANDLES).get(key);
+            req.onsuccess = (e) => resolve(e.target.result || null);
+            req.onerror = (e) => reject(e.target.error);
+          });
         }
       };
     })();
@@ -3546,6 +3733,37 @@
     async function onVideoFileSelected(input) {
       const file = input.files && input.files[0];
       if (!file) return;
+
+      const storageType = getVideoStorageType();
+
+      // ローカル保存モードの場合
+      if (storageType === 'local') {
+        const dirHandle = await VideoStore.getHandle('local_video_dir');
+        if (!dirHandle) {
+          alert('⚠️ 動画の保存先が「ローカル端末」に設定されていますが、フォルダが選択されていません。「データ管理」でフォルダを選択してください。');
+          input.value = '';
+          return;
+        }
+        const hasPerm = await verifyFilePermission(dirHandle, true);
+        if (!hasPerm) {
+          alert('⚠️ 保存先フォルダへのアクセス権限が許可されませんでした。');
+          input.value = '';
+          return;
+        }
+
+        _pendingOldVideoForCleanup = null;
+        _attachedVideoData = {
+          file: file,
+          sync_status: 'local_file',
+          original_name: file.name,
+          file_size: file.size,
+          created_at: Date.now()
+        };
+
+        showAttachedVideoUI(_attachedVideoData);
+        showRecordToast('📁 動画を添付しました（対戦記録保存時にローカルフォルダへ保存されます）');
+        return;
+      }
 
       // フォルダID未設定の場合でも端末IndexedDBへの添付は許可（後から設定・認証時に自動アップロード）
       if (!getDriveFolderId()) {
@@ -3611,7 +3829,10 @@
       const isDrive = status === 'drive_pending' || status === 'pending';
 
       if (linkEl) {
-        if (isYt) {
+        if (status === 'local_file') {
+          linkEl.textContent = '📁 端末内ローカルフォルダに直接保存されます';
+          linkEl.style.color = '#38bdf8';
+        } else if (isYt) {
           linkEl.textContent = '▶️ YouTube（限定公開）に公開済み';
           linkEl.style.color = '#ef4444';
         } else if (isDrive) {
@@ -3654,6 +3875,14 @@
       if (!_attachedVideoData) { resetRecordVideoUI(); return; }
       const status = _attachedVideoData.sync_status;
 
+      // local_file: 一時添付解除のみ
+      if (status === 'local_file') {
+        _attachedVideoData = null;
+        resetRecordVideoUI();
+        showRecordToast('添付動画を解除しました');
+        return;
+      }
+
       // local_pending: IndexedDBから削除
       if (status === 'local_pending' && _attachedVideoData.local_key) {
         VideoStore.delete(_attachedVideoData.local_key).catch(e => console.warn('IndexedDB delete error:', e));
@@ -3689,6 +3918,67 @@
 
     // ---- LOCAL VIDEO PLAYER & CLEANUP (30分間ローカル保持) ----
     let _currentPlayingObjectUrl = null;
+
+    async function playLocalFolderVideoInDetail(recordId, fileName, containerId) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      try {
+        container.innerHTML = '<div style="font-size:12px;color:var(--text-muted);padding:8px">⏳ ローカル動画を読み込み中...</div>';
+        const dirHandle = await VideoStore.getHandle('local_video_dir');
+        if (!dirHandle) {
+          container.innerHTML = '<div style="font-size:12px;color:#ef4444;padding:8px">⚠️ 保存先フォルダが未設定です。「データ管理」でフォルダを選択してください。</div>';
+          return;
+        }
+        const ok = await verifyFilePermission(dirHandle, false);
+        if (!ok) {
+          container.innerHTML = '<div style="font-size:12px;color:#ef4444;padding:8px">⚠️ フォルダへのアクセス権限が許可されませんでした。</div>';
+          return;
+        }
+        let fileHandle;
+        try {
+          fileHandle = await dirHandle.getFileHandle(fileName);
+        } catch (e) {
+          container.innerHTML = `<div style="font-size:12px;color:#ef4444;padding:8px">⚠️ 動画ファイル「${fileName}」が指定フォルダに見つかりませんでした。移動または削除された可能性があります。</div>`;
+          return;
+        }
+        const file = await fileHandle.getFile();
+        if (_currentPlayingObjectUrl) {
+          URL.revokeObjectURL(_currentPlayingObjectUrl);
+          _currentPlayingObjectUrl = null;
+        }
+        _currentPlayingObjectUrl = URL.createObjectURL(file);
+        container.innerHTML = `
+          <div style="margin-top:6px;position:relative">
+            <video src="${_currentPlayingObjectUrl}" controls playsinline autoplay style="width:100%;max-height:360px;border-radius:8px;background:#000;display:block"></video>
+            <div style="font-size:10.5px;color:var(--text-muted);margin-top:4px;display:flex;justify-content:space-between;align-items:center">
+              <span>📁 ローカル動画再生中 (通信量ゼロ・直接再生)</span>
+              <button type="button" onclick="stopLocalFolderVideoPlayer('${containerId}', '${recordId}', '${fileName}')" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:11px">プレイヤーを閉じる ✕</button>
+            </div>
+          </div>
+        `;
+      } catch (e) {
+        console.error('Failed to play local folder video:', e);
+        container.innerHTML = `<div style="font-size:12px;color:#ef4444;padding:8px">⚠️ 動画の再生に失敗しました: ${e.message}</div>`;
+      }
+    }
+    window.playLocalFolderVideoInDetail = playLocalFolderVideoInDetail;
+
+    function stopLocalFolderVideoPlayer(containerId, recordId, fileName) {
+      if (_currentPlayingObjectUrl) {
+        URL.revokeObjectURL(_currentPlayingObjectUrl);
+        _currentPlayingObjectUrl = null;
+      }
+      const container = document.getElementById(containerId);
+      if (container) {
+        container.innerHTML = `
+          <button type="button" onclick="playLocalFolderVideoInDetail('${recordId}', '${fileName}', '${containerId}')" style="display:inline-flex;align-items:center;gap:6px;color:#ffffff;background:#3b82f6;padding:8px 14px;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;box-shadow:0 2px 8px rgba(59,130,246,0.3)">
+            <span>▶️ ローカル動画を再生</span>
+          </button>
+          <div style="font-size:11px;color:var(--text-muted);margin-top:6px">📁 ファイル: ${fileName}</div>
+        `;
+      }
+    }
+    window.stopLocalFolderVideoPlayer = stopLocalFolderVideoPlayer;
 
     async function playLocalVideoInDetail(recordId, containerId) {
       const container = document.getElementById(containerId);
@@ -3825,6 +4115,9 @@
 
     async function startUploadQueue(force = false) {
       if (_isUploadQueueRunning) return;
+
+      // ローカル保存モードの場合はDrive/YouTubeアップロードは一切行わない
+      if (getVideoStorageType() === 'local') return;
 
       // WiFi環境でない場合は自動アップロードを保留（通信量節約）
       if (!force && !isWifiOrFastConnection()) {
@@ -4176,9 +4469,22 @@
         }
       }
 
-      // 動画録画リンク（YouTube、Google Drive、または端末内ローカル）
+      // 動画録画リンク（ローカルフォルダ保存、端末内一時保存、YouTube、Google Drive）
       let videoLinkHtml = '';
-      if (r.sync_status === 'local_pending') {
+      if (r.sync_status === 'local_file') {
+        const fn = r.local_file_name || 'battle_video.webm';
+        videoLinkHtml = `
+          <div class="detail-section">
+            <h4>🎥 対戦録画 (ローカルフォルダ保存)</h4>
+            <div id="local-video-player-box" data-record-id="${r.id}">
+              <button type="button" onclick="playLocalFolderVideoInDetail('${r.id}', '${fn}', 'local-video-player-box')" style="display:inline-flex;align-items:center;gap:6px;color:#ffffff;background:#3b82f6;padding:8px 14px;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;box-shadow:0 2px 8px rgba(59,130,246,0.3)">
+                <span>▶️ ローカル動画を再生</span>
+              </button>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:6px">📁 ファイル: ${fn}</div>
+            </div>
+          </div>
+        `;
+      } else if (r.sync_status === 'local_pending') {
         videoLinkHtml = `
           <div class="detail-section">
             <h4>🎥 対戦録画 (端末内保存)</h4>
@@ -4384,9 +4690,10 @@
         }
 
         // 動画添付情報の復元（全状態対応）
-        if (r.sync_status === 'local_pending' || r.drive_file_id || r.video_url || r.youtube_video_id) {
+        if (r.sync_status === 'local_file' || r.sync_status === 'local_pending' || r.drive_file_id || r.video_url || r.youtube_video_id) {
           _attachedVideoData = {
             local_key: r.sync_status === 'local_pending' ? r.id : null,
+            local_file_name: r.local_file_name || '',
             drive_file_id: r.drive_file_id || '',
             video_url: r.video_url || '',
             sync_status: r.sync_status || 'pending',
@@ -4394,11 +4701,14 @@
             youtube_video_id: r.youtube_video_id || '',
             original_name: r.video_original_name || (
               (r.sync_status === 'yt_uploaded' || r.sync_status === 'uploaded') ? 'YouTube動画' :
+              r.sync_status === 'local_file' ? (r.local_file_name || 'ローカル動画') :
               r.sync_status === 'local_pending' ? '保存済み動画' : 'Google Drive動画'
             )
           };
           // local_pendingの場合、IndexedDBにデータがあるか確認
-          if (r.sync_status === 'local_pending') {
+          if (r.sync_status === 'local_file') {
+            showAttachedVideoUI(_attachedVideoData);
+          } else if (r.sync_status === 'local_pending') {
             VideoStore.get(r.id).then(file => {
               if (!file && _attachedVideoData) {
                 _attachedVideoData.sync_status = 'lost';

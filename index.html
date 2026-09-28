@@ -629,32 +629,69 @@
       </div>
     </div>
 
-    <!-- Google Drive 動画連携設定カード -->
+    <!-- 動画保存先・連携設定カード -->
     <div class="card mb-4" id="dm-drive-settings-card">
       <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
-        <span style="display:flex;align-items:center;gap:6px">🎥 Google Drive 動画連携設定</span>
-        <span id="dm-drive-status-badge" style="font-size:11px;padding:2px 8px;border-radius:4px;background:var(--surface2);color:var(--text-muted)">未接続</span>
+        <span style="display:flex;align-items:center;gap:6px">🎥 動画保存先・連携設定</span>
+        <span id="dm-drive-status-badge" style="font-size:11px;padding:2px 8px;border-radius:4px;background:var(--surface2);color:var(--text-muted)">未設定</span>
       </div>
 
-      <div style="margin-bottom:12px">
-        <label for="dm-drive-folder-id" style="font-size:12px;color:var(--text-muted);margin-bottom:4px;display:block">Google Drive 保存先フォルダID</label>
-        <input type="text" id="dm-drive-folder-id" placeholder="例: 1a2B3c4D5e6F7g8H9i0jK" style="width:100%" autocomplete="off">
-        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">
-          ※ 動画をアップロードするGoogle DriveのフォルダURL末尾のIDを入力してください。
+      <!-- 保存先選択ラジオボタン -->
+      <div style="margin-bottom:16px;padding:10px 14px;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:6px">
+        <label style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:8px;display:block">録画・添付動画の保存先</label>
+        <div style="display:flex;gap:18px;flex-wrap:wrap">
+          <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
+            <input type="radio" name="video_storage_type" value="drive" id="storage-type-drive" onchange="onStorageTypeChanged('drive')" checked>
+            <span>☁️ Google Drive (クラウド保存)</span>
+          </label>
+          <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer;font-size:13px">
+            <input type="radio" name="video_storage_type" value="local" id="storage-type-local" onchange="onStorageTypeChanged('local')">
+            <span>📁 ローカル端末 (PCフォルダ直接保存)</span>
+          </label>
         </div>
       </div>
 
-      <div style="margin-bottom:14px">
-        <label for="dm-drive-client-id" style="font-size:12px;color:var(--text-muted);margin-bottom:4px;display:block">Google OAuth Client ID（Web用）</label>
-        <input type="text" id="dm-drive-client-id" placeholder="例: xxxxx-xxxxx.apps.googleusercontent.com" style="width:100%" autocomplete="off">
-        <div style="font-size:11px;color:var(--text-muted);margin-top:4px">
-          ※ ブラウザからDriveへ直接アップロードするためのOAuth Web Client IDです（詳細は <a href="./docs/SETUP_OAUTH.md" target="_blank" style="color:var(--accent)">設定ガイド</a> 参照）。
+      <!-- ローカル設定セクション -->
+      <div id="dm-local-storage-section" style="display:none;margin-bottom:14px;padding:12px 14px;background:rgba(59,130,246,0.05);border:1px solid rgba(59,130,246,0.2);border-radius:6px">
+        <div style="margin-bottom:10px">
+          <label style="font-size:12px;color:var(--text-muted);margin-bottom:6px;display:block">保存先フォルダ</label>
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <button type="button" class="btn btn-ghost" onclick="selectLocalDirectory()" style="white-space:nowrap;font-size:13px;border-color:var(--accent);color:var(--text)">📂 フォルダを選択</button>
+            <span id="dm-local-dir-name" style="font-size:13px;font-weight:600;color:var(--accent);word-break:break-all">未選択</span>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);line-height:1.6">
+          ※ オートモードの録画や手動添付した動画はこのフォルダに直接保存され、履歴から直接再生できます。<br>
+          ※ 端末内のフォルダに保存されるため、Google DriveやYouTubeへのアップロードは行われません。<br>
+          ※ 次回起動後、録画保存時またはオートモード開始時にブラウザのアクセス許可ポップアップが表示されます。
         </div>
       </div>
 
-      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+      <!-- Google Drive 設定セクション -->
+      <div id="dm-drive-storage-section">
+        <div style="margin-bottom:12px">
+          <label for="dm-drive-folder-id" style="font-size:12px;color:var(--text-muted);margin-bottom:4px;display:block">Google Drive 保存先フォルダID</label>
+          <input type="text" id="dm-drive-folder-id" placeholder="例: 1a2B3c4D5e6F7g8H9i0jK" style="width:100%" autocomplete="off">
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px">
+            ※ 動画をアップロードするGoogle DriveのフォルダURL末尾のIDを入力してください。
+          </div>
+        </div>
+
+        <div style="margin-bottom:14px">
+          <label for="dm-drive-client-id" style="font-size:12px;color:var(--text-muted);margin-bottom:4px;display:block">Google OAuth Client ID（Web用）</label>
+          <input type="text" id="dm-drive-client-id" placeholder="例: xxxxx-xxxxx.apps.googleusercontent.com" style="width:100%" autocomplete="off">
+          <div style="font-size:11px;color:var(--text-muted);margin-top:4px">
+            ※ ブラウザからDriveへ直接アップロードするためのOAuth Web Client IDです（詳細は <a href="./docs/SETUP_OAUTH.md" target="_blank" style="color:var(--accent)">設定ガイド</a> 参照）。
+          </div>
+        </div>
+
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button type="button" class="btn btn-ghost" onclick="testGoogleDriveAuth()" style="white-space:nowrap">🔑 Googleアカウント連携・テスト</button>
+        </div>
+      </div>
+
+      <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
         <button type="button" class="btn btn-primary" onclick="saveDriveSettings()" style="white-space:nowrap">💾 設定を保存</button>
-        <button type="button" class="btn btn-ghost" onclick="testGoogleDriveAuth()" style="white-space:nowrap">🔑 Googleアカウント連携・テスト</button>
       </div>
     </div>
 
