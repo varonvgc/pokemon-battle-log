@@ -28,9 +28,9 @@
     let _histObserver = null;
 
     const TYPE_NAME_JA_MAP = {
-      "normal": "ノーマル", "fire": "ほのお", "water": "みず", "grass": "くさ", "electric": "でんき", "ice": "こおり",
-      "fighting": "かくとう", "poison": "どく", "ground": "じめん", "flying": "ひこう", "psychic": "エスパー",
-      "bug": "むし", "rock": "いわ", "ghost": "ゴースト", "dragon": "ドラゴン", "dark": "あく", "steel": "はがね", "fairy": "フェアリー", "stellar": "ステラ"
+      "normal": "ノ�Eマル", "fire": "ほのぁE, "water": "みぁE, "grass": "くさ", "electric": "でんき", "ice": "こおめE,
+      "fighting": "かくとぁE, "poison": "どぁE, "ground": "じめめE, "flying": "ひこう", "psychic": "エスパ�E",
+      "bug": "むぁE, "rock": "ぁE��", "ghost": "ゴースチE, "dragon": "ドラゴン", "dark": "あく", "steel": "はが�E", "fairy": "フェアリー", "stellar": "スチE��"
     };
 
     function initPokemonIconMap() {
@@ -52,30 +52,30 @@
         }
       });
 
-      // 表記揺れの追加補正
-      POKEMON_ICON_BY_NAME['ロトム(ヒート)'] = 'heat-rotom.png';
-      POKEMON_ICON_BY_NAME['ヒートロトム'] = 'heat-rotom.png';
-      POKEMON_ICON_BY_NAME['ロトム(ウォッシュ)'] = 'wash-rotom.png';
-      POKEMON_ICON_BY_NAME['ウォッシュロトム'] = 'wash-rotom.png';
-      POKEMON_ICON_BY_NAME['ロトム(フロスト)'] = 'frost-rotom.png';
+      // 表記揺れ�E追加補正
+      POKEMON_ICON_BY_NAME['ロトム(ヒ�EチE'] = 'heat-rotom.png';
+      POKEMON_ICON_BY_NAME['ヒ�Eトロトム'] = 'heat-rotom.png';
+      POKEMON_ICON_BY_NAME['ロトム(ウォチE��ュ)'] = 'wash-rotom.png';
+      POKEMON_ICON_BY_NAME['ウォチE��ュロトム'] = 'wash-rotom.png';
+      POKEMON_ICON_BY_NAME['ロトム(フロスチE'] = 'frost-rotom.png';
       POKEMON_ICON_BY_NAME['フロストロトム'] = 'frost-rotom.png';
       POKEMON_ICON_BY_NAME['ロトム(スピン)'] = 'fan-rotom.png';
       POKEMON_ICON_BY_NAME['スピンロトム'] = 'fan-rotom.png';
-      POKEMON_ICON_BY_NAME['ロトム(カット)'] = 'mow-rotom.png';
-      POKEMON_ICON_BY_NAME['カットロトム'] = 'mow-rotom.png';
-      POKEMON_ICON_BY_NAME['ポリゴン２'] = 'porygon2.png';
+      POKEMON_ICON_BY_NAME['ロトム(カチE��)'] = 'mow-rotom.png';
+      POKEMON_ICON_BY_NAME['カチE��ロトム'] = 'mow-rotom.png';
+      POKEMON_ICON_BY_NAME['ポリゴン�E�E] = 'porygon2.png';
       POKEMON_ICON_BY_NAME['ポリゴン2'] = 'porygon2.png';
-      POKEMON_ICON_BY_NAME['ポリゴンＺ'] = 'porygon-z.png';
+      POKEMON_ICON_BY_NAME['ポリゴン�E�'] = 'porygon-z.png';
       POKEMON_ICON_BY_NAME['ポリゴンZ'] = 'porygon-z.png';
-      POKEMON_ICON_BY_NAME['パルデアケンタロス(かくとう)'] = 'tauros-paldean-combat.png';
-      POKEMON_ICON_BY_NAME['パルデアケンタロス(ほのお)'] = 'tauros-paldean-blaze.png';
-      POKEMON_ICON_BY_NAME['パルデアケンタロス(みず)'] = 'tauros-paldean-aqua.png';
-      POKEMON_ICON_BY_NAME['ケンタロス(パルデア単)'] = 'tauros-paldean-combat.png';
-      POKEMON_ICON_BY_NAME['ケンタロス(パルデア炎)'] = 'tauros-paldean-blaze.png';
-      POKEMON_ICON_BY_NAME['ケンタロス(パルデア水)'] = 'tauros-paldean-aqua.png';
+      POKEMON_ICON_BY_NAME['パルチE��ケンタロス(かくとぁE'] = 'tauros-paldean-combat.png';
+      POKEMON_ICON_BY_NAME['パルチE��ケンタロス(ほのぁE'] = 'tauros-paldean-blaze.png';
+      POKEMON_ICON_BY_NAME['パルチE��ケンタロス(みぁE'] = 'tauros-paldean-aqua.png';
+      POKEMON_ICON_BY_NAME['ケンタロス(パルチE��十E'] = 'tauros-paldean-combat.png';
+      POKEMON_ICON_BY_NAME['ケンタロス(パルチE��炁E'] = 'tauros-paldean-blaze.png';
+      POKEMON_ICON_BY_NAME['ケンタロス(パルチE��水)'] = 'tauros-paldean-aqua.png';
       POKEMON_ICON_BY_NAME['イダイトウ(オス)'] = 'basculegion-male.png';
       POKEMON_ICON_BY_NAME['イダイトウ(メス)'] = 'basculegion-female.png';
-      POKEMON_ICON_BY_NAME['イダイトウ♂'] = 'basculegion-male.png';
+      POKEMON_ICON_BY_NAME['イダイトウ♁E] = 'basculegion-male.png';
       POKEMON_ICON_BY_NAME['イダイトウ♀'] = 'basculegion-female.png';
     }
 
@@ -84,7 +84,7 @@
       const p = findPokemon(query);
       const name = p ? p.display : (typeof query === 'string' ? query : query.name || '');
       if (POKEMON_ICON_BY_NAME[name]) return POKEMON_ICON_BY_NAME[name];
-      const clean = name.replace(/\(.*\)/, '').replace(/♂|♀/, '').trim();
+      const clean = name.replace(/\(.*\)/, '').replace(/♁E♀/, '').trim();
       if (POKEMON_ICON_BY_NAME[clean]) return POKEMON_ICON_BY_NAME[clean];
       return 'default.png';
     }
@@ -99,12 +99,12 @@
       return null;
     }
 
-    // 静的マスタデータの高速読み込み（基本マスタ最優先＋AI特徴量バックグラウンドプリロード）
+    // 静的マスタチE�Eタの高速読み込み�E�基本マスタ最優先＋AI特徴量バチE��グラウンド�Eリロード！E
     async function loadStaticMasterData() {
       if (_masterDataPromise) return _masterDataPromise;
       _masterDataPromise = (async () => {
         try {
-          // 1. 基本マスタを最優先で高速取得（ブラウザキャッシュを有効活用）
+          // 1. 基本マスタを最優先で高速取得（ブラウザキャチE��ュを有効活用�E�E
           const [pokeRes, moveRes, itemRes, verRes, regRes] = await Promise.all([
             fetch('data/pokemon.json?v=' + Date.now()),
             fetch('data/moves.json?v=' + Date.now()),
@@ -136,7 +136,7 @@
           rebuildPokemonMap();
           initRecordFormMeta();
 
-          // 基本マスタが揃った瞬間に即座にパーティ・履歴を描画（0.01秒）
+          // 基本マスタが揃った瞬間に即座にパ�EチE��・履歴を描画�E�E.01秒！E
           try {
             renderParties();
             renderHistory();
@@ -182,7 +182,7 @@
       return _masterDataPromise;
     }
 
-    // ポケモン高速引き出し用ハッシュマップ＆スプライトキャッシュ
+    // ポケモン高速引き出し用ハッシュマップ！E��プライトキャチE��ュ
     const _pokemonMap = new Map();
     const _spriteCache = new Map();
 
@@ -198,14 +198,14 @@
       });
     }
 
-    // ポケモン名・表示名・メガ名の表記揺れを完全吸収してポケモンデータを取得するヘルパー（O(1)高速キャッシュ対応）
+    // ポケモン名�E表示名�Eメガ名�E表記揺れを完�E吸収してポケモンチE�Eタを取得する�Eルパ�E�E�E(1)高速キャチE��ュ対応！E
     function findPokemon(query) {
       if (!query) return null;
       if (typeof query === 'object' && query.display) return query;
       const q = String(query).trim();
       if (!q) return null;
 
-      // 1. ハッシュマップからのO(1)高速引き出し
+      // 1. ハッシュマップから�EO(1)高速引き出ぁE
       if (_pokemonMap.has(q)) {
         return _pokemonMap.get(q);
       }
@@ -213,17 +213,17 @@
       const list = localPokemon || POKEMON_LIST;
       if (!list || !list.length) return null;
 
-      const norm = s => (s || '').replace(/[（）()]/g, '').replace(/[ＸX]/g, 'X').replace(/[ＹY]/g, 'Y').replace(/[ＺZ]/g, 'Z').toLowerCase();
+      const norm = s => (s || '').replace(/[�E�！E)]/g, '').replace(/[�E�X]/g, 'X').replace(/[�E�Y]/g, 'Y').replace(/[�E�Z]/g, 'Z').toLowerCase();
       const qNorm = norm(q);
 
-      // 2. display, name, form の正規化完全一致
+      // 2. display, name, form の正規化完�E一致
       let found = list.find(p => norm(p.display) === qNorm || norm(p.name) === qNorm || norm(p.form) === qNorm);
       if (found) {
         _pokemonMap.set(q, found);
         return found;
       }
 
-      // 3. フォーム名（form）の完全一致（例: "メガリザードンY" -> p.form === "メガリザードンＹ"）
+      // 3. フォーム名！Eorm�E��E完�E一致�E�侁E "メガリザードンY" -> p.form === "メガリザードン�E�"�E�E
       found = list.find(p => {
         const fNorm = norm(p.form);
         return fNorm && fNorm !== '通常' && fNorm === qNorm;
@@ -233,7 +233,7 @@
         return found;
       }
 
-      // 4. メガ・フォルム名を含む候補の中で、最も name が長い（最も具体的な）ものを探す
+      // 4. メガ・フォルム名を含む候補�E中で、最めEname が長ぁE��最も�E体的な�E�ものを探ぁE
       const matchedForms = list.filter(p => {
         const dNorm = norm(p.display);
         const fNorm = norm(p.form);
@@ -245,7 +245,7 @@
         return matchedForms[0];
       }
 
-      // 5. ベース名完全一致フォールバック（例: "リザードン(メガ...)" -> "リザードン"）
+      // 5. ベ�Eス名完�E一致フォールバック�E�侁E "リザードン(メガ...)" -> "リザードン"�E�E
       const baseName = q.replace(/\(.*\)/, '').replace(/^メガ/, '').trim();
       const baseNorm = norm(baseName);
       const baseCand = list.filter(p => norm(p.name) === baseNorm);
@@ -275,15 +275,15 @@
     };
     let seasons = JSON.parse(localStorage.getItem('pkm_seasons') || '[]');
     let customTags = JSON.parse(localStorage.getItem('pkm_custom_tags') || '[]');
-    // 直前の記録設定（維持用）
+    // 直前�E記録設定（維持用�E�E
     let currentRecordRegulation = localStorage.getItem('pkm_last_regulation') || '';
     let currentRecordSeason = localStorage.getItem('pkm_last_season') || '';
-    let currentRecordMatchType = localStorage.getItem('pkm_last_match_type') || 'ランクマ';
+    let currentRecordMatchType = localStorage.getItem('pkm_last_match_type') || 'ランクチE;
     let currentRecordTags = JSON.parse(localStorage.getItem('pkm_last_tags') || '[]');
-    // 履歴画面のタグフィルター（OR検索用）
+    // 履歴画面のタグフィルター�E�ER検索用�E�E
     let historyTagFilters = [];
 
-    // 最近選んだポケモン（最大20件、先頭が最新）
+    // 最近選んだポケモン�E�最大20件、�E頭が最新�E�E
     let recentPicks = JSON.parse(localStorage.getItem('pkm_recent_picks') || '[]');
     function recordRecentPick(displayName) {
       recentPicks = recentPicks.filter(n => n !== displayName);
@@ -308,19 +308,19 @@
     }
     let _fbReady = false;
 
-    // 各端末（ブラウザセッション）固有のクライアントID
+    // 吁E��末�E�ブラウザセチE��ョン�E�固有�EクライアンチED
     const CLIENT_ID = 'cli_' + Math.random().toString(36).slice(2, 10) + '_' + Date.now();
 
-    // 最後にこの端末が読み込んだ updatedAt（ミリ秒）
+    // 最後にこ�E端末が読み込んだ updatedAt�E�ミリ秒！E
     let _lastLoadedAt = 0;
 
     function isRemoteConflict(data) {
       if (!data || !data.updatedAt) return false;
-      // 自分が書き込んだ更新なら絶対にリロード要求を出さない
+      // 自刁E��書き込んだ更新なら絶対にリロード要求を出さなぁE
       if (data.updatedBy && data.updatedBy === CLIENT_ID) return false;
 
       const serverTime = (data.updatedAt && data.updatedAt.toMillis) ? data.updatedAt.toMillis() : 0;
-      // この端末がロードした時刻より明確に新しい他端末の更新（+1000ms以上の余裕）のみ競合とみなす
+      // こ�E端末がロードした時刻より明確に新しい他端末の更新�E�E1000ms以上�E余裕）�Eみ競合とみなぁE
       if (_lastLoadedAt > 0 && serverTime > (_lastLoadedAt + 1000)) {
         return true;
       }
@@ -350,7 +350,7 @@
           console.error('Failed to save showdown username to Firestore:', e);
         }
       }
-      showRecordToast(name ? '✅ Showdownユーザー名を保存しました！' : 'ℹ️ Showdownユーザー名をクリアしました');
+      showRecordToast(name ? '✁EShowdownユーザー名を保存しました�E�E : 'ℹ�E�EShowdownユーザー名をクリアしました');
     }
 
     function updateShowdownUserUI() {
@@ -360,7 +360,7 @@
       }
     }
 
-    // 動画保存先・連携設定 (Google Drive / ローカル端末)
+    // 動画保存�E・連携設宁E(Google Drive / ローカル端末)
     function getVideoStorageType() {
       return localStorage.getItem('pkm_video_storage_type') || 'drive';
     }
@@ -399,7 +399,7 @@
 
     async function selectLocalDirectory() {
       if (!window.showDirectoryPicker) {
-        alert('お使いのブラウザはローカルフォルダ直接保存に対応していません。Google ChromeまたはMicrosoft Edgeをご利用ください。');
+        alert('お使ぁE�Eブラウザはローカルフォルダ直接保存に対応してぁE��せん、Eoogle Chromeまた�EMicrosoft Edgeをご利用ください、E);
         return;
       }
       try {
@@ -408,7 +408,7 @@
           await VideoStore.saveHandle('local_video_dir', handle);
           localStorage.setItem('pkm_local_dir_name', handle.name);
           updateDriveSettingsUI();
-          showRecordToast(`📁 保存先フォルダ「${handle.name}」を設定しました`);
+          showRecordToast(`📁 保存�Eフォルダ、E{handle.name}」を設定しました`);
         }
       } catch (e) {
         if (e.name !== 'AbortError') {
@@ -422,11 +422,11 @@
     async function saveVideoToLocalDirectory(fileOrBlob, fileName) {
       const handle = await VideoStore.getHandle('local_video_dir');
       if (!handle) {
-        throw new Error('ローカル保存先フォルダが未設定です。「データ管理」でフォルダを選択してください。');
+        throw new Error('ローカル保存�Eフォルダが未設定です。「データ管琁E��でフォルダを選択してください、E);
       }
       const ok = await verifyFilePermission(handle, true);
       if (!ok) {
-        throw new Error('保存先フォルダへの書き込み権限が許可されませんでした。');
+        throw new Error('保存�Eフォルダへの書き込み権限が許可されませんでした、E);
       }
       const fileHandle = await handle.getFileHandle(fileName, { create: true });
       const writable = await fileHandle.createWritable();
@@ -442,12 +442,12 @@
       if (!isAutoRecord) return true;
       const handle = await VideoStore.getHandle('local_video_dir');
       if (!handle) {
-        alert('⚠️ 動画保存先が「ローカル端末」に設定されていますが、フォルダが選択されていません。「データ管理」でフォルダを選択してください。');
+        alert('⚠�E�E動画保存�Eが「ローカル端末」に設定されてぁE��すが、フォルダが選択されてぁE��せん。「データ管琁E��でフォルダを選択してください、E);
         return false;
       }
       const ok = await verifyFilePermission(handle, true);
       if (!ok) {
-        alert('⚠️ 保存先フォルダへのアクセス権限が許可されませんでした。録画が保存できない可能性があります。');
+        alert('⚠�E�E保存�Eフォルダへのアクセス権限が許可されませんでした。録画が保存できなぁE��能性があります、E);
         return false;
       }
       return true;
@@ -488,7 +488,7 @@
           console.error('Failed to save Drive settings to Firestore:', e);
         }
       }
-      showRecordToast('✅ 動画保存設定を保存しました！');
+      showRecordToast('✁E動画保存設定を保存しました�E�E);
       updateDriveSettingsUI();
     }
 
@@ -507,7 +507,7 @@
       const localDirNameEl = document.getElementById('dm-local-dir-name');
       if (localDirNameEl) {
         const dirName = getLocalDirName();
-        localDirNameEl.textContent = dirName ? `選択中: ${dirName}` : '未選択';
+        localDirNameEl.textContent = dirName ? `選択中: ${dirName}` : '未選抁E;
       }
 
       const folderInput = document.getElementById('dm-drive-folder-id');
@@ -524,7 +524,7 @@
             badge.style.background = 'rgba(59,130,246,0.15)';
             badge.style.color = '#3b82f6';
           } else {
-            badge.textContent = 'フォルダ未選択';
+            badge.textContent = 'フォルダ未選抁E;
             badge.style.background = 'rgba(239,68,68,0.15)';
             badge.style.color = '#ef4444';
           }
@@ -534,11 +534,11 @@
             badge.style.background = 'rgba(74,222,128,0.15)';
             badge.style.color = 'var(--win)';
           } else if (getDriveClientId()) {
-            badge.textContent = 'Client ID設定済 (未認証)';
+            badge.textContent = 'Client ID設定渁E(未認証)';
             badge.style.background = 'rgba(245,158,11,0.15)';
             badge.style.color = '#f59e0b';
           } else {
-            badge.textContent = '未設定';
+            badge.textContent = '未設宁E;
             badge.style.background = 'var(--surface2)';
             badge.style.color = 'var(--text-muted)';
           }
@@ -546,7 +546,7 @@
       }
     }
 
-    // Google Drive認証トークン永続化 & 要求 (GIS)
+    // Google Drive認証ト�Eクン永続化 & 要汁E(GIS)
     window._googleDriveAccessToken = null;
     window._googleDriveTokenExpiresAt = 0;
 
@@ -575,7 +575,7 @@
       } catch(e) {}
     }
 
-    // 初期ロード時にローカルストレージからトークン復元
+    // 初期ロード時にローカルストレージからト�Eクン復允E
     loadStoredDriveToken();
 
     function requestGoogleDriveAccessToken(interactive = true) {
@@ -588,13 +588,13 @@
         }
         const cId = getDriveClientId();
         if (!cId) {
-          const err = new Error('Google OAuth Client ID が設定されていません。「データ管理」画面で設定してください。');
+          const err = new Error('Google OAuth Client ID が設定されてぁE��せん。「データ管琁E��画面で設定してください、E);
           if (interactive) alert(err.message);
           reject(err);
           return;
         }
         if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
-          const err = new Error('Google Identity Services が読み込まれていません。');
+          const err = new Error('Google Identity Services が読み込まれてぁE��せん、E);
           if (interactive) alert(err.message);
           reject(err);
           return;
@@ -613,7 +613,7 @@
               }
               saveStoredDriveToken(response.access_token, response.expires_in);
               updateDriveSettingsUI();
-              // 認証成功後にアップロードキューを開始
+              // 認証成功後にアチE�Eロードキューを開姁E
               setTimeout(() => startUploadQueue(), 500);
               resolve(response.access_token);
             }
@@ -629,16 +629,16 @@
       try {
         const token = await requestGoogleDriveAccessToken(true);
         if (token) {
-          showRecordToast('🎉 Googleアカウントの連携に成功しました！');
+          showRecordToast('🎉 Googleアカウント�E連携に成功しました�E�E);
         }
       } catch (e) {
         alert(`Google連携エラー: ${e.message}`);
       }
     }
 
-    // Firestoreへのデータ保存
+    // FirestoreへのチE�Eタ保孁E
     async function saveData() {
-      if (_isSpectatorMode) return; // 観戦モード中は保存処理をブロック
+      if (_isSpectatorMode) return; // 観戦モード中は保存�E琁E��ブロチE��
       localStorage.setItem('pkm_parties', JSON.stringify(parties));
       localStorage.setItem('pkm_records', JSON.stringify(records));
       localStorage.setItem('pkm_seasons', JSON.stringify(seasons));
@@ -672,14 +672,14 @@
            await syncShareData(uid, passcode);
         }
         _lastLoadedAt = Date.now();
-        // 自分が保存したのでバナーを消す
+        // 自刁E��保存した�Eでバナーを消す
         _conflictBannerDismissed = false;
         const b = document.getElementById('conflict-banner');
         if (b) b.classList.remove('show');
       } catch (e) { console.error('Firestore save error:', e); }
     }
 
-    // 他端末の変更を検知してリロードを促す（入力前チェック用）
+    // 他端末の変更を検知してリロードを俁E���E��E力前チェチE��用�E�E
     let _conflictCheckBusy = false;
     let _conflictBannerDismissed = false;
     let _latestRemoteData = null;
@@ -689,14 +689,14 @@
       const b = document.getElementById('conflict-banner');
       if (b) b.classList.add('show');
     }
-    // バナーを閉じる（「✕」押下時。保存時に自動消去もする）
+    // バナーを閉じる�E�「✕」押下時。保存時に自動消去もする！E
     function dismissConflictBanner() {
       _conflictBannerDismissed = true;
       const b = document.getElementById('conflict-banner');
       if (b) b.classList.remove('show');
     }
 
-    // 最新データ（他端末の更新）を白画面リロードなしで即座に画面へ反映
+    // 最新チE�Eタ�E�他端末の更新�E�を白画面リロードなしで即座に画面へ反映
     async function applyRemoteData() {
       if (_latestRemoteData) {
         if (_latestRemoteData.parties && Array.isArray(_latestRemoteData.parties)) {
@@ -728,10 +728,10 @@
       renderHistory();
       renderRecordPage();
       dismissConflictBanner();
-      showRecordToast('✨ 最新データを画面に反映しました！');
+      showRecordToast('✨ 最新チE�Eタを画面に反映しました�E�E);
     }
 
-    // バックグラウンドで競合チェックし、変更があればバナー表示
+    // バックグラウンドで競合チェチE��し、変更があれ�Eバナー表示
     async function bgConflictCheck() {
       if (!currentUser || !_fbReady || _conflictCheckBusy) return;
       if (_conflictBannerDismissed) return;
@@ -745,13 +745,13 @@
           showConflictBanner();
         }
       } catch (e) {
-        // チェック失敗は無視
+        // チェチE��失敗�E無要E
       } finally {
         _conflictCheckBusy = false;
       }
     }
 
-    // Firestoreからロード（純粋な読み取りのみ）
+    // Firestoreからロード（純粋な読み取りのみ�E�E
     async function loadFromFirestore() {
       if (!currentUser || !_fbReady) return;
       const { doc, getDoc, collection, getDocs } = window._firestoreOps;
@@ -777,19 +777,19 @@
             localStorage.setItem('pkm_custom_tags', JSON.stringify(customTags));
           }
 
-          // Gemini APIキーの同期（読み取りのみ）
+          // Gemini APIキーの同期�E�読み取りのみ�E�E
           if (data.geminiApiKey) {
             localStorage.setItem('pkm_gemini_api_key', data.geminiApiKey);
           }
           updateAiApiKeyUI();
 
-          // Showdownユーザー名の同期（読み取りのみ）
+          // Showdownユーザー名�E同期�E�読み取りのみ�E�E
           if (data.showdownUsername !== undefined) {
             localStorage.setItem('pkm_showdown_username', data.showdownUsername || '');
           }
           updateShowdownUserUI();
 
-          // Google Drive設定の同期（読み取りのみ）
+          // Google Drive設定�E同期�E�読み取りのみ�E�E
           if (data.driveFolderId !== undefined) {
             localStorage.setItem('pkm_drive_folder_id', data.driveFolderId || '');
           }
@@ -809,7 +809,7 @@
           _lastLoadedAt = Date.now();
         }
 
-        // サブコレクション（users/{uid}/records）に記録があれば読み込んでマージ（書き込みは絶対に行わない）
+        // サブコレクション�E�Esers/{uid}/records�E�に記録があれ�E読み込んでマ�Eジ�E�書き込みは絶対に行わなぁE��E
         try {
           const recSnap = await getDocs(collection(db, 'users', uid, 'records'));
           const subRecords = [];
@@ -835,12 +835,12 @@
         localStorage.setItem('pkm_records', JSON.stringify(records));
 
         await dmLoadMasterData();
-        // リアルタイム他端末変更リスナーを開始
+        // リアルタイム他端末変更リスナ�Eを開姁E
         startConflictPolling();
       } catch (e) { console.error('Firestore load error:', e); }
     }
 
-    // リアルタイム他端末変更リスナーの開始
+    // リアルタイム他端末変更リスナ�Eの開姁E
     let _conflictUnsubscribe = null;
     function startConflictPolling() {
       if (_conflictUnsubscribe) return;
@@ -855,7 +855,7 @@
             _latestRemoteData = data;
             showConflictBanner();
           } else {
-            // 自分の更新時はバナーを消す
+            // 自刁E�E更新時�Eバナーを消す
             if (data.updatedBy === CLIENT_ID) {
               const b = document.getElementById('conflict-banner');
               if (b) b.classList.remove('show');
@@ -866,7 +866,7 @@
         console.warn('onSnapshot error:', err);
       }
 
-      // タブ復帰時にもチェック
+      // タブ復帰時にもチェチE��
       document.addEventListener('visibilitychange', function () {
         if (!document.hidden) bgConflictCheck();
       });
@@ -884,7 +884,7 @@
       }
     }
 
-    // 起動時にまず localStorage のデータで 0秒即時描画（真っ白を完全根絶）
+    // 起動時にまぁElocalStorage のチE�Eタで 0秒即時描画�E�真っ白を完�E根絶�E�E
     try {
       renderParties();
       renderHistory();
@@ -892,27 +892,27 @@
       console.warn('Initial local render skipped:', e);
     }
 
-    // Firebase初期化待ちでAuth監視を開始
+    // Firebase初期化征E��でAuth監視を開姁E
     function initFirebase() {
       _fbReady = true;
-      // 未ログインでも共通マスタデータは非同期バックグラウンドで読み込む（画面をブロックしない）
+      // 未ログインでも�E通�EスタチE�Eタは非同期バチE��グラウンドで読み込む�E�画面をブロチE��しなぁE��E
       setTimeout(() => { dmLoadMasterData().catch(console.warn); }, 50);
       window._onAuthStateChanged(window._auth, async (user) => {
         currentUser = user;
         const nameEl = document.getElementById('user-name');
         const btnEl = document.getElementById('auth-btn');
         const banner = document.getElementById('login-banner');
-        // 編集UIの表示制御（管理者のみ表示）
+        // 編雁EIの表示制御�E�管琁E��E�Eみ表示�E�E
         const isAdm = isAdmin(user);
         document.querySelectorAll('.dm-admin-only').forEach(el => {
           el.style.display = isAdm ? '' : 'none';
         });
-        // 非管理者向け「権限なし」メッセージの表示制御
+        // 非管琁E��E��け「権限なし」メチE��ージの表示制御
         const noPermEl = document.getElementById('dm-no-permission');
         if (noPermEl) noPermEl.style.display = isAdm ? 'none' : 'block';
         if (user) {
           nameEl.textContent = user.displayName || user.email;
-          btnEl.textContent = 'ログアウト';
+          btnEl.textContent = 'ログアウチE;
           banner.style.display = 'none';
           await loadFromFirestore();
           renderParties();
@@ -925,7 +925,7 @@
       });
     }
 
-    // Firebase準備完了イベント待ち
+    // Firebase準備完亁E��ベント征E��
     if (window._firebaseReady) {
       initFirebase();
     } else {
@@ -946,7 +946,7 @@
       }
       if (btn) btn.classList.add('active');
       else if (event && event.target) event.target.classList.add('active');
-      // 記録・履歴・データ管理への遷移時はコピーボードを消去
+      // 記録・履歴・チE�Eタ管琁E��の遷移時�Eコピ�Eボ�Eドを消去
       if (['record', 'history', 'datamanage'].includes(name)) clearCopyBoard();
       if (name === 'parties') { renderParties(); showCopyBoard(); }
       if (name === 'record') renderRecordPage();
@@ -978,11 +978,11 @@
       <span class="poke-sprite" style="display:none"></span>
     </button>
     <div class="slot-input-wrap" style="position:relative">
-      <input type="text" placeholder="ポケモン名を入力" autocomplete="off"
+      <input type="text" placeholder="ポケモン名を入劁E autocomplete="off"
         data-container="${containerId}" data-index="${index}"
         oninput="onSlotInput(this)" onkeydown="onSlotKeydown(event, this)"
         onfocus="onSlotFocus(this)">
-      <button class="slot-clear" onclick="clearSlot(this)" tabindex="-1">×</button>
+      <button class="slot-clear" onclick="clearSlot(this)" tabindex="-1">ÁE/button>
       <div class="autocomplete-list" id="ac-${containerId}-${index}"></div>
     </div>
   `;
@@ -994,7 +994,7 @@
       return str.replace(/[ァ-ヶ]/g, c => String.fromCharCode(c.charCodeAt(0) - 0x60));
     }
     function toKatakana(str) {
-      return str.replace(/[ぁ-ゖ]/g, c => String.fromCharCode(c.charCodeAt(0) + 0x60));
+      return str.replace(/[ぁEゖ]/g, c => String.fromCharCode(c.charCodeAt(0) + 0x60));
     }
 
     function onSlotInput(input) {
@@ -1004,7 +1004,7 @@
       if (!val || val.length < 1) { list.classList.remove('open'); return; }
       const valKana = toKatakana(val);
       const valHira = toHiragana(val);
-      // 選出スロットはパーティから絞り込む
+      // 選出スロチE��はパ�EチE��から絞り込む
       let pokemonSource;
       if (input.dataset.container === 'opp-selection-slots' && window._oppPartyOptions && window._oppPartyOptions.length) {
         pokemonSource = window._oppPartyOptions.map(name => ({ display: name, confirmed: true, no: '', type1: '', type2: '' }));
@@ -1013,7 +1013,7 @@
       } else {
         pokemonSource = (localPokemon || POKEMON_LIST).filter(p => p.confirmed);
       }
-      // 相手パーティスロットではメガシンカを除外
+      // 相手パーチE��スロチE��ではメガシンカを除夁E
       const acExcludeMega = input.dataset.container === 'opp-party-slots';
 
       const allMatches = pokemonSource.filter(p => {
@@ -1022,7 +1022,7 @@
         const dH = toHiragana(d);
         return d.includes(valKana) || dH.includes(valHira);
       });
-      // 頭文字一致を先に、途中一致を後に並べる
+      // 頭斁E��一致を�Eに、E��中一致を後に並べめE
       const startsWith = allMatches.filter(p => {
         const dH = toHiragana(p.display);
         return dH.startsWith(valHira) || p.display.startsWith(valKana);
@@ -1031,13 +1031,13 @@
         const dH = toHiragana(p.display);
         return !dH.startsWith(valHira) && !p.display.startsWith(valKana);
       });
-      // 各グループ内で最近選んだものを先頭に
+      // 吁E��ループ�Eで最近選んだも�Eを�E頭に
       const matches = [...sortByRecent(startsWith), ...sortByRecent(others)].slice(0, 20);
       if (!matches.length) { list.classList.remove('open'); return; }
       list.innerHTML = matches.map(p =>
         `<div class="autocomplete-item" data-display="${p.display}">${p.display}</div>`
       ).join('');
-      // mousedownでクリック選択（inputのblur前に発火する）
+      // mousedownでクリチE��選択！Enputのblur前に発火する�E�E
       list.querySelectorAll('.autocomplete-item').forEach(item => {
         item.addEventListener('mousedown', e => {
           e.preventDefault();
@@ -1045,7 +1045,7 @@
           recordRecentPick(item.dataset.display);
           updateSlotIcon(input, item.dataset.display);
           list.classList.remove('open');
-          // 相手パーティスロットで選択したら選出プルダウンを更新
+          // 相手パーチE��スロチE��で選択したら選出プルダウンを更新
           if (input.dataset.container === 'opp-party-slots') rebuildOppSelectionDropdowns();
         });
       });
@@ -1092,17 +1092,17 @@
       if (input.dataset.container === 'opp-party-slots') rebuildOppSelectionDropdowns();
     }
 
-    // フォーカス時に予測変換を即座に表示（空でも最近選んだ順で表示）
+    // フォーカス時に予測変換を即座に表示�E�空でも最近選んだ頁E��表示�E�E
     function onSlotFocus(input) {
       const listId = `ac-${input.dataset.container}-${input.dataset.index}`;
       const list = document.getElementById(listId);
       if (!list) return;
       if (input.value.trim()) {
-        // 文字が入っている場合は通常のフィルタ
+        // 斁E��が入ってぁE��場合�E通常のフィルタ
         onSlotInput(input);
         return;
       }
-      // 空の場合: パーティ候補 or 最近選んだ順で最大10件表示
+      // 空の場吁E パ�EチE��候裁Eor 最近選んだ頁E��最大10件表示
       let candidates;
       const cid = input.dataset.container;
       if (cid === 'opp-selection-slots' && window._oppPartyOptions && window._oppPartyOptions.length) {
@@ -1134,7 +1134,7 @@
       list.classList.add('open');
     }
 
-    // 選出用プルダウン生成（自分/相手のパーティ6体のみ）
+    // 選出用プルダウン生�E�E��E刁E相手�Eパ�EチE��6体�Eみ�E�E
     function createSelectionDropdown(containerId, index, label, options) {
       const wrap = document.createElement('div');
       wrap.className = 'pokemon-slot';
@@ -1142,7 +1142,7 @@
       wrap.innerHTML = `
     <div class="slot-label">${label}</div>
     <select data-container="${containerId}" data-index="${index}">
-      <option value="">-- 選択 --</option>
+      <option value="">-- 選抁E--</option>
       ${opts}
     </select>
   `;
@@ -1150,10 +1150,10 @@
     }
 
     document.addEventListener('click', e => {
-      // pe-col-item-ability(持ち物) / pe-name-cell(ポケモン名) 内のクリックはPEのACを閉じない
+      // pe-col-item-ability(持ち物) / pe-name-cell(ポケモン吁E 冁E�EクリチE��はPEのACを閉じなぁE
       const inPeItemArea = e.target.closest('.pe-col-item-ability') || e.target.closest('.pe-name-input-wrap');
       if (!e.target.closest('.pokemon-slot') && !inPeItemArea) {
-        // opp-party-ac / my-sel-ac / pe用ACは除外しない — すべて閉じる（PE内は上で守る）
+        // opp-party-ac / my-sel-ac / pe用ACは除外しなぁE Eすべて閉じる！EE冁E�E上で守る�E�E
         document.querySelectorAll('.autocomplete-list:not(.opp-party-ac):not(.my-sel-ac)').forEach(l => l.classList.remove('open'));
       }
     });
@@ -1193,7 +1193,7 @@
 
       const container = document.getElementById(containerId);
       if (!container) return [];
-      // input[type=text] と select 両方に対応
+      // input[type=text] と select 両方に対忁E
       const inputs = Array.from(container.querySelectorAll('input[type=text], select'));
       return inputs.slice(0, count).map(i => i.value.trim());
     }
@@ -1210,15 +1210,15 @@
     }
 
     // ---- FILTER SELECTS ----
-    function updateMySelFilterSelect() { /* テキストAC方式に変更のため不要 */ }
+    function updateMySelFilterSelect() { /* チE��スチEC方式に変更のため不要E*/ }
 
-    // 相手の選出フィルター: 全試合の相手選出から重複除去して選択肢を生成
-    function updateOppSelFilterSelect() { /* 廃止: テキストAC方式に変更 */ }
+    // 相手�E選出フィルター: 全試合�E相手選出から重褁E��去して選択肢を生戁E
+    function updateOppSelFilterSelect() { /* 廁E��: チE��スチEC方式に変更 */ }
 
     function addFilterTagFromSelect(selectEl, filterKey) {
       const name = selectEl.value;
       if (!name) return;
-      selectEl.value = ''; // 選択後リセット
+      selectEl.value = ''; // 選択後リセチE��
       addFilterTag(name, filterKey);
     }
 
@@ -1244,11 +1244,11 @@
       const container = document.getElementById(containerId);
       if (!container) return;
       container.innerHTML = arr.map(name =>
-        `<span class="filter-tag">${name}<button onclick="removeFilterTag('${name}','${filterKey}')" title="削除">×</button></span>`
+        `<span class="filter-tag">${name}<button onclick="removeFilterTag('${name}','${filterKey}')" title="削除">ÁE/button></span>`
       ).join('');
     }
 
-    // ---- PARTIES (無限スクロール＆リアルタイム検索対応) ----
+    // ---- PARTIES (無限スクロール�E�E��アルタイム検索対忁E ----
 
     function onPartySearchInput(val) {
       _partySearchQuery = (val || '').trim().toLowerCase();
@@ -1272,7 +1272,7 @@
       if (!grid) return;
       _partyGridBound = true;
 
-      // クリックイベントの集約（イベント移譲: 1つのリスナーですべてのボタンとカード操作を判別）
+      // クリチE��イベント�E雁E��E��イベント移譲: 1つのリスナ�Eですべてのボタンとカード操作を判別�E�E
       grid.addEventListener('click', (e) => {
         const memoBtn = e.target.closest('.party-memo-btn');
         if (memoBtn) {
@@ -1302,7 +1302,7 @@
           return;
         }
 
-        // カード本体タップ時（ボタン以外）に編集モーダルを開く
+        // カード本体タチE�E時（�Eタン以外）に編雁E��ーダルを開ぁE
         const card = e.target.closest('.party-card');
         if (card && !e.target.closest('button')) {
           editParty(card.dataset.partyId);
@@ -1317,10 +1317,10 @@
       <div class="flex justify-between items-center mb-3" style="gap:6px">
         <div class="party-name party-edit-trigger" data-party-id="${p.id}" style="cursor:pointer;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0" title="${p.name}">${p.name}</div>
         <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
-          <button class="party-action-icon-btn party-memo-btn ${p.memo ? 'has-memo' : ''}" data-party-id="${p.id}" title="${p.memo ? 'メモあり (編集)' : 'メモを追加'}">📝</button>
-          <button class="party-action-icon-btn party-ai-edit-btn" data-party-id="${p.id}" title="画像から編集">📸</button>
-          <button class="party-action-icon-btn party-copy-btn" data-party-id="${p.id}" title="パーティをコピー">📋</button>
-          <button class="party-action-icon-btn party-delete-btn" data-party-id="${p.id}" title="パーティを削除">🗑️</button>
+          <button class="party-action-icon-btn party-memo-btn ${p.memo ? 'has-memo' : ''}" data-party-id="${p.id}" title="${p.memo ? 'メモあり (編雁E' : 'メモを追加'}">📝</button>
+          <button class="party-action-icon-btn party-ai-edit-btn" data-party-id="${p.id}" title="画像から編雁E>📸</button>
+          <button class="party-action-icon-btn party-copy-btn" data-party-id="${p.id}" title="パ�EチE��をコピ�E">📋</button>
+          <button class="party-action-icon-btn party-delete-btn" data-party-id="${p.id}" title="パ�EチE��を削除">🗑�E�E/button>
         </div>
       </div>
       <div class="party-pokemon party-edit-trigger" data-party-id="${p.id}" style="cursor:pointer">
@@ -1354,7 +1354,7 @@
       sentinel.style.color = 'var(--text-muted)';
       sentinel.style.fontSize = '12px';
       sentinel.style.gridColumn = '1 / -1';
-      sentinel.textContent = `パーティをさらに読み込み中... (${_partyCurrentRenderedCount} / ${_partyFilteredCache.length}件)`;
+      sentinel.textContent = `パ�EチE��をさらに読み込み中... (${_partyCurrentRenderedCount} / ${_partyFilteredCache.length}件)`;
       grid.appendChild(sentinel);
 
       if (!_partyObserver) {
@@ -1375,11 +1375,11 @@
       initPartyGridDelegation();
 
       if (!parties.length) {
-        grid.innerHTML = '<div class="empty"><div class="empty-icon">🎮</div><p>パーティがまだありません</p><p>右上のボタンから登録してください</p></div>';
+        grid.innerHTML = '<div class="empty"><div class="empty-icon">🎮</div><p>パ�EチE��がまだありません</p><p>右上�Eボタンから登録してください</p></div>';
         return;
       }
 
-      // 検索絞り込み（パーティ名または含まれるポケモン名）
+      // 検索絞り込み�E�パーチE��名また�E含まれるポケモン名！E
       let filtered = parties;
       if (_partySearchQuery) {
         filtered = parties.filter(p => {
@@ -1393,11 +1393,11 @@
       _partyFilteredCache = filtered;
 
       if (!filtered.length) {
-        grid.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><p>一致するパーティが見つかりません</p></div>';
+        grid.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div><p>一致するパ�EチE��が見つかりません</p></div>';
         return;
       }
 
-      // 初期30件のみを描画（何百パーティあっても一瞬で完了）
+      // 初期30件のみを描画�E�何百パ�EチE��あっても一瞬で完亁E��E
       const initialItems = filtered.slice(0, PARTY_PAGE_SIZE);
       _partyCurrentRenderedCount = initialItems.length;
       grid.innerHTML = initialItems.map(renderPartyCardHTML).join('');
@@ -1406,18 +1406,18 @@
         setupPartySentinel(grid);
       }
 
-      // PC環境のみドラッグ&ドロップ並び替えを初期化（検索時は無効）
+      // PC環墁E�EみドラチE��&ドロチE�E並び替えを初期化（検索時�E無効�E�E
       if (!_partySearchQuery && !('ontouchstart' in window)) {
         initPartyDragSort(grid);
       }
-      // コピーボードを先頭に表示
+      // コピ�Eボ�Eドを先頭に表示
       showCopyBoard();
     }
 
     function openPartyModal(id) {
       editingPartyId = id || null;
       const modal = document.getElementById('party-modal');
-      document.getElementById('party-modal-title').textContent = id ? 'パーティを編集' : 'パーティを登録';
+      document.getElementById('party-modal-title').textContent = id ? 'パ�EチE��を編雁E : 'パ�EチE��を登録';
       const slotsEl = document.getElementById('party-modal-slots');
       slotsEl.innerHTML = '';
       for (let i = 0; i < 6; i++) {
@@ -1440,17 +1440,17 @@
 
     function saveParty() {
       const name = document.getElementById('party-name-input').value.trim();
-      if (!name) { alert('パーティ名を入力してください'); return; }
+      if (!name) { alert('パ�EチE��名を入力してください'); return; }
       const pokemon = getSlotValues('party-modal-slots', 6);
-      if (!pokemon.some(Boolean)) { alert('少なくとも1体は入力してください'); return; }
-      // ② 同名チェック（編集中のパーティ自身は除く）
+      if (!pokemon.some(Boolean)) { alert('少なくとめE体�E入力してください'); return; }
+      // ② 同名チェチE���E�編雁E��のパ�EチE��自身は除く！E
       const dup = parties.find(p => p.name === name && p.id !== editingPartyId);
-      if (dup) { alert('「' + name + '」という名前のパーティはすでに存在します'); return; }
+      if (dup) { alert('、E + name + '」とぁE��名前のパ�EチE��はすでに存在しまぁE); return; }
       if (editingPartyId) {
         const idx = parties.findIndex(p => p.id === editingPartyId);
         if (idx >= 0) { parties[idx].name = name; parties[idx].pokemon = pokemon; }
       } else {
-        // ③ 新規は先頭に追加
+        // ③ 新規�E先頭に追加
         parties.unshift({ id: Date.now().toString(), name, pokemon });
       }
       saveData();
@@ -1464,7 +1464,7 @@
     }
 
     function deleteParty(id) {
-      if (!confirm('このパーティを削除しますか？')) return;
+      if (!confirm('こ�Eパ�EチE��を削除しますか�E�E)) return;
       parties = parties.filter(p => p.id !== id);
       saveData();
       renderParties();
@@ -1477,16 +1477,16 @@
     let mySelectionOrder = [];
     let oppSelectionOrder = [];
 
-    // BO3用ゲームデータ（各試合の選出と勝敗）
+    // BO3用ゲームチE�Eタ�E�各試合�E選出と勝敗�E�E
     let bo3Games = [
       { mySelectionOrder: [], oppSelectionOrder: [], result: null },
       { mySelectionOrder: [], oppSelectionOrder: [], result: null },
       { mySelectionOrder: [], oppSelectionOrder: [], result: null }
     ];
 
-    // ===== レギュレーション・シーズン・形式・タグ付けロジック =====
+    // ===== レギュレーション・シーズン・形式�Eタグ付けロジチE�� =====
     function initRecordFormMeta() {
-      // 1. レギュレーションの初期化
+      // 1. レギュレーションの初期匁E
       const regSel = document.getElementById('rec-regulation');
       if (regSel) {
         if (currentRecordRegulation === null || currentRecordRegulation === undefined || currentRecordRegulation === '') {
@@ -1495,7 +1495,7 @@
         initRegulationSelect('rec-regulation', currentRecordRegulation);
       }
 
-      // 2. シーズンの初期化
+      // 2. シーズンの初期匁E
       const seasonSel = document.getElementById('rec-season');
       if (seasonSel) {
         if (currentRecordSeason === null || currentRecordSeason === undefined || currentRecordSeason === '') {
@@ -1504,10 +1504,10 @@
         initSeasonSelect('rec-season', currentRecordSeason);
       }
 
-      // 3. 形式の初期化
-      setRecordMatchType(currentRecordMatchType || 'ランクマ');
+      // 3. 形式�E初期匁E
+      setRecordMatchType(currentRecordMatchType || 'ランクチE);
 
-      // 4. タグの初期化
+      // 4. タグの初期匁E
       renderRecordTagChips();
 
       // 5. 履歴フィルターのレギュ・シーズン・タグ更新
@@ -1523,9 +1523,9 @@
       let html = '';
       if (isFilter) {
         html += '<option value="">すべて</option>';
-        html += '<option value="__none__"' + (selectedVal === '__none__' ? ' selected' : '') + '>記載なし</option>';
+        html += '<option value="__none__"' + (selectedVal === '__none__' ? ' selected' : '') + '>記載なぁE/option>';
       } else {
-        html += '<option value="">記載なし</option>';
+        html += '<option value="">記載なぁE/option>';
       }
       list.forEach(r => {
         const isSel = (r === selectedVal) ? ' selected' : '';
@@ -1545,9 +1545,9 @@
       let html = '';
       if (isFilter) {
         html += '<option value="">すべて</option>';
-        html += '<option value="__none__"' + (selectedVal === '__none__' ? ' selected' : '') + '>記載なし</option>';
+        html += '<option value="__none__"' + (selectedVal === '__none__' ? ' selected' : '') + '>記載なぁE/option>';
       } else {
-        html += '<option value="">記載なし</option>';
+        html += '<option value="">記載なぁE/option>';
       }
       seasons.forEach(s => {
         const isSel = (s === selectedVal) ? ' selected' : '';
@@ -1583,13 +1583,13 @@
             ondrop="onDmSeasonDrop(event, ${idx})"
             ondragend="onDmSeasonDragEnd(event)">
             <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
-              <span class="drag-handle" title="ドラッグして並び替え">☰</span>
+              <span class="drag-handle" title="ドラチE��して並び替ぁE>☰</span>
               <span style="font-size:14px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">📅 ${s}</span>
-              ${isDefault ? '<span style="font-size:10px;background:var(--accent);color:#fff;padding:1px 6px;border-radius:4px;font-weight:700;white-space:nowrap">最新(デフォルト)</span>' : ''}
+              ${isDefault ? '<span style="font-size:10px;background:var(--accent);color:#fff;padding:1px 6px;border-radius:4px;font-weight:700;white-space:nowrap">最新(チE��ォルチE</span>' : ''}
             </div>
             <div style="display:flex;gap:6px;flex-shrink:0">
-              <button type="button" class="btn btn-ghost btn-sm" onclick="editSeason('${safeS}')" style="padding:3px 8px;font-size:12px">✏️ 編集</button>
-              <button type="button" class="btn btn-ghost btn-sm" onclick="deleteSeason('${safeS}')" style="padding:3px 8px;font-size:12px;color:#ef4444">🗑️ 削除</button>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="editSeason('${safeS}')" style="padding:3px 8px;font-size:12px">✏︁E編雁E/button>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="deleteSeason('${safeS}')" style="padding:3px 8px;font-size:12px;color:#ef4444">🗑�E�E削除</button>
             </div>
           </div>
         `;
@@ -1636,7 +1636,7 @@
       if (fromIdx !== toIdx) {
         const [moved] = seasons.splice(fromIdx, 1);
         seasons.splice(toIdx, 0, moved);
-        // 一番上（index 0）が最新＝デフォルト
+        // 一番上！Endex 0�E�が最新�E�デフォルチE
         if (seasons.length > 0) {
           currentRecordSeason = seasons[0];
           localStorage.setItem('pkm_last_season', seasons[0]);
@@ -1645,7 +1645,7 @@
         renderDmSeasons();
         initSeasonSelect('rec-season', currentRecordSeason);
         initSeasonSelect('history-season-filter', document.getElementById('history-season-filter')?.value || '', true);
-        showRecordToast(`📅 シーズンを並び替えました（最上位「${seasons[0]}」をデフォルトに設定）`);
+        showRecordToast(`📅 シーズンを並び替えました�E�最上位、E{seasons[0]}」をチE��ォルトに設定）`);
       }
     }
 
@@ -1673,7 +1673,7 @@
     function editSeason(name) {
       editingSeasonName = name;
       const titleEl = document.getElementById('new-season-modal-title');
-      if (titleEl) titleEl.textContent = '📅 シーズンの編集';
+      if (titleEl) titleEl.textContent = '📅 シーズンの編雁E;
       const btnEl = document.getElementById('btn-save-season-modal');
       if (btnEl) btnEl.textContent = '更新';
 
@@ -1712,13 +1712,13 @@
           currentRecordSeason = name;
         }
         editingSeasonName = null;
-        showRecordToast(`📅 シーズン名を「${name}」に更新しました！`);
+        showRecordToast(`📅 シーズン名を、E{name}」に更新しました�E�`);
       } else {
-        // 新規登録は先頭に追加（＝最新・デフォルト）
+        // 新規登録は先頭に追加�E�＝最新・チE��ォルト！E
         seasons = seasons.filter(s => s !== name);
         seasons.unshift(name);
         currentRecordSeason = name;
-        showRecordToast(`📅 シーズン「${name}」を登録しました！`);
+        showRecordToast(`📅 シーズン、E{name}」を登録しました�E�`);
       }
 
       localStorage.setItem('pkm_last_season', currentRecordSeason);
@@ -1730,7 +1730,7 @@
     }
 
     function deleteSeason(name) {
-      if (!confirm(`シーズン「${name}」を削除しますか？\n※ 過去の対戦記録のシーズン情報は保持されます。`)) return;
+      if (!confirm(`シーズン、E{name}」を削除しますか�E�\n※ 過去の対戦記録のシーズン惁E��は保持されます。`)) return;
       seasons = seasons.filter(s => s !== name);
       if (currentRecordSeason === name) {
         currentRecordSeason = (seasons.length > 0) ? seasons[0] : '';
@@ -1740,7 +1740,7 @@
       initSeasonSelect('rec-season', currentRecordSeason);
       initSeasonSelect('history-season-filter', document.getElementById('history-season-filter')?.value || '', true);
       renderDmSeasons();
-      showRecordToast(`🗑️ シーズン「${name}」を削除しました`);
+      showRecordToast(`🗑�E�Eシーズン、E{name}」を削除しました`);
     }
 
     function setRecordMatchType(type) {
@@ -1768,8 +1768,8 @@
       }
       container.innerHTML = currentRecordTags.map(t => `
         <span class="tag-badge">
-          <span>🏷️ ${t}</span>
-          <button type="button" class="tag-badge-remove" onclick="event.stopPropagation(); removeRecordTag('${t}')">✕</button>
+          <span>🏷�E�E${t}</span>
+          <button type="button" class="tag-badge-remove" onclick="event.stopPropagation(); removeRecordTag('${t}')">✁E/button>
         </span>
       `).join('');
     }
@@ -1829,7 +1829,7 @@
       if (!list) return;
       val = (val || '').trim().toLowerCase();
 
-      const currentFmt = currentRecordMatchType || 'ランクマ';
+      const currentFmt = currentRecordMatchType || 'ランクチE;
       let availableTags = customTags.filter(t => {
         if (!t.formats || !Array.isArray(t.formats) || t.formats.length === 0) return true;
         return t.formats.includes(currentFmt);
@@ -1844,10 +1844,10 @@
       let html = '';
       if (availableTags.length > 0) {
         availableTags.forEach(t => {
-          const fmts = (t.formats && t.formats.length) ? t.formats.join(', ') : '全形式';
+          const fmts = (t.formats && t.formats.length) ? t.formats.join(', ') : '全形弁E;
           html += `
             <div class="tag-ac-item" data-name="${t.name}" onclick="addRecordTag('${t.name}')">
-              <span style="font-weight:600">🏷️ ${t.name}</span>
+              <span style="font-weight:600">🏷�E�E${t.name}</span>
               <span style="font-size:11px;color:var(--text-muted)">(${fmts})</span>
             </div>
           `;
@@ -1860,14 +1860,14 @@
         if (!exactMatch) {
           html += `
             <div class="tag-ac-create" onclick="openCreateTagModal('${inputVal}')">
-              <span>➕ 「${inputVal}」を新規タグとして作成...</span>
+              <span>➁E、E{inputVal}」を新規タグとして作�E...</span>
             </div>
           `;
         }
       } else {
         html += `
           <div class="tag-ac-create" onclick="openCreateTagModal()">
-            <span>➕ 新規タグを作成...</span>
+            <span>➁E新規タグを作�E...</span>
           </div>
         `;
       }
@@ -1904,7 +1904,7 @@
       }
 
       listEl.innerHTML = customTags.map((t, idx) => {
-        const fmts = (t.formats && t.formats.length) ? t.formats.join(', ') : '全形式';
+        const fmts = (t.formats && t.formats.length) ? t.formats.join(', ') : '全形弁E;
         const safeId = t.id ? t.id.replace(/'/g, "\\'") : '';
         return `
           <div class="sortable-item" draggable="true" data-index="${idx}"
@@ -1914,13 +1914,13 @@
             ondrop="onDmTagDrop(event, ${idx})"
             ondragend="onDmTagDragEnd(event)">
             <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex:1;min-width:0">
-              <span class="drag-handle" title="ドラッグして並び替え">☰</span>
-              <span style="font-size:14px;font-weight:600;color:var(--text)">🏷️ ${t.name}</span>
-              <span style="font-size:11px;color:var(--text-muted);background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px">形式: ${fmts}</span>
+              <span class="drag-handle" title="ドラチE��して並び替ぁE>☰</span>
+              <span style="font-size:14px;font-weight:600;color:var(--text)">🏷�E�E${t.name}</span>
+              <span style="font-size:11px;color:var(--text-muted);background:rgba(255,255,255,0.06);padding:2px 6px;border-radius:4px">形弁E ${fmts}</span>
             </div>
             <div style="display:flex;gap:6px;flex-shrink:0">
-              <button type="button" class="btn btn-ghost btn-sm" onclick="editTag('${safeId}')" style="padding:3px 8px;font-size:12px">✏️ 編集</button>
-              <button type="button" class="btn btn-ghost btn-sm" onclick="deleteTag('${safeId}')" style="padding:3px 8px;font-size:12px;color:#ef4444">🗑️ 削除</button>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="editTag('${safeId}')" style="padding:3px 8px;font-size:12px">✏︁E編雁E/button>
+              <button type="button" class="btn btn-ghost btn-sm" onclick="deleteTag('${safeId}')" style="padding:3px 8px;font-size:12px;color:#ef4444">🗑�E�E削除</button>
             </div>
           </div>
         `;
@@ -1969,7 +1969,7 @@
         customTags.splice(toIdx, 0, moved);
         saveData();
         renderDmTags();
-        showRecordToast(`🏷️ タグを並び替えました`);
+        showRecordToast(`🏷�E�Eタグを並び替えました`);
       }
     }
 
@@ -1986,15 +1986,15 @@
       closeHistoryTagAc();
 
       const titleEl = document.getElementById('new-tag-modal-title');
-      if (titleEl) titleEl.textContent = '🏷️ 新規タグの作成';
+      if (titleEl) titleEl.textContent = '🏷�E�E新規タグの作�E';
       const btnEl = document.getElementById('btn-save-tag-modal');
-      if (btnEl) btnEl.textContent = '作成して追加';
+      if (btnEl) btnEl.textContent = '作�Eして追加';
 
       const inp = document.getElementById('new-tag-name-input');
       if (inp) inp.value = initialName;
 
-      const currentFmt = currentRecordMatchType || 'ランクマ';
-      const allFmts = ['ランクマ', '公式大会', '非公式', 'フレ戦', 'showdown'];
+      const currentFmt = currentRecordMatchType || 'ランクチE;
+      const allFmts = ['ランクチE, '公式大企E, '非�E弁E, 'フレ戦', 'showdown'];
       allFmts.forEach(fmt => {
         const cb = document.getElementById(`tag-fmt-${fmt}`);
         if (cb) cb.checked = (fmt === currentFmt);
@@ -2013,14 +2013,14 @@
       closeHistoryTagAc();
 
       const titleEl = document.getElementById('new-tag-modal-title');
-      if (titleEl) titleEl.textContent = '🏷️ タグの編集';
+      if (titleEl) titleEl.textContent = '🏷�E�Eタグの編雁E;
       const btnEl = document.getElementById('btn-save-tag-modal');
       if (btnEl) btnEl.textContent = '更新';
 
       const inp = document.getElementById('new-tag-name-input');
       if (inp) inp.value = tag.name;
 
-      const allFmts = ['ランクマ', '公式大会', '非公式', 'フレ戦', 'showdown'];
+      const allFmts = ['ランクチE, '公式大企E, '非�E弁E, 'フレ戦', 'showdown'];
       allFmts.forEach(fmt => {
         const cb = document.getElementById(`tag-fmt-${fmt}`);
         if (cb) cb.checked = (tag.formats && Array.isArray(tag.formats)) ? tag.formats.includes(fmt) : true;
@@ -2038,12 +2038,12 @@
     }
 
     function toggleAllTagModalFormats() {
-      const allFmts = ['ランクマ', '公式大会', '非公式', 'フレ戦', 'showdown'];
+      const allFmts = ['ランクチE, '公式大企E, '非�E弁E, 'フレ戦', 'showdown'];
       const cbs = allFmts.map(fmt => document.getElementById(`tag-fmt-${fmt}`)).filter(Boolean);
       const allChecked = cbs.every(cb => cb.checked);
       cbs.forEach(cb => cb.checked = !allChecked);
       const btn = document.getElementById('btn-toggle-all-tag-formats');
-      if (btn) btn.textContent = allChecked ? '全選択' : '全解除';
+      if (btn) btn.textContent = allChecked ? '全選抁E : '全解除';
     }
 
     function saveNewTag() {
@@ -2051,7 +2051,7 @@
       const name = (inp?.value || '').trim();
       if (!name) { alert('タグ名を入力してください'); return; }
 
-      const allFmts = ['ランクマ', '公式大会', '非公式', 'フレ戦', 'showdown'];
+      const allFmts = ['ランクチE, '公式大企E, '非�E弁E, 'フレ戦', 'showdown'];
       const selectedFmts = allFmts.filter(fmt => {
         const cb = document.getElementById(`tag-fmt-${fmt}`);
         return cb && cb.checked;
@@ -2082,7 +2082,7 @@
           }
         }
         editingTagId = null;
-        showRecordToast(`🏷️ タグ「${name}」を更新しました！`);
+        showRecordToast(`🏷�E�Eタグ、E{name}」を更新しました�E�`);
       } else {
         const existing = customTags.find(t => t.name === name);
         if (existing) {
@@ -2095,7 +2095,7 @@
           });
         }
         addRecordTag(name);
-        showRecordToast(`🏷️ タグ「${name}」を登録しました！`);
+        showRecordToast(`🏷�E�Eタグ、E{name}」を登録しました�E�`);
       }
 
       saveData();
@@ -2108,7 +2108,7 @@
     function deleteTag(id) {
       const tag = customTags.find(t => t.id === id);
       if (!tag) return;
-      if (!confirm(`タグ「${tag.name}」を削除しますか？\n※ 過去の対戦記録のタグ情報は保持されます。`)) return;
+      if (!confirm(`タグ、E{tag.name}」を削除しますか�E�\n※ 過去の対戦記録のタグ惁E��は保持されます。`)) return;
 
       customTags = customTags.filter(t => t.id !== id);
       if (currentRecordTags.includes(tag.name)) {
@@ -2123,7 +2123,7 @@
       renderDmTags();
       renderRecordTagChips();
       renderHistoryTagChips();
-      showRecordToast(`🗑️ タグ「${tag.name}」を削除しました`);
+      showRecordToast(`🗑�E�Eタグ、E{tag.name}」を削除しました`);
     }
 
     // 履歴画面のタグフィルター用
@@ -2136,8 +2136,8 @@
       }
       container.innerHTML = historyTagFilters.map(t => `
         <span class="tag-badge">
-          <span>🏷️ ${t}</span>
-          <button type="button" class="tag-badge-remove" onclick="event.stopPropagation(); removeHistoryTagFilter('${t}')">✕</button>
+          <span>🏷�E�E${t}</span>
+          <button type="button" class="tag-badge-remove" onclick="event.stopPropagation(); removeHistoryTagFilter('${t}')">✁E/button>
         </span>
       `).join('');
     }
@@ -2173,7 +2173,7 @@
       if (!list) return;
       val = (val || '').trim().toLowerCase();
 
-      // 既に選択中のフィルタータグは除外
+      // 既に選択中のフィルタータグは除夁E
       let availableTags = customTags.filter(t => !historyTagFilters.includes(t.name));
 
       if (val) {
@@ -2183,10 +2183,10 @@
       let html = '';
       if (availableTags.length > 0) {
         availableTags.forEach(t => {
-          const fmts = (t.formats && t.formats.length) ? t.formats.join(', ') : '全形式';
+          const fmts = (t.formats && t.formats.length) ? t.formats.join(', ') : '全形弁E;
           html += `
             <div class="tag-ac-item" data-name="${t.name}" onclick="addHistoryTagFilter('${t.name}')">
-              <span style="font-weight:600">🏷️ ${t.name}</span>
+              <span style="font-weight:600">🏷�E�E${t.name}</span>
               <span style="font-size:11px;color:var(--text-muted)">(${fmts})</span>
             </div>
           `;
@@ -2239,7 +2239,7 @@
       if (mode === 'showdown') {
         const username = getShowdownUsername();
         if (!username || !username.trim()) {
-          alert('データ管理画面でShowdownユーザー名を登録してください。');
+          alert('チE�Eタ管琁E��面でShowdownユーザー名を登録してください、E);
           return;
         }
       }
@@ -2265,7 +2265,7 @@
           }
         });
         if (currentRecordMatchType === 'showdown' || !currentRecordMatchType) {
-          setRecordMatchType('ランクマ');
+          setRecordMatchType('ランクチE);
         } else {
           setRecordMatchType(currentRecordMatchType);
         }
@@ -2313,13 +2313,13 @@
 
       // Floette-Mega は Floette-Eternal に正規化
       if (/^floette-mega/i.test(species)) species = 'Floette-Eternal';
-      // メガシンカ・キョダイマックス・ゲンシカイキ・テラスタルの接尾辞を除去
+      // メガシンカ・キョダイマックス・ゲンシカイキ・チE��スタルの接尾辞を除去
       species = species.replace(/-Mega(-[XYZxyz])?/i, '');
       species = species.replace(/-Gmax/i, '');
       species = species.replace(/-Primal/i, '');
       species = species.replace(/-(Terastal|Stellar)/i, '');
 
-      // 性別によるすがた違い（Showdownで種族名に -F が付かず性別欄に F が入る場合の補正）
+      // 性別によるすがた違ぁE��Ehowdownで種族名に -F が付かず性別欁E�� F が�Eる場合�E補正�E�E
       if (gender === 'F') {
         const idLower = species.toLowerCase();
         if (idLower === 'basculegion' || idLower === 'indeedee' || idLower === 'meowstic' || idLower === 'oinkologne') {
@@ -2332,7 +2332,7 @@
         const ja = translatePokemonToJa(species);
         if (ja && ja !== species) return ja;
 
-        // ハイフン前（ベース名）で再試行
+        // ハイフン前（�Eース名）で再試衁E
         const baseName = species.split('-')[0];
         const baseJa = translatePokemonToJa(baseName);
         if (baseJa && baseJa !== baseName) return baseJa;
@@ -2353,12 +2353,12 @@
 
     function parseShowdownReplayJson(replayData, myUsername) {
       if (!replayData || !replayData.log) {
-        throw new Error('対戦ログデータが不正です');
+        throw new Error('対戦ログチE�Eタが不正でぁE);
       }
 
       const myUserNorm = toTransId(myUsername);
       if (!myUserNorm) {
-        throw new Error('Showdownユーザー名が設定されていません');
+        throw new Error('Showdownユーザー名が設定されてぁE��せん');
       }
 
       const lines = replayData.log.split('\n');
@@ -2398,10 +2398,10 @@
         oppPlayerId = 'p1';
         oppTrainerName = p1Name;
       } else {
-        throw new Error(`設定されたユーザー名「${myUsername}」がログ内のプレイヤー（${p1Name || '未検出'} / ${p2Name || '未検出'}）と一致しませんでした。データ管理画面で正しいユーザー名を登録してください。`);
+        throw new Error(`設定されたユーザー名、E{myUsername}」がログ冁E�Eプレイヤー�E�E{p1Name || '未検�E'} / ${p2Name || '未検�E'}�E�と一致しませんでした。データ管琁E��面で正しいユーザー名を登録してください。`);
       }
 
-      // 相手パーティ（6体）
+      // 相手パーチE���E�E体！E
       const oppPartyNames = [];
       for (const line of lines) {
         if (line.startsWith(`|poke|${oppPlayerId}|`)) {
@@ -2414,8 +2414,8 @@
         }
       }
 
-      // 選出ポケモンの抽出 (繰り出された順)
-      // メガシンカポケモンは繰り出し時は通常名でswitch/dragされるため、そのタイミングで選出順に反映される
+      // 選出ポケモンの抽出 (繰り�Eされた頁E
+      // メガシンカポケモンは繰り�Eし時は通常名でswitch/dragされるため、そのタイミングで選出頁E��反映されめE
       const mySelectionNames = [];
       const oppSelectionNames = [];
 
@@ -2440,7 +2440,7 @@
         }
       }
 
-      // 勝敗判定
+      // 勝敗判宁E
       let result = null;
       for (const line of lines) {
         if (line.startsWith('|win|')) {
@@ -2455,7 +2455,7 @@
         }
       }
 
-      // 相手レート判定
+      // 相手レート判宁E
       let oppRating = (oppPlayerId === 'p1') ? p1Rating : p2Rating;
       for (const line of lines) {
         if (line.startsWith('|raw|')) {
@@ -2480,7 +2480,7 @@
       };
     }
 
-    // 勝敗を明示的にセットする関数（自動入力用・トグルしない）
+    // 勝敗を�E示皁E��セチE��する関数�E��E動�E力用・トグルしなぁE��E
     function applyBo1Result(r) {
       recordResult = r;
       document.getElementById('btn-win')?.classList.toggle('active', r === 'win');
@@ -2497,7 +2497,7 @@
 
     async function fetchShowdownReplayJson(rawUrl) {
       let url = (rawUrl || '').trim();
-      if (!url) throw new Error('URLを入力してください');
+      if (!url) throw new Error('URLを�E力してください');
       if (!url.startsWith('http://') && !url.startsWith('https://')) {
         url = 'https://' + url;
       }
@@ -2515,12 +2515,12 @@
       const urlInput = document.getElementById('rec-showdown-url');
       const url = urlInput ? urlInput.value.trim() : '';
       if (!url) {
-        alert('ShowdownのリプレイURLを入力してください');
+        alert('ShowdownのリプレイURLを�E力してください');
         return;
       }
       const username = getShowdownUsername();
       if (!username) {
-        alert('データ管理画面でShowdownユーザー名を登録してください');
+        alert('チE�Eタ管琁E��面でShowdownユーザー名を登録してください');
         return;
       }
 
@@ -2532,17 +2532,17 @@
         const replayData = await fetchShowdownReplayJson(url);
         const parsed = parseShowdownReplayJson(replayData, username);
 
-        // 1. 相手トレーナー名
+        // 1. 相手トレーナ�E吁E
         if (parsed.oppTrainer) {
           const tInput = document.getElementById('rec-opp-trainer');
           if (tInput) tInput.value = parsed.oppTrainer;
         }
-        // 2. 相手レート
+        // 2. 相手レーチE
         if (parsed.oppRating) {
           const rInput = document.getElementById('rec-opp-rating');
           if (rInput) rInput.value = parsed.oppRating;
         }
-        // 3. 相手パーティ（6体）
+        // 3. 相手パーチE���E�E体！E
         if (parsed.oppParty && parsed.oppParty.length) {
           const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
           parsed.oppParty.forEach((pName, idx) => {
@@ -2553,7 +2553,7 @@
           });
           rebuildOppSelectionDropdowns();
         }
-        // 4. 自分・相手の選出
+        // 4. 自刁E�E相手�E選出
         if (parsed.mySelection && parsed.mySelection.length) {
           setSelectionFromNames('my', parsed.mySelection);
         }
@@ -2565,7 +2565,7 @@
           applyBo1Result(parsed.result);
         }
 
-        showRecordToast('✨ Showdown対戦ログを自動反映しました！');
+        showRecordToast('✨ Showdown対戦ログを�E動反映しました�E�E);
       } catch (err) {
         console.error('Showdown parse error:', err);
         alert(err.message || 'Showdownリプレイの解析に失敗しました');
@@ -2578,12 +2578,12 @@
       const urlInput = document.getElementById(`rec-showdown-url-${gameIdx}`);
       const url = urlInput ? urlInput.value.trim() : '';
       if (!url) {
-        alert(`${gameIdx + 1}戦目のShowdownリプレイURLを入力してください`);
+        alert(`${gameIdx + 1}戦目のShowdownリプレイURLを�E力してください`);
         return;
       }
       const username = getShowdownUsername();
       if (!username) {
-        alert('データ管理画面でShowdownユーザー名を登録してください');
+        alert('チE�Eタ管琁E��面でShowdownユーザー名を登録してください');
         return;
       }
 
@@ -2595,17 +2595,17 @@
         const replayData = await fetchShowdownReplayJson(url);
         const parsed = parseShowdownReplayJson(replayData, username);
 
-        // 相手トレーナー名
+        // 相手トレーナ�E吁E
         if (parsed.oppTrainer) {
           const tInput = document.getElementById('rec-opp-trainer');
           if (tInput) tInput.value = parsed.oppTrainer;
         }
-        // 相手レート
+        // 相手レーチE
         if (parsed.oppRating) {
           const rInput = document.getElementById('rec-opp-rating');
           if (rInput) rInput.value = parsed.oppRating;
         }
-        // 相手パーティ（未入力または1戦目の場合は設定）
+        // 相手パーチE���E�未入力また�E1戦目の場合�E設定！E
         if (parsed.oppParty && parsed.oppParty.length) {
           const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
           const hasExisting = Array.from(oppInputs).some(inp => inp.value.trim());
@@ -2620,7 +2620,7 @@
           }
         }
 
-        // 各ゲームの選出反映
+        // 吁E��ームの選出反映
         if (parsed.mySelection && parsed.mySelection.length) {
           setSelectionFromNames('my', parsed.mySelection, gameIdx);
         }
@@ -2631,7 +2631,7 @@
           applyBo3Result(gameIdx, parsed.result);
         }
 
-        showRecordToast(`✨ ${gameIdx + 1}戦目の対戦ログを自動反映しました！`);
+        showRecordToast(`✨ ${gameIdx + 1}戦目の対戦ログを�E動反映しました�E�`);
       } catch (err) {
         console.error(`Showdown parse error (game ${gameIdx + 1}):`, err);
         alert(err.message || `${gameIdx + 1}戦目のShowdownリプレイ解析に失敗しました`);
@@ -2646,7 +2646,7 @@
       const u2 = document.getElementById('rec-showdown-url-2')?.value.trim();
 
       if (!u0 && !u1 && !u2) {
-        alert('ShowdownのリプレイURLを入力してください');
+        alert('ShowdownのリプレイURLを�E力してください');
         return;
       }
 
@@ -2658,7 +2658,7 @@
     function renderRecordPage() {
       const sel = document.getElementById('party-select-dropdown');
       if (!sel) return;
-      sel.innerHTML = '<option value="">-- パーティを選択 --</option>';
+      sel.innerHTML = '<option value="">-- パ�EチE��を選抁E--</option>';
       parties.forEach(p => {
         const opt = document.createElement('option');
         opt.value = p.id;
@@ -2701,7 +2701,7 @@
       const form = document.getElementById('record-form-card');
       form.style.display = 'block';
 
-      // Set datetime (新規登録時のみ現在日時を設定)
+      // Set datetime (新規登録時�Eみ現在日時を設宁E
       if (!editingRecordId) {
         const now = new Date();
         const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
@@ -2709,29 +2709,29 @@
         initRecordFormMeta();
       }
 
-      // 自分のパーティ
+      // 自刁E�Eパ�EチE��
       const myParty = parties.find(p => p.id === selectedPartyId);
       const myPokemon = myParty ? myParty.pokemon : [];
 
-      // 相手パーティスロット（フリー入力）
+      // 相手パーチE��スロチE���E�フリー入力！E
       const oppParty = document.getElementById('opp-party-slots');
       oppParty.innerHTML = '';
       for (let i = 0; i < 6; i++) oppParty.appendChild(createPokemonSlot('opp-party-slots', i, `${i + 1}体目`));
 
-      // 相手パーティ: 直接テキスト入力してフォーカスを外した場合に対応
+      // 相手パーチE��: 直接チE��スト�E力してフォーカスを外した場合に対忁E
       oppParty.querySelectorAll('input[type=text]').forEach(input => {
         input.addEventListener('blur', () => {
           rebuildOppSelectionDropdowns();
         });
       });
 
-      // 自分のパーティアイコンを表示
+      // 自刁E�Eパ�EチE��アイコンを表示
       const myIcons = document.getElementById('my-party-icons');
       if (myIcons) {
         myIcons.innerHTML = myPokemon.map(pk => typeof pk === 'string' ? pk : (pk && pk.name || '')).filter(Boolean).map(name => getPokeSpriteHTMLByDisplay(name)).join('');
       }
 
-      // 選出スロットの初期化（BO1 & BO3）
+      // 選出スロチE��の初期化！EO1 & BO3�E�E
       mySelectionOrder = [];
       oppSelectionOrder = [];
       renderSelectionSlots('my');
@@ -2781,7 +2781,7 @@
           renderSelectionSlots('opp');
         }
       } else {
-        // BO3 (指定gameIdx)
+        // BO3 (持E��gameIdx)
         const g = bo3Games[gameIdx];
         if (!g) return;
 
@@ -2841,12 +2841,12 @@
                 iconHtml = `<img src="${BALL_ICON_SRC}" alt="${name}" class="ball-img">`;
               }
             } else {
-              iconHtml = `<img src="${BALL_ICON_SRC}" alt="未設定" class="ball-img">`;
+              iconHtml = `<img src="${BALL_ICON_SRC}" alt="未設宁E class="ball-img">`;
             }
 
             const cls = `selection-poke-card${isSelected ? ' selected' : ''}${isDisabled ? ' disabled' : ''}`;
             html += `
-              <div class="${cls}" onclick="toggleSelectionSlot('my', ${i})" title="${name || '未設定'}">
+              <div class="${cls}" onclick="toggleSelectionSlot('my', ${i})" title="${name || '未設宁E}">
                 ${iconHtml}
                 <div class="selection-order-badge">${badge}</div>
               </div>
@@ -2879,12 +2879,12 @@
                 iconHtml = `<img src="${BALL_ICON_SRC}" alt="${name}" class="ball-img">`;
               }
             } else {
-              iconHtml = `<img src="${BALL_ICON_SRC}" alt="未入力" class="ball-img">`;
+              iconHtml = `<img src="${BALL_ICON_SRC}" alt="未入劁E class="ball-img">`;
             }
 
             const cls = `selection-poke-card${isSelected ? ' selected' : ''}${isDisabled ? ' disabled' : ''}`;
             html += `
-              <div class="${cls}" onclick="toggleSelectionSlot('opp', ${i})" title="${name || '未入力'}">
+              <div class="${cls}" onclick="toggleSelectionSlot('opp', ${i})" title="${name || '未入劁E}">
                 ${iconHtml}
                 <div class="selection-order-badge">${badge}</div>
               </div>
@@ -2923,12 +2923,12 @@
                 iconHtml = `<img src="${BALL_ICON_SRC}" alt="${name}" class="ball-img">`;
               }
             } else {
-              iconHtml = `<img src="${BALL_ICON_SRC}" alt="未設定" class="ball-img">`;
+              iconHtml = `<img src="${BALL_ICON_SRC}" alt="未設宁E class="ball-img">`;
             }
 
             const cls = `selection-poke-card${isSelected ? ' selected' : ''}${isDisabled ? ' disabled' : ''}`;
             html += `
-              <div class="${cls}" onclick="toggleSelectionSlot('my', ${i}, ${gameIdx})" title="${name || '未設定'}">
+              <div class="${cls}" onclick="toggleSelectionSlot('my', ${i}, ${gameIdx})" title="${name || '未設宁E}">
                 ${iconHtml}
                 <div class="selection-order-badge">${badge}</div>
               </div>
@@ -2961,12 +2961,12 @@
                 iconHtml = `<img src="${BALL_ICON_SRC}" alt="${name}" class="ball-img">`;
               }
             } else {
-              iconHtml = `<img src="${BALL_ICON_SRC}" alt="未入力" class="ball-img">`;
+              iconHtml = `<img src="${BALL_ICON_SRC}" alt="未入劁E class="ball-img">`;
             }
 
             const cls = `selection-poke-card${isSelected ? ' selected' : ''}${isDisabled ? ' disabled' : ''}`;
             html += `
-              <div class="${cls}" onclick="toggleSelectionSlot('opp', ${i}, ${gameIdx})" title="${name || '未入力'}">
+              <div class="${cls}" onclick="toggleSelectionSlot('opp', ${i}, ${gameIdx})" title="${name || '未入劁E}">
                 ${iconHtml}
                 <div class="selection-order-badge">${badge}</div>
               </div>
@@ -2993,7 +2993,7 @@
           mySelectionOrder = [];
           names.forEach(name => {
             if (!name) return;
-            const norm = name.split('(')[0].split('（')[0].trim();
+            const norm = name.split('(')[0].split('�E�E)[0].trim();
             let bestIdx = -1;
             for (let i = 0; i < 6; i++) {
               if (mySelectionOrder.includes(i)) continue;
@@ -3001,7 +3001,7 @@
               const pName = (typeof pk === 'string' ? pk : (pk && pk.name || '')) || '';
               if (!pName) continue;
               if (pName === name) { bestIdx = i; break; }
-              const pNorm = pName.split('(')[0].split('（')[0].trim();
+              const pNorm = pName.split('(')[0].split('�E�E)[0].trim();
               if (pNorm === norm) { bestIdx = i; break; }
             }
             if (bestIdx !== -1 && mySelectionOrder.length < 4) {
@@ -3015,14 +3015,14 @@
           oppSelectionOrder = [];
           names.forEach(name => {
             if (!name) return;
-            const norm = name.split('(')[0].split('（')[0].trim();
+            const norm = name.split('(')[0].split('�E�E)[0].trim();
             let bestIdx = -1;
             for (let i = 0; i < 6; i++) {
               if (oppSelectionOrder.includes(i)) continue;
               const pName = oppPokemon[i] || '';
               if (!pName) continue;
               if (pName === name) { bestIdx = i; break; }
-              const pNorm = pName.split('(')[0].split('（')[0].trim();
+              const pNorm = pName.split('(')[0].split('�E�E)[0].trim();
               if (pNorm === norm) { bestIdx = i; break; }
             }
             if (bestIdx !== -1 && oppSelectionOrder.length < 4) {
@@ -3040,7 +3040,7 @@
           g.mySelectionOrder = [];
           names.forEach(name => {
             if (!name) return;
-            const norm = name.split('(')[0].split('（')[0].trim();
+            const norm = name.split('(')[0].split('�E�E)[0].trim();
             let bestIdx = -1;
             for (let i = 0; i < 6; i++) {
               if (g.mySelectionOrder.includes(i)) continue;
@@ -3048,7 +3048,7 @@
               const pName = (typeof pk === 'string' ? pk : (pk && pk.name || '')) || '';
               if (!pName) continue;
               if (pName === name) { bestIdx = i; break; }
-              const pNorm = pName.split('(')[0].split('（')[0].trim();
+              const pNorm = pName.split('(')[0].split('�E�E)[0].trim();
               if (pNorm === norm) { bestIdx = i; break; }
             }
             if (bestIdx !== -1 && g.mySelectionOrder.length < 4) {
@@ -3062,14 +3062,14 @@
           g.oppSelectionOrder = [];
           names.forEach(name => {
             if (!name) return;
-            const norm = name.split('(')[0].split('（')[0].trim();
+            const norm = name.split('(')[0].split('�E�E)[0].trim();
             let bestIdx = -1;
             for (let i = 0; i < 6; i++) {
               if (g.oppSelectionOrder.includes(i)) continue;
               const pName = oppPokemon[i] || '';
               if (!pName) continue;
               if (pName === name) { bestIdx = i; break; }
-              const pNorm = pName.split('(')[0].split('（')[0].trim();
+              const pNorm = pName.split('(')[0].split('�E�E)[0].trim();
               if (pNorm === norm) { bestIdx = i; break; }
             }
             if (bestIdx !== -1 && g.oppSelectionOrder.length < 4) {
@@ -3084,7 +3084,7 @@
     function rebuildOppSelectionDropdowns() {
       const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
       const oppPokemon = Array.from(oppInputs).map(inp => inp.value.trim());
-      // 相手パーティから削除されたスロット番号は選出から外す
+      // 相手パーチE��から削除されたスロチE��番号は選出から外す
       oppSelectionOrder = oppSelectionOrder.filter(idx => idx < oppPokemon.length && !!oppPokemon[idx]);
       renderSelectionSlots('opp');
 
@@ -3107,7 +3107,7 @@
 
     function setBo3Result(gameIdx, r) {
       if (bo3Games[gameIdx].result === r) {
-        bo3Games[gameIdx].result = null; // 再度タップで解除
+        bo3Games[gameIdx].result = null; // 再度タチE�Eで解除
       } else {
         bo3Games[gameIdx].result = r;
       }
@@ -3131,15 +3131,15 @@
           if (g.result === 'win') {
             badge.innerHTML = '<span class="badge-win" style="font-size:10px;padding:2px 6px">🏆 勝ち</span>';
           } else if (g.result === 'lose') {
-            badge.innerHTML = '<span class="badge-lose" style="font-size:10px;padding:2px 6px">💀 負け</span>';
+            badge.innerHTML = '<span class="badge-lose" style="font-size:10px;padding:2px 6px">💀 負ぁE/span>';
           } else if (g.result === 'draw') {
-            badge.innerHTML = '<span class="badge-draw" style="font-size:10px;padding:2px 6px">🤝 分け</span>';
+            badge.innerHTML = '<span class="badge-draw" style="font-size:10px;padding:2px 6px">🤁E刁E��</span>';
           } else {
             badge.innerHTML = '';
           }
         }
 
-        // 引き分けの場合は総合勝敗数には追加されない
+        // 引き刁E��の場合�E総合勝敗数には追加されなぁE
         if (g.result === 'win') wins++;
         if (g.result === 'lose') losses++;
       }
@@ -3150,8 +3150,8 @@
       if (winEl) winEl.textContent = wins;
       if (loseEl) loseEl.textContent = losses;
 
-      // 3試合目の表示判定:
-      // 1戦目と2戦目の勝敗が 2-0 または 0-2 で決着がついている場合のみ3戦目を非表示（引き分け等がある場合は3戦目を表示）
+      // 3試合目の表示判宁E
+      // 1戦目と2戦目の勝敗ぁE2-0 また�E 0-2 で決着がつぁE��ぁE��場合�Eみ3戦目を非表示�E�引き刁E��等がある場合�E3戦目を表示�E�E
       const g0 = bo3Games[0].result;
       const g1 = bo3Games[1].result;
       const card3 = document.getElementById('bo3-game-card-2');
@@ -3159,7 +3159,7 @@
         const isCleanSweep = (g0 === 'win' && g1 === 'win') || (g0 === 'lose' && g1 === 'lose');
         if (isCleanSweep) {
           card3.style.display = 'none';
-          bo3Games[2].result = null; // 2-0 または 0-2 のときは3戦目リセット
+          bo3Games[2].result = null; // 2-0 また�E 0-2 のとき�E3戦目リセチE��
           const btnWin3 = document.getElementById('btn-win-bo3-2');
           const btnLose3 = document.getElementById('btn-lose-bo3-2');
           const btnDraw3 = document.getElementById('btn-draw-bo3-2');
@@ -3168,7 +3168,7 @@
           if (btnDraw3) btnDraw3.classList.remove('active');
           const badge3 = document.getElementById('bo3-badge-2');
           if (badge3) badge3.innerHTML = '';
-          // スコア再集計
+          // スコア再集訁E
           const finalWins = (g0 === 'win' ? 1 : 0) + (g1 === 'win' ? 1 : 0);
           const finalLosses = (g0 === 'lose' ? 1 : 0) + (g1 === 'lose' ? 1 : 0);
           if (winEl) winEl.textContent = finalWins;
@@ -3197,9 +3197,9 @@
     }
 
     async function saveRecord() {
-      if (!selectedPartyId) { alert('パーティを選択してください'); return; }
+      if (!selectedPartyId) { alert('パ�EチE��を選択してください'); return; }
       const oppParty = getSlotValues('opp-party-slots', 6);
-      if (!oppParty.some(Boolean)) { alert('相手のパーティを1体以上入力してください'); return; }
+      if (!oppParty.some(Boolean)) { alert('相手�Eパ�EチE��めE体以上�E力してください'); return; }
 
       const oppTrainer = (document.getElementById('rec-opp-trainer')?.value || '').trim();
       const oppRating = (document.getElementById('rec-opp-rating')?.value || '').trim();
@@ -3208,7 +3208,7 @@
 
       const regulation = (document.getElementById('rec-regulation')?.value || '').trim();
       const season = (document.getElementById('rec-season')?.value || '').trim();
-      const matchType = currentRecordMatchType || (currentRecordSourceMode === 'showdown' ? 'showdown' : 'ランクマ');
+      const matchType = currentRecordMatchType || (currentRecordSourceMode === 'showdown' ? 'showdown' : 'ランクチE);
       const tags = [...currentRecordTags];
 
       let showdownUrl = null;
@@ -3250,9 +3250,9 @@
         if (showdownUrl) rec.showdownUrl = showdownUrl;
       } else {
         // BO3
-        // 一つでも勝敗欄が入力されているか確認（引き分けを含む）
+        // 一つでも勝敗欁E��入力されてぁE��か確認（引き刁E��を含む�E�E
         const hasAnyResult = bo3Games.some(g => g.result !== null);
-        if (!hasAnyResult) { alert('少なくとも1試合の勝敗を入力してください'); return; }
+        if (!hasAnyResult) { alert('少なくとめE試合�E勝敗を�E力してください'); return; }
 
         let wins = 0;
         let losses = 0;
@@ -3302,7 +3302,7 @@
         if (showdownUrls && showdownUrls.some(Boolean)) rec.showdownUrls = showdownUrls;
       }
 
-      // 添付動画情報の引き継ぎ・保存
+      // 添付動画惁E��の引き継ぎ・保孁E
       if (_attachedVideoData) {
         if (_attachedVideoData.sync_status === 'local_file') {
           if (_attachedVideoData.file) {
@@ -3320,10 +3320,10 @@
               showRecordToast('📁 動画をローカルフォルダに保存しました');
             } catch (err) {
               console.error('Failed to save video to local folder:', err);
-              alert(`⚠️ ローカルフォルダへの動画保存に失敗しました: ${err.message}`);
+              alert(`⚠�E�Eローカルフォルダへの動画保存に失敗しました: ${err.message}`);
             }
           } else if (_attachedVideoData.local_file_name) {
-            // 編集モードで既存ローカル動画を維持する場合
+            // 編雁E��ードで既存ローカル動画を維持する場吁E
             rec.sync_status = 'local_file';
             rec.local_file_name = _attachedVideoData.local_file_name;
             rec.created_at = _attachedVideoData.created_at || Date.now();
@@ -3350,7 +3350,7 @@
         }
       }
 
-      // 1. ローカルに即時保存 (編集中は上書き更新、新規は先頭に追加)
+      // 1. ローカルに即時保孁E(編雁E��は上書き更新、新規�E先頭に追加)
       if (editingRecordId) {
         rec.id = editingRecordId;
         const targetIdx = records.findIndex(x => x.id === editingRecordId);
@@ -3362,23 +3362,23 @@
         editingRecordId = null;
         updateRecordFormEditModeUI();
         saveData();
-        showRecordToast('💾 対戦記録を更新しました！');
+        showRecordToast('💾 対戦記録を更新しました�E�E);
       } else {
         records.unshift(rec);
         saveData();
-        showRecordToast('💾 対戦記録を保存しました！');
+        showRecordToast('💾 対戦記録を保存しました�E�E);
       }
 
-      // WiFi環境かつ認証済みなら即座にアップロードキューを起動（ローカルモード時はスキップ）
+      // WiFi環墁E��つ認証済みなら即座にアチE�Eロードキューを起動（ローカルモード時はスキチE�E�E�E
       if (getVideoStorageType() !== 'local') {
         setTimeout(() => startUploadQueue(), 300);
       }
 
-      // 動画添付状態のリセット
+      // 動画添付状態�EリセチE��
       _attachedVideoData = null;
       resetRecordVideoUI();
 
-      // 2. UIのリセット（前回選択したパーティは維持し、フォームを展開状態にする）
+      // 2. UIのリセチE���E�前回選択したパーチE��は維持し、フォームを展開状態にする�E�E
       recordResult = null;
       document.getElementById('btn-win').classList.remove('active');
       document.getElementById('btn-lose').classList.remove('active');
@@ -3400,14 +3400,14 @@
 
 
 
-    // ---- HISTORY (無限スクロール / ページネーション対応) ----
+    // ---- HISTORY (無限スクロール / ペ�Eジネ�Eション対忁E ----
 
     function renderHistoryItemHTML(r) {
       const party = parties.find(p => p.id === r.partyId);
       const dateStr = r.date ? new Date(r.date).toLocaleString('ja-JP', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '';
       const oppPartyList = (r.oppParty || []).filter(Boolean);
 
-      // 左枠線の色（勝ち=緑、負け=赤、引き分け=黄）
+      // 左枠線�E色�E�勝ち=緑、負ぁE赤、引き刁E��=黁E��E
       let borderColor = 'var(--lose)';
       if (r.result === 'win') borderColor = 'var(--win)';
       else if (r.result === 'draw') borderColor = '#eab308';
@@ -3418,36 +3418,36 @@
           const sprite = getPokeSpriteHTMLByDisplay(p);
           return `<div style="display:inline-flex;flex-direction:column;align-items:center;${isHighlight ? 'outline:2px solid var(--accent);border-radius:4px;' : ''}vertical-align:top">${sprite}</div>`;
         }).join('')
-        : '<span style="font-size:11px;color:var(--text-muted)">なし</span>';
+        : '<span style="font-size:11px;color:var(--text-muted)">なぁE/span>';
 
       // 勝敗バッジのHTML
       let resultBadgeHtml = '';
       if (r.format === 'bo3' && r.games && r.games.length > 0) {
         resultBadgeHtml = r.games.map(g => {
-          if (g.result === 'win') return `<span class="badge-win" style="font-size:10px;padding:2px 6px">🏆勝</span>`;
+          if (g.result === 'win') return `<span class="badge-win" style="font-size:10px;padding:2px 6px">🏆勁E/span>`;
           if (g.result === 'lose') return `<span class="badge-lose" style="font-size:10px;padding:2px 6px">💀負</span>`;
-          return `<span class="badge-draw" style="font-size:10px;padding:2px 6px">🤝分</span>`;
+          return `<span class="badge-draw" style="font-size:10px;padding:2px 6px">🤝�E</span>`;
         }).join(' ');
       } else {
         const isWin = r.result === 'win';
         const isDraw = r.result === 'draw';
         const badgeCls = isWin ? 'badge-win' : (isDraw ? 'badge-draw' : 'badge-lose');
-        const badgeTxt = isWin ? '🏆勝' : (isDraw ? '🤝分' : '💀負');
+        const badgeTxt = isWin ? '🏆勁E : (isDraw ? '🤝�E' : '💀負');
         resultBadgeHtml = `<span class="${badgeCls}" style="font-size:10px;padding:2px 6px">${badgeTxt}</span>`;
       }
 
-      // トレーナー名・レート表示バッジ
+      // トレーナ�E名�Eレート表示バッジ
       let oppInfoHtml = '';
       const badgeStyle = 'font-size:11px;font-weight:700;color:var(--text);background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px;border:1px solid rgba(255,255,255,0.1)';
       if (r.oppTrainer && r.oppRating) {
-        oppInfoHtml = `<span style="${badgeStyle}">👤 ${r.oppTrainer} <span style="color:#f59e0b;margin-left:2px">★</span>${r.oppRating}</span>`;
+        oppInfoHtml = `<span style="${badgeStyle}">👤 ${r.oppTrainer} <span style="color:#f59e0b;margin-left:2px">☁E/span>${r.oppRating}</span>`;
       } else if (r.oppTrainer) {
         oppInfoHtml = `<span style="${badgeStyle}">👤 ${r.oppTrainer}</span>`;
       } else if (r.oppRating) {
-        oppInfoHtml = `<span style="${badgeStyle}"><span style="color:#f59e0b">★</span> ${r.oppRating}</span>`;
+        oppInfoHtml = `<span style="${badgeStyle}"><span style="color:#f59e0b">☁E/span> ${r.oppRating}</span>`;
       }
 
-      // 選出ポケモンのHTML（BO3の場合は1試合目・2試合目・3試合目を縦に並べる）
+      // 選出ポケモンのHTML�E�EO3の場合�E1試合目・2試合目・3試合目を縦に並べる！E
       let mySelHtml = '';
       let oppSelHtml = '';
 
@@ -3472,17 +3472,17 @@
       if (r.sync_status === 'local_file') {
         videoBadgeHtml = `<span style="font-size:10px;padding:1px 5px;background:#3b82f6;color:#fff;border-radius:4px;font-weight:700" title="ローカルフォルダに保存済み (直接再生可)">📁 ローカル</span>`;
       } else if (r.sync_status === 'local_pending') {
-        videoBadgeHtml = `<span style="font-size:10px;padding:1px 5px;background:var(--accent);color:#fff;border-radius:4px;font-weight:700" title="端末内に保存中 (タップでアプリ内再生)">📱 ローカル</span>`;
+        videoBadgeHtml = `<span style="font-size:10px;padding:1px 5px;background:var(--accent);color:#fff;border-radius:4px;font-weight:700" title="端末冁E��保存中 (タチE�Eでアプリ冁E�E甁E">📱 ローカル</span>`;
       } else if (r.video_url || r.drive_file_id || r.youtube_video_id) {
         const isUploaded = r.sync_status === 'yt_uploaded' || r.sync_status === 'uploaded' ||
                            (r.video_url && r.video_url.includes('youtu'));
         if (isUploaded) {
-          videoBadgeHtml = `<span style="font-size:10px;padding:1px 5px;background:#dc2626;color:#fff;border-radius:4px;font-weight:700" title="YouTube録画あり">▶️ 動画</span>`;
+          videoBadgeHtml = `<span style="font-size:10px;padding:1px 5px;background:#dc2626;color:#fff;border-radius:4px;font-weight:700" title="YouTube録画あり">▶�E�E動画</span>`;
         } else {
           const isWithin30Min = r.drive_uploaded_at && (Date.now() - r.drive_uploaded_at < 30 * 60 * 1000);
-          videoBadgeHtml = `<span style="font-size:10px;padding:1px 5px;background:#22c55e;color:#fff;border-radius:4px;font-weight:700" title="Google Drive保存済 (YouTube転送待ち)">☁️ Drive</span>`;
+          videoBadgeHtml = `<span style="font-size:10px;padding:1px 5px;background:#22c55e;color:#fff;border-radius:4px;font-weight:700" title="Google Drive保存渁E(YouTube転送征E��)">☁E��EDrive</span>`;
           if (isWithin30Min) {
-            videoBadgeHtml += ` <span style="font-size:10px;padding:1px 5px;background:var(--accent);color:#fff;border-radius:4px;font-weight:700" title="端末内にも保存中 (30分間保持)">📱 ローカル</span>`;
+            videoBadgeHtml += ` <span style="font-size:10px;padding:1px 5px;background:var(--accent);color:#fff;border-radius:4px;font-weight:700" title="端末冁E��も保存中 (30刁E��保持)">📱 ローカル</span>`;
           }
         }
       }
@@ -3502,11 +3502,11 @@
       </div>
       <div class="hist-sel-row" style="display:contents">
         <div class="hist-my-sel">
-          <div class="hist-row-label" style="color:var(--text-muted);font-size:11px">自分の選出</div>
+          <div class="hist-row-label" style="color:var(--text-muted);font-size:11px">自刁E�E選出</div>
           ${mySelHtml}
         </div>
         <div class="hist-opp-sel">
-          <div class="hist-row-label" style="color:var(--text-muted);font-size:11px">相手の選出</div>
+          <div class="hist-row-label" style="color:var(--text-muted);font-size:11px">相手�E選出</div>
           ${oppSelHtml}
         </div>
       </div>
@@ -3557,7 +3557,7 @@
       // Update filter options
       const filter = document.getElementById('history-filter');
       const current = filter.value;
-      filter.innerHTML = '<option value="">すべてのパーティ</option>';
+      filter.innerHTML = '<option value="">すべてのパ�EチE��</option>';
       parties.forEach(p => {
         filter.innerHTML += `<option value="${p.id}" ${current === p.id ? 'selected' : ''}>${p.name}</option>`;
       });
@@ -3571,7 +3571,7 @@
       const seasonFilterVal = document.getElementById('history-season-filter')?.value || '';
       const matchTypeFilterVal = document.getElementById('history-match-type-filter')?.value || '';
 
-      // パーティ未選択 = 全試合表示
+      // パ�EチE��未選抁E= 全試合表示
       let filtered = filterVal ? records.filter(r => r.partyId === filterVal) : records.slice();
       if (resultFilterVal) filtered = filtered.filter(r => r.result === resultFilterVal);
 
@@ -3596,12 +3596,12 @@
       // 形式フィルター
       if (matchTypeFilterVal) {
         filtered = filtered.filter(r => {
-          const mt = r.matchType || (r.sourceMode === 'showdown' ? 'showdown' : 'ランクマ');
+          const mt = r.matchType || (r.sourceMode === 'showdown' ? 'showdown' : 'ランクチE);
           return mt === matchTypeFilterVal;
         });
       }
 
-      // タグフィルター（複数選択時はOR検索）
+      // タグフィルター�E�褁E��選択時はOR検索�E�E
       if (historyTagFilters && historyTagFilters.length > 0) {
         filtered = filtered.filter(r => {
           const rTags = r.tags || [];
@@ -3609,7 +3609,7 @@
         });
       }
 
-      // 自分の選出絞り込み（1体）
+      // 自刁E�E選出絞り込み�E�E体！E
       if (mySelFilterName) {
         filtered = filtered.filter(r => {
           if (r.mySelection && r.mySelection.includes(mySelFilterName)) return true;
@@ -3617,14 +3617,14 @@
           return false;
         });
       }
-      // 相手のパーティ絞り込み（1体、oppPartyで判定）
+      // 相手�Eパ�EチE��絞り込み�E�E体、oppPartyで判定！E
       if (oppPartyFilterName) {
         filtered = filtered.filter(r => r.oppParty && r.oppParty.includes(oppPartyFilterName));
       }
 
       _histFilteredCache = filtered;
 
-      // Stats（全試合を対象に正確に計算、BO3も1カウント）
+      // Stats�E��E試合を対象に正確に計算、BO3めEカウント！E
       const stats = document.getElementById('history-stats');
       if (filtered.length) {
         stats.style.display = 'block';
@@ -3650,7 +3650,7 @@
       _histCurrentRenderedCount = initialItems.length;
       list.innerHTML = initialItems.map(renderHistoryItemHTML).join('');
 
-      // 50件以上ある場合は自動無限スクロール用センチネルを配置
+      // 50件以上ある場合�E自動無限スクロール用センチネルを�E置
       if (_histCurrentRenderedCount < filtered.length) {
         setupHistSentinel(list);
       }
@@ -3745,17 +3745,17 @@
 
       const storageType = getVideoStorageType();
 
-      // ローカル保存モードの場合
+      // ローカル保存モード�E場吁E
       if (storageType === 'local') {
         const dirHandle = await VideoStore.getHandle('local_video_dir');
         if (!dirHandle) {
-          alert('⚠️ 動画の保存先が「ローカル端末」に設定されていますが、フォルダが選択されていません。「データ管理」でフォルダを選択してください。');
+          alert('⚠�E�E動画の保存�Eが「ローカル端末」に設定されてぁE��すが、フォルダが選択されてぁE��せん。「データ管琁E��でフォルダを選択してください、E);
           input.value = '';
           return;
         }
         const hasPerm = await verifyFilePermission(dirHandle, true);
         if (!hasPerm) {
-          alert('⚠️ 保存先フォルダへのアクセス権限が許可されませんでした。');
+          alert('⚠�E�E保存�Eフォルダへのアクセス権限が許可されませんでした、E);
           input.value = '';
           return;
         }
@@ -3770,16 +3770,16 @@
         };
 
         showAttachedVideoUI(_attachedVideoData);
-        showRecordToast('📁 動画を添付しました（対戦記録保存時にローカルフォルダへ保存されます）');
+        showRecordToast('📁 動画を添付しました�E�対戦記録保存時にローカルフォルダへ保存されます！E);
         return;
       }
 
-      // フォルダID未設定の場合でも端末IndexedDBへの添付は許可（後から設定・認証時に自動アップロード）
+      // フォルダID未設定�E場合でも端末IndexedDBへの添付�E許可�E�後から設定�E認証時に自動アチE�Eロード！E
       if (!getDriveFolderId()) {
-        showRecordToast('⚠️ DriveフォルダID未設定。「データ管理」で設定後に自動アップロードされます。');
+        showRecordToast('⚠�E�EDriveフォルダID未設定。「データ管琁E��で設定後に自動アチE�Eロードされます、E);
       }
 
-      // 差し替え時：旧動画のクリーンアップ
+      // 差し替え時�E�旧動画のクリーンアチE�E
       if (_pendingOldVideoForCleanup) {
         const old = _pendingOldVideoForCleanup;
         _pendingOldVideoForCleanup = null;
@@ -3793,18 +3793,18 @@
               headers: { Authorization: `Bearer ${tok}` }
             }).catch(e => console.warn('Drive delete error:', e));
           } else {
-            showRecordToast('⚠️ 旧DriveファイルはGoogle Driveから手動削除してください。');
+            showRecordToast('⚠�E�E旧DriveファイルはGoogle Driveから手動削除してください、E);
           }
         }
       }
 
-      // IndexedDBに保存（通信なし・即完了）
+      // IndexedDBに保存（通信なし�E即完亁E��E
       const tempKey = `_new_${Date.now()}`;
       try {
         await VideoStore.save(tempKey, file);
       } catch (e) {
         console.error('IndexedDB save failed:', e);
-        alert('動画の保存に失敗しました。端末のストレージ容量を確認してください。');
+        alert('動画の保存に失敗しました。端末のストレージ容量を確認してください、E);
         input.value = '';
         return;
       }
@@ -3818,7 +3818,7 @@
       };
 
       showAttachedVideoUI(_attachedVideoData);
-      showRecordToast('📱 動画を保存しました。WiFi接続時に自動アップロードします。');
+      showRecordToast('📱 動画を保存しました。WiFi接続時に自動アチE�Eロードします、E);
     }
 
     function showAttachedVideoUI(videoData) {
@@ -3839,19 +3839,19 @@
 
       if (linkEl) {
         if (status === 'local_file') {
-          linkEl.textContent = '📁 端末内ローカルフォルダに直接保存されます';
+          linkEl.textContent = '📁 端末冁E��ーカルフォルダに直接保存されまぁE;
           linkEl.style.color = '#38bdf8';
         } else if (isYt) {
-          linkEl.textContent = '▶️ YouTube（限定公開）に公開済み';
+          linkEl.textContent = '▶�E�EYouTube�E�限定�E開）に公開済み';
           linkEl.style.color = '#ef4444';
         } else if (isDrive) {
-          linkEl.textContent = '☁️ Drive保存済・夕間にYouTube自動転送';
+          linkEl.textContent = '☁E��EDrive保存済�E夕間にYouTube自動転送E;
           linkEl.style.color = '#22c55e';
         } else if (status === 'local_pending') {
-          linkEl.textContent = '📱 WiFi接続後に自動アップロード';
+          linkEl.textContent = '📱 WiFi接続後に自動アチE�EローチE;
           linkEl.style.color = 'var(--accent)';
         } else if (status === 'lost') {
-          linkEl.textContent = '⚠️ 動画データが消えています。再添付してください';
+          linkEl.textContent = '⚠�E�E動画チE�Eタが消えてぁE��す。�E添付してください';
           linkEl.style.color = '#f59e0b';
         }
       }
@@ -3863,17 +3863,17 @@
           html += `<a href="${youtubeUrl}" target="_blank" class="btn btn-ghost btn-sm" style="font-size:11px;padding:2px 8px;color:#ef4444;border-color:#ef4444;text-decoration:none">▶ 見る</a>`;
         }
         if (status !== 'lost') {
-          html += `<button type="button" class="btn btn-ghost btn-sm" onclick="replaceAttachedVideo()" style="font-size:11px;padding:2px 8px">差し替え</button>`;
+          html += `<button type="button" class="btn btn-ghost btn-sm" onclick="replaceAttachedVideo()" style="font-size:11px;padding:2px 8px">差し替ぁE/button>`;
         } else {
-          html += `<button type="button" class="btn btn-ghost btn-sm" onclick="replaceAttachedVideo()" style="font-size:11px;padding:2px 8px;color:#f59e0b;border-color:#f59e0b">再添付</button>`;
+          html += `<button type="button" class="btn btn-ghost btn-sm" onclick="replaceAttachedVideo()" style="font-size:11px;padding:2px 8px;color:#f59e0b;border-color:#f59e0b">再添仁E/button>`;
         }
-        html += `<button type="button" class="btn btn-ghost btn-sm" onclick="removeAttachedVideo()" style="font-size:11px;padding:2px 8px;color:#ef4444;border-color:#ef4444">✕ 削除</button>`;
+        html += `<button type="button" class="btn btn-ghost btn-sm" onclick="removeAttachedVideo()" style="font-size:11px;padding:2px 8px;color:#ef4444;border-color:#ef4444">✁E削除</button>`;
         actionsEl.innerHTML = html;
       }
     }
 
     function replaceAttachedVideo() {
-      // 旧動画を一時保持し、ファイル選択ダイアログを開く
+      // 旧動画を一時保持し、ファイル選択ダイアログを開ぁE
       _pendingOldVideoForCleanup = _attachedVideoData ? { ..._attachedVideoData } : null;
       _attachedVideoData = null;
       const input = document.getElementById('rec-video-file-input');
@@ -3897,7 +3897,7 @@
         VideoStore.delete(_attachedVideoData.local_key).catch(e => console.warn('IndexedDB delete error:', e));
       }
 
-      // drive_pending: Drive APIで削除（認証済みのみ）
+      // drive_pending: Drive APIで削除�E�認証済みのみ�E�E
       if ((status === 'drive_pending' || status === 'pending') && _attachedVideoData.drive_file_id) {
         const tok = window._googleDriveAccessToken;
         if (tok) {
@@ -3906,13 +3906,13 @@
             headers: { Authorization: `Bearer ${tok}` }
           }).catch(e => console.warn('Drive delete error:', e));
         } else {
-          showRecordToast('⚠️ Drive上のファイルはGoogle Driveから手動削除してください。');
+          showRecordToast('⚠�E�EDrive上�EファイルはGoogle Driveから手動削除してください、E);
         }
       }
 
-      // yt_uploaded: 手動削除を案内
+      // yt_uploaded: 手動削除を案�E
       if (isYtStatus(status, _attachedVideoData.video_url)) {
-        showRecordToast('⚠️ YouTube動画はYouTube Studioで手動削除してください。');
+        showRecordToast('⚠�E�EYouTube動画はYouTube Studioで手動削除してください、E);
       }
 
       _attachedVideoData = null;
@@ -3925,7 +3925,7 @@
              (videoUrl && videoUrl.includes('youtu'));
     }
 
-    // ---- LOCAL VIDEO PLAYER & CLEANUP (30分間ローカル保持) ----
+    // ---- LOCAL VIDEO PLAYER & CLEANUP (30刁E��ローカル保持) ----
     let _currentPlayingObjectUrl = null;
 
     async function playLocalFolderVideoInDetail(recordId, fileName, containerId) {
@@ -3935,19 +3935,19 @@
         container.innerHTML = '<div style="font-size:12px;color:var(--text-muted);padding:8px">⏳ ローカル動画を読み込み中...</div>';
         const dirHandle = await VideoStore.getHandle('local_video_dir');
         if (!dirHandle) {
-          container.innerHTML = '<div style="font-size:12px;color:#ef4444;padding:8px">⚠️ 保存先フォルダが未設定です。「データ管理」でフォルダを選択してください。</div>';
+          container.innerHTML = '<div style="font-size:12px;color:#ef4444;padding:8px">⚠�E�E保存�Eフォルダが未設定です。「データ管琁E��でフォルダを選択してください、E/div>';
           return;
         }
         const ok = await verifyFilePermission(dirHandle, false);
         if (!ok) {
-          container.innerHTML = '<div style="font-size:12px;color:#ef4444;padding:8px">⚠️ フォルダへのアクセス権限が許可されませんでした。</div>';
+          container.innerHTML = '<div style="font-size:12px;color:#ef4444;padding:8px">⚠�E�Eフォルダへのアクセス権限が許可されませんでした、E/div>';
           return;
         }
         let fileHandle;
         try {
           fileHandle = await dirHandle.getFileHandle(fileName);
         } catch (e) {
-          container.innerHTML = `<div style="font-size:12px;color:#ef4444;padding:8px">⚠️ 動画ファイル「${fileName}」が指定フォルダに見つかりませんでした。移動または削除された可能性があります。</div>`;
+          container.innerHTML = `<div style="font-size:12px;color:#ef4444;padding:8px">⚠�E�E動画ファイル、E{fileName}」が持E��フォルダに見つかりませんでした。移動また�E削除された可能性があります、E/div>`;
           return;
         }
         const file = await fileHandle.getFile();
@@ -3961,13 +3961,13 @@
             <video src="${_currentPlayingObjectUrl}" controls playsinline autoplay style="width:100%;max-height:360px;border-radius:8px;background:#000;display:block"></video>
             <div style="font-size:10.5px;color:var(--text-muted);margin-top:4px;display:flex;justify-content:space-between;align-items:center">
               <span>📁 ローカル動画再生中 (通信量ゼロ・直接再生)</span>
-              <button type="button" onclick="stopLocalFolderVideoPlayer('${containerId}', '${recordId}', '${fileName}')" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:11px">プレイヤーを閉じる ✕</button>
+              <button type="button" onclick="stopLocalFolderVideoPlayer('${containerId}', '${recordId}', '${fileName}')" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:11px">プレイヤーを閉じる ✁E/button>
             </div>
           </div>
         `;
       } catch (e) {
         console.error('Failed to play local folder video:', e);
-        container.innerHTML = `<div style="font-size:12px;color:#ef4444;padding:8px">⚠️ 動画の再生に失敗しました: ${e.message}</div>`;
+        container.innerHTML = `<div style="font-size:12px;color:#ef4444;padding:8px">⚠�E�E動画の再生に失敗しました: ${e.message}</div>`;
       }
     }
     window.playLocalFolderVideoInDetail = playLocalFolderVideoInDetail;
@@ -3981,7 +3981,7 @@
       if (container) {
         container.innerHTML = `
           <button type="button" onclick="playLocalFolderVideoInDetail('${recordId}', '${fileName}', '${containerId}')" style="display:inline-flex;align-items:center;gap:6px;color:#ffffff;background:#3b82f6;padding:8px 14px;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;box-shadow:0 2px 8px rgba(59,130,246,0.3)">
-            <span>▶️ ローカル動画を再生</span>
+            <span>▶�E�Eローカル動画を�E甁E/span>
           </button>
           <div style="font-size:11px;color:var(--text-muted);margin-top:6px">📁 ファイル: ${fileName}</div>
         `;
@@ -3996,7 +3996,7 @@
         container.innerHTML = '<div style="font-size:12px;color:var(--text-muted);padding:8px">⏳ 動画を読み込み中...</div>';
         const file = await VideoStore.get(recordId);
         if (!file) {
-          container.innerHTML = '<div style="font-size:12px;color:#ef4444;padding:8px">⚠️ この端末にはローカル動画がありません（別の端末で記録されたか、30分以上経過して自動消去されました）</div>';
+          container.innerHTML = '<div style="font-size:12px;color:#ef4444;padding:8px">⚠�E�Eこ�E端末にはローカル動画がありません�E�別の端末で記録されたか、E0刁E��上経過して自動消去されました�E�E/div>';
           return;
         }
         if (_currentPlayingObjectUrl) {
@@ -4008,14 +4008,14 @@
           <div style="margin-top:6px;position:relative">
             <video src="${_currentPlayingObjectUrl}" controls playsinline autoplay style="width:100%;max-height:360px;border-radius:8px;background:#000;display:block"></video>
             <div style="font-size:10.5px;color:var(--text-muted);margin-top:4px;display:flex;justify-content:space-between;align-items:center">
-              <span>📱 端末内動画再生中 (通信量ゼロ)</span>
-              <button type="button" onclick="stopLocalVideoPlayer('${containerId}', '${recordId}')" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:11px">プレイヤーを閉じる ✕</button>
+              <span>📱 端末冁E��画再生中 (通信量ゼロ)</span>
+              <button type="button" onclick="stopLocalVideoPlayer('${containerId}', '${recordId}')" style="background:transparent;border:none;color:#94a3b8;cursor:pointer;font-size:11px">プレイヤーを閉じる ✁E/button>
             </div>
           </div>
         `;
       } catch (e) {
         console.error('Failed to play local video:', e);
-        container.innerHTML = `<div style="font-size:12px;color:#ef4444;padding:8px">⚠️ 動画の読み込みに失敗しました: ${e.message}</div>`;
+        container.innerHTML = `<div style="font-size:12px;color:#ef4444;padding:8px">⚠�E�E動画の読み込みに失敗しました: ${e.message}</div>`;
       }
     }
 
@@ -4029,13 +4029,13 @@
         const rId = recordId || container.dataset.recordId;
         container.innerHTML = `
           <button type="button" onclick="playLocalVideoInDetail('${rId}', '${containerId}')" style="display:inline-flex;align-items:center;gap:6px;color:#ffffff;background:var(--accent);padding:8px 14px;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;box-shadow:0 2px 8px rgba(108,99,255,0.3)">
-            <span>▶️ 端末内の動画を再生</span>
+            <span>▶�E�E端末冁E�E動画を�E甁E/span>
           </button>
         `;
       }
     }
 
-    // Driveアップロード完了後30分経過した動画をIndexedDBから安全に消去
+    // DriveアチE�Eロード完亁E��E0刁E��過した動画をIndexedDBから安�Eに消去
     async function cleanupOldLocalVideos() {
       try {
         const now = Date.now();
@@ -4072,7 +4072,7 @@
       }
       _isUploadQueueRunning = false;
       hideUploadPill();
-      showRecordToast('動画アップロードをキャンセルしました');
+      showRecordToast('動画アチE�Eロードをキャンセルしました');
     }
 
     function resetRecordVideoUI() {
@@ -4087,20 +4087,20 @@
       if (info) info.style.display = 'none';
     }
 
-    // ---- UPLOAD QUEUE (WiFi接続時自動アップロード) ----
+    // ---- UPLOAD QUEUE (WiFi接続時自動アチE�EローチE ----
     let _isUploadQueueRunning = false;
     let _uploadPillTimer = null;
     let _currentUploadingRecordId = null;
 
     function isWifiOrFastConnection() {
       const c = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-      if (!c) return true; // iOS Safari等のNetwork Information API非対応環境
+      if (!c) return true; // iOS Safari等�ENetwork Information API非対応環墁E
       if (c.saveData) return false;
       if (c.type === 'cellular') return false;
       return true;
     }
 
-    // Google Drive上の既存ファイルを検索（中断・再起動時の自己修復用）
+    // Google Drive上�E既存ファイルを検索�E�中断・再起動時の自己修復用�E�E
     async function findDriveVideoFile(token, folderId, recordId) {
       try {
         let query = `name contains 'battle_log_${recordId}_' and trashed = false`;
@@ -4125,22 +4125,22 @@
     async function startUploadQueue(force = false) {
       if (_isUploadQueueRunning) return;
 
-      // ローカル保存モードの場合はDrive/YouTubeアップロードは一切行わない
+      // ローカル保存モード�E場合�EDrive/YouTubeアチE�Eロード�E一刁E��わなぁE
       if (getVideoStorageType() === 'local') return;
 
-      // WiFi環境でない場合は自動アップロードを保留（通信量節約）
+      // WiFi環墁E��なぁE��合�E自動アチE�Eロードを保留�E�通信量節紁E��E
       if (!force && !isWifiOrFastConnection()) {
         console.log('Mobile network detected - upload postponed until WiFi connection.');
         return;
       }
 
-      // Drive認証確認（有効なトークンをメモリまたはlocalStorageから取得）
+      // Drive認証確認（有効なト�Eクンをメモリまた�ElocalStorageから取得！E
       let token = loadStoredDriveToken();
       if (!token) {
-        // トークン未取得/期限切れの場合、連携アクションピルを表示（未認証でDrive APIは呼ばない）
+        // ト�Eクン未取征E期限刁E��の場合、E��携アクションピルを表示�E�未認証でDrive APIは呼ばなぁE��E
         const pendingCount = records.filter(r => r.sync_status === 'local_pending').length;
         if (pendingCount > 0 && getDriveClientId()) {
-          showActionUploadPill('⚠️ 動画' + pendingCount + '件が未送信 (タップして連携)', () => {
+          showActionUploadPill('⚠�E�E動画' + pendingCount + '件が未送信 (タチE�Eして連携)', () => {
             requestGoogleDriveAccessToken(true);
           });
         }
@@ -4159,9 +4159,9 @@
 
         let successCount = 0;
 
-        // キュー実行中に新しい対戦が追加されても取りこぼさないよう while ループで処理
+        // キュー実行中に新しい対戦が追加されても取りこぼさなぁE��ぁEwhile ループで処琁E
         while (true) {
-          // 未送信の記録を「古い順（時系列昇順）」にソートして取得
+          // 未送信の記録を「古ぁE��E��時系列�E頁E��」にソートして取征E
           const pendingRecords = records
             .filter(r => r.sync_status === 'local_pending')
             .sort((a, b) => (Number(a.id) || 0) - (Number(b.id) || 0));
@@ -4175,7 +4175,7 @@
             const pillText = `${i + 1}/${pendingRecords.length}件: ${rec.video_original_name || 'video'}`;
             showUploadPill(pillText, 0);
 
-              // 【自己修復】まずGoogle Driveにすでにアップロード済みファイルが存在するか確認
+              // 【�E己修復】まずGoogle DriveにすでにアチE�Eロード済みファイルが存在するか確誁E
             const existingFile = await findDriveVideoFile(token, folderId, rec.id);
             if (existingFile) {
               console.log(`Record ${rec.id} is already uploaded to Drive as ${existingFile.id}. Restoring link...`);
@@ -4184,14 +4184,14 @@
               rec.sync_status = 'drive_pending';
               if (!rec.drive_uploaded_at) rec.drive_uploaded_at = Date.now();
               await saveData();
-              cleanupOldLocalVideos(); // 30分経過した古い動画のみ安全に消去
+              cleanupOldLocalVideos(); // 30刁E��過した古ぁE��画のみ安�Eに消去
               renderHistory(); // 1件修復ごとに即座に画面更新
               successCount++;
               processedAnyInThisPass = true;
               continue;
             }
 
-            // Driveに未存在の場合、IndexedDBから動画を取得してアップロード
+            // Driveに未存在の場合、IndexedDBから動画を取得してアチE�EローチE
             const file = await VideoStore.get(rec.id);
             if (!file) {
               console.warn(`Video data not found in IndexedDB for record ${rec.id}`);
@@ -4217,13 +4217,13 @@
               rec.drive_file_id = result.id;
               rec.video_url = `https://drive.google.com/file/d/${result.id}/preview`;
               rec.sync_status = 'drive_pending';
-              rec.drive_uploaded_at = Date.now(); // アップロード完了時刻を記録
+              rec.drive_uploaded_at = Date.now(); // アチE�Eロード完亁E��刻を記録
               await saveData();
 
-              // Drive処理中の30分間は端末からも動画を再生できるよう残し、30分超過した過去動画のみ消去
+              // Drive処琁E��の30刁E��は端末からも動画を�E生できるよう残し、E0刁E��E��した過去動画のみ消去
               cleanupOldLocalVideos();
 
-              renderHistory(); // 1件完了ごとに即座に画面更新
+              renderHistory(); // 1件完亁E��とに即座に画面更新
               successCount++;
               processedAnyInThisPass = true;
             } catch(e) {
@@ -4232,18 +4232,18 @@
               if (e.message !== 'Upload aborted by user') {
                 console.error(`Upload failed for record ${rec.id}:`, e);
               }
-              // このファイルでエラーが発生した場合は次のループへ（無限ループ防止）
+              // こ�Eファイルでエラーが発生した場合�E次のループへ�E�無限ループ防止�E�E
               break;
             }
           }
 
-          // このパスで1件も処理できなかった（ファイル不在やエラー）場合は無限ループを防止して抜ける
+          // こ�Eパスで1件も�E琁E��きなかった（ファイル不在めE��ラー�E�場合�E無限ループを防止して抜けめE
           if (!processedAnyInThisPass) break;
         }
 
         hideUploadPill();
         if (successCount > 0) {
-          showRecordToast(`✅ ${successCount}件の動画をGoogle Driveに同期しました`);
+          showRecordToast(`✁E${successCount}件の動画をGoogle Driveに同期しました`);
           renderHistory();
         }
       } finally {
@@ -4297,9 +4297,9 @@
       const pillText = document.getElementById('upload-pill-text');
       const pillBar = document.getElementById('upload-pill-bar');
       const pillPercent = document.getElementById('upload-pill-percent');
-      if (pillText) pillText.textContent = 'アップロード完了！';
+      if (pillText) pillText.textContent = 'アチE�Eロード完亁E��E;
       if (pillBar) pillBar.style.width = '100%';
-      if (pillPercent) pillPercent.textContent = '✅';
+      if (pillPercent) pillPercent.textContent = '✁E;
       clearTimeout(_uploadPillTimer);
       _uploadPillTimer = setTimeout(() => { pill.style.display = 'none'; }, 2500);
     }
@@ -4311,7 +4311,7 @@
       clearTimeout(_uploadPillTimer);
     }
 
-    // ドラッグ＆ドロップ機能の初期化
+    // ドラチE���E�E��ロチE�E機�Eの初期匁E
     function initDraggableUploadPill() {
       const pill = document.getElementById('upload-pill');
       if (!pill) return;
@@ -4330,7 +4330,7 @@
         startY = pt.clientY;
 
         const rect = pill.getBoundingClientRect();
-        // right/bottom固定から left/top絶対指定に切り替え
+        // right/bottom固定かめEleft/top絶対持E��に刁E��替ぁE
         pill.style.right = 'auto';
         pill.style.bottom = 'auto';
         pill.style.left = rect.left + 'px';
@@ -4353,7 +4353,7 @@
         let newLeft = initialLeft + dx;
         let newTop = initialTop + dy;
 
-        // 画面外にはみ出さないよう制限
+        // 画面外にはみ出さなぁE��ぁE��陁E
         const maxLeft = window.innerWidth - pill.offsetWidth - 8;
         const maxTop = window.innerHeight - pill.offsetHeight - 8;
         newLeft = Math.max(8, Math.min(newLeft, maxLeft));
@@ -4368,7 +4368,7 @@
         isDragging = false;
         pill.style.cursor = 'grab';
 
-        // ドラッグ移動しなかった場合（クリック判定）
+        // ドラチE��移動しなかった場合（クリチE��判定！E
         if (!_pillDragMoved && _pillActionCallback) {
           _pillActionCallback();
         }
@@ -4396,14 +4396,14 @@
       if (r.format === 'bo3' && r.games && r.games.length > 0) {
         headerResultHtml = r.games.map((g, idx) => {
           if (g.result === 'win') return `<span class="badge-win" style="font-size:15px;padding:4px 12px">🏆 ${idx + 1}戦目: 勝ち</span>`;
-          if (g.result === 'lose') return `<span class="badge-lose" style="font-size:15px;padding:4px 12px">💀 ${idx + 1}戦目: 負け</span>`;
-          return `<span class="badge-draw" style="font-size:15px;padding:4px 12px">🤝 ${idx + 1}戦目: 引き分け</span>`;
+          if (g.result === 'lose') return `<span class="badge-lose" style="font-size:15px;padding:4px 12px">💀 ${idx + 1}戦目: 負ぁE/span>`;
+          return `<span class="badge-draw" style="font-size:15px;padding:4px 12px">🤁E${idx + 1}戦目: 引き刁E��</span>`;
         }).join(' ');
       } else {
         const isWin = r.result === 'win';
         const isDraw = r.result === 'draw';
         const badgeCls = isWin ? 'badge-win' : (isDraw ? 'badge-draw' : 'badge-lose');
-        const badgeTxt = isWin ? '🏆 勝ち' : (isDraw ? '🤝 引き分け' : '💀 負け');
+        const badgeTxt = isWin ? '🏆 勝ち' : (isDraw ? '🤁E引き刁E��' : '💀 負ぁE);
         headerResultHtml = `<span class="${badgeCls}" style="font-size:16px;padding:4px 16px">${badgeTxt}</span>`;
       }
 
@@ -4414,15 +4414,15 @@
           const oppSel = (g.oppSelection || []).filter(Boolean);
           return `
             <div class="detail-section">
-              <h4>${idx + 1}戦目の自分の選出（4体）</h4>
+              <h4>${idx + 1}戦目の自刁E�E選出�E�E体！E/h4>
               <div class="detail-pokemon">
-                ${mySel.map(p => getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">記録なし</span>'}
+                ${mySel.map(p => getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">記録なぁE/span>'}
               </div>
             </div>
             <div class="detail-section">
-              <h4>${idx + 1}戦目の相手の選出（4体）</h4>
+              <h4>${idx + 1}戦目の相手�E選出�E�E体！E/h4>
               <div class="detail-pokemon">
-                ${oppSel.map(p => getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">記録なし</span>'}
+                ${oppSel.map(p => getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">記録なぁE/span>'}
               </div>
             </div>
           `;
@@ -4432,15 +4432,15 @@
         const oppSel = (r.oppSelection || []).filter(Boolean);
         selectionDetailHtml = `
           <div class="detail-section">
-            <h4>自分の選出（4体）</h4>
+            <h4>自刁E�E選出�E�E体！E/h4>
             <div class="detail-pokemon">
-              ${mySel.map(p => getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">記録なし</span>'}
+              ${mySel.map(p => getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">記録なぁE/span>'}
             </div>
           </div>
           <div class="detail-section">
-            <h4>相手の選出（4体）</h4>
+            <h4>相手�E選出�E�E体！E/h4>
             <div class="detail-pokemon">
-              ${oppSel.map(p => getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">記録なし</span>'}
+              ${oppSel.map(p => getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">記録なぁE/span>'}
             </div>
           </div>
         `;
@@ -4478,16 +4478,16 @@
         }
       }
 
-      // 動画録画リンク（ローカルフォルダ保存、端末内一時保存、YouTube、Google Drive）
+      // 動画録画リンク�E�ローカルフォルダ保存、端末冁E��時保存、YouTube、Google Drive�E�E
       let videoLinkHtml = '';
       if (r.sync_status === 'local_file') {
         const fn = r.local_file_name || 'battle_video.webm';
         videoLinkHtml = `
           <div class="detail-section">
-            <h4>🎥 対戦録画 (ローカルフォルダ保存)</h4>
+            <h4>🎥 対戦録画 (ローカルフォルダ保孁E</h4>
             <div id="local-video-player-box" data-record-id="${r.id}">
               <button type="button" onclick="playLocalFolderVideoInDetail('${r.id}', '${fn}', 'local-video-player-box')" style="display:inline-flex;align-items:center;gap:6px;color:#ffffff;background:#3b82f6;padding:8px 14px;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;box-shadow:0 2px 8px rgba(59,130,246,0.3)">
-                <span>▶️ ローカル動画を再生</span>
+                <span>▶�E�Eローカル動画を�E甁E/span>
               </button>
               <div style="font-size:11px;color:var(--text-muted);margin-top:6px">📁 ファイル: ${fn}</div>
             </div>
@@ -4496,12 +4496,12 @@
       } else if (r.sync_status === 'local_pending') {
         videoLinkHtml = `
           <div class="detail-section">
-            <h4>🎥 対戦録画 (端末内保存)</h4>
+            <h4>🎥 対戦録画 (端末冁E��孁E</h4>
             <div id="local-video-player-box" data-record-id="${r.id}">
               <button type="button" onclick="playLocalVideoInDetail('${r.id}', 'local-video-player-box')" style="display:inline-flex;align-items:center;gap:6px;color:#ffffff;background:var(--accent);padding:8px 14px;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;box-shadow:0 2px 8px rgba(108,99,255,0.3)">
-                <span>▶️ 端末内の動画を再生</span>
+                <span>▶�E�E端末冁E�E動画を�E甁E/span>
               </button>
-              <div style="font-size:11px;color:var(--text-muted);margin-top:6px">⏳ WiFi接続時にGoogle Driveへ自動アップロードされます</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:6px">⏳ WiFi接続時にGoogle Driveへ自動アチE�EロードされまぁE/div>
             </div>
           </div>
         `;
@@ -4515,8 +4515,8 @@
               <div class="detail-section">
                 <h4>🎥 対戦録画 (YouTube)</h4>
                 <a href="${url}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;color:#ffffff;background:#dc2626;padding:8px 14px;border-radius:8px;font-weight:600;font-size:13px;text-decoration:none;box-shadow:0 2px 8px rgba(220,38,38,0.3)">
-                  <span>▶️ YouTubeで見る</span>
-                  <span style="font-size:11px;opacity:0.85">（限定公開）</span>
+                  <span>▶�E�EYouTubeで見る</span>
+                  <span style="font-size:11px;opacity:0.85">�E�限定�E開！E/span>
                 </a>
               </div>
             `;
@@ -4524,19 +4524,19 @@
             const isWithin30Min = r.drive_uploaded_at && (Date.now() - r.drive_uploaded_at < 30 * 60 * 1000);
             videoLinkHtml = `
               <div class="detail-section">
-                <h4>🎥 対戦録画 (Google Drive一時保存)</h4>
+                <h4>🎥 対戦録画 (Google Drive一時保孁E</h4>
                 <div style="display:flex;flex-direction:column;gap:8px">
                   ${isWithin30Min ? `
                   <div id="local-video-player-box" data-record-id="${r.id}">
                     <button type="button" onclick="playLocalVideoInDetail('${r.id}', 'local-video-player-box')" style="display:inline-flex;align-items:center;gap:6px;color:#ffffff;background:var(--accent);padding:8px 14px;border:none;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;width:fit-content;box-shadow:0 2px 8px rgba(108,99,255,0.3)">
-                      <span>📱 端末内の動画を再生 (処理待ちなし)</span>
+                      <span>📱 端末冁E�E動画を�E甁E(処琁E��E��なぁE</span>
                     </button>
-                    <div style="font-size:11px;color:#a78bfa;margin-top:4px">💡 Drive処理中も端末から即座に快適再生できます（送信後30分間保持）</div>
+                    <div style="font-size:11px;color:#a78bfa;margin-top:4px">💡 Drive処琁E��も端末から即座に快適再生できます（送信征E0刁E��保持�E�E/div>
                   </div>` : ''}
                   <a href="${url}" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:8px;color:#ffffff;background:#22c55e;padding:8px 14px;border-radius:8px;font-weight:600;font-size:13px;text-decoration:none;width:fit-content;box-shadow:0 2px 8px rgba(34,197,94,0.3)">
                     <span>📁 Google Driveで開く</span>
                   </a>
-                  <span style="font-size:11px;color:var(--text-muted)">⏳ 本日夜間の定期バッチでYouTubeへ自動転送されます</span>
+                  <span style="font-size:11px;color:var(--text-muted)">⏳ 本日夜間の定期バッチでYouTubeへ自動転送されまぁE/span>
                 </div>
               </div>
             `;
@@ -4551,13 +4551,13 @@
       if (r.season) {
         metaBadgesDetailHtml += `<span class="badge-meta badge-season" style="font-size:12px;padding:3px 8px">📅 ${r.season}</span>`;
       }
-      const matchTypeDetail = r.matchType || (r.sourceMode === 'showdown' ? 'showdown' : 'ランクマ');
+      const matchTypeDetail = r.matchType || (r.sourceMode === 'showdown' ? 'showdown' : 'ランクチE);
       if (matchTypeDetail) {
         metaBadgesDetailHtml += `<span class="badge-meta badge-match-type" style="font-size:12px;padding:3px 8px">🎮 ${matchTypeDetail}</span>`;
       }
       if (r.tags && Array.isArray(r.tags) && r.tags.length > 0) {
         r.tags.forEach(t => {
-          metaBadgesDetailHtml += `<span class="badge-meta badge-tag-item" style="font-size:12px;padding:3px 8px">🏷️ ${t}</span>`;
+          metaBadgesDetailHtml += `<span class="badge-meta badge-tag-item" style="font-size:12px;padding:3px 8px">🏷�E�E${t}</span>`;
         });
       }
 
@@ -4567,18 +4567,18 @@
       <span style="color:var(--text-muted);font-size:13px">${dateStr}</span>
       ${metaBadgesDetailHtml}
     </div>
-    ${r.oppTrainer ? `<div style="margin-bottom:${r.oppRating ? '6px' : '14px'}"><span style="font-size:12px;color:var(--text-muted)">相手トレーナー: </span><span style="font-weight:700;font-size:14px;color:var(--accent)">👤 ${r.oppTrainer}</span></div>` : ''}
-    ${r.oppRating ? `<div style="margin-bottom:14px"><span style="font-size:12px;color:var(--text-muted)">相手レート: </span><span style="font-weight:700;font-size:14px;color:var(--text)"><span style="color:#f59e0b">★</span> ${r.oppRating}</span></div>` : ''}
+    ${r.oppTrainer ? `<div style="margin-bottom:${r.oppRating ? '6px' : '14px'}"><span style="font-size:12px;color:var(--text-muted)">相手トレーナ�E: </span><span style="font-weight:700;font-size:14px;color:var(--accent)">👤 ${r.oppTrainer}</span></div>` : ''}
+    ${r.oppRating ? `<div style="margin-bottom:14px"><span style="font-size:12px;color:var(--text-muted)">相手レーチE </span><span style="font-weight:700;font-size:14px;color:var(--text)"><span style="color:#f59e0b">☁E/span> ${r.oppRating}</span></div>` : ''}
     <div class="detail-section">
-      <h4>自分のパーティ</h4>
+      <h4>自刁E�Eパ�EチE��</h4>
       <div class="detail-pokemon">
         ${(party ? party.pokemon.map(pk => typeof pk === 'string' ? pk : (pk && pk.name || '')).filter(Boolean) : []).map(p => getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">(削除済み)</span>'}
       </div>
     </div>
     <div class="detail-section">
-      <h4>相手のパーティ（6体）</h4>
+      <h4>相手�Eパ�EチE���E�E体！E/h4>
       <div class="detail-pokemon">
-        ${(r.oppParty || []).filter(Boolean).map(p => getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">記録なし</span>'}
+        ${(r.oppParty || []).filter(Boolean).map(p => getPokeSpriteHTMLByDisplay(p)).join('') || '<span class="text-muted">記録なぁE/span>'}
       </div>
     </div>
     ${selectionDetailHtml}
@@ -4608,12 +4608,12 @@
       editingRecordId = id;
       closeDetailModal();
 
-      // ナビゲーションバーの「記録する」ボタンをアクティブにしてタブ遷移
+      // ナビゲーションバ�Eの「記録する」�EタンをアクチE��ブにしてタブ�E移
       const navBtns = document.querySelectorAll('nav button');
       const recordNavBtn = Array.from(navBtns).find(b => b.textContent.includes('記録する'));
       showPage('record', recordNavBtn);
 
-      // モード切り替え & Showdown URL復元
+      // モード�Eり替ぁE& Showdown URL復允E
       if (r.sourceMode === 'showdown' || r.showdownUrl || (r.showdownUrls && r.showdownUrls.some(Boolean))) {
         setRecordMode('showdown');
         if (r.format === 'bo1') {
@@ -4630,26 +4630,26 @@
         setRecordMode('champions');
       }
 
-      // フォーマット設定
+      // フォーマット設宁E
       const fmt = r.format || 'bo1';
       setRecordFormat(fmt);
 
-      // パーティ選択
+      // パ�EチE��選抁E
       selectedPartyId = r.partyId || null;
       renderRecordPage();
 
       if (selectedPartyId) {
         showRecordForm();
 
-        // 日時を復元
+        // 日時を復允E
         if (r.date) {
           document.getElementById('rec-date').value = r.date;
         }
 
-        // レギュレーション・シーズン・形式・タグの復元
+        // レギュレーション・シーズン・形式�Eタグの復允E
         currentRecordRegulation = r.regulation !== undefined ? r.regulation : '';
         currentRecordSeason = r.season !== undefined ? r.season : '';
-        currentRecordMatchType = r.matchType || (r.sourceMode === 'showdown' ? 'showdown' : 'ランクマ');
+        currentRecordMatchType = r.matchType || (r.sourceMode === 'showdown' ? 'showdown' : 'ランクチE);
         currentRecordTags = Array.isArray(r.tags) ? [...r.tags] : [];
 
         initRegulationSelect('rec-regulation', currentRecordRegulation);
@@ -4657,14 +4657,14 @@
         setRecordMatchType(currentRecordMatchType);
         renderRecordTagChips();
 
-        // 相手トレーナー名・レート・メモ
+        // 相手トレーナ�E名�Eレート�Eメモ
         const recOppTrainer = document.getElementById('rec-opp-trainer');
         if (recOppTrainer) recOppTrainer.value = r.oppTrainer || '';
         const recOppRating = document.getElementById('rec-opp-rating');
         if (recOppRating) recOppRating.value = r.oppRating || '';
         document.getElementById('rec-memo').value = r.memo || '';
 
-        // 相手パーティ（6体）
+        // 相手パーチE���E�E体！E
         if (r.oppParty && Array.isArray(r.oppParty)) {
           setSlotValues('opp-party-slots', r.oppParty);
         }
@@ -4698,7 +4698,7 @@
           updateBo3Score();
         }
 
-        // 動画添付情報の復元（全状態対応）
+        // 動画添付情報の復允E���E状態対応！E
         if (r.sync_status === 'local_file' || r.sync_status === 'local_pending' || r.drive_file_id || r.video_url || r.youtube_video_id) {
           _attachedVideoData = {
             local_key: r.sync_status === 'local_pending' ? r.id : null,
@@ -4714,7 +4714,7 @@
               r.sync_status === 'local_pending' ? '保存済み動画' : 'Google Drive動画'
             )
           };
-          // local_pendingの場合、IndexedDBにデータがあるか確認
+          // local_pendingの場合、IndexedDBにチE�Eタがあるか確誁E
           if (r.sync_status === 'local_file') {
             showAttachedVideoUI(_attachedVideoData);
           } else if (r.sync_status === 'local_pending') {
@@ -4755,7 +4755,7 @@
       ];
       renderRecordPage();
       showRecordForm();
-      showRecordToast('編集をキャンセルしました');
+      showRecordToast('編雁E��キャンセルしました');
     }
 
     function updateRecordFormEditModeUI() {
@@ -4765,13 +4765,13 @@
       const cancelBtnBottom = document.getElementById('record-cancel-edit-btn-bottom');
 
       if (editingRecordId) {
-        if (titleEl) titleEl.innerHTML = '✏️ 対戦記録の編集';
-        if (saveBtn) saveBtn.innerHTML = '💾 変更を保存';
+        if (titleEl) titleEl.innerHTML = '✏︁E対戦記録の編雁E;
+        if (saveBtn) saveBtn.innerHTML = '💾 変更を保孁E;
         if (cancelBtnTop) cancelBtnTop.style.display = 'inline-flex';
         if (cancelBtnBottom) cancelBtnBottom.style.display = 'inline-flex';
       } else {
         if (titleEl) titleEl.innerHTML = '対戦を記録する';
-        if (saveBtn) saveBtn.innerHTML = '💾 記録を保存';
+        if (saveBtn) saveBtn.innerHTML = '💾 記録を保孁E;
         if (cancelBtnTop) cancelBtnTop.style.display = 'none';
         if (cancelBtnBottom) cancelBtnBottom.style.display = 'none';
       }
@@ -4780,14 +4780,14 @@
     async function deleteRecord(id) {
       const targetRec = records.find(r => r.id === id);
       if (!targetRec) return;
-      if (!confirm('この記録を削除しますか？')) return;
+      if (!confirm('こ�E記録を削除しますか�E�E)) return;
 
       if (editingRecordId === id) {
         editingRecordId = null;
         updateRecordFormEditModeUI();
       }
 
-      // 1. もし今まさにこのレコードの動画をアップロード中なら中断
+      // 1. もし今まさにこ�Eレコード�E動画をアチE�Eロード中なら中断
       if (_currentUploadingRecordId === id && _currentVideoUploader) {
         try {
           _currentVideoUploader.abort();
@@ -4797,14 +4797,14 @@
         hideUploadPill();
       }
 
-      // 2. IndexedDBの動画データを削除（端末容量解放）
+      // 2. IndexedDBの動画チE�Eタを削除�E�端末容量解放�E�E
       try {
         await VideoStore.delete(id);
       } catch (e) {
         console.warn('IndexedDB delete error on deleteRecord:', e);
       }
 
-      // 3. Google Driveに保存済みの場合はDrive上のファイルを削除
+      // 3. Google Driveに保存済みの場合�EDrive上�Eファイルを削除
       let driveDeleted = false;
       if (targetRec.drive_file_id) {
         const token = loadStoredDriveToken();
@@ -4827,27 +4827,27 @@
       closeDetailModal();
       renderHistory();
 
-      // 5. 待機ピルの再計算・更新
+      // 5. 征E��ピルの再計算�E更新
       const remainingPending = records.filter(r => r.sync_status === 'local_pending').length;
       if (remainingPending === 0) {
-        closeUploadPill(); // 未送信動画が0件なら即座にメッセージを完全消去
+        closeUploadPill(); // 未送信動画ぁE件なら即座にメチE��ージを完�E消去
       } else if (!loadStoredDriveToken()) {
-        showActionUploadPill('⚠️ 動画' + remainingPending + '件が未送信 (タップして連携)', () => {
+        showActionUploadPill('⚠�E�E動画' + remainingPending + '件が未送信 (タチE�Eして連携)', () => {
           requestGoogleDriveAccessToken(true);
         });
       }
 
-      // 6. メッセージ案内
+      // 6. メチE��ージ案�E
       if (targetRec.drive_file_id) {
         if (driveDeleted) {
-          showRecordToast('🗑️ 記録とDrive動画を削除しました');
+          showRecordToast('🗑�E�E記録とDrive動画を削除しました');
         } else {
-          showRecordToast('🗑️ 記録を削除しました（※Drive動画は手動で削除してください）');
+          showRecordToast('🗑�E�E記録を削除しました�E�※Drive動画は手動で削除してください�E�E);
         }
       } else if (targetRec.sync_status === 'yt_uploaded' || targetRec.youtube_video_id) {
-        showRecordToast('🗑️ 記録を削除しました（※YouTube動画はYouTube Studioから削除してください）');
+        showRecordToast('🗑�E�E記録を削除しました�E�※YouTube動画はYouTube Studioから削除してください�E�E);
       } else {
-        showRecordToast('🗑️ 記録を削除しました');
+        showRecordToast('🗑�E�E記録を削除しました');
       }
     }
 
@@ -4860,35 +4860,35 @@
     let localMoves = [];
 
     const NATURES_DATA = [
-      { name: "さみしがり", up: "atk", down: "def" },
-      { name: "いじっぱり", up: "atk", down: "spa" },
-      { name: "やんちゃ", up: "atk", down: "spd" },
-      { name: "ゆうかん", up: "atk", down: "spe" },
-      { name: "ずぶとい", up: "def", down: "atk" },
-      { name: "わんぱく", up: "def", down: "spa" },
-      { name: "のうてんき", up: "def", down: "spd" },
+      { name: "さみしがめE, up: "atk", down: "def" },
+      { name: "ぁE��っぱめE, up: "atk", down: "spa" },
+      { name: "めE��ちめE, up: "atk", down: "spd" },
+      { name: "めE��かん", up: "atk", down: "spe" },
+      { name: "ず�EとぁE, up: "def", down: "atk" },
+      { name: "わんぱぁE, up: "def", down: "spa" },
+      { name: "のぁE��んき", up: "def", down: "spd" },
       { name: "のんき", up: "def", down: "spe" },
-      { name: "ひかえめ", up: "spa", down: "atk" },
-      { name: "おっとり", up: "spa", down: "def" },
-      { name: "うっかりや", up: "spa", down: "spd" },
+      { name: "ひかえめE, up: "spa", down: "atk" },
+      { name: "おっとめE, up: "spa", down: "def" },
+      { name: "ぁE��かりめE, up: "spa", down: "spd" },
       { name: "れいせい", up: "spa", down: "spe" },
-      { name: "おだやか", up: "spd", down: "atk" },
+      { name: "おだめE��", up: "spd", down: "atk" },
       { name: "おとなしい", up: "spd", down: "def" },
-      { name: "しんちょう", up: "spd", down: "spa" },
-      { name: "なまいき", up: "spd", down: "spe" },
-      { name: "おくびょう", up: "spe", down: "atk" },
+      { name: "しんちめE��", up: "spd", down: "spa" },
+      { name: "なまぁE��", up: "spd", down: "spe" },
+      { name: "おくびめE��", up: "spe", down: "atk" },
       { name: "せっかち", up: "spe", down: "def" },
-      { name: "ようき", up: "spe", down: "spa" },
-      { name: "むじゃき", up: "spe", down: "spd" },
+      { name: "ようぁE, up: "spe", down: "spa" },
+      { name: "むじゃぁE, up: "spe", down: "spd" },
       { name: "てれや", up: null, down: null },
       { name: "がんばりや", up: null, down: null },
-      { name: "すなお", up: null, down: null },
+      { name: "すなぁE, up: null, down: null },
       { name: "きまぐれ", up: null, down: null },
       { name: "まじめ", up: null, down: null }
     ];
 
-    let localItems = []; // 持ち物リスト（confirmed付き）
-    // 古いlocalStorageキーをクリア（pkm_master_pokemonは旧方式）
+    let localItems = []; // 持ち物リスト！Eonfirmed付き�E�E
+    // 古ぁEocalStorageキーをクリア�E�Ekm_master_pokemonは旧方式！E
     localStorage.removeItem('pkm_master_pokemon');
 
     function dmSelectType(type) {
@@ -4902,15 +4902,15 @@
       document.getElementById('dm-list-card').style.display = 'none';
       const btnList = document.getElementById('dm-btn-list');
       if (btnList) btnList.className = 'btn btn-ghost';
-      // 持ち物は「検索・編集」→「検索」に変更
-      document.getElementById('dm-btn-search').textContent = type === 'item' ? '🔍 検索' : '🔍 検索・編集';
+      // 持ち物は「検索・編雁E���E「検索」に変更
+      document.getElementById('dm-btn-search').textContent = type === 'item' ? '🔍 検索' : '🔍 検索・編雁E;
       document.getElementById('dm-btn-search').className = 'btn btn-ghost';
       document.getElementById('dm-search-input').value = '';
       document.getElementById('dm-search-list').classList.remove('open');
     }
 
     function dmSelectAction(action) {
-      // 一覧(list)は全員OK、searchは管理者のみ（addは廃止）
+      // 一覧(list)は全員OK、searchは管琁E��E�Eみ�E�Eddは廁E���E�E
       if (!isAdmin() && action !== 'list') return;
       dmAction = action;
       const btnList = document.getElementById('dm-btn-list');
@@ -4919,7 +4919,7 @@
       document.getElementById('dm-list-card').style.display = action === 'list' ? 'block' : 'none';
       if (action === 'list') {
         renderDmList();
-        // 技・持ち物の一覧でも管理者に保存ボタン表示
+        // 技・持ち物の一覧でも管琁E��E��保存�Eタン表示
         const saveBtn = document.querySelector('#dm-list-card .btn-primary');
         const cancelBtn = document.querySelector('#dm-list-card .btn-ghost');
         if (isAdmin() && (dmType === 'move' || dmType === 'item')) {
@@ -4935,13 +4935,13 @@
         document.getElementById('dm-search-area').style.display = 'block';
         if (dmType === 'pokemon') {
           document.getElementById('dm-search-label').textContent = 'ポケモン名で検索';
-          document.getElementById('dm-search-input').placeholder = 'ポケモン名を入力...';
+          document.getElementById('dm-search-input').placeholder = 'ポケモン名を入劁E..';
         } else if (dmType === 'item') {
           document.getElementById('dm-search-label').textContent = '持ち物名で検索';
-          document.getElementById('dm-search-input').placeholder = '持ち物名を入力...';
+          document.getElementById('dm-search-input').placeholder = '持ち物名を入劁E..';
         } else {
           document.getElementById('dm-search-label').textContent = '技名で検索';
-          document.getElementById('dm-search-input').placeholder = '技名を入力...';
+          document.getElementById('dm-search-input').placeholder = '技名を入劁E..';
         }
         document.getElementById('dm-form-card').style.display = 'none';
       }
@@ -4958,12 +4958,12 @@
         const all = localPokemon.filter(p => {
           const dH = toHiragana(p.display);
           return p.display.includes(valKana) || dH.includes(valHira);
-        }); // データ管理は内定フィルタなし・全件検索
+        }); // チE�Eタ管琁E�E冁E��フィルタなし�E全件検索
         const sw = all.filter(p => toHiragana(p.display).startsWith(valHira) || p.display.startsWith(valKana));
         const ot = all.filter(p => !toHiragana(p.display).startsWith(valHira) && !p.display.startsWith(valKana));
         entries = [...sw, ...ot].slice(0, 20).map(p => ({ label: p.display, idx: localPokemon.indexOf(p) }));
       } else if (dmType === 'item') {
-        // 持ち物検索（名前のみ、表示だけでformは開かない）
+        // 持ち物検索�E�名前�Eみ、表示だけでformは開かなぁE��E
         const all = localItems.filter(name => {
           const dH = toHiragana(name);
           return name.includes(valKana) || dH.includes(valHira);
@@ -4987,7 +4987,7 @@
           ev.preventDefault();
           input.value = item.textContent;
           list.classList.remove('open');
-          // 持ち物はフォームを開かず、一覧カードに結果を表示するだけ
+          // 持ち物はフォームを開かず、一覧カードに結果を表示するだぁE
           if (item.dataset.isItem === 'true') {
             dmShowItemResult(item.textContent);
           } else {
@@ -5009,7 +5009,7 @@
     }
 
     function dmShowForm(idx) {
-      if (idx === null) return; // 新規追加は廃止
+      if (idx === null) return; // 新規追加は廁E��
       dmEditIndex = idx;
       const card = document.getElementById('dm-form-card');
       const title = document.getElementById('dm-form-title');
@@ -5018,31 +5018,31 @@
       card.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
       if (dmType === 'pokemon') {
-        title.textContent = 'ポケモンを編集';
+        title.textContent = 'ポケモンを編雁E;
         const d = localPokemon[idx];
         if (d.confirmed === undefined) d.confirmed = true;
         const v = k => (d[k] ?? '').replace(/"/g, '&quot;');
         fields.innerHTML = `
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">基本情報</div><label style="display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer"><input type="checkbox" id="dmf-confirmed" style="width:18px;height:18px;accent-color:var(--accent)" ${d.confirmed ? 'checked' : ''}><span style="color:var(--accent);font-weight:600">内定</span></label></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px"><div style="font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">基本惁E��</div><label style="display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer"><input type="checkbox" id="dmf-confirmed" style="width:18px;height:18px;accent-color:var(--accent)" ${d.confirmed ? 'checked' : ''}><span style="color:var(--accent);font-weight:600">冁E��E/span></label></div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px">
         <div><label>図鑑No</label><input type="text" id="dmf-no"      value="${v('no')}"></div>
         <div><label>名前</label><input type="text" id="dmf-name"    value="${v('name')}"    oninput="dmAutoDisplay()"></div>
-        <div><label>フォルム名</label><input type="text" id="dmf-form"    value="${v('form')}"    oninput="dmAutoDisplay()"></div>
-        <div><label>表示名</label><input type="text" id="dmf-display" value="${v('display')}" readonly style="opacity:0.6"></div>
+        <div><label>フォルム吁E/label><input type="text" id="dmf-form"    value="${v('form')}"    oninput="dmAutoDisplay()"></div>
+        <div><label>表示吁E/label><input type="text" id="dmf-display" value="${v('display')}" readonly style="opacity:0.6"></div>
       </div>
-      <div style="margin-bottom:6px;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">タイプ</div>
+      <div style="margin-bottom:6px;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">タイチE/div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px">
-        <div><label>タイプ1</label><input type="text" id="dmf-type1" value="${v('type1')}"></div>
-        <div><label>タイプ2</label><input type="text" id="dmf-type2" value="${v('type2')}"></div>
+        <div><label>タイチE</label><input type="text" id="dmf-type1" value="${v('type1')}"></div>
+        <div><label>タイチE</label><input type="text" id="dmf-type2" value="${v('type2')}"></div>
       </div>
       <div style="margin-bottom:6px;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">種族値</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:10px;margin-bottom:14px">
         <div><label>HP</label><input    type="text" id="dmf-hp"    value="${v('hp')}"></div>
-        <div><label>攻撃</label><input  type="text" id="dmf-atk"   value="${v('atk')}"></div>
+        <div><label>攻撁E/label><input  type="text" id="dmf-atk"   value="${v('atk')}"></div>
         <div><label>防御</label><input  type="text" id="dmf-def"   value="${v('def')}"></div>
         <div><label>特攻</label><input  type="text" id="dmf-spatk" value="${v('spatk')}"></div>
         <div><label>特防</label><input  type="text" id="dmf-spdef" value="${v('spdef')}"></div>
-        <div><label>素早さ</label><input type="text" id="dmf-spd"   value="${v('spd')}"></div>
+        <div><label>素早ぁE/label><input type="text" id="dmf-spd"   value="${v('spd')}"></div>
       </div>
       <div style="margin-bottom:6px;font-size:12px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em">特性</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px">
@@ -5051,19 +5051,19 @@
         <div style="grid-column:1/-1"><label>夢特性</label><input type="text" id="dmf-ability-hidden" value="${v('ability_hidden')}"></div>
       </div>`;
       } else {
-        title.textContent = '技を編集';
+        title.textContent = '技を編雁E;
         const d = localMoves[idx];
         const v = k => (d[k] ?? '').replace(/"/g, '&quot;');
         fields.innerHTML = `
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:14px">
-        <div><label>技名</label><input      type="text" id="dmf-move-name"     value="${v('name')}"></div>
-        <div><label>タイプ</label><input    type="text" id="dmf-move-type"     value="${v('type')}"></div>
-        <div><label>分類</label><input      type="text" id="dmf-move-category" value="${v('category')}"></div>
+        <div><label>技吁E/label><input      type="text" id="dmf-move-name"     value="${v('name')}"></div>
+        <div><label>タイチE/label><input    type="text" id="dmf-move-type"     value="${v('type')}"></div>
+        <div><label>刁E��E/label><input      type="text" id="dmf-move-category" value="${v('category')}"></div>
         <div><label>威力</label><input      type="text" id="dmf-move-power"    value="${v('power')}"></div>
         <div style="grid-column:1/-1"><label>PP</label><input type="text" id="dmf-move-pp" value="${v('pp')}"></div>
       </div>
-      <div style="margin-bottom:12px"><label>説明</label><textarea id="dmf-move-desc"   rows="3">${d.desc ?? ''}</textarea></div>
-      <div><label>効果（英語）</label><textarea id="dmf-move-effect" rows="3">${d.effect ?? ''}</textarea></div>`;
+      <div style="margin-bottom:12px"><label>説昁E/label><textarea id="dmf-move-desc"   rows="3">${d.desc ?? ''}</textarea></div>
+      <div><label>効果（英語！E/label><textarea id="dmf-move-effect" rows="3">${d.effect ?? ''}</textarea></div>`;
       }
     }
 
@@ -5076,13 +5076,13 @@
 
     async function dmSaveEntry() {
       if (!isAdmin()) {
-        alert('編集権限がありません');
+        alert('編雁E��限がありません');
         return;
       }
       let entry;
       if (dmType === 'pokemon') {
         const name = document.getElementById('dmf-name').value.trim();
-        if (!name) { alert('名前を入力してください'); return; }
+        if (!name) { alert('名前を�E力してください'); return; }
         const form = document.getElementById('dmf-form').value.trim() || '通常';
         entry = {
           no: document.getElementById('dmf-no').value.trim(),
@@ -5119,19 +5119,19 @@
         localMoves[dmEditIndex] = entry;
       }
       await dmSaveMasterData();
-      alert('登録しました！');
+      alert('登録しました�E�E);
       document.getElementById('dm-form-card').style.display = 'none';
       document.getElementById('dm-search-input').value = '';
     }
 
     async function dmDeleteEntry() {
       if (!isAdmin()) {
-        alert('編集権限がありません');
+        alert('編雁E��限がありません');
         return;
       }
       if (dmEditIndex === null) return;
       const label = dmType === 'pokemon' ? localPokemon[dmEditIndex].display : localMoves[dmEditIndex].name;
-      if (!confirm(`「${label}」を削除しますか？`)) return;
+      if (!confirm(`、E{label}」を削除しますか�E�`)) return;
       if (dmType === 'pokemon') localPokemon.splice(dmEditIndex, 1);
       else localMoves.splice(dmEditIndex, 1);
       await dmSaveMasterData();
@@ -5146,13 +5146,13 @@
     }
 
     async function dmSaveMasterData() {
-      // 編集権限チェック（自分のUIDのみ保存可能）
+      // 編雁E��限チェチE���E��E刁E�EUIDのみ保存可能�E�E
       if (!isAdmin()) {
         console.warn('Master data save blocked: no permission');
         return;
       }
 
-      // POKEMON_LISTのデフォルトと異なるconfirmedのみを差分として保存
+      // POKEMON_LISTのチE��ォルトと異なるconfirmedのみを差刁E��して保孁E
       const defaultConfirmed = {};
       POKEMON_LIST.forEach(p => { defaultConfirmed[p.display] = p.confirmed; });
       const overrides = {};
@@ -5161,7 +5161,7 @@
           overrides[p.display] = p.confirmed;
         }
       });
-      // 持ち物：confirmed=falseのものだけ差分保存（デフォルトtrue）
+      // 持ち物�E�confirmed=falseのも�Eだけ差刁E��存（デフォルチErue�E�E
       const itemOverrides = {};
       localItems.forEach(it => { if (!it.confirmed) itemOverrides[it.name] = false; });
 
@@ -5173,7 +5173,7 @@
 
       if (!_fbReady) return;
       try {
-        // 全アカウント共通の shared コレクションに保存
+        // 全アカウント�E通�E shared コレクションに保孁E
         await window._firestoreOps.setDoc(
           window._firestoreOps.doc(window._db, 'shared', 'master'),
           { masterVersion: staticVer, overrides, moves: localMoves, itemOverrides, updatedAt: window._firestoreOps.serverTimestamp() }
@@ -5202,7 +5202,7 @@
       }
 
       if (!_fbReady) {
-        // Firebase未初期化時のフォールバック：localStorageから読む
+        // Firebase未初期化時のフォールバック�E�localStorageから読む
         try {
           const overrides = JSON.parse(localStorage.getItem('pkm_confirmed_overrides') || '{}');
           applyOverrides(overrides);
@@ -5214,7 +5214,7 @@
         return;
       }
       try {
-        // 全アカウント共通の shared コレクションから読み込み（ログイン不要）
+        // 全アカウント�E通�E shared コレクションから読み込み�E�ログイン不要E��E
         const snap = await window._firestoreOps.getDoc(
           window._firestoreOps.doc(window._db, 'shared', 'master')
         );
@@ -5222,13 +5222,13 @@
           const d = snap.data();
           const fbMasterVer = d.masterVersion || 0;
 
-          // 静的データがFirebaseのバージョンより新しい場合、古いFirebaseのoverridesを破棄して最新静的データを正とする
+          // 静的チE�EタがFirebaseのバ�Eジョンより新しい場合、古いFirebaseのoverridesを破棁E��て最新静的チE�Eタを正とする
           if (staticVer > fbMasterVer) {
             console.log(`[MasterSync] Static data is newer than Firebase (v${staticVer} > v${fbMasterVer}). Discarding outdated Firebase overrides.`);
             localStorage.removeItem('pkm_confirmed_overrides');
             localStorage.setItem('pkm_master_static_version', String(staticVer));
             
-            // 管理者の場合はFirebase側も自動的にクリーン更新
+            // 管琁E��E�E場合�EFirebase側も�E動的にクリーン更新
             if (isAdmin()) {
               try {
                 await window._firestoreOps.setDoc(
@@ -5239,7 +5239,7 @@
               } catch (err) { }
             }
           } else {
-            // Firebase側が最新または同等バージョンの場合、ユーザーが手動で設定した差分を適用
+            // Firebase側が最新また�E同等バージョンの場合、ユーザーが手動で設定した差刁E��適用
             if (d.overrides) {
               localStorage.setItem('pkm_confirmed_overrides', JSON.stringify(d.overrides));
               applyOverrides(d.overrides);
@@ -5257,7 +5257,7 @@
         }
       } catch (e) {
         console.error('Master load error:', e);
-        // Firestore取得失敗時のフォールバック：localStorageから読む
+        // Firestore取得失敗時のフォールバック�E�localStorageから読む
         try {
           const overrides = JSON.parse(localStorage.getItem('pkm_confirmed_overrides') || '{}');
           applyOverrides(overrides);
@@ -5270,7 +5270,7 @@
       rebuildPokemonMap();
     }
 
-    // ---- ピンチズーム無効化（iOS対応）----
+    // ---- ピンチズーム無効化！EOS対応！E---
     document.addEventListener('touchstart', e => {
       if (e.touches.length > 1) e.preventDefault();
     }, { passive: false });
@@ -5290,7 +5290,7 @@
     let pickerTargetInput = null;
     let pickerActiveType = null;
 
-    // iconNumの計算：姿違い・フォルムインデックスに対応したスプライトシート位置を取得
+    // iconNumの計算：姿違い・フォルムインチE��クスに対応したスプライトシート位置を取征E
     function getPokeIconPos(pOrDisp, defaultNo = 0) {
       if (!pOrDisp) return '0px 0px';
       let idx = 0;
@@ -5312,9 +5312,9 @@
     }
 
     function buildPickerTypes() {
-      const types = ['ノーマル', 'ほのお', 'みず', 'でんき', 'くさ', 'こおり',
-        'かくとう', 'どく', 'じめん', 'ひこう', 'エスパー', 'むし',
-        'いわ', 'ゴースト', 'ドラゴン', 'あく', 'はがね', 'フェアリー'];
+      const types = ['ノ�Eマル', 'ほのぁE, 'みぁE, 'でんき', 'くさ', 'こおめE,
+        'かくとぁE, 'どぁE, 'じめめE, 'ひこう', 'エスパ�E', 'むぁE,
+        'ぁE��', 'ゴースチE, 'ドラゴン', 'あく', 'はが�E', 'フェアリー'];
       const container = document.getElementById('picker-types');
       container.innerHTML = types.map(t =>
         `<button class="type-btn" data-type="${t}" onclick="pickerToggleType('${t}')">${t}</button>`
@@ -5377,7 +5377,7 @@
     function openPokemonPicker(btn) {
       const wrap = btn.closest('.pokemon-slot');
       pickerTargetInput = wrap ? wrap.querySelector('input[type=text]') : btn.closest('.slot-input-wrap').querySelector('input[type=text]');
-      // opp-selection-slotsの場合は相手パーティのみ表示
+      // opp-selection-slotsの場合�E相手パーチE��のみ表示
       const containerId = pickerTargetInput ? pickerTargetInput.dataset.container : '';
       window._pickerOppOnly = (containerId === 'opp-selection-slots' && window._oppPartyOptions && window._oppPartyOptions.length > 0);
       window._pickerMyOnly = (containerId === 'my-selection-slots' && window._myPartyOptions && window._myPartyOptions.length > 0);
@@ -5416,7 +5416,7 @@
 
     function renderPickerGrid(searchVal) {
       const grid = document.getElementById('picker-grid');
-      // 選出ピッカーはパーティから絞り込み
+      // 選出ピッカーはパ�EチE��から絞り込み
       let src;
       if (window._pickerOppOnly && window._oppPartyOptions) {
         src = window._oppPartyOptions.map(name => ({ display: name, confirmed: true, no: '', type1: '', type2: '' }));
@@ -5428,16 +5428,16 @@
       const valKana = toKatakana(searchVal.trim());
       const valHira = toHiragana(searchVal.trim());
 
-      // 相手パーティスロットではメガシンカを除外
+      // 相手パーチE��スロチE��ではメガシンカを除夁E
       const excludeMega = pickerTargetInput && pickerTargetInput.dataset.container === 'opp-party-slots';
 
       let filtered = src.filter(p => {
         if (!p.confirmed) return false;
-        // 相手パーティにはメガシンカ不可
+        // 相手パーチE��にはメガシンカ不可
         if (excludeMega && isMegaForm(p)) return false;
         // タイプ絞り込み
         if (pickerActiveType && p.type1 !== pickerActiveType && p.type2 !== pickerActiveType) return false;
-        // テキスト絞り込み
+        // チE��スト絞り込み
         if (searchVal.trim()) {
           const dH = toHiragana(p.display);
           if (!p.display.includes(valKana) && !dH.includes(valHira)) return false;
@@ -5446,11 +5446,11 @@
       });
 
       if (!filtered.length) {
-        grid.innerHTML = '<div class="picker-empty">該当するポケモンがいません</div>';
+        grid.innerHTML = '<div class="picker-empty">該当する�Eケモンがいません</div>';
         return;
       }
 
-      // 最近選んだ順でソート（絞り込みがない場合のみ）
+      // 最近選んだ頁E��ソート（絞り込みがなぁE��合�Eみ�E�E
       if (!searchVal.trim() && !pickerActiveType) {
         filtered = sortByRecent(filtered);
       }
@@ -5468,7 +5468,7 @@
 
     function selectFromPicker(displayName) {
       if (_pePickerTargetIdx >= 0) {
-        // パーティ編集ページ用
+        // パ�EチE��編雁E�Eージ用
         selectPePokeByName(_pePickerTargetIdx, displayName);
         const cardPE = document.querySelector('#pe-body .pe-pokemon-card[data-pe-idx="' + _pePickerTargetIdx + '"]');
         if (cardPE) { const inp = cardPE.querySelector('.pe-name-input'); if (inp) inp.value = displayName; }
@@ -5478,7 +5478,7 @@
       }
 
       if (pickerOppSlotIndex >= 0 && pickerTargetInput && pickerTargetInput.dataset.container === 'opp-party-slots') {
-        // 相手パーティ選択時
+        // 相手パーチE��選択時
         pickerTargetInput.value = displayName;
         recordRecentPick(displayName);
         updateSlotIcon(pickerTargetInput, displayName);
@@ -5486,10 +5486,10 @@
 
         const nextIdx = pickerOppSlotIndex + 1;
         if (nextIdx < 6) {
-          // 次のスロットへ移動
+          // 次のスロチE��へ移勁E
           setPickerOppSlot(nextIdx);
         } else {
-          // 6番目の選択完了 -> ピッカーを閉じる
+          // 6番目の選択完亁E-> ピッカーを閉じる
           closePokemonPicker();
         }
         return;
@@ -5506,7 +5506,7 @@
       closePokemonPicker();
     }
 
-    // ピッカー外クリックで閉じる
+    // ピッカー外クリチE��で閉じめE
     document.addEventListener('click', e => {
       const overlay = document.getElementById('pokemon-picker');
       if (overlay && overlay.classList.contains('open') && e.target === overlay) {
@@ -5514,13 +5514,13 @@
       }
     });
 
-    // ピッカーのタイプボタンを初期化
+    // ピッカーのタイプ�Eタンを�E期化
     document.addEventListener('DOMContentLoaded', buildPickerTypes);
-    // DOMContentLoadedが既に発火している場合のフォールバック
+    // DOMContentLoadedが既に発火してぁE��場合�Eフォールバック
     if (document.readyState !== 'loading') buildPickerTypes();
 
 
-    // ---- 内定一覧 ----
+    // ---- 冁E��一覧 ----
     let dmListDraft = [];
 
     function renderDmList() {
@@ -5528,10 +5528,10 @@
       const countEl = document.getElementById('dm-list-count');
 
       if (dmType === 'item') {
-        // 持ち物一覧：内定チェックボックス付き
+        // 持ち物一覧�E��E定チェチE��ボックス付き
         const isAdminItem = isAdmin();
         const confirmedItemCount = localItems.filter(it => it.confirmed).length;
-        countEl.textContent = `全${localItems.length}件 / 内定${confirmedItemCount}件`;
+        countEl.textContent = `全${localItems.length}件 / 冁E��E{confirmedItemCount}件`;
         body.innerHTML = localItems.map((it, i) =>
           `<div class="dm-list-row">
         <div class="dm-list-name">${it.name}</div>
@@ -5543,17 +5543,17 @@
           cb.addEventListener('change', () => {
             localItems[parseInt(cb.dataset.idx)].confirmed = cb.checked;
             const n = localItems.filter(it => it.confirmed).length;
-            countEl.textContent = `全${localItems.length}件 / 内定${n}件`;
+            countEl.textContent = `全${localItems.length}件 / 冁E��E{n}件`;
           });
         });
         return;
       }
 
       if (dmType === 'move') {
-        // 技一覧：内定チェックボックス付き＋クリックで編集
+        // 技一覧�E��E定チェチE��ボックス付き�E�クリチE��で編雁E
         const isAdminMove = isAdmin();
         const confirmedMoveCount = localMoves.filter(m => m.confirmed !== false).length;
-        countEl.textContent = `全${localMoves.length}件 / 内定${confirmedMoveCount}件`;
+        countEl.textContent = `全${localMoves.length}件 / 冁E��E{confirmedMoveCount}件`;
         body.innerHTML = localMoves.map((m, i) => `
       <div class="dm-list-row">
         <div class="dm-list-name" style="cursor:pointer;flex:1" onclick="dmShowForm(${i})">${m.name}</div>
@@ -5565,17 +5565,17 @@
           cb.addEventListener('change', () => {
             localMoves[parseInt(cb.dataset.idx)].confirmed = cb.checked;
             const n = localMoves.filter(m => m.confirmed !== false).length;
-            countEl.textContent = `全${localMoves.length}件 / 内定${n}件`;
+            countEl.textContent = `全${localMoves.length}件 / 冁E��E{n}件`;
           });
         });
         return;
       }
 
-      // ポケモン一覧（従来通り）
+      // ポケモン一覧�E�従来通り�E�E
       dmListDraft = localPokemon.map(p => ({ ...p }));
       const updateCount = () => {
         const n = dmListDraft.filter(p => p.confirmed).length;
-        countEl.textContent = `全${dmListDraft.length}件 / 内定${n}件`;
+        countEl.textContent = `全${dmListDraft.length}件 / 冁E��E{n}件`;
       };
       updateCount();
       body.innerHTML = dmListDraft.map((p, i) => {
@@ -5602,28 +5602,28 @@
 
     async function dmSaveList() {
       if (!isAdmin()) {
-        alert('編集権限がありません');
+        alert('編雁E��限がありません');
         return;
       }
-      // ポケモンの場合のみ dmListDraft を localPokemon に反映
+      // ポケモンの場合�Eみ dmListDraft めElocalPokemon に反映
       if (dmType === 'pokemon') {
         dmListDraft.forEach((p, i) => { localPokemon[i].confirmed = p.confirmed; });
       }
-      // 技・持ち物は renderDmList 内でチェックボックス変更時に localMoves/localItems を直接更新済み
+      // 技・持ち物は renderDmList 冁E��チェチE��ボックス変更時に localMoves/localItems を直接更新済み
       await dmSaveMasterData();
-      alert('登録しました！');
+      alert('登録しました�E�E);
     }
 
     function dmCancelList() {
-      // 変更前の状態にリセット
+      // 変更前�E状態にリセチE��
       if (dmType === 'pokemon') {
         dmListDraft = [];
       }
-      // 技・持ち物はリロード時にFirestoreから最新を読み込むため、再表示のみ
+      // 技・持ち物はリロード時にFirestoreから最新を読み込むため、�E表示のみ
       dmSelectType(dmType);
     }
 
-    // 持ち物の検索結果を一覧カードに表示（編集なし）
+    // 持ち物の検索結果を一覧カードに表示�E�編雁E��し！E
     function dmShowItemResult(name) {
       const isAdm = isAdmin();
       const body = document.getElementById('dm-list-body');
@@ -5641,18 +5641,18 @@
         });
       }
       document.getElementById('dm-list-card').style.display = 'block';
-      // 保存ボタン表示
+      // 保存�Eタン表示
       const saveBtn = document.querySelector('#dm-list-card .btn-primary');
       const cancelBtn = document.querySelector('#dm-list-card .btn-ghost');
       if (isAdm) { if (saveBtn) saveBtn.style.display = 'inline-flex'; if (cancelBtn) cancelBtn.style.display = 'inline-flex'; }
     }
 
 
-    // ---- パーティ編集ページ（フルスクリーン） ----
-    let pePokemons = []; // 編集中の6体分データ [{name,item,ability,moves,nature,evs}, ...]
-    // 各スロットの空データ
+    // ---- パ�EチE��編雁E�Eージ�E�フルスクリーン�E�E----
+    let pePokemons = []; // 編雁E��の6体�EチE�Eタ [{name,item,ability,moves,nature,evs}, ...]
+    // 吁E��ロチE��の空チE�Eタ
 
-    // ---- メモ機能 ----
+    // ---- メモ機�E ----
     // _memoContext: { type: 'party'|'pokemon', partyId, pokeIdx }
     let _memoContext = null;
 
@@ -5674,7 +5674,7 @@
       if (!_memoContext) { closeMemoModal(); return; }
 
       if (_memoContext.type === 'party') {
-        // パーティメモ
+        // パ�EチE��メモ
         const p = parties.find(x => x.id === _memoContext.partyId);
         if (p) {
           p.memo = text;
@@ -5694,7 +5694,7 @@
       closeMemoModal();
     }
 
-    // パーティメモを開く
+    // パ�EチE��メモを開ぁE
     function openPartyMemo(partyId) {
       const p = parties.find(x => x.id === partyId);
       if (!p) return;
@@ -5705,7 +5705,7 @@
       );
     }
 
-    // 個体メモを開く
+    // 個体メモを開ぁE
     function openPokeMemo(idx) {
       const pk = pePokemons[idx];
       const title = pk.name ? `📝 ${pk.name} のメモ` : `📝 ${idx + 1}体目のメモ`;
@@ -5734,10 +5734,10 @@
 
     async function openPartyEdit(id) {
       await loadStaticMasterData();
-      // バナーが出ている時だけ確認（毎回Firestore通信しない）
+      // バナーが�EてぁE��時だけ確認（毎回Firestore通信しなぁE��E
       const banner = document.getElementById('conflict-banner');
       if (banner && banner.classList.contains('show')) {
-        const ok = confirm('別の端末でデータが更新されています。\nリロードしますか？\n\nOK → リロード\nキャンセル → このまま続ける');
+        const ok = confirm('別の端末でチE�Eタが更新されてぁE��す、Enリロードしますか�E�\n\nOK ↁEリロード\nキャンセル ↁEこ�Eまま続けめE);
         if (ok) { location.reload(); return; }
       }
       editingPartyId = id || null;
@@ -5766,22 +5766,22 @@
       renderPartyEditBody();
       document.getElementById('page-party-edit').classList.add('active');
       document.getElementById('page-party-edit').scrollTop = 0;
-      // コピーボードがあれば party-edit 内にも表示
+      // コピ�Eボ�Eドがあれば party-edit 冁E��も表示
       syncCopyBoardToPE();
     }
 
     function closePartyEdit() {
       document.getElementById('page-party-edit').classList.remove('active');
-      // pe内のボードをリセット（parties画面のボードは renderParties > showCopyBoard で復元）
+      // pe冁E�Eボ�EドをリセチE���E�Earties画面のボ�Eド�E renderParties > showCopyBoard で復允E��E
       const peBoard = document.getElementById('pe-copy-board-pe');
       if (peBoard) { peBoard.style.display = 'none'; peBoard.innerHTML = ''; }
     }
 
     function savePartyEdit() {
       const name = document.getElementById('pe-name-input').value.trim();
-      if (!name) { alert('パーティ名を入力してください'); return; }
+      if (!name) { alert('パ�EチE��名を入力してください'); return; }
       const dup = parties.find(p => p.name === name && p.id !== editingPartyId);
-      if (dup) { alert('「' + name + '」という名前のパーティはすでに存在します'); return; }
+      if (dup) { alert('、E + name + '」とぁE��名前のパ�EチE��はすでに存在しまぁE); return; }
       // pePokemons を保存形式に変換
       const pokemon = pePokemons.map(pk => pk.name ? { ...pk, moves: [...pk.moves], evs: { ...pk.evs }, memo: (pk.memo || '') } : '');
       if (editingPartyId) {
@@ -5806,14 +5806,14 @@
       if (!p) return;
       const copy = JSON.parse(JSON.stringify(p));
       copy.id = Date.now().toString();
-      copy.name = p.name + 'のコピー';
+      copy.name = p.name + 'のコピ�E';
       parties.unshift(copy);
       saveData();
       renderParties();
       renderRecordPage();
     }
 
-    // パーティ編集ページのDOM構築
+    // パ�EチE��編雁E�EージのDOM構篁E
     function renderPartyEditBody() {
       const body = document.getElementById('pe-body');
       body.innerHTML = '';
@@ -5823,28 +5823,28 @@
     }
 
 
-    // ===== コピーボード機能 =====
-    let _copiedPoke = null; // コピーされたポケモンデータ
+    // ===== コピ�Eボ�Eド機�E =====
+    let _copiedPoke = null; // コピ�Eされた�EケモンチE�Eタ
 
-    // コピーボードのHTML文字列を生成
+    // コピ�Eボ�Eド�EHTML斁E���Eを生戁E
     function _buildBoardHTML() {
       const pk = _copiedPoke;
       if (!pk) return '';
-      const moves = (pk.moves || []).filter(Boolean).join(' / ') || '技なし';
+      const moves = (pk.moves || []).filter(Boolean).join(' / ') || '技なぁE;
       return `<div class="pe-copy-board-header">
-      <span class="pe-copy-board-title">📋 クリップボード</span>
-      <button class="pe-copy-board-del" onclick="clearCopyBoard()">✕ 削除</button>
+      <span class="pe-copy-board-title">📋 クリチE�Eボ�EチE/span>
+      <button class="pe-copy-board-del" onclick="clearCopyBoard()">✁E削除</button>
     </div>
     <div class="pe-copy-board-body">
-      <span class="pe-copy-board-name">${pk.name || '(未設定)'}</span>
-      <span class="pe-copy-board-tag">${pk.item || 'なし'}</span>
-      <span class="pe-copy-board-tag">${pk.ability || 'なし'}</span>
+      <span class="pe-copy-board-name">${pk.name || '(未設宁E'}</span>
+      <span class="pe-copy-board-tag">${pk.item || 'なぁE}</span>
+      <span class="pe-copy-board-tag">${pk.ability || 'なぁE}</span>
       <span class="pe-copy-board-tag">${moves}</span>
       <span class="pe-copy-board-tag">${pk.nature || 'まじめ'}</span>
     </div>`;
     }
 
-    // パーティ一覧のボードを更新
+    // パ�EチE��一覧のボ�Eドを更新
     function showCopyBoard() {
       const board = document.getElementById('pe-copy-board');
       if (!board) return;
@@ -5857,7 +5857,7 @@
       board.innerHTML = _buildBoardHTML();
     }
 
-    // page-party-edit 内のボードを同期
+    // page-party-edit 冁E�Eボ�Eドを同期
     function syncCopyBoardToPE() {
       const peBoard = document.getElementById('pe-copy-board-pe');
       if (!peBoard) return;
@@ -5872,22 +5872,22 @@
       peBoard.innerHTML = _buildBoardHTML();
     }
 
-    // コピーボードを消去
+    // コピ�Eボ�Eドを消去
     function clearCopyBoard() {
       _copiedPoke = null;
-      // パーティ一覧ボード
+      // パ�EチE��一覧ボ�EチE
       const board = document.getElementById('pe-copy-board');
       if (board) { board.className = ''; board.innerHTML = ''; }
-      // 個体詳細ボード
+      // 個体詳細ボ�EチE
       const peBoard = document.getElementById('pe-copy-board-pe');
       if (peBoard) { peBoard.style.display = 'none'; peBoard.innerHTML = ''; }
     }
 
-    // ポケモンをコピー
+    // ポケモンをコピ�E
     function copyPeSlot(idx) {
       const pk = pePokemons[idx];
       if (!pk) return;
-      // ディープコピー
+      // チE��ープコピ�E
       _copiedPoke = {
         name: pk.name || '',
         item: pk.item || '',
@@ -5897,11 +5897,11 @@
         evs: { ...(pk.evs || { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 }) },
         memo: pk.memo || ''
       };
-      showCopyBoard();      // パーティ一覧ボード更新
-      syncCopyBoardToPE(); // 個体詳細ボード更新
+      showCopyBoard();      // パ�EチE��一覧ボ�Eド更新
+      syncCopyBoardToPE(); // 個体詳細ボ�Eド更新
     }
 
-    // ペースト
+    // ペ�EスチE
     function pastePeSlot(idx, wrapper) {
       if (!_copiedPoke) return;
       pePokemons[idx] = {
@@ -5916,11 +5916,11 @@
       // カードを再描画
       const oldCard = wrapper.querySelector('.pe-pokemon-card');
       if (oldCard) oldCard.replaceWith(buildPePokeCard(idx));
-      // ペースト後ボードを消去
+      // ペ�Eスト後�Eードを消去
       clearCopyBoard();
     }
 
-    // ===== ポケモン移動（順番入れ替え）機能 =====
+    // ===== ポケモン移動（頁E��入れ替え）機�E =====
     let _movingPokeIdx = -1;
 
     function openMovePokeModal(fromIdx) {
@@ -5956,15 +5956,15 @@
       listEl.innerHTML = '';
 
       for (let i = 0; i < 6; i++) {
-        // 先頭への移動ボタン（fromIdx > 0 かつ i === 0 の場合）
+        // 先頭への移動�Eタン�E�EromIdx > 0 かつ i === 0 の場合！E
         if (fromIdx > 0 && i === 0) {
           listEl.appendChild(createMoveTargetBtn(fromIdx, 0));
         }
 
-        // スロット i の行
+        // スロチE�� i の衁E
         listEl.appendChild(createMovePokeRow(i, i === fromIdx));
 
-        // ポケモンの後の移動ボタン
+        // ポケモンの後�E移動�Eタン
         if (i < fromIdx) {
           if (i + 1 < fromIdx) {
             listEl.appendChild(createMoveTargetBtn(fromIdx, i + 1));
@@ -6028,7 +6028,7 @@
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'move-target-btn';
-      btn.innerHTML = `<span class="move-target-arrow">➔</span><span>ここに移動</span>`;
+      btn.innerHTML = `<span class="move-target-arrow">➁E/span><span>ここに移勁E/span>`;
       btn.onclick = () => movePeSlot(fromIdx, targetIdx);
       return btn;
     }
@@ -6049,13 +6049,13 @@
       wrapper.className = 'pe-poke-wrapper';
       wrapper.dataset.wrapperIdx = idx;
 
-      // ── ボタン行（カードの外・上）: 移動 | コピー | ペースト | クリア ──
+      // ── ボタン行（カード�E外�E上！E 移勁E| コピ�E | ペ�EスチE| クリア ──
       const actions = document.createElement('div');
       actions.className = 'pe-card-actions';
 
       const moveBtn = document.createElement('button');
       moveBtn.className = 'pe-card-btn';
-      moveBtn.textContent = '移動';
+      moveBtn.textContent = '移勁E;
       moveBtn.onclick = () => openMovePokeModal(idx);
       actions.appendChild(moveBtn);
 
@@ -6066,7 +6066,7 @@
 
       const copyBtn = document.createElement('button');
       copyBtn.className = 'pe-card-btn';
-      copyBtn.textContent = 'コピー';
+      copyBtn.textContent = 'コピ�E';
       copyBtn.onclick = () => copyPeSlot(idx);
       actions.appendChild(copyBtn);
 
@@ -6077,7 +6077,7 @@
 
       const pasteBtn = document.createElement('button');
       pasteBtn.className = 'pe-card-btn';
-      pasteBtn.textContent = 'ペースト';
+      pasteBtn.textContent = 'ペ�EスチE;
       pasteBtn.onclick = () => pastePeSlot(idx, wrapper);
       actions.appendChild(pasteBtn);
 
@@ -6103,22 +6103,22 @@
       card.className = 'pe-pokemon-card';
       card.dataset.peIdx = idx;
 
-      // ── カード全体グリッド（4列×1行） ──
-      // col1: アイコン上部 ＋ 名前エリア下部（縦積みflex）
-      // 4列×2行グリッド:
-      //   行1: [アイコン] [持ち物+特性] [技×4] [ステータス]
-      //   行2: [名前(col1/3 span)      ] [空]  [空]
+      // ── カード�E体グリチE���E�E列ÁE行！E──
+      // col1: アイコン上部 �E�E名前エリア下部�E�縦積みflex�E�E
+      // 4列ÁE行グリチE��:
+      //   衁E: [アイコン] [持ち物+特性] [技ÁE] [スチE�Eタス]
+      //   衁E: [名前(col1/3 span)      ] [空]  [空]
       const inner = document.createElement('div');
       inner.className = 'pe-card-inner';
 
-      // 行1・列1: アイコン（上部にメモボタン、下部にアイコン）
+      // 衁E・刁E: アイコン�E�上部にメモボタン、下部にアイコン�E�E
       const col1 = document.createElement('div');
       col1.className = 'pe-col-icon';
-      // メモボタン（アイコンの上）
+      // メモボタン�E�アイコンの上！E
       const memoBtn = document.createElement('button');
       memoBtn.className = 'memo-icon-btn' + (pk.memo ? ' has-memo' : '');
       memoBtn.id = `pe-memo-btn-${idx}`;
-      memoBtn.title = pk.memo ? 'メモを編集' : 'メモを追加';
+      memoBtn.title = pk.memo ? 'メモを編雁E : 'メモを追加';
       memoBtn.textContent = '📝';
       memoBtn.onclick = () => openPokeMemo(idx);
       col1.appendChild(memoBtn);
@@ -6131,7 +6131,7 @@
       col1.appendChild(pickerBtn);
       inner.appendChild(col1);
 
-      // 行1・列2: 持ち物 + 特性
+      // 衁E・刁E: 持ち物 + 特性
       const col2 = document.createElement('div');
       col2.className = 'pe-col-item-ability';
       col2.innerHTML = '<div class="pe-label">持ち物</div>';
@@ -6144,7 +6144,7 @@
       itemInput.oninput = function () { onPeItemInput(this, idx); };
       itemInput.onfocus = function () { onPeItemFocus(this, idx); };
       itemInput.onblur = function () {
-        if (window._peAcMousedown) return; // AC項目クリック中はblurで閉じない
+        if (window._peAcMousedown) return; // AC頁E��クリチE��中はblurで閉じなぁE
         const l = document.getElementById(`pe-item-ac-${idx}`); if (l) l.classList.remove('open');
       };
       const itemAc = document.createElement('div');
@@ -6162,7 +6162,7 @@
       col2.appendChild(abilSel);
       inner.appendChild(col2);
 
-      // 行1・列3: 技×4
+      // 衁E・刁E: 技ÁE
       const col3 = document.createElement('div');
       col3.className = 'pe-col'; col3.style.gridColumn = '3';
       col3.innerHTML = '<div class="pe-label">技</div>';
@@ -6176,10 +6176,10 @@
       }
       inner.appendChild(col3);
 
-      // 行1・列4: ステータス
+      // 衁E・刁E: スチE�Eタス
       const col4 = document.createElement('div');
       col4.className = 'pe-col'; col4.style.gridColumn = '4';
-      col4.innerHTML = '<div class="pe-label">ステータス</div>';
+      col4.innerHTML = '<div class="pe-label">スチE�Eタス</div>';
       const statsBtn = document.createElement('button');
       statsBtn.className = 'pe-stats-btn'; statsBtn.id = `pe-stats-btn-${idx}`;
       statsBtn.onclick = () => openStatsPopup(idx);
@@ -6187,7 +6187,7 @@
       col4.appendChild(statsBtn);
       inner.appendChild(col4);
 
-      // 行2・列1〜2: 名前セル (grid-column:1/3 でspan)
+      // 衁E・刁E、E: 名前セル (grid-column:1/3 でspan)
       const nameCell = document.createElement('div');
       nameCell.className = 'pe-name-cell'; // CSSで grid-column:1/3, grid-row:2
       const nameLbl = document.createElement('div');
@@ -6206,7 +6206,7 @@
       };
       nameInput.onfocus = function () { onPeNameFocus(this, idx); };
       nameInput.onblur = function () {
-        if (window._peAcMousedown) return; // AC項目クリック中はblurで閉じない
+        if (window._peAcMousedown) return; // AC頁E��クリチE��中はblurで閉じなぁE
         const l = document.getElementById(`pe-ac-${idx}`); if (l) l.classList.remove('open');
       };
       nameInput.onkeydown = function (e) {
@@ -6220,7 +6220,7 @@
       nameCell.appendChild(nameWrap);
       inner.appendChild(nameCell);
 
-      // 行2の列3・列4は .pe-col が grid-row:1/3 でまたがるため空セル不要
+      // 衁Eの刁E・刁Eは .pe-col ぁEgrid-row:1/3 でまたがるため空セル不要E
 
       card.appendChild(inner);
       return card;
@@ -6231,24 +6231,24 @@
     }
     function buildStatsBtnHTML(idx) {
       const pk = pePokemons[idx];
-      if (!pk.name) return '<span style="opacity:.4;font-size:10px">ステータス</span>';
+      if (!pk.name) return '<span style="opacity:.4;font-size:10px">スチE�Eタス</span>';
       const nd = NATURES_DATA.find(n => n.name === (pk.nature || 'まじめ')) || { up: null, down: null };
       const pd = findPokemon(pk.name);
-      if (!pd) return '<span style="opacity:.4;font-size:10px">ステータス</span>';
+      if (!pd) return '<span style="opacity:.4;font-size:10px">スチE�Eタス</span>';
       const KEYS = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
       const BKEYS = ['hp', 'atk', 'def', 'spatk', 'spdef', 'spd'];
       const ABBR = ['H', 'A', 'B', 'C', 'D', 'S'];
       const evs = pk.evs || { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
-      // 各行: "H 22    175" / "A -        93" / "C 22+ 166"
-      // 3列: [キー+EV+補正(左寄せ)]  [算出値(右寄せ)]
+      // 吁E��E "H 22    175" / "A -        93" / "C 22+ 166"
+      // 3刁E [キー+EV+補正(左寁E��)]  [算�E値(右寁E��)]
       return KEYS.map((k, i) => {
         const base = parseInt(pd[BKEYS[i]]) || 0;
         const ev = evs[k] || 0;
         const v = calcStat(k, base, ev, nd);
         const mod = nd.up === k ? '+' : nd.down === k ? '-' : '';
         const color = mod === '+' ? '#4ade80' : mod === '-' ? '#f87171' : '';
-        // キー部分: "H" + EV値(>0なら表示) + 補正記号
-        // color は キー+EV+補正 の部分のみに適用
+        // キー部刁E "H" + EV値(>0なら表示) + 補正記号
+        // color は キー+EV+補正 の部刁E�Eみに適用
         const evStr = ev > 0 ? String(ev) : '';
         const keyPart = ABBR[i] + (evStr ? ' ' + evStr : '') + (mod ? mod : '');
         const keySpan = color
@@ -6282,11 +6282,11 @@
     }
 
     function buildAbilityOptions(sel, pokeName, current) {
-      sel.innerHTML = '<option value="">（なし）</option>';
+      sel.innerHTML = '<option value="">�E�なし！E/option>';
       if (pokeName) {
         let pd = findPokemon(pokeName);
         if (pd) {
-          // メガシンカフォームの場合はベースポケモン（メガ前）の特性のみを使用
+          // メガシンカフォームの場合�Eベ�Eスポケモン�E�メガ前）�E特性のみを使用
           if (pd.form && pd.form.includes('メガ')) {
             const base = (localPokemon || POKEMON_LIST).find(p => p.name === pd.name && (p.form === '通常' || !p.form));
             if (base) pd = base;
@@ -6307,14 +6307,14 @@
       }
     }
 
-    // ポケモン名入力のオートコンプリート（パーティ編集用）
+    // ポケモン名�E力�Eオートコンプリート（パーチE��編雁E���E�E
     function showPeNameAc(input, idx, val) {
       const listEl = document.getElementById(`pe-ac-${idx}`);
       if (!listEl) return;
       const src = (localPokemon || POKEMON_LIST).filter(p => p.confirmed);
       let hits;
       if (!val) {
-        // 空: 最近選んだポケモンを表示（最大10件）
+        // 空: 最近選んだポケモンを表示�E�最大10件�E�E
         const recent = recentPicks
           .map(name => src.find(p => p.display === name))
           .filter(Boolean).slice(0, 10);
@@ -6367,14 +6367,14 @@
       // 特性選択肢更新
       const abilSel = document.getElementById(`pe-ability-${idx}`);
       if (abilSel) buildAbilityOptions(abilSel, name, '');
-      // 名前入力欄も更新（textarea対応）
+      // 名前入力欁E��更新�E�Eextarea対応！E
       const cardPE2 = document.querySelector(`#pe-body .pe-pokemon-card[data-pe-idx="${idx}"]`);
       if (cardPE2) { const ta = cardPE2.querySelector('.pe-name-input'); if (ta) ta.value = name; }
-      // ステータスボタン更新
+      // スチE�Eタスボタン更新
       updateStatsBtnText(idx);
     }
 
-    // ===== Pokepaste (Showdown形式) 連携機能 =====
+    // ===== Pokepaste (Showdown形弁E 連携機�E =====
     let _transMapData = null;
     let _transMapPromise = null;
     async function loadTranslationMap() {
@@ -6401,7 +6401,7 @@
 
     function normalizeJaAlphaNum(s) {
       if (!s) return '';
-      return String(s).replace(/[Ａ-Ｚａ-ｚ０-９]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0));
+      return String(s).replace(/[�E�-�E��E�E�E�！E�E�]/g, ch => String.fromCharCode(ch.charCodeAt(0) - 0xFEE0));
     }
 
     function translatePokemonToEn(jaDisplay) {
@@ -6477,14 +6477,14 @@
       return _transMapData.natures_en_to_ja[id] || 'まじめ';
     }
 
-    // アプリ内パーティ -> Pokepasteテキスト生成
+    // アプリ冁E��ーチE�� -> PokepasteチE��スト生戁E
     function exportToPokepasteText(pokemonList, isOts = false) {
       const blocks = [];
       (pokemonList || []).forEach(pk => {
         if (!pk || !pk.name) return;
         const lines = [];
 
-        // 1. ポケモン名 & 持ち物
+        // 1. ポケモン吁E& 持ち物
         let pokeEn = translatePokemonToEn(pk.name);
         const itemEn = pk.item ? translateItemToEn(pk.item) : '';
         if (itemEn) {
@@ -6502,7 +6502,7 @@
         // 3. レベル
         lines.push(`Level: 50`);
 
-        // OTS以外の場合: EVs & 性格
+        // OTS以外�E場吁E EVs & 性格
         if (!isOts) {
           const evs = pk.evs || {};
           const STAT_ORDER = [
@@ -6543,7 +6543,7 @@
       return blocks.join('\n\n');
     }
 
-    // Pokepasteテキスト -> アプリ内ポケモンデータ解析
+    // PokepasteチE��スチE-> アプリ冁E�EケモンチE�Eタ解极E
     function parsePokepasteText(text) {
       if (!text || !text.trim()) return [];
       const rawLines = text.split(/\r?\n/);
@@ -6576,7 +6576,7 @@
           memo: ''
         };
 
-        // 1行目の解析: "Species (Gender) @ Item" または "Nickname (Species) (Gender) @ Item"
+        // 1行目の解极E "Species (Gender) @ Item" また�E "Nickname (Species) (Gender) @ Item"
         const firstLine = blk[0];
         let itemPart = '';
         let pokePart = firstLine;
@@ -6587,20 +6587,20 @@
           itemPart = firstLine.substring(atIdx + 1).trim();
         }
 
-        // 性別表記 (M), (F) を除去
+        // 性別表訁E(M), (F) を除去
         pokePart = pokePart.replace(/\s*\([MF]\)\s*$/i, '').trim();
 
-        // ニックネーム表記 "Nickname (Species)" -> "Species"
+        // ニックネ�Eム表訁E"Nickname (Species)" -> "Species"
         const nickMatch = pokePart.match(/\(([^)]+)\)$/);
         if (nickMatch) {
           pokePart = nickMatch[1].trim();
         }
 
-        // ポケモン名・アイテム名の日本語変換
+        // ポケモン名�EアイチE��名�E日本語変換
         let jaName = translatePokemonToJa(pokePart);
         let jaItem = itemPart ? translateItemToJa(itemPart) : '';
 
-        // メガストーンを持っている場合はメガシンカフォルムに自動マッピング
+        // メガスト�Eンを持ってぁE��場合�Eメガシンカフォルムに自動�EチE��ング
         if (jaItem) {
           const stoneMap = window.MEGA_STONE_MAP || (window.MEGA_STONES_DATA || {});
           if (stoneMap && stoneMap[jaItem]) {
@@ -6626,7 +6626,7 @@
                 const val = parseInt(m[1], 10) || 0;
                 const stat = m[2].toLowerCase();
                 const statKey = stat === 'spa' ? 'spa' : (stat === 'spd' ? 'spd' : (stat === 'spe' ? 'spe' : stat));
-                // 32より大きい（通常の252振りなど）場合は 0〜32 に丸め
+                // 32より大きい�E�通常の252振りなど�E�場合�E 0、E2 に丸めE
                 pk.evs[statKey] = val > 32 ? Math.min(32, Math.round(val / 8)) : val;
               }
             });
@@ -6644,7 +6644,7 @@
           }
         }
 
-        // メガシンカポケモンの場合、特性がメガ前のものに適合しているか確認
+        // メガシンカポケモンの場合、特性がメガ前�Eも�Eに適合してぁE��か確誁E
         if (pk.name) {
           let pd = findPokemon(pk.name);
           if (pd && pd.form && pd.form.includes('メガ')) {
@@ -6688,13 +6688,13 @@
       if (!textarea) return;
       const text = textarea.value.trim();
       if (!text) {
-        alert('Pokepasteテキストを入力してください');
+        alert('PokepasteチE��ストを入力してください');
         return;
       }
 
       const pokes = parsePokepasteText(text);
       if (!pokes.length) {
-        alert('有効なポケモンデータを読み取れませんでした');
+        alert('有効なポケモンチE�Eタを読み取れませんでした');
         return;
       }
 
@@ -6717,7 +6717,7 @@
 
       const text = exportToPokepasteText(pePokemons, isOts);
       if (!text) {
-        alert('出力するポケモンデータがありません');
+        alert('出力する�EケモンチE�Eタがありません');
         return;
       }
 
@@ -6759,7 +6759,7 @@
       setTimeout(() => { form.remove(); }, 500);
     }
 
-    // ピッカーからポケモン選択
+    // ピッカーからポケモン選抁E
     let _pePickerTargetIdx = -1;
     function openPokemonPickerForPe(idx) {
       _pePickerTargetIdx = idx;
@@ -6785,13 +6785,13 @@
       localStorage.setItem('pkm_recent_items', JSON.stringify(recentItems));
     }
 
-    // 持ち物オートコンプリート
+    // 持ち物オートコンプリーチE
     function showPeItemAc(input, idx, val) {
       const listEl = document.getElementById(`pe-item-ac-${idx}`);
       if (!listEl) return;
       let hits;
       if (!val) {
-        // 空: 最近選んだ持ち物を表示（最大10件）
+        // 空: 最近選んだ持ち物を表示�E�最大10件�E�E
         const confirmedItems = localItems.filter(it => it.confirmed !== false).map(it => it.name);
         const recentConfirmed = recentItems.filter(n => confirmedItems.includes(n));
         hits = recentConfirmed.slice(0, 10);
@@ -6863,7 +6863,7 @@
       if (btn) btn.innerHTML = buildStatsBtnHTML(idx);
     }
 
-    // ---- ステータス計算 ----
+    // ---- スチE�Eタス計箁E----
     function calcStat(key, base, ev, nd) {
       if (key === 'hp') return base + (ev || 0) + 75;
       const mult = nd && nd.up === key ? 1.1 : (nd && nd.down === key ? 0.9 : 1.0);
@@ -6895,7 +6895,7 @@
         : null;
 
       if (pokeLearnedList && pokeLearnedList.length > 0) {
-        _moveLearnOnly = true; // 覚える技に限定
+        _moveLearnOnly = true; // 覚える技に限宁E
         if (toggleBtn) {
           toggleBtn.style.display = 'inline-block';
           toggleBtn.textContent = '全技を表示';
@@ -6906,7 +6906,7 @@
       } else {
         _moveLearnOnly = false;
         if (toggleBtn) toggleBtn.style.display = 'none';
-        if (titleEl) titleEl.textContent = '技を選択';
+        if (titleEl) titleEl.textContent = '技を選抁E;
       }
 
       buildMovePickerTypes();
@@ -6964,14 +6964,14 @@
         }
       }
 
-      let list = (localMoves || MOVES_LIST).filter(m => m.confirmed !== false); // 内定のみ
+      let list = (localMoves || MOVES_LIST).filter(m => m.confirmed !== false); // 冁E���Eみ
       if (_movePkActiveType) list = list.filter(m => m.type === _movePkActiveType);
       if (val.trim()) list = list.filter(m => { const h = toHiragana(m.name); return m.name.includes(valKana) || h.includes(valHira); });
 
       if (learnedSet && _moveLearnOnly) {
         list = list.filter(m => learnedSet.has(m.name));
       } else if (learnedSet) {
-        // 習得技を上位にソート
+        // 習得技を上位にソーチE
         list = [...list].sort((a, b) => {
           const aLearned = learnedSet.has(a.name) ? 1 : 0;
           const bLearned = learnedSet.has(b.name) ? 1 : 0;
@@ -6988,14 +6988,14 @@
         const isLearned = learnedSet ? learnedSet.has(m.name) : false;
         return `<div class="move-picker-row" onclick="selectMoveFromPicker('${m.name.replace(/'/g, "\\'")}')">
       <span class="move-type-badge" style="background:${getTypeColor(m.type)}">${m.type}</span>
-      <span class="move-picker-name">${isLearned ? '<span style="color:#eab308;font-size:11px;margin-right:4px" title="習得可能技">★</span>' : ''}${m.name}</span>
+      <span class="move-picker-name">${isLearned ? '<span style="color:#eab308;font-size:11px;margin-right:4px" title="習得可能技">☁E/span>' : ''}${m.name}</span>
       <span class="move-picker-cat" style="margin-left:auto">${m.category || ''}</span>
       <span class="move-picker-pwr">${m.power || '-'}</span>
     </div>`;
       }).join('');
     }
     function getTypeColor(type) {
-      const map = { ノーマル: '#9e9e9e', ほのお: '#e8622e', みず: '#3a8fd1', でんき: '#e0b022', くさ: '#5a9e32', こおり: '#5aafc8', かくとう: '#c4501e', どく: '#8c3a8c', じめん: '#b8963c', ひこう: '#7a8ecd', エスパー: '#d43078', むし: '#8ea820', いわ: '#b0962a', ゴースト: '#5a4578', ドラゴン: '#5038c8', あく: '#2c2840', はがね: '#6878a8', フェアリー: '#d060a0' };
+      const map = { ノ�Eマル: '#9e9e9e', ほのぁE '#e8622e', みぁE '#3a8fd1', でんき: '#e0b022', くさ: '#5a9e32', こおめE '#5aafc8', かくとぁE '#c4501e', どぁE '#8c3a8c', じめめE '#b8963c', ひこう: '#7a8ecd', エスパ�E: '#d43078', むぁE '#8ea820', ぁE��: '#b0962a', ゴースチE '#5a4578', ドラゴン: '#5038c8', あく: '#2c2840', はが�E: '#6878a8', フェアリー: '#d060a0' };
       return map[type] || '#888';
     }
     function selectMoveFromPicker(name) {
@@ -7006,7 +7006,7 @@
       closeMovePickerPopup();
     }
 
-    // ---- ステータスポップアップ ----
+    // ---- スチE�EタスポップアチE�E ----
     let _statsPkIdx = -1;
     function openStatsPopup(idx) {
       _statsPkIdx = idx;
@@ -7023,14 +7023,14 @@
       const pd = pk.name ? findPokemon(pk.name) : null;
       const nd = NATURES_DATA.find(n => n.name === (pk.nature || 'まじめ')) || { up: null, down: null };
 
-      document.getElementById('stats-popup-title').textContent = pk.name ? `${pk.name} のステータス` : 'ステータス';
+      document.getElementById('stats-popup-title').textContent = pk.name ? `${pk.name} のスチE�Eタス` : 'スチE�Eタス';
 
-      // 性格セレクト
+      // 性格セレクチE
       const natSel = document.getElementById('stats-nature-sel');
       natSel.innerHTML = NATURES_DATA.map(n => `<option value="${n.name}" ${n.name === (pk.nature || 'まじめ') ? 'selected' : ''}>${n.name}</option>`).join('');
 
       const STAT_KEYS = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
-      const STAT_LABELS = ['HP', '攻撃', '防御', '特攻', '特防', '素早さ'];
+      const STAT_LABELS = ['HP', '攻撁E, '防御', '特攻', '特防', '素早ぁE];
       const BASE_KEYS = ['hp', 'atk', 'def', 'spatk', 'spdef', 'spd'];
       const MAX_BASE = 255;
       const evs = pk.evs || { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
@@ -7090,7 +7090,7 @@
       v = Math.max(0, Math.min(32, Math.min(v, 66 - others)));
       slider.value = v;
       evs[key] = v;
-      // 数値入力同期
+      // 数値入力同朁E
       const numInput = document.querySelector(`.stats-ev-input[data-stat-key="${key}"]`);
       if (numInput) numInput.value = v;
       refreshStatsCalc();
@@ -7102,7 +7102,7 @@
       const nd = NATURES_DATA.find(n => n.name === (pk.nature || 'まじめ')) || { up: null, down: null };
       const STAT_KEYS = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'];
       const BASE_KEYS = ['hp', 'atk', 'def', 'spatk', 'spdef', 'spd'];
-      const STAT_LABELS = ['HP', '攻撃', '防御', '特攻', '特防', '素早さ'];
+      const STAT_LABELS = ['HP', '攻撁E, '防御', '特攻', '特防', '素早ぁE];
       const evs = pk.evs;
       let total = 0;
       STAT_KEYS.forEach((key, i) => {
@@ -7128,10 +7128,10 @@
 
 
 
-    // ポケモンピッカーからパーティ編集への選択フック（selectFromPickerをPE対応に拡張）
+    // ポケモンピッカーからパ�EチE��編雁E��の選択フチE���E�EelectFromPickerをPE対応に拡張�E�E
 
 
-    // ポケモンスロットのアイコンを更新（ポケモン名があればスプライト、なければボール）
+    // ポケモンスロチE��のアイコンを更新�E��Eケモン名があればスプライト、なければボ�Eル�E�E
     function updateSlotIcon(input, displayName) {
       const containerId = input.dataset.container;
       const index = input.dataset.index;
@@ -7142,13 +7142,13 @@
       if (!ballImg || !spriteEl) return;
 
       if (!displayName) {
-        // ボールを表示
+        // ボ�Eルを表示
         ballImg.style.display = 'block';
         spriteEl.style.display = 'none';
         return;
       }
 
-      // localPokemonからnoを取得してアイコン位置計算
+      // localPokemonからnoを取得してアイコン位置計箁E
       const poke = localPokemon.find(p => p.display === displayName);
       if (!poke) {
         ballImg.style.display = 'block';
@@ -7161,22 +7161,22 @@
     }
 
 
-    // メガシンカフォームかどうか判定（メガニウム・メガヤンマは除外しない）
+    // メガシンカフォームかどぁE��判定（メガニウム・メガヤンマ�E除外しなぁE��E
     function isMegaForm(pokemon) {
       if (!pokemon) return false;
-      // form に「メガ」が含まれていればメガ進化フォーム
-      // メガニウム(form=通常)やメガヤンマ(form=通常)は除外しない
+      // form に「メガ」が含まれてぁE��ばメガ進化フォーム
+      // メガニウム(form=通常)めE��ガヤンチEform=通常)は除外しなぁE
       // メガニウム(form=メガメガニウム)はformにメガが含まれるので除外対象
       return pokemon.form && pokemon.form.includes('メガ');
     }
 
 
-    // フォーム名からアイコン下の短縮ラベルを生成
+    // フォーム名からアイコン下�E短縮ラベルを生戁E
     function getFormLabel(form, pokemonName) {
       if (!form || form === '通常') return '';
       let label = form;
 
-      // メガ進化: ポケモン名を除いて「メガ」+末尾記号だけ残す
+      // メガ進匁E ポケモン名を除ぁE��「メガ、E末尾記号だけ残す
       if (label.startsWith('メガ')) {
         const suffix = label.slice(2);
         const nameRemoved = pokemonName && suffix.startsWith(pokemonName)
@@ -7185,13 +7185,13 @@
       }
 
       // ロトムフォーム: 末尾の「ロトム」を除去
-      if (label.endsWith('ロトム') && label !== 'ロトムのすがた') {
+      if (label.endsWith('ロトム') && label !== 'ロトムのすがぁE) {
         return label.slice(0, -3);
       }
-      if (label === 'ロトムのすがた') return '';
+      if (label === 'ロトムのすがぁE) return '';
 
-      // 不要な文言を除去
-      for (const word of ['のすがた', 'すがた', 'フォルム', 'のサイズ', 'サイズ']) {
+      // 不要な斁E��を除去
+      for (const word of ['のすがぁE, 'すがぁE, 'フォルム', 'のサイズ', 'サイズ']) {
         label = label.replace(word, '');
       }
       return label.trim();
@@ -7202,7 +7202,7 @@
       return `<div class="poke-tag-icon"><span class="poke-tag-sprite" style="background-position:${pos}"></span></div>`;
     }
 
-    // display名からポケモンデータを取得してスプライトHTMLを返す（O(1)キャッシュ対応）
+    // display名から�EケモンチE�Eタを取得してスプライチETMLを返す�E�E(1)キャチE��ュ対応！E
     function getPokeSpriteHTMLByDisplay(display) {
       if (!display) return '';
       if (_spriteCache.has(display)) {
@@ -7220,12 +7220,12 @@
     }
 
 
-    // パーティ並び替えドラッグ&ドロップ
+    // パ�EチE��並び替えドラチE��&ドロチE�E
     function initPartyDragSort(grid) {
       let dragSrc = null;
 
       grid.querySelectorAll('.party-card').forEach(card => {
-        // スマホ(タッチデバイス)ではdraggableを無効（タップ遅延を防ぐ）
+        // スマ�E(タチE��チE��イス)ではdraggableを無効�E�タチE�E遁E��を防ぐ！E
         if (!('ontouchstart' in window)) {
           card.setAttribute('draggable', 'true');
         }
@@ -7265,7 +7265,7 @@
           const fromIdx = parties.findIndex(p => p.id === fromId);
           const toIdx = parties.findIndex(p => p.id === toId);
           if (fromIdx < 0 || toIdx < 0) return;
-          // 並び替え
+          // 並び替ぁE
           const [moved] = parties.splice(fromIdx, 1);
           parties.splice(toIdx, 0, moved);
           saveData();
@@ -7277,7 +7277,7 @@
 
 
     // ============================================================
-    // ---- 相手パーティ絞り込み（テキスト入力AC） ----
+    // ---- 相手パーチE��絞り込み�E�テキスト�E力AC�E�E----
     // ============================================================
 
     function onOppPartyFilterFocus(input) { showOppPartyAC(input.value); }
@@ -7305,7 +7305,7 @@
     function showOppPartyAC(val) {
       const list = document.getElementById('opp-party-filter-ac');
       if (!list) return;
-      // 現在選択中のパーティの試合の相手パーティから候補を生成
+      // 現在選択中のパ�EチE��の試合�E相手パーチE��から候補を生�E
       const filterVal = document.getElementById('history-filter').value;
       const baseRecords = filterVal ? records.filter(r => r.partyId === filterVal) : records;
       const allPokemon = [...new Set(baseRecords.flatMap(r => r.oppParty.filter(Boolean)))].sort();
@@ -7371,7 +7371,7 @@
       renderHistory();
     }
 
-    // AC外クリックで閉じる
+    // AC外クリチE��で閉じめE
     document.addEventListener('click', e => {
       const ac = document.getElementById('opp-party-filter-ac');
       const input = document.getElementById('opp-party-filter-input');
@@ -7381,9 +7381,9 @@
     });
 
 
-    // ---- 自分の選出フィルター（テキストAC方式） ----
+    // ---- 自刁E�E選出フィルター�E�テキスチEC方式！E----
 
-    // 対象試合の自分の選出から候補を収集
+    // 対象試合�E自刁E�E選出から候補を収集
     function getMySelCandidates() {
       const filterVal = document.getElementById('history-filter').value;
       const baseRecords = filterVal ? records.filter(r => r.partyId === filterVal) : records;
@@ -7478,7 +7478,7 @@
       rateEl.style.display = 'block';
     }
 
-    // AC外クリックで閉じる（自分の選出）
+    // AC外クリチE��で閉じる（�E刁E�E選出�E�E
     document.addEventListener('click', e => {
       const ac = document.getElementById('my-sel-filter-ac');
       const input = document.getElementById('my-sel-filter-input');
@@ -7488,7 +7488,7 @@
     });
 
     // ======================================================
-    // ---- AI PARTY IMAGE PARSER (Gemini API / BYOK方式) ----
+    // ---- AI PARTY IMAGE PARSER (Gemini API / BYOK方弁E ----
     // ======================================================
     let _aiTargetPartyId = null;
     let _aiUploadedImages = []; // [{ id, name, mimeType, base64, dataUrl }]
@@ -7521,11 +7521,11 @@
       if (!inp) return;
       const val = inp.value.trim();
       if (!val) {
-        alert('APIキーを入力してください');
+        alert('APIキーを�E力してください');
         return;
       }
       saveGeminiApiKey(val);
-      alert('Gemini APIキーを保存しました！');
+      alert('Gemini APIキーを保存しました�E�E);
       const guideBox = document.getElementById('ai-key-guide-box');
       if (guideBox) guideBox.style.display = 'none';
     }
@@ -7555,14 +7555,14 @@
           badge.textContent = '設定済み';
           badge.style.color = 'var(--win)';
         } else {
-          badge.textContent = '未設定';
+          badge.textContent = '未設宁E;
           badge.style.color = 'var(--lose)';
         }
       }
       if (inp && key) {
         inp.value = key;
       }
-      // 未設定の場合は自動的にガイドを表示
+      // 未設定�E場合�E自動的にガイドを表示
       if (!key && guideBox) {
         guideBox.style.display = 'block';
       }
@@ -7574,10 +7574,10 @@
 
       const title = document.getElementById('ai-party-modal-title');
       if (title) {
-        title.textContent = partyId ? '📸 画像からパーティ編集' : '📸 画像からパーティ自動作成';
+        title.textContent = partyId ? '📸 画像からパーチE��編雁E : '📸 画像からパーチE��自動作�E';
       }
 
-      // 初期化
+      // 初期匁E
       const errEl = document.getElementById('ai-error-msg');
       if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
       const loadingBox = document.getElementById('ai-loading-box');
@@ -7605,10 +7605,10 @@
       const files = event.target.files;
       if (!files || !files.length) return;
       addAiImageFiles(Array.from(files));
-      event.target.value = ''; // リセット
+      event.target.value = ''; // リセチE��
     }
 
-    // 画像ファイルをCanvasで軽量リサイズ（長辺1600px、JPEG品質0.85）して追加
+    // 画像ファイルをCanvasで軽量リサイズ�E�長辺1600px、JPEG品質0.85�E�して追加
     async function addAiImageFiles(files) {
       const imgFiles = files.filter(f => f.type.startsWith('image/'));
       if (!imgFiles.length) {
@@ -7618,7 +7618,7 @@
 
       const remaining = 2 - _aiUploadedImages.length;
       if (remaining <= 0) {
-        alert('画像は最大2枚までアップロードできます（能力画面＋ステータス画面）');
+        alert('画像�E最大2枚までアチE�Eロードできます（�E力画面�E�スチE�Eタス画面�E�E);
         return;
       }
 
@@ -7641,7 +7641,7 @@
       renderAiPreviews();
     }
 
-    // 画像リサイズ・圧縮ヘルパー
+    // 画像リサイズ・圧縮ヘルパ�E
     function resizeImageFile(file, maxDimension = 1600, quality = 0.85) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -7698,11 +7698,11 @@
 
       container.style.display = 'grid';
       container.innerHTML = _aiUploadedImages.map((img, idx) => {
-        const label = idx === 0 ? '画像 1' : '画像 2';
+        const label = idx === 0 ? '画僁E1' : '画僁E2';
         return `
       <div class="ai-preview-item">
         <img src="${img.dataUrl}" alt="プレビュー">
-        <button class="ai-preview-del" onclick="removeAiImage('${img.id}')" title="削除">✕</button>
+        <button class="ai-preview-del" onclick="removeAiImage('${img.id}')" title="削除">✁E/button>
         <span class="ai-preview-badge">${label}</span>
       </div>
     `;
@@ -7711,7 +7711,7 @@
       submitBtn.disabled = false;
     }
 
-    // ドラッグ&ドロップ、ペーストのイベントリスナー設定
+    // ドラチE��&ドロチE�E、�Eースト�Eイベントリスナ�E設宁E
     document.addEventListener('DOMContentLoaded', () => {
       const dropZone = document.getElementById('ai-drop-zone');
       if (dropZone) {
@@ -7737,7 +7737,7 @@
         });
       }
 
-      // クリップボード貼り付け（Ctrl+V）
+      // クリチE�Eボ�Eド貼り付け�E�Etrl+V�E�E
       window.addEventListener('paste', e => {
         const modal = document.getElementById('ai-party-modal');
         if (!modal || !modal.classList.contains('open')) return;
@@ -7758,17 +7758,17 @@
       });
     });
 
-    // ---- Gemini API 呼び出し & 解析 ----
+    // ---- Gemini API 呼び出ぁE& 解极E----
     async function executeAiPartyAnalysis() {
       const apiKey = getGeminiApiKey();
       if (!apiKey) {
-        alert('Gemini APIキーが設定されていません。上の設定欄にAPIキーを入力してください。');
+        alert('Gemini APIキーが設定されてぁE��せん。上�E設定欁E��APIキーを�E力してください、E);
         toggleAiApiKeyGuide();
         return;
       }
 
       if (!_aiUploadedImages.length) {
-        alert('解析する画像をアップロードまたは貼り付けてください');
+        alert('解析する画像をアチE�Eロードまた�E貼り付けてください');
         return;
       }
 
@@ -7784,32 +7784,32 @@
 
       try {
         const promptText = `
-あなたはポケットモンスター（Pokemon HOMEおよびスカーレット・バイオレット）の対戦チーム画面抽出エキスパートです。
-添付された画像（「能力」画面や「ステータス」画面）を詳細に解析し、パーティ全体の情報を正確なJSON形式で抽出してください。
+あなた�EポケチE��モンスター�E�Eokemon HOMEおよびスカーレチE��・バイオレチE���E��E対戦チ�Eム画面抽出エキスパ�Eトです、E
+添付された画像（「�E力」画面めE��スチE�Eタス」画面�E�を詳細に解析し、パーチE��全体�E惁E��を正確なJSON形式で抽出してください、E
 
-【抽出ルール】
-1. teamName: チーム名（例: "Va" やスロット番号など、画面上部にあれば）
-2. teamId: チームID（例: "6KBAX0Y1Q9" など画面上部にあれば）
-3. pokemons: スロット1〜6のポケモン（最大6匹）の配列。各オブジェクトは以下を含めること：
-   - slot: 1〜6の番号
-   - name: ポケモン名（例: "フラエッテ", "エルフーン", "ドドゲザン", "ウインディ", "イダイトウ", "カイリュー" など）
-   - form: フォルム・姿（例: "ヒスイのすがた", "えいえんのはな", "アローラのすがた", "通常" など）
-   - gender: "♂" または "♀" または "なし"
-   - teraType: テラスタイプ（例: "フェアリー", "ほのお", "ひこう", "ゴースト", "ノーマル", "みず" など）
-   - ability: 特性名（例: "フラワーベール", "いたずらごころ", "まけんき", "いしあたま", "てきおうりょく", "せいしんりょく" など）
-   - item: 持ち物名（例: "フラエッテナイト", "きあいのタスキ", "くろいメガネ", "オボンのみ", "こだわりスカーフ", "りゅうのキバ" など）
-   - moves: 技名の配列（最大4つ、例: ["まもる", "マジカルシャイン", "ムーンフォース", "はめつのひかり"]）
-   - stats: 実数値オブジェクト { "hp": 数値, "atk": 数値, "def": 数値, "spa": 数値, "spd": 数値, "spe": 数値 }
-   - evs: ステータス画面の右側に表示されている努力値段階数値(0〜32) { "hp": 数値, "atk": 数値, "def": 数値, "spa": 数値, "spd": 数値, "spe": 数値 }（表示がない場合はすべて0）
-   - natureUp: 性格の上昇ステータス（赤色▲の項目: "atk", "def", "spa", "spd", "spe" または なし）
-   - natureDown: 性格の下降ステータス（青色▼の項目: "atk", "def", "spa", "spd", "spe" または なし）
-   - nature: 推測される性格名（例: "ひかえめ", "いじっぱり", "ようき", "おくびょう", "まじめ" など）
+【抽出ルール、E
+1. teamName: チ�Eム名（侁E "Va" めE��ロチE��番号など、画面上部にあれば�E�E
+2. teamId: チ�EムID�E�侁E "6KBAX0Y1Q9" など画面上部にあれば�E�E
+3. pokemons: スロチE��1、Eのポケモン�E�最大6匹�E��E配�E。各オブジェクト�E以下を含めること�E�E
+   - slot: 1、Eの番号
+   - name: ポケモン名（侁E "フラエチE��", "エルフ�Eン", "ドドゲザン", "ウインチE��", "イダイトウ", "カイリュー" など�E�E
+   - form: フォルム・姿�E�侁E "ヒスイのすがぁE, "えいえんのはな", "アローラのすがぁE, "通常" など�E�E
+   - gender: "♁E また�E "♀" また�E "なぁE
+   - teraType: チE��スタイプ（侁E "フェアリー", "ほのぁE, "ひこう", "ゴースチE, "ノ�Eマル", "みぁE など�E�E
+   - ability: 特性名（侁E "フラワーベ�Eル", "ぁE��ずらごこめE, "まけんぁE, "ぁE��あたま", "てきおぁE��めE��", "せいしんりょぁE など�E�E
+   - item: 持ち物名（侁E "フラエチE��ナイチE, "きあぁE�Eタスキ", "くろぁE��ガチE, "オボンのみ", "こだわりスカーチE, "りゅぁE�EキチE など�E�E
+   - moves: 技名�E配�E�E�最大4つ、侁E ["まもる", "マジカルシャイン", "ムーンフォース", "はめつのひかり"]�E�E
+   - stats: 実数値オブジェクチE{ "hp": 数値, "atk": 数値, "def": 数値, "spa": 数値, "spd": 数値, "spe": 数値 }
+   - evs: スチE�Eタス画面の右側に表示されてぁE��努力値段階数値(0、E2) { "hp": 数値, "atk": 数値, "def": 数値, "spa": 数値, "spd": 数値, "spe": 数値 }�E�表示がなぁE��合�Eすべて0�E�E
+   - natureUp: 性格の上�EスチE�Eタス�E�赤色▲の頁E��: "atk", "def", "spa", "spd", "spe" また�E なし！E
+   - natureDown: 性格の下降スチE�Eタス�E�青色▼の頁E��: "atk", "def", "spa", "spd", "spe" また�E なし！E
+   - nature: 推測される性格名（侁E "ひかえめE, "ぁE��っぱめE, "ようぁE, "おくびめE��", "まじめ" など�E�E
 
-【重要】
-・画像が2枚ある場合（能力画面＋ステータス画面）、同じスロットの情報を統合して1つのオブジェクトにまとめてください。
-・ポケモンがメガストーン（例: "リザードナイトY", "フシギバナイト"など）を持っている場合は、formおよびnameに対応するメガシンカ（例: "メガリザードンY", "メガフシギバナ"）を反映してください。
-・Nintendo Switch版またはスマートフォン版のどちらの比率・レイアウトであっても正確に抽出してください。
-・出力は純粋なJSONのみを返してください。
+【重要、E
+・画像が2枚ある場合（�E力画面�E�スチE�Eタス画面�E�、同じスロチE��の惁E��を統合して1つのオブジェクトにまとめてください、E
+・ポケモンがメガスト�Eン�E�侁E "リザードナイチE", "フシギバナイチEなど�E�を持ってぁE��場合�E、formおよびnameに対応するメガシンカ�E�侁E "メガリザードンY", "メガフシギバナ"�E�を反映してください、E
+・Nintendo Switch版また�Eスマ�Eトフォン版�Eどちら�E比率・レイアウトであっても正確に抽出してください、E
+・出力�E純粋なJSONのみを返してください、E
 `;
 
         const parts = [{ text: promptText }];
@@ -7852,14 +7852,14 @@
         }
 
         if (!response || !response.ok) {
-          throw lastError || new Error('AIモデルの呼び出しに失敗しました');
+          throw lastError || new Error('AIモチE��の呼び出しに失敗しました');
         }
 
         const resJson = await response.json();
         const rawText = resJson.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        if (!rawText) throw new Error('AIから応答データが取得できませんでした。');
+        if (!rawText) throw new Error('AIから応答データが取得できませんでした、E);
 
-        // JSONパース（マークダウンコードブロック対応）
+        // JSONパ�Eス�E��EークダウンコードブロチE��対応！E
         let cleanJsonStr = rawText.trim();
         if (cleanJsonStr.startsWith('```json')) cleanJsonStr = cleanJsonStr.slice(7);
         if (cleanJsonStr.startsWith('```')) cleanJsonStr = cleanJsonStr.slice(3);
@@ -7867,7 +7867,7 @@
 
         const parsedData = JSON.parse(cleanJsonStr.trim());
 
-        // アプリマスターデータと突合・クレンジングしてPEに反映
+        // アプリマスターチE�Eタと突合・クレンジングしてPEに反映
         applyAnalyzedPartyToPE(parsedData, _aiTargetPartyId);
 
       } catch (err) {
@@ -7882,12 +7882,12 @@
       }
     }
 
-    // ---- マスターデータ照合・正規化 & PE反映 ----
+    // ---- マスターチE�Eタ照合�E正規化 & PE反映 ----
     function applyAnalyzedPartyToPE(data, targetPartyId) {
       editingPartyId = targetPartyId || null;
       pePokemons = Array.from({ length: 6 }, () => peEmptyPoke());
 
-      // パーティ名
+      // パ�EチE��吁E
       const nameInput = document.getElementById('pe-name-input');
       if (targetPartyId) {
         const existing = parties.find(p => p.id === targetPartyId);
@@ -7895,7 +7895,7 @@
       } else if (data.teamName && nameInput) {
         nameInput.value = data.teamName;
       } else if (nameInput) {
-        nameInput.value = '新規パーティ';
+        nameInput.value = '新規パーチE��';
       }
 
       const allPokeSrc = localPokemon || POKEMON_LIST;
@@ -7908,11 +7908,11 @@
         if (i >= 6) return;
         const pokeObj = peEmptyPoke();
 
-        // 3. 持ち物の照合
+        // 3. 持ち物の照吁E
         const matchedItem = matchItem(rawPk.item, allItemsSrc);
         pokeObj.item = matchedItem;
 
-        // 1. ポケモン名の照合（display名）＋ メガストーン判定
+        // 1. ポケモン名�E照合！Eisplay名）！Eメガスト�Eン判宁E
         let matchedDisplay = matchPokemonDisplay(rawPk.name, rawPk.form, rawPk.ability, allPokeSrc);
         if (matchedItem) {
           matchedDisplay = resolveMegaFormByItem(matchedDisplay, matchedItem);
@@ -7920,17 +7920,17 @@
         const resolvedPoke = findPokemon(matchedDisplay);
         pokeObj.name = resolvedPoke ? resolvedPoke.display : (matchedDisplay || rawPk.name || '');
 
-        // 2. 特性の照合
+        // 2. 特性の照吁E
         pokeObj.ability = matchAbility(matchedDisplay, rawPk.ability, allPokeSrc);
 
-        // 4. 技の照合 (4つ)
+        // 4. 技の照吁E(4つ)
         const rawMoves = Array.isArray(rawPk.moves) ? rawPk.moves : [];
         pokeObj.moves = [0, 1, 2, 3].map(mIdx => matchMove(rawMoves[mIdx] || '', allMovesSrc));
 
-        // 5. 性格の特定（上昇/下降から逆引き、または性格名照合）
+        // 5. 性格の特定（上�E/下降から送E��き、また�E性格名�E合！E
         pokeObj.nature = resolveNature(rawPk.natureUp, rawPk.natureDown, rawPk.nature);
 
-        // 6. 努力値（0〜32段階）
+        // 6. 努力値�E�E、E2段階！E
         pokeObj.evs = resolveEvs(rawPk.evs);
 
         pePokemons[i] = pokeObj;
@@ -7943,17 +7943,17 @@
       syncCopyBoardToPE();
     }
 
-    // ポケモン名（display）のあいまい照合
+    // ポケモン名！Eisplay�E��EあいまぁE�E吁E
     function matchPokemonDisplay(rawName, rawForm, rawAbility, pokeSrc) {
       if (!rawName) return '';
       const rNameKana = toKatakana(rawName.trim());
       const rNameHira = toHiragana(rawName.trim());
       const rForm = (rawForm || '').trim();
 
-      // 完全一致チェック
+      // 完�E一致チェチE��
       let exact = pokeSrc.find(p => p.display === rawName || p.name === rawName);
 
-      // フォルムが指定されている場合
+      // フォルムが指定されてぁE��場吁E
       if (rForm && rForm !== '通常') {
         const withForm = pokeSrc.find(p => {
           const h = toHiragana(p.display);
@@ -7963,7 +7963,7 @@
         if (withForm) return withForm.display;
       }
 
-      // 特性からフォルムを特定（例: いしあたまウインディ → ヒスイ）
+      // 特性からフォルムを特定（侁E ぁE��あたまウインチE�� ↁEヒスイ�E�E
       if (rawAbility) {
         const withAbil = pokeSrc.find(p => {
           const h = toHiragana(p.display);
@@ -7974,7 +7974,7 @@
         if (withAbil) return withAbil.display;
       }
 
-      // 部分一致
+      // 部刁E��致
       const candidates = pokeSrc.filter(p => {
         const dH = toHiragana(p.display);
         return p.display.includes(rNameKana) || dH.includes(rNameHira) ||
@@ -7982,7 +7982,7 @@
       });
 
       if (candidates.length) {
-        // 通常フォームを優先
+        // 通常フォームを優允E
         const normal = candidates.find(p => p.form === '通常' || p.display === p.name);
         return normal ? normal.display : candidates[0].display;
       }
@@ -7990,12 +7990,12 @@
       return rawName;
     }
 
-    // 特性の照合
+    // 特性の照吁E
     function matchAbility(pokeDisplay, rawAbility, pokeSrc) {
       if (!rawAbility) return '';
       let pd = findPokemon(pokeDisplay);
       if (pd) {
-        // メガシンカフォームの場合はベースポケモン（メガ前）の特性から照合
+        // メガシンカフォームの場合�Eベ�Eスポケモン�E�メガ前）�E特性から照吁E
         if (pd.form && pd.form.includes('メガ')) {
           const base = (localPokemon || POKEMON_LIST).find(p => p.name === pd.name && (p.form === '通常' || !p.form));
           if (base) pd = base;
@@ -8008,7 +8008,7 @@
       return rawAbility;
     }
 
-    // 持ち物の照合
+    // 持ち物の照吁E
     function matchItem(rawItem, itemsSrc) {
       if (!rawItem) return '';
       const rKana = toKatakana(rawItem.trim());
@@ -8022,7 +8022,7 @@
       return partial || rawItem;
     }
 
-    // 技の照合
+    // 技の照吁E
     function matchMove(rawMove, movesSrc) {
       if (!rawMove) return '';
       const rKana = toKatakana(rawMove.trim());
@@ -8035,7 +8035,7 @@
       return partial ? partial.name : rawMove;
     }
 
-    // 性格の特定
+    // 性格の特宁E
     function resolveNature(up, down, rawNature) {
       if (up && down && up !== down) {
         const found = NATURES_DATA.find(n => n.up === up && n.down === down);
@@ -8048,7 +8048,7 @@
       return 'まじめ';
     }
 
-    // 努力値のクレンジング（0〜32段階）
+    // 努力値のクレンジング�E�E、E2段階！E
     function resolveEvs(rawEvs) {
       const evs = { hp: 0, atk: 0, def: 0, spa: 0, spd: 0, spe: 0 };
       if (!rawEvs || typeof rawEvs !== 'object') return evs;
@@ -8059,7 +8059,7 @@
       keys.forEach(k => {
         let val = parseInt(rawEvs[k]) || 0;
         if (val > 32) {
-          // 252などの実努力値が入ってきた場合は32段階に変換
+          // 252などの実努力値が�Eってきた場合�E32段階に変換
           val = Math.min(32, Math.round(val / 7.875));
         }
         val = Math.max(0, Math.min(32, val));
@@ -8067,7 +8067,7 @@
         total += val;
       });
 
-      // 合計が66を超える場合は比率で調整
+      // 合計が66を趁E��る場合�E比率で調整
       if (total > 66) {
         const ratio = 66 / total;
         keys.forEach(k => {
@@ -8079,7 +8079,7 @@
     }
 
     // ======================================================
-    // ---- BATTLE SCREEN AUTO FILL (完全ローカル・マルチモーダル認識エンジン) ----
+    // ---- BATTLE SCREEN AUTO FILL (完�Eローカル・マルチモーダル認識エンジン) ----
     // ======================================================
 
     let recordScanMode = 'auto'; // 'auto' | 'not_selected' | 'selected'
@@ -8144,7 +8144,7 @@
     }
 
     function onRecDropZoneClick(event) {
-      // プレビュー表示中はファイルダイアログを開かない
+      // プレビュー表示中はファイルダイアログを開かなぁE
       const previewUi = document.getElementById('rec-ai-preview-ui');
       if (previewUi && previewUi.style.display !== 'none') return;
       document.getElementById('rec-ai-file-input').click();
@@ -8167,7 +8167,7 @@
       if (loadingUi) loadingUi.style.display = 'none';
       if (previewUi) previewUi.style.display = 'none';
       if (idleUi) idleUi.style.display = 'block';
-      // ※ すでに自動入力された相手パーティや選出の情報は保持する
+      // ※ すでに自動�E力された相手パーチE��めE��出の惁E��は保持する
     }
 
     function openImageLightbox(event) {
@@ -8235,7 +8235,7 @@
         // recognition_engine.js is already loaded synchronously in <head>.
         // Just call loadDictionaries() to fetch JSON assets.
         if (!window.recognitionEngine) {
-          throw new Error('recognition_engine.js が読み込まれていません。ページをリロードしてください。');
+          throw new Error('recognition_engine.js が読み込まれてぁE��せん。�Eージをリロードしてください、E);
         }
         await window.recognitionEngine.loadDictionaries();
         // loadDictionaries() sets isLoaded=true on success, false on error.
@@ -8256,46 +8256,46 @@
       try {
         await ensureAiEngineLoaded();
       } catch (err) {
-        // エンジンスクリプト自体は同期読み込み済みのため、辞書ロードが失敗しても続行を試みる
+        // エンジンスクリプト自体�E同期読み込み済みのため、辞書ロードが失敗しても続行を試みめE
         if (!window.recognitionEngine) {
           console.error('Failed to load AI engine:', err);
           setRecordAiLoading(false);
-          alert('AI認識モジュールの読み込みに失敗しました。ページをリロードしてください。');
+          alert('AI認識モジュールの読み込みに失敗しました。�Eージをリロードしてください、E);
           return;
         }
         console.warn('Dictionary preload warning (continuing with available data):', err);
       }
 
-      setRecordAiLoading(true, 'AI高精度解析中（PHOG幾何エンジン）...');
+      setRecordAiLoading(true, 'AI高精度解析中�E�EHOG幾何エンジン�E�E..');
       const startTime = performance.now();
 
       try {
         const img = await loadImageFromFile(file);
 
-        // プレビュー画像のセット
+        // プレビュー画像�EセチE��
         const previewImg = document.getElementById('rec-ai-preview-img');
         if (previewImg && currentRecordAiImgDataUrl) {
           previewImg.src = currentRecordAiImgDataUrl;
         }
 
-        // 現在選択されている自分のパーティのポケモン一覧を取得
+        // 現在選択されてぁE��自刁E�Eパ�EチE��のポケモン一覧を取征E
         let myTeamList = [];
         const myParty = parties.find(p => p.id === selectedPartyId);
         if (myParty && myParty.pokemon && myParty.pokemon.length) {
           myTeamList = myParty.pokemon.map(pk => (typeof pk === 'string' ? pk : (pk && pk.name || '')));
         }
 
-        // 高精度認識エンジン（大津2値化＋680次元PHOG＋幾何Solidity記述子＋タイプ認識）の実行
+        // 高精度認識エンジン�E�大津2値化！E80次元PHOG�E�幾何Solidity記述子＋タイプ認識）�E実衁E
         const result = await window.recognitionEngine.recognize(img, myTeamList, recordScanMode);
         console.log('Recognition Result:', result);
 
-        // 1. 相手トレーナー名の反映
+        // 1. 相手トレーナ�E名�E反映
         if (result.trainerName) {
           const tInput = document.getElementById('rec-opp-trainer');
           if (tInput) tInput.value = result.trainerName;
         }
 
-        // 2. 相手パーティスロットに反映
+        // 2. 相手パーチE��スロチE��に反映
         const oppInputs = document.querySelectorAll('#opp-party-slots input[type=text]');
         let setOppCount = 0;
         if (result.opponent && result.opponent.length) {
@@ -8307,10 +8307,10 @@
           });
         }
 
-        // 相手選出ドロップダウンの選択肢を再構築
+        // 相手選出ドロチE�Eダウンの選択肢を�E構篁E
         rebuildOppSelectionDropdowns();
 
-        // 3. 自分の選出（AFTERモード時の先発1/先発2/後発1/後発2）を反映
+        // 3. 自刁E�E選出�E�EFTERモード時の先発1/先発2/後発1/後発2�E�を反映
         let isSelectionAutoFilled = false;
         if (result.mode === 'AFTER' && result.mySelection && result.mySelection.length === 4) {
           setSelectionFromNames('my', result.mySelection);
@@ -8324,20 +8324,20 @@
 
         const elapsedMs = Math.round(performance.now() - startTime);
         const modeLabel = (result.mode === 'BEFORE') ? '選出画面' : '準備画面';
-        const trainerLabel = result.trainerName ? `（トレーナー: ${result.trainerName}）` : '';
-        const toastMsg = `⚡ 【${modeLabel}】相手パーティ${setOppCount}体` + (isSelectionAutoFilled ? 'と自分の選出4体' : '') + `${trainerLabel}を自動入力しました！（${elapsedMs}ms）`;
+        const trainerLabel = result.trainerName ? `�E�トレーナ�E: ${result.trainerName}�E�` : '';
+        const toastMsg = `⚡ 、E{modeLabel}】相手パーチE��${setOppCount}体` + (isSelectionAutoFilled ? 'と自刁E�E選出4佁E : '') + `${trainerLabel}を�E動�E力しました�E�E��E{elapsedMs}ms�E�`;
         showRecordToast(toastMsg);
 
       } catch (err) {
         console.error('Record Recognition Error:', err);
         clearRecordAiImage();
-        alert('画像の解析に失敗しました: ' + (err.message || err));
+        alert('画像�E解析に失敗しました: ' + (err.message || err));
       } finally {
         setRecordAiLoading(false);
       }
     }
 
-    // ドラッグ＆ドロップ、ペーストのイベントリスナー設定（記録画面用）
+    // ドラチE���E�E��ロチE�E、�Eースト�Eイベントリスナ�E設定（記録画面用�E�E
     function initRecordAiEvents() {
       const dropZone = document.getElementById('rec-ai-drop-zone');
       if (dropZone) {
@@ -8363,7 +8363,7 @@
         });
       }
 
-      // グローバルペースト（Ctrl+V）：記録画面表示中の場合
+      // グローバルペ�Eスト！Etrl+V�E�：記録画面表示中の場吁E
       window.addEventListener('paste', e => {
         const recordPage = document.getElementById('page-record');
         const partyModal = document.getElementById('ai-party-modal');
@@ -8390,7 +8390,7 @@
     });
 
     
-    // ==== 共有設定・観戦モード関連 ====
+    // ==== 共有設定�E観戦モード関連 ====
     async function generateShareHash(uid, passcode) {
       const msgUint8 = new TextEncoder().encode(uid + ':' + passcode);
       const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
@@ -8404,7 +8404,7 @@
       if (area) area.style.display = isEnabled ? 'block' : 'none';
       
       if (!isEnabled) {
-        // 共有OFF時はすぐにクラウドへ反映
+        // 共有OFF時�Eすぐにクラウドへ反映
         saveShareSettings(false);
       } else {
         if (currentUser) {
@@ -8419,16 +8419,16 @@
       const passcode = document.getElementById('dm-share-passcode') ? document.getElementById('dm-share-passcode').value.trim() : '';
 
       if (isEnabled && (!passcode || !/^[\x21-\x7E]{1,10}$/.test(passcode))) {
-        alert('合言葉は半角英数記号1〜10文字で設定してください。');
+        alert('合言葉�E半角英数記号1、E0斁E��で設定してください、E);
         return;
       }
 
       localStorage.setItem('pkm_share_enabled', isEnabled);
       localStorage.setItem('pkm_share_passcode', passcode);
 
-      if (currentUser && window._firestoreOps && window._fbReady) {
+      if (currentUser && window._firestoreOps && _fbReady) {
         try {
-          // mainドキュメントに状態保存
+          // mainドキュメントに状態保孁E
           await window._firestoreOps.setDoc(
             window._firestoreOps.doc(window._db, 'users', currentUser.uid, 'data', 'main'),
             {
@@ -8439,17 +8439,17 @@
             { merge: true }
           );
           
-          // 共有ONの場合はshares_dataにもデータを同期
+          // 共有ONの場合�Eshares_dataにもデータを同朁E
           if (isEnabled) {
              await syncShareData(currentUser.uid, passcode);
           } else if (passcode) {
-             // 共有OFFの場合、該当ハッシュのデータを消去(任意)
+             // 共有OFFの場合、該当ハチE��ュのチE�Eタを消去(任愁E
              const hash = await generateShareHash(currentUser.uid, passcode);
              await window._firestoreOps.deleteDoc(window._firestoreOps.doc(window._db, 'shares_data', hash));
           }
 
           if (forceEnabled !== false) {
-             showRecordToast('✅ 共有設定を保存しました');
+             showRecordToast('✁E共有設定を保存しました');
           }
         } catch(e) {
           console.error("Share config save error", e);
@@ -8462,7 +8462,7 @@
     window.copyShareUrl = function() {
         const url = document.getElementById('dm-share-url');
         if (url && url.value) {
-            navigator.clipboard.writeText(url.value).then(() => showRecordToast('📋 URLをコピーしました！'));
+            navigator.clipboard.writeText(url.value).then(() => showRecordToast('📋 URLをコピ�Eしました�E�E));
         }
     };
 
@@ -8512,9 +8512,9 @@
        if (banner) banner.style.display = 'block';
        document.querySelectorAll('.dm-admin-only, .btn-auto-mode').forEach(el => el.style.display = 'none');
        
-       // 記録・データ管理タブを隠す
+       // 記録・チE�Eタ管琁E��ブを隠ぁE
        document.querySelectorAll('nav button').forEach(b => {
-           if (b.textContent.includes('記録する') || b.textContent.includes('データ管理')) {
+           if (b.textContent.includes('記録する') || b.textContent.includes('チE�Eタ管琁E)) {
                b.style.display = 'none';
            }
        });
@@ -8529,7 +8529,7 @@
            
            try {
                const hash = await generateShareHash(shareUid, passcode);
-               // _fbReadyになるまで待つ
+               // _fbReadyになるまで征E��
                let waitCount = 0;
                while (!_fbReady && waitCount < 50) {
                    await new Promise(r => setTimeout(r, 100));
@@ -8550,14 +8550,14 @@
                    
                    renderParties();
                    renderHistory();
-                   showRecordToast(`✅ ${ownerName}さんのデータを読み込みました`);
+                   showRecordToast(`✁E${ownerName}さんのチE�Eタを読み込みました`);
                } else {
-                   alert("❌ 合言葉が間違っているか、共有がオフになっています。");
+                   alert("❁E合言葉が間違ってぁE��か、�E有がオフになってぁE��す、E);
                    location.href = location.origin + location.pathname;
                }
            } catch(e) {
                console.error("Spectator load error", e);
-               alert("❌ データの読み込みに失敗しました。");
+               alert("❁EチE�Eタの読み込みに失敗しました、E);
            }
        }, 500);
 
@@ -8571,7 +8571,7 @@
     });
 
     // ---- INIT ----
-    // localStorageから初期データを確実に読み込み
+    // localStorageから初期チE�Eタを確実に読み込み
     try {
       const lp = localStorage.getItem('pkm_parties');
       const lr = localStorage.getItem('pkm_records');
@@ -8583,14 +8583,14 @@
       renderParties();
     });
 
-    // ---- PWA: Service Worker 解除（キャッシュ問題対策） ----
+    // ---- PWA: Service Worker 解除�E�キャチE��ュ問題対策！E----
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.getRegistrations().then(regs => {
         regs.forEach(reg => reg.unregister());
       });
     }
 
-    // ---- WiFi検知: 接続変化時にアップロードキューを起動 ----
+    // ---- WiFi検知: 接続変化時にアチE�Eロードキューを起勁E----
     if (navigator.connection) {
       navigator.connection.addEventListener('change', () => {
         const c = navigator.connection;
@@ -8600,10 +8600,10 @@
       });
     }
 
-    // アプリ起動時に未送信動画があればピルを表示（認証済みならキュー実行、未認証ならタップ連携を促す）
+    // アプリ起動時に未送信動画があれ�Eピルを表示�E�認証済みならキュー実行、未認証ならタチE�E連携を俁E���E�E
     setTimeout(async () => {
       initDraggableUploadPill();
-      cleanupOldLocalVideos(); // 30分経過した過去のローカル動画を安全にクリーンアップ
+      cleanupOldLocalVideos(); // 30刁E��過した過去のローカル動画を安�EにクリーンアチE�E
       const validToken = loadStoredDriveToken();
       updateDriveSettingsUI();
 
@@ -8613,8 +8613,9 @@
       if (validToken) {
         startUploadQueue();
       } else if (getDriveClientId()) {
-        showActionUploadPill('⚠️ 動画' + pendingCount + '件が未送信 (タップして連携)', () => {
+        showActionUploadPill('⚠�E�E動画' + pendingCount + '件が未送信 (タチE�Eして連携)', () => {
           requestGoogleDriveAccessToken(true);
         });
       }
     }, 800);
+
