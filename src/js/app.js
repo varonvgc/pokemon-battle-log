@@ -8418,7 +8418,7 @@
       const isEnabled = forceEnabled !== undefined ? forceEnabled : (enabledCheckbox ? enabledCheckbox.checked : false);
       const passcode = document.getElementById('dm-share-passcode') ? document.getElementById('dm-share-passcode').value.trim() : '';
 
-      if (isEnabled && (!passcode || !/^[a-zA-Z0-9!-/:-@\[-`{-~]{1,10}$/.test(passcode))) {
+      if (isEnabled && (!passcode || !/^[\x21-\x7E]{1,10}$/.test(passcode))) {
         alert('合言葉は半角英数記号1〜10文字で設定してください。');
         return;
       }
@@ -8520,7 +8520,8 @@
        });
 
        setTimeout(async () => {
-           const passcode = prompt("👀 共有データを閲覧するための合言葉を入力してください");
+           let passcode = prompt("👀 共有データを閲覧するための合言葉を入力してください");
+           if(passcode) passcode = passcode.trim();
            if (!passcode) {
                location.href = location.origin + location.pathname;
                return;
