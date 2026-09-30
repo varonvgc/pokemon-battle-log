@@ -7,7 +7,8 @@
     let POKEMON_ICON_BY_NAME = {};
     let POKEMON_BY_ICON_FILE = {};
     let _masterDataPromise = null;
-    let _isSpectatorMode = false;
+    const _urlParams = new URLSearchParams(window.location.search);
+    let _isSpectatorMode = Boolean(_urlParams.get('share') || localStorage.getItem('pkm_share_uid'));
     let _spectatorOwnerUid = null;
     let _spectatorPasscode = null;
 
@@ -8447,7 +8448,8 @@
             {
               shareEnabled: isEnabled,
               sharePasscode: passcode,
-              updatedAt: window._firestoreOps.serverTimestamp()
+              updatedAt: window._firestoreOps.serverTimestamp(),
+              updatedBy: CLIENT_ID
             },
             { merge: true }
           );
