@@ -914,9 +914,11 @@
           nameEl.textContent = user.displayName || user.email;
           btnEl.textContent = 'ログアウト';
           banner.style.display = 'none';
-          await loadFromFirestore();
-          renderParties();
-          renderHistory();
+          if (!_isSpectatorMode) {
+            await loadFromFirestore();
+            renderParties();
+            renderHistory();
+          }
         } else {
           nameEl.textContent = '';
           btnEl.textContent = 'ログイン';
@@ -1439,6 +1441,7 @@
     }
 
     function saveParty() {
+      if (_isSpectatorMode) { alert("閲覧モードでは操作できません"); return; }
       const name = document.getElementById('party-name-input').value.trim();
       if (!name) { alert('パーティ名を入力してください'); return; }
       const pokemon = getSlotValues('party-modal-slots', 6);
@@ -1464,6 +1467,7 @@
     }
 
     function deleteParty(id) {
+      if (_isSpectatorMode) { alert("閲覧モードでは操作できません"); return; }
       if (!confirm('このパーティを削除しますか？')) return;
       parties = parties.filter(p => p.id !== id);
       saveData();
@@ -3197,6 +3201,7 @@
     }
 
     async function saveRecord() {
+      if (_isSpectatorMode) { alert("閲覧モードでは操作できません"); return; }
       if (!selectedPartyId) { alert('パーティを選択してください'); return; }
       const oppParty = getSlotValues('opp-party-slots', 6);
       if (!oppParty.some(Boolean)) { alert('相手のパーティを1体以上入力してください'); return; }
@@ -4588,8 +4593,15 @@
   `;
 
       const editBtn = document.getElementById('detail-edit-btn');
-      if (editBtn) editBtn.onclick = () => editRecord(id);
-      document.getElementById('detail-delete-btn').onclick = () => deleteRecord(id);
+      const delBtn = document.getElementById('detail-delete-btn');
+      if (editBtn) {
+        editBtn.onclick = () => editRecord(id);
+        editBtn.style.display = _isSpectatorMode ? 'none' : '';
+      }
+      if (delBtn) {
+        delBtn.onclick = () => deleteRecord(id);
+        delBtn.style.display = _isSpectatorMode ? 'none' : '';
+      }
       document.getElementById('detail-modal').classList.add('open');
     }
 
@@ -4778,6 +4790,7 @@
     }
 
     async function deleteRecord(id) {
+      if (_isSpectatorMode) { alert("閲覧モードでは操作できません"); return; }
       const targetRec = records.find(r => r.id === id);
       if (!targetRec) return;
       if (!confirm('この記録を削除しますか？')) return;
@@ -8499,9 +8512,15 @@
        );
     }
 
+    window.exitSpectatorMode = function() {
+       localStorage.removeItem('pkm_share_uid');
+       localStorage.removeItem('pkm_share_pass');
+       location.href = location.origin + location.pathname;
+    };
+
     async function initSpectatorMode() {
        const params = new URLSearchParams(window.location.search);
-       const shareUid = params.get('share');
+       let shareUid = params.get('share') || localStorage.getItem('pkm_share_uid');
        if (!shareUid) return false;
 
        _isSpectatorMode = true;
@@ -8512,18 +8531,27 @@
        if (banner) banner.style.display = 'block';
        document.querySelectorAll('.dm-admin-only, .btn-auto-mode').forEach(el => el.style.display = 'none');
        
-       // 記録・データ管理タブを隠す
+       // 不要なタブを隠す
        document.querySelectorAll('nav button').forEach(b => {
-           if (b.textContent.includes('記録する') || b.textContent.includes('データ管理')) {
+           const t = b.textContent;
+           if (t.includes('記録する') || t.includes('データ管理') || t.includes('パーティ管理') || t.includes('オートモード')) {
                b.style.display = 'none';
            }
        });
+       
+       // 履歴タブを開く
+       const histBtn = Array.from(document.querySelectorAll('nav button')).find(b => b.textContent.includes('履歴'));
+       if (histBtn) showPage('history', histBtn);
 
        setTimeout(async () => {
-           let passcode = prompt("👀 共有データを閲覧するための合言葉を入力してください");
-           if(passcode) passcode = passcode.trim();
+           let passcode = params.get('pass') || localStorage.getItem('pkm_share_pass');
            if (!passcode) {
-               location.href = location.origin + location.pathname;
+               passcode = prompt("👀 共有データを閲覧するための合言葉を入力してください");
+               if(passcode) passcode = passcode.trim();
+           }
+           
+           if (!passcode) {
+               window.exitSpectatorMode();
                return;
            }
            
@@ -8538,6 +8566,9 @@
                
                const snap = await window._firestoreOps.getDoc(window._firestoreOps.doc(window._db, 'shares_data', hash));
                if (snap.exists()) {
+                   localStorage.setItem('pkm_share_uid', shareUid);
+                   localStorage.setItem('pkm_share_pass', passcode);
+                   
                    const data = snap.data();
                    parties = data.parties || [];
                    records = data.records || [];
@@ -8553,11 +8584,12 @@
                    showRecordToast(`✅ ${ownerName}さんのデータを読み込みました`);
                } else {
                    alert("❌ 合言葉が間違っているか、共有がオフになっています。");
-                   location.href = location.origin + location.pathname;
+                   window.exitSpectatorMode();
                }
            } catch(e) {
                console.error("Spectator load error", e);
                alert("❌ データの読み込みに失敗しました。");
+               window.exitSpectatorMode();
            }
        }, 500);
 
