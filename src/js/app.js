@@ -716,6 +716,12 @@
           customTags = _latestRemoteData.customTags;
           localStorage.setItem('pkm_custom_tags', JSON.stringify(customTags));
         }
+        if (_latestRemoteData.shareEnabled !== undefined) {
+          localStorage.setItem('pkm_share_enabled', _latestRemoteData.shareEnabled);
+        }
+        if (_latestRemoteData.sharePasscode !== undefined) {
+          localStorage.setItem('pkm_share_passcode', _latestRemoteData.sharePasscode);
+        }
         if (_latestRemoteData.updatedAt && _latestRemoteData.updatedAt.toMillis) {
           _lastLoadedAt = _latestRemoteData.updatedAt.toMillis();
         } else {
@@ -728,6 +734,7 @@
       renderParties();
       renderHistory();
       renderRecordPage();
+      if (typeof updateShareUI === 'function') updateShareUI();
       dismissConflictBanner();
       showRecordToast('✨ 最新データを画面に反映しました！');
     }
@@ -801,6 +808,14 @@
             localStorage.setItem('pkm_video_storage_type', data.videoStorageType || 'drive');
           }
           updateDriveSettingsUI();
+
+          if (data.shareEnabled !== undefined) {
+            localStorage.setItem('pkm_share_enabled', data.shareEnabled);
+          }
+          if (data.sharePasscode !== undefined) {
+            localStorage.setItem('pkm_share_passcode', data.sharePasscode);
+          }
+          if (typeof updateShareUI === 'function') updateShareUI();
 
           initRecordFormMeta();
 
