@@ -553,7 +553,7 @@
           }
 
           // --- Automatic Migration ---
-          if (loadedRecords.length > 0 || data.parties) {
+          if (loadedRecords.length > 0 || (typeof data !== "undefined" && data.parties)) {
              console.log("Migrating data to subcollections...");
              // save to subcollections
              for(let r of records) { await saveRecord(r); }
