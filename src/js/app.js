@@ -28,9 +28,9 @@
     let _histObserver = null;
 
     const TYPE_NAME_JA_MAP = {
-      "normal": "繝弱・繝槭Ν", "fire": "縺ｻ縺ｮ縺・, "water": "縺ｿ縺・, "grass": "縺上＆", "electric": "縺ｧ繧薙″", "ice": "縺薙♀繧・,
-      "fighting": "縺九￥縺ｨ縺・, "poison": "縺ｩ縺・, "ground": "縺倥ａ繧・, "flying": "縺ｲ縺薙≧", "psychic": "繧ｨ繧ｹ繝代・",
-      "bug": "繧縺・, "rock": "縺・ｏ", "ghost": "繧ｴ繝ｼ繧ｹ繝・, "dragon": "繝峨Λ繧ｴ繝ｳ", "dark": "縺ゅ￥", "steel": "縺ｯ縺後・", "fairy": "繝輔ぉ繧｢繝ｪ繝ｼ", "stellar": "繧ｹ繝・Λ"
+      "normal": "Normal", "fire": "Fire", "water": "Water", "grass": "Grass", "electric": "Electric", "ice": "Ice",
+      "fighting": "Fighting", "poison": "Poison", "ground": "Ground", "flying": "Flying", "psychic": "Psychic",
+      "bug": "Bug", "rock": "Rock", "ghost": "Ghost", "dragon": "Dragon", "dark": "Dark", "steel": "Steel", "fairy": "Fairy", "stellar": "Stellar"
     };
 
     function initPokemonIconMap() {
