@@ -523,7 +523,7 @@
         
         try {
           // --- records loading ---
-          const recSnap = await getDocs(collection(db, "users", uid, "records"));
+          const recSnap = await getDocs(collection(db, 'users', uid, 'records'));
           const subRecords = [];
           recSnap.forEach(docSnap => { if (docSnap.exists()) subRecords.push(docSnap.data()); });
           
@@ -538,7 +538,7 @@
           }
 
           // --- parties loading ---
-          const ptySnap = await getDocs(collection(db, "users", uid, "parties"));
+          const ptySnap = await getDocs(collection(db, 'users', uid, 'parties'));
           const subParties = [];
           ptySnap.forEach(docSnap => { if (docSnap.exists()) subParties.push(docSnap.data()); });
           
@@ -560,7 +560,7 @@
              parties.forEach((p,i)=>{p.order=i});
              for(let p of parties) { await saveParty(p); }
              // delete from main doc
-             await window._firestoreOps.setDoc(doc(db, "users", uid, "data", "main"), { records: window._firestoreOps.deleteField(), parties: window._firestoreOps.deleteField() }, { merge: true });
+             await window._firestoreOps.setDoc(doc(db, 'users', uid, 'data', 'main'), { records: window._firestoreOps.deleteField(), parties: window._firestoreOps.deleteField() }, { merge: true });
              console.log("Migration complete.");
           }
 
@@ -3097,16 +3097,16 @@
         rec.id = editingRecordId;
         const targetIdx = records.findIndex(x => x.id === editingRecordId);
         if (targetIdx !== -1) {
-          records[targetIdx] = rec;
+          records[targetIdx] = rec; saveRecord(rec);
         } else {
-          records.unshift(rec);
+          records.unshift(rec); saveRecord(rec);
         }
         editingRecordId = null;
         updateRecordFormEditModeUI();
         saveData();
         showRecordToast('💾 対戦記録を更新しました！');
       } else {
-        records.unshift(rec);
+        records.unshift(rec); saveRecord(rec);
         saveData();
         showRecordToast('💾 対戦記録を保存しました！');
       }
@@ -3923,7 +3923,7 @@
               console.log(`Record ${rec.id} is already uploaded to Drive as ${existingFile.id}. Restoring link...`);
               rec.drive_file_id = existingFile.id;
               rec.video_url = existingFile.webViewLink || `https://drive.google.com/file/d/${existingFile.id}/preview`;
-              saveRecord(rec); rec.sync_status = 'drive_pending';
+              rec.sync_status = 'drive_pending';
               if (!rec.drive_uploaded_at) rec.drive_uploaded_at = Date.now();
               await saveData();
               cleanupOldLocalVideos(); // 30分経過した古い動画のみ安全に消去
@@ -3958,7 +3958,7 @@
               // Firestore & ローカル更新
               rec.drive_file_id = result.id;
               rec.video_url = `https://drive.google.com/file/d/${result.id}/preview`;
-              saveRecord(rec); rec.sync_status = 'drive_pending';
+              rec.sync_status = 'drive_pending';
               rec.drive_uploaded_at = Date.now(); // アップロード完了時刻を記録
               await saveData();
 

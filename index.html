@@ -17,7 +17,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged }
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc, serverTimestamp, query, orderBy, onSnapshot }
+    import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc, serverTimestamp, query, orderBy, onSnapshot, deleteField }
       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -39,7 +39,7 @@
     window._signInWithPopup = signInWithPopup;
     window._signOut = signOut;
     window._onAuthStateChanged = onAuthStateChanged;
-    window._firestoreOps = { doc, getDoc, setDoc, collection, getDocs, deleteDoc, serverTimestamp, query, orderBy, onSnapshot };
+    window._firestoreOps = { doc, getDoc, setDoc, collection, getDocs, deleteDoc, serverTimestamp, query, orderBy, onSnapshot, deleteField };
     window._firebaseReady = true;
     document.dispatchEvent(new Event('firebase-ready'));
   </script>
@@ -1266,7 +1266,7 @@
     </div>
   </div>
 
-  <script src="src/js/app.js?v=6"></script>
+  <script src="src/js/app.js?v=7"></script>
 
   <!-- AUTO MODE CONTROLLER & PC UI LOGIC -->
   <script src="scripts/auto_mode_controller.js"></script>
