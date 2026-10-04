@@ -176,7 +176,7 @@
           }, 300);
 
         } catch (e) {
-          console.error('Failed to load static master data:', e);
+          console.error("Error");
         }
       })();
       return _masterDataPromise;
@@ -347,10 +347,10 @@
             updatedBy: CLIENT_ID
           }, { merge: true });
         } catch (e) {
-          console.error('Failed to save showdown username to Firestore:', e);
+          console.error("Error");
         }
       }
-      showRecordToast(name ? '✁EShowdownユーザー名を保存しました�E�E : 'ℹ�E�EShowdownユーザー名をクリアしました');
+      showRecordToast("Notification");
     }
 
     function updateShowdownUserUI() {
@@ -399,7 +399,7 @@
 
     async function selectLocalDirectory() {
       if (!window.showDirectoryPicker) {
-        alert('お使ぁE�Eブラウザはローカルフォルダ直接保存に対応してぁE��せん、Eoogle Chromeまた�EMicrosoft Edgeをご利用ください、E);
+        alert("Alert");
         return;
       }
       try {
@@ -408,12 +408,12 @@
           await VideoStore.saveHandle('local_video_dir', handle);
           localStorage.setItem('pkm_local_dir_name', handle.name);
           updateDriveSettingsUI();
-          showRecordToast(`📁 保存�Eフォルダ、E{handle.name}」を設定しました`);
+          showRecordToast("Notification");
         }
       } catch (e) {
         if (e.name !== 'AbortError') {
-          console.error('Directory picker failed:', e);
-          alert('フォルダの選択に失敗しました: ' + e.message);
+          console.error("Error");
+          alert("Alert");
         }
       }
     }
@@ -422,11 +422,11 @@
     async function saveVideoToLocalDirectory(fileOrBlob, fileName) {
       const handle = await VideoStore.getHandle('local_video_dir');
       if (!handle) {
-        throw new Error('ローカル保存�Eフォルダが未設定です。「データ管琁E��でフォルダを選択してください、E);
+        throw new Error("Error");
       }
       const ok = await verifyFilePermission(handle, true);
       if (!ok) {
-        throw new Error('保存�Eフォルダへの書き込み権限が許可されませんでした、E);
+        throw new Error("Error");
       }
       const fileHandle = await handle.getFileHandle(fileName, { create: true });
       const writable = await fileHandle.createWritable();
@@ -442,12 +442,12 @@
       if (!isAutoRecord) return true;
       const handle = await VideoStore.getHandle('local_video_dir');
       if (!handle) {
-        alert('⚠�E�E動画保存�Eが「ローカル端末」に設定されてぁE��すが、フォルダが選択されてぁE��せん。「データ管琁E��でフォルダを選択してください、E);
+        alert("Alert");
         return false;
       }
       const ok = await verifyFilePermission(handle, true);
       if (!ok) {
-        alert('⚠�E�E保存�Eフォルダへのアクセス権限が許可されませんでした。録画が保存できなぁE��能性があります、E);
+        alert("Alert");
         return false;
       }
       return true;
@@ -485,10 +485,10 @@
             updatedBy: CLIENT_ID
           }, { merge: true });
         } catch (e) {
-          console.error('Failed to save Drive settings to Firestore:', e);
+          console.error("Error");
         }
       }
-      showRecordToast('✁E動画保存設定を保存しました�E�E);
+      showRecordToast("Notification");
       updateDriveSettingsUI();
     }
 
@@ -589,13 +589,13 @@
         const cId = getDriveClientId();
         if (!cId) {
           const err = new Error('Google OAuth Client ID が設定されてぁE��せん。「データ管琁E��画面で設定してください、E);
-          if (interactive) alert(err.message);
+          if (interactive) alert("Alert");
           reject(err);
           return;
         }
         if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
           const err = new Error('Google Identity Services が読み込まれてぁE��せん、E);
-          if (interactive) alert(err.message);
+          if (interactive) alert("Alert");
           reject(err);
           return;
         }
@@ -629,10 +629,10 @@
       try {
         const token = await requestGoogleDriveAccessToken(true);
         if (token) {
-          showRecordToast('🎉 Googleアカウント�E連携に成功しました�E�E);
+          showRecordToast("Notification");
         }
       } catch (e) {
-        alert(`Google連携エラー: ${e.message}`);
+        alert("Alert");
       }
     }
 
@@ -694,7 +694,7 @@
         _conflictBannerDismissed = false;
         const b = document.getElementById('conflict-banner');
         if (b) b.classList.remove('show');
-      } catch (e) { console.error('Firestore save error:', e); }
+      } catch (e) { console.error("Error"); }
     }
 
     // 他端末の変更を検知してリロードを俁E���E��E力前チェチE��用�E�E
@@ -746,7 +746,7 @@
       renderHistory();
       renderRecordPage();
       dismissConflictBanner();
-      showRecordToast('✨ 最新チE�Eタを画面に反映しました�E�E);
+      showRecordToast("Notification");
     }
 
     // バックグラウンドで競合チェチE��し、変更があれ�Eバナー表示
@@ -863,7 +863,7 @@
         await dmLoadMasterData();
         // リアルタイム他端末変更リスナ�Eを開姁E
         startConflictPolling();
-      } catch (e) { console.error('Firestore load error:', e); }
+      } catch (e) { console.error("Error"); }
     }
 
     // リアルタイム他端末変更リスナ�Eの開姁E
@@ -906,7 +906,7 @@
         const provider = new window._GoogleAuthProvider();
         try {
           await window._signInWithPopup(window._auth, provider);
-        } catch (e) { console.error('Auth error:', e); }
+        } catch (e) { console.error("Error"); }
       }
     }
 
@@ -1466,12 +1466,12 @@
 
     function saveParty() {
       const name = document.getElementById('party-name-input').value.trim();
-      if (!name) { alert('パ�EチE��名を入力してください'); return; }
+      if (!name) { alert("Alert"); return; }
       const pokemon = getSlotValues('party-modal-slots', 6);
-      if (!pokemon.some(Boolean)) { alert('少なくとめE体�E入力してください'); return; }
+      if (!pokemon.some(Boolean)) { alert("Alert"); return; }
       // ② 同名チェチE���E�編雁E��のパ�EチE��自身は除く！E
       const dup = parties.find(p => p.name === name && p.id !== editingPartyId);
-      if (dup) { alert('、E + name + '」とぁE��名前のパ�EチE��はすでに存在しまぁE); return; }
+      if (dup) { alert("Alert"); return; }
       if (editingPartyId) {
         const idx = parties.findIndex(p => p.id === editingPartyId);
         if (idx >= 0) { parties[idx].name = name; parties[idx].pokemon = pokemon; } savePartyDoc(parties[idx]);
@@ -1490,7 +1490,7 @@
     }
 
     function deleteParty(id) {
-      if (!confirm('こ�Eパ�EチE��を削除しますか�E�E)) return;
+      if (!confirm("Confirm?")) return;
       parties = parties.filter(p => p.id !== id); deletePartyDoc(id);
       saveData();
       renderParties();
@@ -1671,7 +1671,7 @@
         renderDmSeasons();
         initSeasonSelect('rec-season', currentRecordSeason);
         initSeasonSelect('history-season-filter', document.getElementById('history-season-filter')?.value || '', true);
-        showRecordToast(`📅 シーズンを並び替えました�E�最上位、E{seasons[0]}」をチE��ォルトに設定）`);
+        showRecordToast("Notification");
       }
     }
 
@@ -1719,7 +1719,7 @@
     function saveNewSeason() {
       const inp = document.getElementById('new-season-name-input');
       const name = (inp?.value || '').trim();
-      if (!name) { alert('シーズン名を入力してください'); return; }
+      if (!name) { alert("Alert"); return; }
 
       if (editingSeasonName) {
         const oldName = editingSeasonName;
@@ -1738,13 +1738,13 @@
           currentRecordSeason = name;
         }
         editingSeasonName = null;
-        showRecordToast(`📅 シーズン名を、E{name}」に更新しました�E�`);
+        showRecordToast("Notification");
       } else {
         // 新規登録は先頭に追加�E�＝最新・チE��ォルト！E
         seasons = seasons.filter(s => s !== name);
         seasons.unshift(name);
         currentRecordSeason = name;
-        showRecordToast(`📅 シーズン、E{name}」を登録しました�E�`);
+        showRecordToast("Notification");
       }
 
       localStorage.setItem('pkm_last_season', currentRecordSeason);
@@ -1756,7 +1756,7 @@
     }
 
     function deleteSeason(name) {
-      if (!confirm(`シーズン、E{name}」を削除しますか�E�\n※ 過去の対戦記録のシーズン惁E��は保持されます。`)) return;
+      if (!confirm("Confirm?")) return;
       seasons = seasons.filter(s => s !== name);
       if (currentRecordSeason === name) {
         currentRecordSeason = (seasons.length > 0) ? seasons[0] : '';
@@ -1766,7 +1766,7 @@
       initSeasonSelect('rec-season', currentRecordSeason);
       initSeasonSelect('history-season-filter', document.getElementById('history-season-filter')?.value || '', true);
       renderDmSeasons();
-      showRecordToast(`🗑�E�Eシーズン、E{name}」を削除しました`);
+      showRecordToast("Notification");
     }
 
     function setRecordMatchType(type) {
@@ -1995,7 +1995,7 @@
         customTags.splice(toIdx, 0, moved);
         saveData();
         renderDmTags();
-        showRecordToast(`🏷�E�Eタグを並び替えました`);
+        showRecordToast("Notification");
       }
     }
 
@@ -2075,7 +2075,7 @@
     function saveNewTag() {
       const inp = document.getElementById('new-tag-name-input');
       const name = (inp?.value || '').trim();
-      if (!name) { alert('タグ名を入力してください'); return; }
+      if (!name) { alert("Alert"); return; }
 
       const allFmts = ['ランクチE, '公式大企E, '非�E弁E, 'フレ戦', 'showdown'];
       const selectedFmts = allFmts.filter(fmt => {
@@ -2108,7 +2108,7 @@
           }
         }
         editingTagId = null;
-        showRecordToast(`🏷�E�Eタグ、E{name}」を更新しました�E�`);
+        showRecordToast("Notification");
       } else {
         const existing = customTags.find(t => t.name === name);
         if (existing) {
@@ -2121,7 +2121,7 @@
           });
         }
         addRecordTag(name);
-        showRecordToast(`🏷�E�Eタグ、E{name}」を登録しました�E�`);
+        showRecordToast("Notification");
       }
 
       saveData();
@@ -2134,7 +2134,7 @@
     function deleteTag(id) {
       const tag = customTags.find(t => t.id === id);
       if (!tag) return;
-      if (!confirm(`タグ、E{tag.name}」を削除しますか�E�\n※ 過去の対戦記録のタグ惁E��は保持されます。`)) return;
+      if (!confirm("Confirm?")) return;
 
       customTags = customTags.filter(t => t.id !== id);
       if (currentRecordTags.includes(tag.name)) {
@@ -2149,7 +2149,7 @@
       renderDmTags();
       renderRecordTagChips();
       renderHistoryTagChips();
-      showRecordToast(`🗑�E�Eタグ、E{tag.name}」を削除しました`);
+      showRecordToast("Notification");
     }
 
     // 履歴画面のタグフィルター用
@@ -2265,7 +2265,7 @@
       if (mode === 'showdown') {
         const username = getShowdownUsername();
         if (!username || !username.trim()) {
-          alert('チE�Eタ管琁E��面でShowdownユーザー名を登録してください、E);
+          alert("Alert");
           return;
         }
       }
@@ -2379,12 +2379,12 @@
 
     function parseShowdownReplayJson(replayData, myUsername) {
       if (!replayData || !replayData.log) {
-        throw new Error('対戦ログチE�Eタが不正でぁE);
+        throw new Error("Error");
       }
 
       const myUserNorm = toTransId(myUsername);
       if (!myUserNorm) {
-        throw new Error('Showdownユーザー名が設定されてぁE��せん');
+        throw new Error("Error");
       }
 
       const lines = replayData.log.split('\n');
@@ -2424,7 +2424,7 @@
         oppPlayerId = 'p1';
         oppTrainerName = p1Name;
       } else {
-        throw new Error(`設定されたユーザー名、E{myUsername}」がログ冁E�Eプレイヤー�E�E{p1Name || '未検�E'} / ${p2Name || '未検�E'}�E�と一致しませんでした。データ管琁E��面で正しいユーザー名を登録してください。`);
+        throw new Error("Error");
       }
 
       // 相手パーチE���E�E体！E
@@ -2523,7 +2523,7 @@
 
     async function fetchShowdownReplayJson(rawUrl) {
       let url = (rawUrl || '').trim();
-      if (!url) throw new Error('URLを�E力してください');
+      if (!url) throw new Error("Error");
       if (!url.startsWith('http://') && !url.startsWith('https://')) {
         url = 'https://' + url;
       }
@@ -2541,12 +2541,12 @@
       const urlInput = document.getElementById('rec-showdown-url');
       const url = urlInput ? urlInput.value.trim() : '';
       if (!url) {
-        alert('ShowdownのリプレイURLを�E力してください');
+        alert("Alert");
         return;
       }
       const username = getShowdownUsername();
       if (!username) {
-        alert('チE�Eタ管琁E��面でShowdownユーザー名を登録してください');
+        alert("Alert");
         return;
       }
 
@@ -2591,10 +2591,10 @@
           applyBo1Result(parsed.result);
         }
 
-        showRecordToast('✨ Showdown対戦ログを�E動反映しました�E�E);
+        showRecordToast("Notification");
       } catch (err) {
-        console.error('Showdown parse error:', err);
-        alert(err.message || 'Showdownリプレイの解析に失敗しました');
+        console.error("Error");
+        alert("Alert");
       } finally {
         if (loadingEl) loadingEl.style.display = 'none';
       }
@@ -2604,12 +2604,12 @@
       const urlInput = document.getElementById(`rec-showdown-url-${gameIdx}`);
       const url = urlInput ? urlInput.value.trim() : '';
       if (!url) {
-        alert(`${gameIdx + 1}戦目のShowdownリプレイURLを�E力してください`);
+        alert("Alert");
         return;
       }
       const username = getShowdownUsername();
       if (!username) {
-        alert('チE�Eタ管琁E��面でShowdownユーザー名を登録してください');
+        alert("Alert");
         return;
       }
 
@@ -2657,10 +2657,10 @@
           applyBo3Result(gameIdx, parsed.result);
         }
 
-        showRecordToast(`✨ ${gameIdx + 1}戦目の対戦ログを�E動反映しました�E�`);
+        showRecordToast("Notification");
       } catch (err) {
         console.error(`Showdown parse error (game ${gameIdx + 1}):`, err);
-        alert(err.message || `${gameIdx + 1}戦目のShowdownリプレイ解析に失敗しました`);
+        alert("Alert");
       } finally {
         if (loadingEl) loadingEl.style.display = 'none';
       }
@@ -2672,7 +2672,7 @@
       const u2 = document.getElementById('rec-showdown-url-2')?.value.trim();
 
       if (!u0 && !u1 && !u2) {
-        alert('ShowdownのリプレイURLを�E力してください');
+        alert("Alert");
         return;
       }
 
@@ -3223,9 +3223,9 @@
     }
 
     async function saveRecord() {
-      if (!selectedPartyId) { alert('パ�EチE��を選択してください'); return; }
+      if (!selectedPartyId) { alert("Alert"); return; }
       const oppParty = getSlotValues('opp-party-slots', 6);
-      if (!oppParty.some(Boolean)) { alert('相手�Eパ�EチE��めE体以上�E力してください'); return; }
+      if (!oppParty.some(Boolean)) { alert("Alert"); return; }
 
       const oppTrainer = (document.getElementById('rec-opp-trainer')?.value || '').trim();
       const oppRating = (document.getElementById('rec-opp-rating')?.value || '').trim();
@@ -3254,7 +3254,7 @@
       let rec = null;
 
       if (currentRecordFormat === 'bo1') {
-        if (!recordResult) { alert('勝敗を選択してください'); return; }
+        if (!recordResult) { alert("Alert"); return; }
         rec = {
           id: Date.now().toString(),
           format: 'bo1',
@@ -3278,7 +3278,7 @@
         // BO3
         // 一つでも勝敗欁E��入力されてぁE��か確認（引き刁E��を含む�E�E
         const hasAnyResult = bo3Games.some(g => g.result !== null);
-        if (!hasAnyResult) { alert('少なくとめE試合�E勝敗を�E力してください'); return; }
+        if (!hasAnyResult) { alert("Alert"); return; }
 
         let wins = 0;
         let losses = 0;
@@ -3343,10 +3343,10 @@
               rec.local_file_name = localFileName;
               rec.created_at = _attachedVideoData.created_at || Date.now();
               if (_attachedVideoData.original_name) rec.video_original_name = _attachedVideoData.original_name;
-              showRecordToast('📁 動画をローカルフォルダに保存しました');
+              showRecordToast("Notification");
             } catch (err) {
-              console.error('Failed to save video to local folder:', err);
-              alert(`⚠�E�Eローカルフォルダへの動画保存に失敗しました: ${err.message}`);
+              console.error("Error");
+              alert("Alert");
             }
           } else if (_attachedVideoData.local_file_name) {
             // 編雁E��ードで既存ローカル動画を維持する場吁E
@@ -3388,11 +3388,11 @@
         editingRecordId = null;
         updateRecordFormEditModeUI();
         saveData();
-        showRecordToast('💾 対戦記録を更新しました�E�E);
+        showRecordToast("Notification");
       } else {
         records.unshift(rec); saveRecordDoc(rec);
         saveData();
-        showRecordToast('💾 対戦記録を保存しました�E�E);
+        showRecordToast("Notification");
       }
 
       // WiFi環墁E��つ認証済みなら即座にアチE�Eロードキューを起動（ローカルモード時はスキチE�E�E�E
@@ -3775,13 +3775,13 @@
       if (storageType === 'local') {
         const dirHandle = await VideoStore.getHandle('local_video_dir');
         if (!dirHandle) {
-          alert('⚠�E�E動画の保存�Eが「ローカル端末」に設定されてぁE��すが、フォルダが選択されてぁE��せん。「データ管琁E��でフォルダを選択してください、E);
+          alert("Alert");
           input.value = '';
           return;
         }
         const hasPerm = await verifyFilePermission(dirHandle, true);
         if (!hasPerm) {
-          alert('⚠�E�E保存�Eフォルダへのアクセス権限が許可されませんでした、E);
+          alert("Alert");
           input.value = '';
           return;
         }
@@ -3796,13 +3796,13 @@
         };
 
         showAttachedVideoUI(_attachedVideoData);
-        showRecordToast('📁 動画を添付しました�E�対戦記録保存時にローカルフォルダへ保存されます！E);
+        showRecordToast("Notification");
         return;
       }
 
       // フォルダID未設定�E場合でも端末IndexedDBへの添付�E許可�E�後から設定�E認証時に自動アチE�Eロード！E
       if (!getDriveFolderId()) {
-        showRecordToast('⚠�E�EDriveフォルダID未設定。「データ管琁E��で設定後に自動アチE�Eロードされます、E);
+        showRecordToast("Notification");
       }
 
       // 差し替え時�E�旧動画のクリーンアチE�E
@@ -3819,7 +3819,7 @@
               headers: { Authorization: `Bearer ${tok}` }
             }).catch(e => console.warn('Drive delete error:', e));
           } else {
-            showRecordToast('⚠�E�E旧DriveファイルはGoogle Driveから手動削除してください、E);
+            showRecordToast("Notification");
           }
         }
       }
@@ -3829,8 +3829,8 @@
       try {
         await VideoStore.save(tempKey, file);
       } catch (e) {
-        console.error('IndexedDB save failed:', e);
-        alert('動画の保存に失敗しました。端末のストレージ容量を確認してください、E);
+        console.error("Error");
+        alert("Alert");
         input.value = '';
         return;
       }
@@ -3844,7 +3844,7 @@
       };
 
       showAttachedVideoUI(_attachedVideoData);
-      showRecordToast('📱 動画を保存しました。WiFi接続時に自動アチE�Eロードします、E);
+      showRecordToast("Notification");
     }
 
     function showAttachedVideoUI(videoData) {
@@ -3914,7 +3914,7 @@
       if (status === 'local_file') {
         _attachedVideoData = null;
         resetRecordVideoUI();
-        showRecordToast('添付動画を解除しました');
+        showRecordToast("Notification");
         return;
       }
 
@@ -3932,18 +3932,18 @@
             headers: { Authorization: `Bearer ${tok}` }
           }).catch(e => console.warn('Drive delete error:', e));
         } else {
-          showRecordToast('⚠�E�EDrive上�EファイルはGoogle Driveから手動削除してください、E);
+          showRecordToast("Notification");
         }
       }
 
       // yt_uploaded: 手動削除を案�E
       if (isYtStatus(status, _attachedVideoData.video_url)) {
-        showRecordToast('⚠�E�EYouTube動画はYouTube Studioで手動削除してください、E);
+        showRecordToast("Notification");
       }
 
       _attachedVideoData = null;
       resetRecordVideoUI();
-      showRecordToast('添付動画を解除しました');
+      showRecordToast("Notification");
     }
 
     function isYtStatus(status, videoUrl) {
@@ -3992,7 +3992,7 @@
           </div>
         `;
       } catch (e) {
-        console.error('Failed to play local folder video:', e);
+        console.error("Error");
         container.innerHTML = `<div style="font-size:12px;color:#ef4444;padding:8px">⚠�E�E動画の再生に失敗しました: ${e.message}</div>`;
       }
     }
@@ -4040,7 +4040,7 @@
           </div>
         `;
       } catch (e) {
-        console.error('Failed to play local video:', e);
+        console.error("Error");
         container.innerHTML = `<div style="font-size:12px;color:#ef4444;padding:8px">⚠�E�E動画の読み込みに失敗しました: ${e.message}</div>`;
       }
     }
@@ -4098,7 +4098,7 @@
       }
       _isUploadQueueRunning = false;
       hideUploadPill();
-      showRecordToast('動画アチE�Eロードをキャンセルしました');
+      showRecordToast("Notification");
     }
 
     function resetRecordVideoUI() {
@@ -4156,7 +4156,7 @@
 
       // WiFi環墁E��なぁE��合�E自動アチE�Eロードを保留�E�通信量節紁E��E
       if (!force && !isWifiOrFastConnection()) {
-        console.log('Mobile network detected - upload postponed until WiFi connection.');
+        console.log("Log");
         return;
       }
 
@@ -4166,7 +4166,7 @@
         // ト�Eクン未取征E期限刁E��の場合、E��携アクションピルを表示�E�未認証でDrive APIは呼ばなぁE��E
         const pendingCount = records.filter(r => r.sync_status === 'local_pending').length;
         if (pendingCount > 0 && getDriveClientId()) {
-          showActionUploadPill('⚠�E�E動画' + pendingCount + '件が未送信 (タチE�Eして連携)', () => {
+          showActionUploadPill("Action", () => {
             requestGoogleDriveAccessToken(true);
           });
         }
@@ -4204,7 +4204,7 @@
               // 【�E己修復】まずGoogle DriveにすでにアチE�Eロード済みファイルが存在するか確誁E
             const existingFile = await findDriveVideoFile(token, folderId, rec.id);
             if (existingFile) {
-              console.log(`Record ${rec.id} is already uploaded to Drive as ${existingFile.id}. Restoring link...`);
+              console.log("Log");
               rec.drive_file_id = existingFile.id;
               rec.video_url = existingFile.webViewLink || `https://drive.google.com/file/d/${existingFile.id}/preview`;
               rec.sync_status = 'drive_pending';
@@ -4256,7 +4256,7 @@
               _currentVideoUploader = null;
               _currentUploadingRecordId = null;
               if (e.message !== 'Upload aborted by user') {
-                console.error(`Upload failed for record ${rec.id}:`, e);
+                console.error("Error");
               }
               // こ�Eファイルでエラーが発生した場合�E次のループへ�E�無限ループ防止�E�E
               break;
@@ -4269,7 +4269,7 @@
 
         hideUploadPill();
         if (successCount > 0) {
-          showRecordToast(`✁E${successCount}件の動画をGoogle Driveに同期しました`);
+          showRecordToast("Notification");
           renderHistory();
         }
       } finally {
@@ -4280,7 +4280,7 @@
     let _pillActionCallback = null;
     let _pillDragMoved = false;
 
-    function showActionUploadPill(text, onClick) {
+    function showActionUploadPill("Action", onClick) {
       const pill = document.getElementById('upload-pill');
       const pillText = document.getElementById('upload-pill-text');
       const pillBar = document.getElementById('upload-pill-bar');
@@ -4781,7 +4781,7 @@
       ];
       renderRecordPage();
       showRecordForm();
-      showRecordToast('編雁E��キャンセルしました');
+      showRecordToast("Notification");
     }
 
     function updateRecordFormEditModeUI() {
@@ -4806,7 +4806,7 @@
     async function deleteRecord(id) {
       const targetRec = records.find(r => r.id === id);
       if (!targetRec) return;
-      if (!confirm('こ�E記録を削除しますか�E�E)) return;
+      if (!confirm("Confirm?")) return;
 
       if (editingRecordId === id) {
         editingRecordId = null;
@@ -4858,7 +4858,7 @@
       if (remainingPending === 0) {
         closeUploadPill(); // 未送信動画ぁE件なら即座にメチE��ージを完�E消去
       } else if (!loadStoredDriveToken()) {
-        showActionUploadPill('⚠�E�E動画' + remainingPending + '件が未送信 (タチE�Eして連携)', () => {
+        showActionUploadPill("Action", () => {
           requestGoogleDriveAccessToken(true);
         });
       }
@@ -4866,14 +4866,14 @@
       // 6. メチE��ージ案�E
       if (targetRec.drive_file_id) {
         if (driveDeleted) {
-          showRecordToast('🗑�E�E記録とDrive動画を削除しました');
+          showRecordToast("Notification");
         } else {
-          showRecordToast('🗑�E�E記録を削除しました�E�※Drive動画は手動で削除してください�E�E);
+          showRecordToast("Notification");
         }
       } else if (targetRec.sync_status === 'yt_uploaded' || targetRec.youtube_video_id) {
-        showRecordToast('🗑�E�E記録を削除しました�E�※YouTube動画はYouTube Studioから削除してください�E�E);
+        showRecordToast("Notification");
       } else {
-        showRecordToast('🗑�E�E記録を削除しました');
+        showRecordToast("Notification");
       }
     }
 
@@ -5102,13 +5102,13 @@
 
     async function dmSaveEntry() {
       if (!isAdmin()) {
-        alert('編雁E��限がありません');
+        alert("Alert");
         return;
       }
       let entry;
       if (dmType === 'pokemon') {
         const name = document.getElementById('dmf-name').value.trim();
-        if (!name) { alert('名前を�E力してください'); return; }
+        if (!name) { alert("Alert"); return; }
         const form = document.getElementById('dmf-form').value.trim() || '通常';
         entry = {
           no: document.getElementById('dmf-no').value.trim(),
@@ -5127,11 +5127,11 @@
           ability_hidden: document.getElementById('dmf-ability-hidden').value.trim(),
           confirmed: document.getElementById('dmf-confirmed')?.checked || false,
         };
-        if (dmEditIndex === null) { alert('新規追加はできません'); return; }
+        if (dmEditIndex === null) { alert("Alert"); return; }
         localPokemon[dmEditIndex] = entry;
       } else {
         const name = document.getElementById('dmf-move-name').value.trim();
-        if (!name) { alert('技名を入力してください'); return; }
+        if (!name) { alert("Alert"); return; }
         entry = {
           name,
           type: document.getElementById('dmf-move-type').value.trim(),
@@ -5141,27 +5141,27 @@
           desc: document.getElementById('dmf-move-desc').value.trim(),
           effect: document.getElementById('dmf-move-effect').value.trim(),
         };
-        if (dmEditIndex === null) { alert('新規追加はできません'); return; }
+        if (dmEditIndex === null) { alert("Alert"); return; }
         localMoves[dmEditIndex] = entry;
       }
       await dmSaveMasterData();
-      alert('登録しました�E�E);
+      alert("Alert");
       document.getElementById('dm-form-card').style.display = 'none';
       document.getElementById('dm-search-input').value = '';
     }
 
     async function dmDeleteEntry() {
       if (!isAdmin()) {
-        alert('編雁E��限がありません');
+        alert("Alert");
         return;
       }
       if (dmEditIndex === null) return;
       const label = dmType === 'pokemon' ? localPokemon[dmEditIndex].display : localMoves[dmEditIndex].name;
-      if (!confirm(`、E{label}」を削除しますか�E�`)) return;
+      if (!confirm("Confirm?")) return;
       if (dmType === 'pokemon') localPokemon.splice(dmEditIndex, 1);
       else localMoves.splice(dmEditIndex, 1);
       await dmSaveMasterData();
-      alert('削除しました');
+      alert("Alert");
       document.getElementById('dm-form-card').style.display = 'none';
       document.getElementById('dm-search-input').value = '';
     }
@@ -5204,7 +5204,7 @@
           window._firestoreOps.doc(window._db, 'shared', 'master'),
           { masterVersion: staticVer, overrides, moves: localMoves, itemOverrides, updatedAt: window._firestoreOps.serverTimestamp() }
         );
-      } catch (e) { console.error('Master save error:', e); }
+      } catch (e) { console.error("Error"); }
     }
 
     async function dmLoadMasterData() {
@@ -5261,7 +5261,7 @@
                   window._firestoreOps.doc(window._db, 'shared', 'master'),
                   { masterVersion: staticVer, overrides: {}, moves: localMoves, itemOverrides: {}, updatedAt: window._firestoreOps.serverTimestamp() }
                 );
-                console.log('[MasterSync] Firebase shared/master cleaned and updated to version:', staticVer);
+                console.log("Log");
               } catch (err) { }
             }
           } else {
@@ -5282,7 +5282,7 @@
           }
         }
       } catch (e) {
-        console.error('Master load error:', e);
+        console.error("Error");
         // Firestore取得失敗時のフォールバック�E�localStorageから読む
         try {
           const overrides = JSON.parse(localStorage.getItem('pkm_confirmed_overrides') || '{}');
@@ -5628,7 +5628,7 @@
 
     async function dmSaveList() {
       if (!isAdmin()) {
-        alert('編雁E��限がありません');
+        alert("Alert");
         return;
       }
       // ポケモンの場合�Eみ dmListDraft めElocalPokemon に反映
@@ -5637,7 +5637,7 @@
       }
       // 技・持ち物は renderDmList 冁E��チェチE��ボックス変更時に localMoves/localItems を直接更新済み
       await dmSaveMasterData();
-      alert('登録しました�E�E);
+      alert("Alert");
     }
 
     function dmCancelList() {
@@ -5763,7 +5763,7 @@
       // バナーが�EてぁE��時だけ確認（毎回Firestore通信しなぁE��E
       const banner = document.getElementById('conflict-banner');
       if (banner && banner.classList.contains('show')) {
-        const ok = confirm('別の端末でチE�Eタが更新されてぁE��す、Enリロードしますか�E�\n\nOK ↁEリロード\nキャンセル ↁEこ�Eまま続けめE);
+        const ok = confirm("Confirm?");
         if (ok) { location.reload(); return; }
       }
       editingPartyId = id || null;
@@ -5805,9 +5805,9 @@
 
     function savePartyEdit() {
       const name = document.getElementById('pe-name-input').value.trim();
-      if (!name) { alert('パ�EチE��名を入力してください'); return; }
+      if (!name) { alert("Alert"); return; }
       const dup = parties.find(p => p.name === name && p.id !== editingPartyId);
-      if (dup) { alert('、E + name + '」とぁE��名前のパ�EチE��はすでに存在しまぁE); return; }
+      if (dup) { alert("Alert"); return; }
       // pePokemons を保存形式に変換
       const pokemon = pePokemons.map(pk => pk.name ? { ...pk, moves: [...pk.moves], evs: { ...pk.evs }, memo: (pk.memo || '') } : '');
       if (editingPartyId) {
@@ -5832,7 +5832,7 @@
       if (!p) return;
       const copy = JSON.parse(JSON.stringify(p));
       copy.id = Date.now().toString();
-      copy.name = p.name + 'のコピ�E';
+      copy.name = p.name + " copy";
       parties.unshift(copy); parties.forEach((p,i)=>{p.order=i; savePartyDoc(p);});
       saveData();
       renderParties();
@@ -6413,7 +6413,7 @@
             _transMapData = await res.json();
           }
         } catch (e) {
-          console.error('Failed to load translation map:', e);
+          console.error("Error");
         }
         return _transMapData || {};
       })();
@@ -6714,13 +6714,13 @@
       if (!textarea) return;
       const text = textarea.value.trim();
       if (!text) {
-        alert('PokepasteチE��ストを入力してください');
+        alert("Alert");
         return;
       }
 
       const pokes = parsePokepasteText(text);
       if (!pokes.length) {
-        alert('有効なポケモンチE�Eタを読み取れませんでした');
+        alert("Alert");
         return;
       }
 
@@ -6743,7 +6743,7 @@
 
       const text = exportToPokepasteText(pePokemons, isOts);
       if (!text) {
-        alert('出力する�EケモンチE�Eタがありません');
+        alert("Alert");
         return;
       }
 
@@ -7537,7 +7537,7 @@
             updatedAt: window._firestoreOps.serverTimestamp()
           }, { merge: true });
         } catch (e) {
-          console.error('API key cloud save error:', e);
+          console.error("Error");
         }
       }
     }
@@ -7547,11 +7547,11 @@
       if (!inp) return;
       const val = inp.value.trim();
       if (!val) {
-        alert('APIキーを�E力してください');
+        alert("Alert");
         return;
       }
       saveGeminiApiKey(val);
-      alert('Gemini APIキーを保存しました�E�E);
+      alert("Alert");
       const guideBox = document.getElementById('ai-key-guide-box');
       if (guideBox) guideBox.style.display = 'none';
     }
@@ -7638,13 +7638,13 @@
     async function addAiImageFiles(files) {
       const imgFiles = files.filter(f => f.type.startsWith('image/'));
       if (!imgFiles.length) {
-        alert('画像ファイルを選択してください');
+        alert("Alert");
         return;
       }
 
       const remaining = 2 - _aiUploadedImages.length;
       if (remaining <= 0) {
-        alert('画像�E最大2枚までアチE�Eロードできます（�E力画面�E�スチE�Eタス画面�E�E);
+        alert("Alert");
         return;
       }
 
@@ -7661,7 +7661,7 @@
             dataUrl: resized.dataUrl
           });
         } catch (e) {
-          console.error('Image resize error:', e);
+          console.error("Error");
         }
       }
       renderAiPreviews();
@@ -7788,13 +7788,13 @@
     async function executeAiPartyAnalysis() {
       const apiKey = getGeminiApiKey();
       if (!apiKey) {
-        alert('Gemini APIキーが設定されてぁE��せん。上�E設定欁E��APIキーを�E力してください、E);
+        alert("Alert");
         toggleAiApiKeyGuide();
         return;
       }
 
       if (!_aiUploadedImages.length) {
-        alert('解析する画像をアチE�Eロードまた�E貼り付けてください');
+        alert("Alert");
         return;
       }
 
@@ -7883,7 +7883,7 @@
 
         const resJson = await response.json();
         const rawText = resJson.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        if (!rawText) throw new Error('AIから応答データが取得できませんでした、E);
+        if (!rawText) throw new Error("Error");
 
         // JSONパ�Eス�E��EークダウンコードブロチE��対応！E
         let cleanJsonStr = rawText.trim();
@@ -7897,7 +7897,7 @@
         applyAnalyzedPartyToPE(parsedData, _aiTargetPartyId);
 
       } catch (err) {
-        console.error('AI解析エラー:', err);
+        console.error("Error");
         if (loadingBox) loadingBox.style.display = 'none';
         if (uploadSection) uploadSection.style.display = 'block';
         if (modalFooter) modalFooter.style.display = 'flex';
@@ -8261,7 +8261,7 @@
         // recognition_engine.js is already loaded synchronously in <head>.
         // Just call loadDictionaries() to fetch JSON assets.
         if (!window.recognitionEngine) {
-          throw new Error('recognition_engine.js が読み込まれてぁE��せん。�Eージをリロードしてください、E);
+          throw new Error("Error");
         }
         await window.recognitionEngine.loadDictionaries();
         // loadDictionaries() sets isLoaded=true on success, false on error.
@@ -8274,7 +8274,7 @@
 
     async function handleRecordAiFile(file) {
       if (!file || !file.type.startsWith('image/')) {
-        alert('画像ファイルを選択してください');
+        alert("Alert");
         return;
       }
 
@@ -8284,9 +8284,9 @@
       } catch (err) {
         // エンジンスクリプト自体�E同期読み込み済みのため、辞書ロードが失敗しても続行を試みめE
         if (!window.recognitionEngine) {
-          console.error('Failed to load AI engine:', err);
+          console.error("Error");
           setRecordAiLoading(false);
-          alert('AI認識モジュールの読み込みに失敗しました。�Eージをリロードしてください、E);
+          alert("Alert");
           return;
         }
         console.warn('Dictionary preload warning (continuing with available data):', err);
@@ -8313,7 +8313,7 @@
 
         // 高精度認識エンジン�E�大津2値化！E80次元PHOG�E�幾何Solidity記述子＋タイプ認識）�E実衁E
         const result = await window.recognitionEngine.recognize(img, myTeamList, recordScanMode);
-        console.log('Recognition Result:', result);
+        console.log("Log");
 
         // 1. 相手トレーナ�E名�E反映
         if (result.trainerName) {
@@ -8352,10 +8352,10 @@
         const modeLabel = (result.mode === 'BEFORE') ? '選出画面' : '準備画面';
         const trainerLabel = result.trainerName ? `�E�トレーナ�E: ${result.trainerName}�E�` : '';
         const toastMsg = `⚡ 、E{modeLabel}】相手パーチE��${setOppCount}体` + (isSelectionAutoFilled ? 'と自刁E�E選出4佁E : '') + `${trainerLabel}を�E動�E力しました�E�E��E{elapsedMs}ms�E�`;
-        showRecordToast(toastMsg);
+        showRecordToast("Notification");
 
       } catch (err) {
-        console.error('Record Recognition Error:', err);
+        console.error("Error");
         clearRecordAiImage();
         alert('画像�E解析に失敗しました: ' + (err.message || err));
       } finally {
@@ -8445,7 +8445,7 @@
       const passcode = document.getElementById('dm-share-passcode') ? document.getElementById('dm-share-passcode').value.trim() : '';
 
       if (isEnabled && (!passcode || !/^[\x21-\x7E]{1,10}$/.test(passcode))) {
-        alert('合言葉�E半角英数記号1、E0斁E��で設定してください、E);
+        alert("Alert");
         return;
       }
 
@@ -8475,10 +8475,10 @@
           }
 
           if (forceEnabled !== false) {
-             showRecordToast('✁E共有設定を保存しました');
+             showRecordToast("Notification");
           }
         } catch(e) {
-          console.error("Share config save error", e);
+          console.error("Error");
         }
       }
     }
@@ -8576,14 +8576,14 @@
                    
                    renderParties();
                    renderHistory();
-                   showRecordToast(`✁E${ownerName}さんのチE�Eタを読み込みました`);
+                   showRecordToast("Notification");
                } else {
-                   alert("❁E合言葉が間違ってぁE��か、�E有がオフになってぁE��す、E);
+                   alert("Alert");
                    location.href = location.origin + location.pathname;
                }
            } catch(e) {
-               console.error("Spectator load error", e);
-               alert("❁EチE�Eタの読み込みに失敗しました、E);
+               console.error("Error");
+               alert("Alert");
            }
        }, 500);
 
@@ -8639,7 +8639,7 @@
       if (validToken) {
         startUploadQueue();
       } else if (getDriveClientId()) {
-        showActionUploadPill('⚠�E�E動画' + pendingCount + '件が未送信 (タチE�Eして連携)', () => {
+        showActionUploadPill("Action", () => {
           requestGoogleDriveAccessToken(true);
         });
       }
