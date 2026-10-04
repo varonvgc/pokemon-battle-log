@@ -257,7 +257,10 @@ def update_firestore_record(db, uid, record_id, youtube_video_id):
                 break
 
         if updated_main:
-            main_doc_ref.update({'updatedAt': firestore.SERVER_TIMESTAMP})
+            main_doc_ref.update({
+                'records': records,
+                'updatedAt': firestore.SERVER_TIMESTAMP
+            })
             print(f"  ✅ Firestore mainドキュメント レコード更新完了 (Record ID: {record_id})")
 
             # --- 共有データの更新 ---
