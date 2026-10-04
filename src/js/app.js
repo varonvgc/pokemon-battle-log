@@ -339,323 +339,17 @@
       if (input) input.value = name;
 
       if (currentUser && _fbReady) {
-        const { doc, setDoc } = window._firestoreOps;
-        const db = window._db;
-        try {
-          await setDoc(doc(db, 'users', currentUser.uid, 'data', 'main'), {
-            showdownUsername: name,
-            updatedAt: window._firestoreOps.serverTimestamp(),
-            updatedBy: CLIENT_ID
-          }, { merge: true });
-        } catch (e) {
-          console.error('Failed to save showdown username to Firestore:', e);
-        }
-      }
-      showRecordToast(name ? '✅ Showdownユーザー名を保存しました！' : 'ℹ️ Showdownユーザー名をクリアしました');
-    }
-
-    function updateShowdownUserUI() {
-      const input = document.getElementById('dm-showdown-username');
-      if (input) {
-        input.value = getShowdownUsername();
-      }
-    }
-
-    // 動画保存先・連携設定 (Google Drive / ローカル端末)
-    function getVideoStorageType() {
-      return localStorage.getItem('pkm_video_storage_type') || 'drive';
-    }
-
-    function setVideoStorageType(type) {
-      localStorage.setItem('pkm_video_storage_type', type);
-    }
-
-    function getLocalDirName() {
-      return localStorage.getItem('pkm_local_dir_name') || '';
-    }
-
-    function onStorageTypeChanged(type) {
-      setVideoStorageType(type);
-      updateDriveSettingsUI();
-    }
-    window.onStorageTypeChanged = onStorageTypeChanged;
-
-    async function verifyFilePermission(handle, readWrite = true) {
-      if (!handle) return false;
-      const options = {};
-      if (readWrite) options.mode = 'readwrite';
-      try {
-        if ((await handle.queryPermission(options)) === 'granted') {
-          return true;
-        }
-        if ((await handle.requestPermission(options)) === 'granted') {
-          return true;
-        }
-      } catch (e) {
-        console.warn('verifyFilePermission error:', e);
-      }
-      return false;
-    }
-    window.verifyFilePermission = verifyFilePermission;
-
-    async function selectLocalDirectory() {
-      if (!window.showDirectoryPicker) {
-        alert('お使いのブラウザはローカルフォルダ直接保存に対応していません。Google ChromeまたはMicrosoft Edgeをご利用ください。');
-        return;
-      }
-      try {
-        const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
-        if (handle) {
-          await VideoStore.saveHandle('local_video_dir', handle);
-          localStorage.setItem('pkm_local_dir_name', handle.name);
-          updateDriveSettingsUI();
-          showRecordToast(`📁 保存先フォルダ「${handle.name}」を設定しました`);
-        }
-      } catch (e) {
-        if (e.name !== 'AbortError') {
-          console.error('Directory picker failed:', e);
-          alert('フォルダの選択に失敗しました: ' + e.message);
-        }
-      }
-    }
-    window.selectLocalDirectory = selectLocalDirectory;
-
-    async function saveVideoToLocalDirectory(fileOrBlob, fileName) {
-      const handle = await VideoStore.getHandle('local_video_dir');
-      if (!handle) {
-        throw new Error('ローカル保存先フォルダが未設定です。「データ管理」でフォルダを選択してください。');
-      }
-      const ok = await verifyFilePermission(handle, true);
-      if (!ok) {
-        throw new Error('保存先フォルダへの書き込み権限が許可されませんでした。');
-      }
-      const fileHandle = await handle.getFileHandle(fileName, { create: true });
-      const writable = await fileHandle.createWritable();
-      await writable.write(fileOrBlob);
-      await writable.close();
-      return fileName;
-    }
-    window.saveVideoToLocalDirectory = saveVideoToLocalDirectory;
-
-    async function checkLocalRecordingPermissionIfNeeded() {
-      if (getVideoStorageType() !== 'local') return true;
-      const isAutoRecord = localStorage.getItem('autoModeAutoRecord') === 'true';
-      if (!isAutoRecord) return true;
-      const handle = await VideoStore.getHandle('local_video_dir');
-      if (!handle) {
-        alert('⚠️ 動画保存先が「ローカル端末」に設定されていますが、フォルダが選択されていません。「データ管理」でフォルダを選択してください。');
-        return false;
-      }
-      const ok = await verifyFilePermission(handle, true);
-      if (!ok) {
-        alert('⚠️ 保存先フォルダへのアクセス権限が許可されませんでした。録画が保存できない可能性があります。');
-        return false;
-      }
-      return true;
-    }
-    window.checkLocalRecordingPermissionIfNeeded = checkLocalRecordingPermissionIfNeeded;
-
-    function getDriveFolderId() {
-      return localStorage.getItem('pkm_drive_folder_id') || '';
-    }
-
-    function getDriveClientId() {
-      return localStorage.getItem('pkm_drive_client_id') || '';
-    }
-
-    async function saveDriveSettings() {
-      const storageType = getVideoStorageType();
-      const folderInput = document.getElementById('dm-drive-folder-id');
-      const clientInput = document.getElementById('dm-drive-client-id');
-      const folderId = (folderInput ? folderInput.value : '').trim();
-      const clientId = (clientInput ? clientInput.value : '').trim();
-
-      localStorage.setItem('pkm_drive_folder_id', folderId);
-      localStorage.setItem('pkm_drive_client_id', clientId);
-      localStorage.setItem('pkm_video_storage_type', storageType);
-
-      if (currentUser && _fbReady) {
-        const { doc, setDoc } = window._firestoreOps;
-        const db = window._db;
-        try {
-          await setDoc(doc(db, 'users', currentUser.uid, 'data', 'main'), {
-            driveFolderId: folderId,
-            driveClientId: clientId,
-            videoStorageType: storageType,
-            updatedAt: window._firestoreOps.serverTimestamp(),
-            updatedBy: CLIENT_ID
-          }, { merge: true });
-        } catch (e) {
-          console.error('Failed to save Drive settings to Firestore:', e);
-        }
-      }
-      showRecordToast('✅ 動画保存設定を保存しました！');
-      updateDriveSettingsUI();
-    }
-
-    function updateDriveSettingsUI() {
-      const storageType = getVideoStorageType();
-      const driveRadio = document.getElementById('storage-type-drive');
-      const localRadio = document.getElementById('storage-type-local');
-      if (driveRadio) driveRadio.checked = (storageType === 'drive');
-      if (localRadio) localRadio.checked = (storageType === 'local');
-
-      const driveSec = document.getElementById('dm-drive-storage-section');
-      const localSec = document.getElementById('dm-local-storage-section');
-      if (driveSec) driveSec.style.display = (storageType === 'drive') ? 'block' : 'none';
-      if (localSec) localSec.style.display = (storageType === 'local') ? 'block' : 'none';
-
-      const localDirNameEl = document.getElementById('dm-local-dir-name');
-      if (localDirNameEl) {
-        const dirName = getLocalDirName();
-        localDirNameEl.textContent = dirName ? `選択中: ${dirName}` : '未選択';
-      }
-
-      const folderInput = document.getElementById('dm-drive-folder-id');
-      const clientInput = document.getElementById('dm-drive-client-id');
-      if (folderInput) folderInput.value = getDriveFolderId();
-      if (clientInput) clientInput.value = getDriveClientId();
-
-      const badge = document.getElementById('dm-drive-status-badge');
-      if (badge) {
-        if (storageType === 'local') {
-          const dirName = getLocalDirName();
-          if (dirName) {
-            badge.textContent = `ローカル (${dirName})`;
-            badge.style.background = 'rgba(59,130,246,0.15)';
-            badge.style.color = '#3b82f6';
-          } else {
-            badge.textContent = 'フォルダ未選択';
-            badge.style.background = 'rgba(239,68,68,0.15)';
-            badge.style.color = '#ef4444';
-          }
-        } else {
-          if (window._googleDriveAccessToken && Date.now() < window._googleDriveTokenExpiresAt) {
-            badge.textContent = '認証済み (接続中)';
-            badge.style.background = 'rgba(74,222,128,0.15)';
-            badge.style.color = 'var(--win)';
-          } else if (getDriveClientId()) {
-            badge.textContent = 'Client ID設定済 (未認証)';
-            badge.style.background = 'rgba(245,158,11,0.15)';
-            badge.style.color = '#f59e0b';
-          } else {
-            badge.textContent = '未設定';
-            badge.style.background = 'var(--surface2)';
-            badge.style.color = 'var(--text-muted)';
-          }
-        }
-      }
-    }
-
-    // Google Drive認証トークン永続化 & 要求 (GIS)
-    window._googleDriveAccessToken = null;
-    window._googleDriveTokenExpiresAt = 0;
-
-    function loadStoredDriveToken() {
-      try {
-        const tok = localStorage.getItem('gdrive_access_token');
-        const exp = parseInt(localStorage.getItem('gdrive_token_expires_at') || '0', 10);
-        if (tok && Date.now() < exp) {
-          window._googleDriveAccessToken = tok;
-          window._googleDriveTokenExpiresAt = exp;
-          return tok;
-        }
-      } catch(e) {}
-      window._googleDriveAccessToken = null;
-      window._googleDriveTokenExpiresAt = 0;
-      return null;
-    }
-
-    function saveStoredDriveToken(token, expiresInSec) {
-      try {
-        const exp = Date.now() + (parseInt(expiresInSec, 10) - 60) * 1000;
-        localStorage.setItem('gdrive_access_token', token);
-        localStorage.setItem('gdrive_token_expires_at', exp.toString());
-        window._googleDriveAccessToken = token;
-        window._googleDriveTokenExpiresAt = exp;
-      } catch(e) {}
-    }
-
-    // 初期ロード時にローカルストレージからトークン復元
-    loadStoredDriveToken();
-
-    function requestGoogleDriveAccessToken(interactive = true) {
-      return new Promise((resolve, reject) => {
-        const cached = loadStoredDriveToken();
-        if (cached) {
-          updateDriveSettingsUI();
-          resolve(cached);
-          return;
-        }
-        const cId = getDriveClientId();
-        if (!cId) {
-          const err = new Error('Google OAuth Client ID が設定されていません。「データ管理」画面で設定してください。');
-          if (interactive) alert(err.message);
-          reject(err);
-          return;
-        }
-        if (typeof google === 'undefined' || !google.accounts || !google.accounts.oauth2) {
-          const err = new Error('Google Identity Services が読み込まれていません。');
-          if (interactive) alert(err.message);
-          reject(err);
-          return;
-        }
-
-        try {
-          const client = google.accounts.oauth2.initTokenClient({
-            client_id: cId,
-            scope: 'https://www.googleapis.com/auth/drive.file',
-            include_granted_scopes: false,
-            callback: (response) => {
-              if (response.error) {
-                console.warn('Google OAuth response error:', response);
-                reject(new Error(response.error_description || response.error));
-                return;
-              }
-              saveStoredDriveToken(response.access_token, response.expires_in);
-              updateDriveSettingsUI();
-              // 認証成功後にアップロードキューを開始
-              setTimeout(() => startUploadQueue(), 500);
-              resolve(response.access_token);
-            }
-          });
-          client.requestAccessToken({ prompt: interactive ? 'select_account' : '' });
-        } catch (e) {
-          reject(e);
-        }
-      });
-    }
-
-    async function testGoogleDriveAuth() {
-      try {
-        const token = await requestGoogleDriveAccessToken(true);
-        if (token) {
-          showRecordToast('🎉 Googleアカウントの連携に成功しました！');
-        }
-      } catch (e) {
-        alert(`Google連携エラー: ${e.message}`);
-      }
-    }
-
-    // Firestoreへのデータ保存
-    async function saveData() {
-      if (_isSpectatorMode) return; // 観戦モード中は保存処理をブロック
-      localStorage.setItem('pkm_parties', JSON.stringify(parties));
-      localStorage.setItem('pkm_records', JSON.stringify(records));
-      localStorage.setItem('pkm_seasons', JSON.stringify(seasons));
-      localStorage.setItem('pkm_custom_tags', JSON.stringify(customTags));
-      if (!currentUser || !_fbReady) return;
-      const { doc, setDoc } = window._firestoreOps;
+        const { doc, setDoc, deleteField } = window._firestoreOps;
       const db = window._db;
       const uid = currentUser.uid;
       try {
         const payload = {
-          parties,
-          records,
           seasons,
           customTags,
           updatedAt: window._firestoreOps.serverTimestamp(),
-          updatedBy: CLIENT_ID
+          updatedBy: CLIENT_ID,
+          parties: deleteField(),
+          records: deleteField()
         };
         const apiKey = getGeminiApiKey();
         if (apiKey) payload.geminiApiKey = apiKey;
@@ -826,25 +520,52 @@
         }
 
         // サブコレクション（users/{uid}/records）に記録があれば読み込んでマージ（書き込みは絶対に行わない）
+        
         try {
-          const recSnap = await getDocs(collection(db, 'users', uid, 'records'));
+          // --- records loading ---
+          const recSnap = await getDocs(collection(db, "users", uid, "records"));
           const subRecords = [];
-          recSnap.forEach(docSnap => {
-            if (docSnap.exists()) {
-              subRecords.push(docSnap.data());
-            }
-          });
-
-          if (subRecords.length > 0) {
+          recSnap.forEach(docSnap => { if (docSnap.exists()) subRecords.push(docSnap.data()); });
+          
+          if (subRecords.length > 0 || loadedRecords.length > 0) {
             const recordMap = new Map();
-            loadedRecords.forEach(r => { if (r && r.id) recordMap.set(r.id, r); });
-            subRecords.forEach(r => { if (r && r.id) recordMap.set(r.id, r); });
+            loadedRecords.forEach(r => { if (r && r.id) recordMap.set(r.id.toString(), r); });
+            subRecords.forEach(r => { if (r && r.id) recordMap.set(r.id.toString(), r); });
             records = Array.from(recordMap.values());
             records.sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0));
           } else {
-            records = loadedRecords;
+            records = [];
           }
-        } catch (recErr) {
+
+          // --- parties loading ---
+          const ptySnap = await getDocs(collection(db, "users", uid, "parties"));
+          const subParties = [];
+          ptySnap.forEach(docSnap => { if (docSnap.exists()) subParties.push(docSnap.data()); });
+          
+          if (subParties.length > 0 || parties.length > 0) {
+            const partyMap = new Map();
+            parties.forEach(p => { if (p && p.id) partyMap.set(p.id.toString(), p); });
+            subParties.forEach(p => { if (p && p.id) partyMap.set(p.id.toString(), p); });
+            parties = Array.from(partyMap.values());
+            parties.sort((a, b) => (Number(a.order) || 0) - (Number(b.order) || 0));
+          } else {
+            parties = [];
+          }
+
+          // --- Automatic Migration ---
+          if (loadedRecords.length > 0 || data.parties) {
+             console.log("Migrating data to subcollections...");
+             // save to subcollections
+             for(let r of records) { await saveRecord(r); }
+             parties.forEach((p,i)=>{p.order=i});
+             for(let p of parties) { await saveParty(p); }
+             // delete from main doc
+             await window._firestoreOps.setDoc(doc(db, "users", uid, "data", "main"), { records: window._firestoreOps.deleteField(), parties: window._firestoreOps.deleteField() }, { merge: true });
+             console.log("Migration complete.");
+          }
+
+        } catch (err) {
+          console.error("Subcollection load err:", err);
           records = loadedRecords;
         }
 
@@ -1471,7 +1192,7 @@
       } else {
         // ③ 新規は先頭に追加
         parties.unshift({ id: Date.now().toString(), name, pokemon });
-      }
+      } parties.forEach((p,i)=>{p.order=i; saveParty(p);});
       saveData();
       closePartyModal();
       renderParties();
@@ -1485,7 +1206,7 @@
     function deleteParty(id) {
       if (_isSpectatorMode) { alert("閲覧モードでは操作できません"); return; }
       if (!confirm('このパーティを削除しますか？')) return;
-      parties = parties.filter(p => p.id !== id);
+      parties = parties.filter(p => p.id !== id); deleteParty(id);
       saveData();
       renderParties();
     }
@@ -4202,7 +3923,7 @@
               console.log(`Record ${rec.id} is already uploaded to Drive as ${existingFile.id}. Restoring link...`);
               rec.drive_file_id = existingFile.id;
               rec.video_url = existingFile.webViewLink || `https://drive.google.com/file/d/${existingFile.id}/preview`;
-              rec.sync_status = 'drive_pending';
+              saveRecord(rec); rec.sync_status = 'drive_pending';
               if (!rec.drive_uploaded_at) rec.drive_uploaded_at = Date.now();
               await saveData();
               cleanupOldLocalVideos(); // 30分経過した古い動画のみ安全に消去
@@ -4237,7 +3958,7 @@
               // Firestore & ローカル更新
               rec.drive_file_id = result.id;
               rec.video_url = `https://drive.google.com/file/d/${result.id}/preview`;
-              rec.sync_status = 'drive_pending';
+              saveRecord(rec); rec.sync_status = 'drive_pending';
               rec.drive_uploaded_at = Date.now(); // アップロード完了時刻を記録
               await saveData();
 
@@ -4851,7 +4572,7 @@
       }
 
       // 4. Firestore / localStorage から削除
-      records = records.filter(r => r.id !== id);
+      records = records.filter(r => r.id !== id); deleteRecord(id);
       saveData();
       closeDetailModal();
       renderHistory();
@@ -5707,6 +5428,7 @@
         const p = parties.find(x => x.id === _memoContext.partyId);
         if (p) {
           p.memo = text;
+          saveParty(p);
           saveData();
           renderParties(); // メモアイコンの色を更新
         }
@@ -5818,7 +5540,7 @@
         if (idx >= 0) { parties[idx].name = name; parties[idx].pokemon = pokemon; }
       } else {
         parties.unshift({ id: Date.now().toString(), name, pokemon });
-      }
+      } parties.forEach((p,i)=>{p.order=i; saveParty(p);});
       saveData();
       closePartyEdit();
       renderParties();
@@ -5836,7 +5558,7 @@
       const copy = JSON.parse(JSON.stringify(p));
       copy.id = Date.now().toString();
       copy.name = p.name + 'のコピー';
-      parties.unshift(copy);
+      parties.unshift(copy); parties.forEach((p,i)=>{p.order=i; saveParty(p);});
       saveData();
       renderParties();
       renderRecordPage();
@@ -7296,7 +7018,7 @@
           if (fromIdx < 0 || toIdx < 0) return;
           // 並び替え
           const [moved] = parties.splice(fromIdx, 1);
-          parties.splice(toIdx, 0, moved);
+          parties.splice(toIdx, 0, moved); parties.forEach((p,i)=>{p.order=i; saveParty(p);});
           saveData();
           renderParties();
           renderRecordPage();
