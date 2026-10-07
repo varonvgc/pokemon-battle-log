@@ -7978,9 +7978,29 @@
           });
         });
 
-        const candidateModels = ['gemini-3.6-flash', 'gemini-2.5-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'];
+        let candidateModels = ['gemini-3.5-flash', 'gemini-3.0-flash', 'gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro'];
         let response = null;
         let lastError = null;
+
+        // 動的に利用可能なモデルを取得し、存在しないモデルによるエラーを防ぐ
+        try {
+          const modelsRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+          if (modelsRes.ok) {
+            const modelsData = await modelsRes.json();
+            const availableModels = modelsData.models
+              .filter(m => m.supportedGenerationMethods?.includes('generateContent'))
+              .map(m => m.name.replace('models/', ''));
+            
+            const validCandidates = candidateModels.filter(m => availableModels.includes(m));
+            if (validCandidates.length > 0) {
+              candidateModels = validCandidates;
+            } else {
+              candidateModels = availableModels.filter(m => m.includes('flash') || m.includes('pro'));
+            }
+          }
+        } catch (e) {
+          console.warn('利用可能なモデル一覧の取得に失敗しました:', e);
+        }
 
         for (const model of candidateModels) {
           try {
